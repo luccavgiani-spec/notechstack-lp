@@ -2113,22 +2113,176 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
 
 /* ─── CASES ─── */
 (function renderCases(){
+
+  /* ── MOCKUP CSS INJECTION ── */
+  (function(){
+    var s=document.createElement('style');
+    s.textContent=
+      '.mock-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;font-family:system-ui,sans-serif;}'+
+      '.mock-clinic{background:#fff;}'+
+      '.mock-sensori{background:#0f0904;}'+
+      '.mock-scroll{width:100%;}'+
+      '.mock-clinic .mock-scroll{animation:mscroll-c 9s ease-in-out infinite;}'+
+      '.mock-sensori .mock-scroll{animation:mscroll-s 9s ease-in-out infinite;}'+
+      '@keyframes mscroll-c{0%,10%{transform:translateY(0)}38%,48%{transform:translateY(-145px)}72%,82%{transform:translateY(-270px)}96%,100%{transform:translateY(0)}}'+
+      '@keyframes mscroll-s{0%,10%{transform:translateY(0)}38%,48%{transform:translateY(-135px)}72%,82%{transform:translateY(-250px)}96%,100%{transform:translateY(0)}}'+
+      '.mock-cur{position:absolute;width:12px;height:12px;border-radius:50% 50% 50% 0;transform-origin:top left;pointer-events:none;z-index:10;}'+
+      '.mock-clinic .mock-cur{background:rgba(22,163,74,.8);animation:mcur-c 9s ease-in-out infinite;}'+
+      '.mock-sensori .mock-cur{background:rgba(214,176,128,.9);animation:mcur-s 9s ease-in-out infinite;}'+
+      '@keyframes mcur-c{'+
+        '0%{top:52px;left:44px;transform:scale(1) rotate(-45deg)}'+
+        '8%{top:52px;left:44px;transform:scale(.55) rotate(-45deg)}'+
+        '13%{top:52px;left:44px;transform:scale(1) rotate(-45deg)}'+
+        '33%{top:98px;left:62px;transform:scale(1) rotate(-45deg)}'+
+        '41%{top:98px;left:62px;transform:scale(.55) rotate(-45deg)}'+
+        '46%{top:98px;left:62px;transform:scale(1) rotate(-45deg)}'+
+        '66%{top:60px;left:28px;transform:scale(1) rotate(-45deg)}'+
+        '74%{top:60px;left:28px;transform:scale(.55) rotate(-45deg)}'+
+        '79%{top:60px;left:28px;transform:scale(1) rotate(-45deg)}'+
+        '100%{top:52px;left:44px;transform:scale(1) rotate(-45deg)}}'+
+      '@keyframes mcur-s{'+
+        '0%{top:56px;left:38px;transform:scale(1) rotate(-45deg)}'+
+        '8%{top:56px;left:38px;transform:scale(.55) rotate(-45deg)}'+
+        '13%{top:56px;left:38px;transform:scale(1) rotate(-45deg)}'+
+        '33%{top:92px;left:55px;transform:scale(1) rotate(-45deg)}'+
+        '41%{top:92px;left:55px;transform:scale(.55) rotate(-45deg)}'+
+        '46%{top:92px;left:55px;transform:scale(1) rotate(-45deg)}'+
+        '66%{top:64px;left:25px;transform:scale(1) rotate(-45deg)}'+
+        '74%{top:64px;left:25px;transform:scale(.55) rotate(-45deg)}'+
+        '79%{top:64px;left:25px;transform:scale(1) rotate(-45deg)}'+
+        '100%{top:56px;left:38px;transform:scale(1) rotate(-45deg)}}';
+    document.head.appendChild(s);
+  })();
+
+  /* ── MOCKUP HTML GENERATOR ── */
+  function getMockupHTML(type){
+    if(type==='clinic'){return(
+      '<div class="mock-wrap mock-clinic">'+
+      '<div class="mock-scroll">'+
+        /* ── Navbar ── */
+        '<div style="background:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e7eb;">'+
+          '<div style="font-weight:800;color:#15803d;font-size:13px;letter-spacing:-.4px;">Cl&#237;nica Conecta</div>'+
+          '<div style="display:flex;gap:10px;font-size:9px;color:#9ca3af;">'+
+            '<span>Especialidades</span><span>M&#233;dicos</span><span>Login</span>'+
+          '</div>'+
+        '</div>'+
+        /* ── Hero ── */
+        '<div style="background:linear-gradient(145deg,#f0fdf4,#dcfce7);padding:16px 16px 14px;">'+
+          '<div style="font-size:16px;font-weight:800;color:#14532d;line-height:1.25;margin-bottom:5px;">Consulte com<br>especialistas</div>'+
+          '<div style="font-size:9px;color:#6b7280;margin-bottom:12px;">Online &#183; R&#225;pido &#183; Seguro</div>'+
+          '<div style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:7px 14px;border-radius:6px;display:inline-block;">&#9654; Agendar Consulta</div>'+
+        '</div>'+
+        /* ── Doctor cards ── */
+        '<div style="background:#f9fafb;padding:10px;">'+
+          '<div style="font-size:9px;font-weight:700;color:#374151;margin-bottom:8px;">M&#233;dicos dispon&#237;veis</div>'+
+          /* card 1 */
+          '<div style="background:#fff;border-radius:10px;padding:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:8px;align-items:center;margin-bottom:8px;">'+
+            '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#86efac,#22c55e);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">&#x1f9ba;</div>'+
+            '<div style="flex:1;">'+
+              '<div style="font-size:10px;font-weight:700;color:#111827;">Dr. Carlos Lima</div>'+
+              '<div style="font-size:8px;color:#6b7280;">Cl&#237;nica Geral &#183; &#11088; 4.9</div>'+
+              '<div style="font-size:8px;color:#16a34a;margin-top:2px;">&#9679; Dispon&#237;vel agora</div>'+
+            '</div>'+
+            '<div style="background:#f0fdf4;color:#16a34a;font-size:7px;font-weight:700;padding:4px 8px;border-radius:5px;white-space:nowrap;">Agendar</div>'+
+          '</div>'+
+          /* card 2 */
+          '<div style="background:#fff;border-radius:10px;padding:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:8px;align-items:center;">'+
+            '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#a5f3fc,#0891b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">&#x1f469;&#x200d;&#x2695;&#xfe0f;</div>'+
+            '<div style="flex:1;">'+
+              '<div style="font-size:10px;font-weight:700;color:#111827;">Dra. Ana Souza</div>'+
+              '<div style="font-size:8px;color:#6b7280;">Dermatologia &#183; &#11088; 5.0</div>'+
+              '<div style="font-size:8px;color:#16a34a;margin-top:2px;">&#9679; Pr&#243;x. consulta: 14h</div>'+
+            '</div>'+
+            '<div style="background:#f0fdf4;color:#16a34a;font-size:7px;font-weight:700;padding:4px 8px;border-radius:5px;white-space:nowrap;">Agendar</div>'+
+          '</div>'+
+        '</div>'+
+        /* ── Schedule ── */
+        '<div style="background:#fff;padding:10px 10px 12px;">'+
+          '<div style="font-size:9px;font-weight:700;color:#374151;margin-bottom:8px;">Escolha um hor&#225;rio</div>'+
+          '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">'+
+            '<div style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:8px;padding:4px 8px;border-radius:5px;">09:00</div>'+
+            '<div style="background:#16a34a;color:#fff;font-size:8px;padding:4px 8px;border-radius:5px;">10:30</div>'+
+            '<div style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:8px;padding:4px 8px;border-radius:5px;">14:00</div>'+
+            '<div style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:8px;padding:4px 8px;border-radius:5px;">16:30</div>'+
+          '</div>'+
+          '<div style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:8px;border-radius:6px;text-align:center;">Confirmar Agendamento</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="mock-cur"></div>'+
+      '</div>'
+    );}
+    if(type==='sensori'){return(
+      '<div class="mock-wrap mock-sensori">'+
+      '<div class="mock-scroll">'+
+        /* ── Navbar ── */
+        '<div style="background:#0f0904;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(214,176,128,.15);">'+
+          '<div style="font-weight:800;color:#d6b080;font-size:11px;letter-spacing:2.5px;">MAISON S&#201;NSORI</div>'+
+          '<div style="display:flex;gap:10px;font-size:8px;color:rgba(214,176,128,.45);">'+
+            '<span>Cole&#231;&#227;o</span><span>Ritual</span><span>&#10022;</span>'+
+          '</div>'+
+        '</div>'+
+        /* ── Hero ── */
+        '<div style="background:linear-gradient(160deg,#1a1008,#2d1f0a);padding:16px;text-align:center;">'+
+          /* bottle shape */
+          '<div style="width:56px;height:76px;background:linear-gradient(180deg,#e8c878,#9a6830);border-radius:5px 5px 18px 18px;margin:0 auto 10px;box-shadow:0 6px 20px rgba(0,0,0,.5);position:relative;">'+
+            '<div style="position:absolute;top:6px;left:50%;transform:translateX(-50%);width:20px;height:6px;background:rgba(255,255,255,.18);border-radius:3px;"></div>'+
+          '</div>'+
+          '<div style="font-size:8px;color:rgba(214,176,128,.55);letter-spacing:3px;margin-bottom:4px;">&#201;DITION LIMIT&#201;E</div>'+
+          '<div style="font-size:14px;font-weight:800;color:#f5e6c8;margin-bottom:4px;">Elixir de S&#226;ndalo</div>'+
+          '<div style="font-size:12px;color:#d6b080;margin-bottom:12px;font-weight:600;">R$ 890,00</div>'+
+          '<div style="background:linear-gradient(90deg,#d6b080,#a07840);color:#0f0904;font-size:8px;font-weight:800;padding:8px 18px;border-radius:3px;display:inline-block;letter-spacing:.8px;">+ ADICIONAR AO CARRINHO</div>'+
+        '</div>'+
+        /* ── Benefits ── */
+        '<div style="background:#150d05;padding:12px 12px 10px;">'+
+          '<div style="font-size:8px;color:rgba(214,176,128,.45);letter-spacing:2px;margin-bottom:8px;">SOBRE O PRODUTO</div>'+
+          '<div style="font-size:8px;color:rgba(245,230,200,.65);line-height:1.6;margin-bottom:10px;">Uma jornada olfativa &#250;nica, criada para quem aprecia o requ&#233;m da aromaterapia de alto luxo.</div>'+
+          '<div style="display:flex;gap:6px;">'+
+            '<div style="flex:1;background:rgba(214,176,128,.06);border:1px solid rgba(214,176,128,.14);border-radius:6px;padding:8px;text-align:center;">'+
+              '<div style="font-size:13px;margin-bottom:3px;">&#x1f33f;</div>'+
+              '<div style="font-size:7px;color:rgba(214,176,128,.7);">Natural</div>'+
+            '</div>'+
+            '<div style="flex:1;background:rgba(214,176,128,.06);border:1px solid rgba(214,176,128,.14);border-radius:6px;padding:8px;text-align:center;">'+
+              '<div style="font-size:13px;margin-bottom:3px;">&#10022;</div>'+
+              '<div style="font-size:7px;color:rgba(214,176,128,.7);">Premium</div>'+
+            '</div>'+
+            '<div style="flex:1;background:rgba(214,176,128,.06);border:1px solid rgba(214,176,128,.14);border-radius:6px;padding:8px;text-align:center;">'+
+              '<div style="font-size:13px;margin-bottom:3px;">&#x1f69a;</div>'+
+              '<div style="font-size:7px;color:rgba(214,176,128,.7);">Express</div>'+
+            '</div>'+
+          '</div>'+
+        '</div>'+
+        /* ── Review ── */
+        '<div style="background:#0f0904;padding:12px;">'+
+          '<div style="font-size:8px;color:rgba(214,176,128,.45);letter-spacing:2px;margin-bottom:8px;">AVALIA&#199;&#213;ES</div>'+
+          '<div style="background:rgba(214,176,128,.05);border:1px solid rgba(214,176,128,.12);border-radius:8px;padding:8px;">'+
+            '<div style="font-size:8px;color:#d6b080;margin-bottom:4px;">&#11088;&#11088;&#11088;&#11088;&#11088; &#8212; Isabela M.</div>'+
+            '<div style="font-size:8px;color:rgba(245,230,200,.6);line-height:1.5;">"Experi&#234;ncia inesquec&#237;vel. A embalagem j&#225; &#233; uma obra de arte."</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="mock-cur"></div>'+
+      '</div>'
+    );}
+    return '';
+  }
+
   var CASES=[
-    {cls:'c-blue',url:'https://prontiasaude.com.br/',badge:'Telemedicina',
-     name:'Prontia Sa\u00fade',
+    {cls:'c-blue',url:'#',displayUrl:'clinicaconecta.com.br',badge:'Telemedicina',
+     name:'Cl\u00ednica Conecta',
      tagline:'Plataforma de consultas m\u00e9dicas online com agendamento e prontu\u00e1rio digital',
      logos:['Lovable','Supabase','Claude AI','n8n','WhatsApp','Stripe','Pix API','Cal.com'],
      desc:'Paciente agenda, consulta por v\u00eddeo, recebe prescri\u00e7\u00e3o digital e tem todo o hist\u00f3rico salvo \u2014 numa plataforma pr\u00f3pria.',
      m:[{v:'100%',l:'online'},{v:'<2h',l:'1\u00aa consulta'},{v:'R$22k',l:'implementa\u00e7\u00e3o'},{v:'R$900',l:'manuten\u00e7\u00e3o'}],
      items:['Agendamento com sele\u00e7\u00e3o de especialidade','Videochamada integrada na plataforma','Prontu\u00e1rio eletr\u00f4nico completo','Prescri\u00e7\u00e3o digital com assinatura','Pagamento Pix e cart\u00e3o','Lembretes via WhatsApp'],
-     video:true},
-    {cls:'c-yellow',url:'https://loie-commerce-spark.lovable.app/',badge:'E-commerce Luxo',
-     name:'Lo\u00ee\u00ea \u00b7 Sala Arom\u00e1tica',
+     mockup:'clinic'},
+    {cls:'c-yellow',url:'#',displayUrl:'maisonsensori.com.br',badge:'E-commerce Luxo',
+     name:'Maison S\u00e9nsori',
      tagline:'Loja high-ticket de aromaterapia com experi\u00eancia premium e p\u00f3s-venda automatizado',
      logos:['Lovable','Supabase','Stripe','Pix API','Claude AI','n8n','Canva Pro'],
      desc:'E-commerce de alto padr\u00e3o. Visual imersivo, checkout fluido, p\u00f3s-venda automatizado e conte\u00fado gerado por IA toda semana.',
      m:[{v:'High',l:'ticket'},{v:'Auto',l:'p\u00f3s-venda'},{v:'R$28k',l:'implementa\u00e7\u00e3o'},{v:'R$800',l:'manuten\u00e7\u00e3o'}],
-     items:['Design luxo com anima\u00e7\u00f5es premium','Checkout Stripe + Pix','Fluxo p\u00f3s-compra autom\u00e1tico','IA gera conte\u00fado semanal','Dashboard de vendas ao vivo']},
+     items:['Design luxo com anima\u00e7\u00f5es premium','Checkout Stripe + Pix','Fluxo p\u00f3s-compra autom\u00e1tico','IA gera conte\u00fado semanal','Dashboard de vendas ao vivo'],
+     mockup:'sensori'},
     {cls:'c-green',url:'https://koulumkt.com.br/',badge:'Ag\u00eancia de Performance',
      name:'Koulu Growth Commerce',
      tagline:'Site institucional com CRM autom\u00e1tico e \u00e1rea do cliente com relat\u00f3rios ao vivo',
@@ -2152,17 +2306,19 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
     var mhtml=c.m.map(function(m){return '<div class="case-metric"><div class="case-metric-v">'+m.v+'</div><div class="case-metric-l">'+m.l+'</div></div>';}).join('');
     var ihtml=c.items.map(function(t){return '<li>'+t+'</li>';}).join('');
     var fid='cfl'+i;
-    var dom=c.url.replace(/https?:\/\//,'').replace(/\/$/,'');
+    var dom=c.displayUrl||(c.url.replace(/https?:\/\//,'').replace(/\/$/,''));
     var previewHTML=c.video
       ? '<video autoplay muted loop playsinline preload="auto" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;pointer-events:none"><source src="'+VID_SRC+'" type="video/mp4"></video>'
-      : '<div class="case-loader" id="'+fid+'"><div class="case-loader-bar"><div class="case-loader-fill"></div></div><div class="case-loader-domain">'+dom+'</div></div>'
-        +'<iframe title="'+c.name+'" loading="lazy" sandbox="allow-scripts allow-same-origin" data-fid="'+fid+'"></iframe>';
+      : c.mockup
+        ? getMockupHTML(c.mockup)
+        : '<div class="case-loader" id="'+fid+'"><div class="case-loader-bar"><div class="case-loader-fill"></div></div><div class="case-loader-domain">'+dom+'</div></div>'
+          +'<iframe title="'+c.name+'" loading="lazy" sandbox="allow-scripts allow-same-origin" data-fid="'+fid+'"></iframe>';
     var card=document.createElement('a');
     card.className='case-card '+c.cls+' reveal '+delays[i];
     card.href=c.url; card.target='_blank'; card.rel='noopener';
     card.addEventListener('click',function(e){e.preventDefault();});
     card.innerHTML=
-      '<div class="case-chrome"><div class="chrome-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="chrome-url">'+c.url+'</div></div>'+
+      '<div class="case-chrome"><div class="chrome-dots"><div class="cd cd-r"></div><div class="cd cd-y"></div><div class="cd cd-g"></div></div><div class="chrome-url">'+(c.displayUrl||c.url)+'</div></div>'+
       '<div class="case-preview">'+previewHTML+'<div class="case-preview-fade"></div></div>'+
       '<div class="case-body">'+
         '<div class="case-body-top"><span class="case-badge">'+c.badge+'</span><span class="case-arrow">&#x2197;</span></div>'+
@@ -2174,7 +2330,7 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
         '<div class="case-expand"><div class="case-expand-inner"><div class="case-expand-title">O que foi entregue</div><ul class="case-expand-list">'+ihtml+'</ul></div></div>'+
         '<a class="case-visit" href="'+c.url+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visitar site</a>'+
       '</div>';
-    if(!c.video){
+    if(!c.video&&!c.mockup){
       var iframe=card.querySelector('iframe');
       if(iframe){
         iframe.addEventListener('load',function(){
