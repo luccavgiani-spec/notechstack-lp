@@ -412,6 +412,13 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 .mod-c-gray .mod-front-name{color:rgba(255,255,255,.28)}
 .mod-c-gray .mod-front-tagline{color:rgba(255,255,255,.16)}
 .mod-c-gray .mod-front::after{display:none}
+.mod-c-orange .mod-front{background:rgba(234,88,12,.04);border-color:rgba(234,88,12,.18)}
+.mod-c-orange .mod-back{background:rgba(234,88,12,.07);border-color:rgba(234,88,12,.28)}
+.mod-c-orange .mod-front-badge{background:rgba(234,88,12,.15);color:#fdba74}
+.mod-c-orange .mod-deco{background:radial-gradient(circle,rgba(234,88,12,.2),transparent 70%)}
+.mod-c-orange .mod-icon-wrap{background:rgba(234,88,12,.15);color:#fdba74}
+.mod-c-orange .mod-back-features li::before{color:#fdba74;opacity:1}
+.mod-c-orange .mod-back-cta{background:rgba(234,88,12,.22);color:#fdba74}
 @media(hover:none){.mod-card:hover .mod-inner{transform:none}}
 @media(max-width:1100px){.modules-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.modules-grid{grid-template-columns:1fr}.mod-card{height:280px}#modulos{padding:72px 20px}}
@@ -2306,6 +2313,14 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
      desc:'Sincroniza tarifas e disponibilidade no Airbnb, Booking e no seu próprio site simultaneamente — com uma única ação.',
      features:['Painel unificado de todos os canais','Bloqueio automático após reserva confirmada','Relatório de ocupação e receita por canal'],
      ctaText:'Conhecer o StaySync',href:'#staysync'},
+    {cls:'mod-c-orange',
+     iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="3" cy="6" r="2"/><circle cx="21" cy="6" r="2"/><circle cx="3" cy="18" r="2"/><circle cx="21" cy="18" r="2"/><path d="M5 6.5l5 4M19 6.5l-5 4M5 17.5l5-4M19 17.5l-5-4"/></svg>',
+     badge:'IA · Análise · Monitoramento',
+     name:'Cortex',
+     tagline:'Seu assistente de IA conectado a tudo que importa.',
+     desc:'Conecta às suas plataformas, documentos e dados. Faz análises, responde perguntas e dispara alertas — tudo em linguagem natural, sem dashboards complexos.',
+     features:['Integra com Drive, Notion, planilhas e APIs','Responde perguntas sobre seus dados em tempo real','Alertas automáticos quando algo sai do padrão'],
+     ctaText:'',href:null},
     {cls:'mod-c-gray',
      iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
      badge:'Em breve',
@@ -2319,13 +2334,18 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
     var delays=['','reveal-d1','reveal-d2','reveal-d3',''];
     MODULES.forEach(function(m,i){
       var featuresHTML=m.features.map(function(f){return '<li>'+f+'</li>';}).join('');
+      var backHead='<div class="mod-back-head"><span class="mod-back-title">'+m.name+'</span><span class="mod-front-badge" style="flex-shrink:0">'+m.badge+'</span></div>';
       var backContent=m.href
-        ? '<div class="mod-back-head"><span class="mod-back-title">'+m.name+'</span><span class="mod-front-badge" style="flex-shrink:0">'+m.badge+'</span></div>'
+        ? backHead
           +'<div class="mod-back-desc">'+m.desc+'</div>'
           +'<ul class="mod-back-features">'+featuresHTML+'</ul>'
           +'<a class="mod-back-cta" href="'+m.href+'" onclick="event.stopPropagation()">'+m.ctaText+' ↗</a>'
-        : '<div class="mod-back-head"><span class="mod-back-title" style="color:rgba(255,255,255,.25)">'+m.name+'</span></div>'
-          +'<div class="mod-back-desc" style="color:rgba(255,255,255,.16)">Estamos desenvolvendo novos módulos para os nichos de hotelaria, saúde e e-commerce.</div>';
+        : m.desc
+          ? backHead
+            +'<div class="mod-back-desc">'+m.desc+'</div>'
+            +'<ul class="mod-back-features">'+featuresHTML+'</ul>'
+          : '<div class="mod-back-head"><span class="mod-back-title" style="color:rgba(255,255,255,.25)">'+m.name+'</span></div>'
+            +'<div class="mod-back-desc" style="color:rgba(255,255,255,.16)">Estamos desenvolvendo novos módulos para os nichos de hotelaria, saúde e e-commerce.</div>';
       var el=document.createElement(m.href ? 'a' : 'div');
       el.className='mod-card '+m.cls+' reveal '+(delays[i]||'');
       if(m.href){el.href=m.href;el.target='_blank';el.rel='noopener';}
