@@ -211,61 +211,66 @@ body{
   overflow:hidden;
 }
 
-/* ── Mindmap — responsive grid layout ── */
+/* ── Mindmap — responsive SVG canvas w/ percentage-positioned nodes ── */
 .how-mindmap-wrap{
   width:100%;display:flex;flex-direction:column;
-  align-items:stretch;padding:0 16px;
+  align-items:center;padding:0 12px;
 }
 .how-mindmap{
-  position:static;width:100%;height:auto;
-  display:flex;flex-direction:column;gap:0;
-  opacity:0;transition:opacity .4s ease;
+  position:relative;
+  width:100%;max-width:340px;
+  aspect-ratio:350/370;
 }
-.how-mindmap.mm-show{opacity:1}
-
-/* Row containers */
-.mm-row{display:grid;gap:8px}
-.mm-row-top{grid-template-columns:1fr 1fr 1fr}
-.mm-row-bot{grid-template-columns:1fr 1fr}
-
-/* Hub strip with connector lines */
-.mm-hub-strip{display:flex;align-items:center;padding:10px 0}
-.mm-hub-line{flex:1;height:2px;background:linear-gradient(90deg,rgba(66,133,244,.12),rgba(66,133,244,.35))}
-.mm-hub-line:last-child{background:linear-gradient(270deg,rgba(66,133,244,.12),rgba(66,133,244,.35))}
-
-/* Hub */
-.mm-hub{
-  position:static;transform:none;
-  background:var(--dark);border-radius:44px;padding:14px 24px;
-  text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25);
-  white-space:nowrap;flex-shrink:0;
-  opacity:0;transition:opacity .4s ease,transform .4s ease;
+.hw-svg{
+  position:absolute;inset:0;width:100%;height:100%;
+  pointer-events:none;overflow:visible;z-index:0;
 }
-.mm-hub.mm-show{opacity:1}
-.mm-hub-logo{
-  height:46px;width:auto;display:block;margin:0 auto;
+@keyframes hwMarch{from{stroke-dashoffset:0}to{stroke-dashoffset:-20}}
+.hw-line{opacity:0;stroke-dasharray:6 4;transition:opacity .4s ease}
+.hw-line.hw-show{opacity:1;animation:hwMarch .55s linear infinite}
+.hw-l1.hw-show{animation-duration:.50s}
+.hw-l2.hw-show{animation-duration:.58s}
+.hw-l3.hw-show{animation-duration:.52s}
+.hw-l4.hw-show{animation-duration:.60s}
+.hw-l5.hw-show{animation-duration:.55s}
+
+.hw-hub{
+  position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(0.7);
+  background:var(--dark);border-radius:42px;padding:14px 22px;
+  text-align:center;z-index:3;
+  box-shadow:0 6px 28px rgba(0,0,0,.35);
+  white-space:nowrap;
+  opacity:0;
+  transition:opacity .4s ease,transform .4s ease;
+}
+.hw-hub.hw-show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.hw-hub-logo{
+  height:36px;width:auto;display:block;margin:0 auto;
   filter:brightness(0) invert(1);
 }
 
-/* Node cards */
-.mm-node{
-  position:static;width:100%;
-  background:var(--white);border-radius:14px;
+.hw-node{
+  position:absolute;
+  width:29.14%;
+  background:var(--white);
+  border-radius:12px;
   border:2px solid var(--border);
-  padding:10px 8px 11px;text-align:center;
-  opacity:0;transform:scale(0.88);
+  padding:8px 5px 9px;
+  text-align:center;z-index:2;
+  opacity:0;transform:scale(0.85);
   transition:opacity .3s ease,transform .32s ease;
 }
-.mm-node.mm-show{opacity:1;transform:scale(1)}
-.mm-node.n-blue  {border-color:var(--blue)}
-.mm-node.n-green {border-color:var(--green)}
-.mm-node.n-yellow{border-color:var(--yellow)}
-.mm-node.n-red   {border-color:var(--red)}
-.mm-node-label{font-family:var(--font);font-size:7px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mid);margin-bottom:3px}
-.mm-node-icon{display:flex;align-items:center;justify-content:center;margin-bottom:3px;height:20px}
-.mm-node-icon svg{width:16px;height:16px}
-.mm-node-title{font-family:var(--font);font-size:10px;font-weight:700;margin-bottom:2px;line-height:1.2}
-.mm-node-desc{font-family:var(--font);font-size:8px;color:var(--mid);line-height:1.35}
+.hw-node.hw-show{opacity:1;transform:scale(1)}
+.hw-node.n-blue  {border-color:var(--blue)}
+.hw-node.n-green {border-color:var(--green)}
+.hw-node.n-yellow{border-color:var(--yellow)}
+.hw-node.n-red   {border-color:var(--red)}
+.hw-node-label{font-family:var(--font);font-size:6.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);margin-bottom:3px;line-height:1.15}
+.hw-node-icon{display:flex;align-items:center;justify-content:center;margin-bottom:2px;height:17px}
+.hw-node-icon svg{width:14px;height:14px}
+.hw-node-title{font-family:var(--font);font-size:9.5px;font-weight:700;margin-bottom:1px;line-height:1.15}
+.hw-node-desc{font-family:var(--font);font-size:7.5px;color:var(--mid);line-height:1.3}
 
 
 /* ════════════════════════════════════════════
@@ -420,51 +425,52 @@ body{
   <div class="how-mindmap-wrap">
     <div class="how-mindmap" id="howMindmap">
 
-      <!-- Top row: 3 nodes -->
-      <div class="mm-row mm-row-top">
-        <div class="mm-node n-blue">
-          <div class="mm-node-label">Presença Digital</div>
-          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-          <div class="mm-node-title">Site ou App</div>
-          <div class="mm-node-desc">Bonito, rápido e que converte</div>
-        </div>
-        <div class="mm-node n-green">
-          <div class="mm-node-label">Dados Seguros</div>
-          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-          <div class="mm-node-title">Cadastros &amp; Dados</div>
-          <div class="mm-node-desc">Tudo salvo, seguro e acessível</div>
-        </div>
-        <div class="mm-node n-red">
-          <div class="mm-node-label">Int. Artificial</div>
-          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg></div>
-          <div class="mm-node-title">IA Trabalhando</div>
-          <div class="mm-node-desc">Escreve, analisa e decide por você</div>
-        </div>
+      <!-- SVG radial lines -->
+      <svg class="hw-svg" viewBox="0 0 350 370" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <line class="hw-line hw-l1" x1="175" y1="185" x2="56"  y2="58"  stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l2" x1="175" y1="185" x2="175" y2="48"  stroke="#34A853" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l3" x1="175" y1="185" x2="294" y2="58"  stroke="#EA4335" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l4" x1="175" y1="185" x2="76"  y2="320" stroke="#FBBC04" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l5" x1="175" y1="185" x2="274" y2="320" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+
+      <!-- Hub — absolute center -->
+      <div class="hw-hub" id="mmHub">
+        <img src="/img/logo-footer.png" alt="nó" class="hw-hub-logo">
       </div>
 
-      <!-- Hub strip -->
-      <div class="mm-hub-strip">
-        <div class="mm-hub-line"></div>
-        <div class="mm-hub" id="mmHub">
-          <img src="/img/logo-footer.png" alt="nó" class="mm-hub-logo">
-        </div>
-        <div class="mm-hub-line"></div>
+      <!-- 3 top nodes -->
+      <div class="hw-node n-blue" style="left:1.4%;top:1%">
+        <div class="hw-node-label">Presença Digital</div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <div class="hw-node-title">Site ou App</div>
+        <div class="hw-node-desc">Bonito, rápido e que converte</div>
+      </div>
+      <div class="hw-node n-green" style="left:35.4%;top:0">
+        <div class="hw-node-label">Dados Seguros</div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="hw-node-title">Cadastros &amp; Dados</div>
+        <div class="hw-node-desc">Tudo salvo, seguro e acessível</div>
+      </div>
+      <div class="hw-node n-red" style="left:69.4%;top:1%">
+        <div class="hw-node-label">Int. Artificial</div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg></div>
+        <div class="hw-node-title">IA Trabalhando</div>
+        <div class="hw-node-desc">Escreve, analisa e decide por você</div>
       </div>
 
-      <!-- Bottom row: 2 nodes -->
-      <div class="mm-row mm-row-bot">
-        <div class="mm-node n-yellow">
-          <div class="mm-node-label">Piloto Automático</div>
-          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
-          <div class="mm-node-title">Tarefas Automáticas</div>
-          <div class="mm-node-desc">Mensagens e alertas sem você tocar</div>
-        </div>
-        <div class="mm-node n-blue">
-          <div class="mm-node-label">Visão do Negócio</div>
-          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
-          <div class="mm-node-title">Painel de Controle</div>
-          <div class="mm-node-desc">Seus números em tempo real</div>
-        </div>
+      <!-- 2 bottom nodes -->
+      <div class="hw-node n-yellow" style="left:7.1%;top:76%">
+        <div class="hw-node-label">Piloto Automático</div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+        <div class="hw-node-title">Tarefas Automáticas</div>
+        <div class="hw-node-desc">Mensagens e alertas sem você tocar</div>
+      </div>
+      <div class="hw-node n-blue" style="left:63.7%;top:76%">
+        <div class="hw-node-label">Visão do Negócio</div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+        <div class="hw-node-title">Painel de Controle</div>
+        <div class="hw-node-desc">Seus números em tempo real</div>
       </div>
 
     </div><!-- /how-mindmap -->
@@ -626,23 +632,27 @@ body{
   var ts  = document.getElementById('thoughtSection');
   if (!mm) return;
 
-  var nodes = Array.from(mm.querySelectorAll('.mm-node'));
-  var hub   = mm.querySelector('.mm-hub');
+  var nodes = Array.from(mm.querySelectorAll('.hw-node'));
+  var lines = Array.from(mm.querySelectorAll('.hw-line'));
+  var hub   = mm.querySelector('.hw-hub');
   var done  = false;
 
   function animate() {
     if (done) return; done = true;
-    mm.classList.add('mm-show');
-    if (hub) { setTimeout(function() { hub.classList.add('mm-show'); }, 80); }
-    var delays = [160, 280, 220, 400, 330];
+    if (hub) { setTimeout(function() { hub.classList.add('hw-show'); }, 80); }
+    var lineDelays = [180, 260, 220, 340, 290];
+    lines.forEach(function(l, i) {
+      setTimeout(function() { l.classList.add('hw-show'); }, lineDelays[i]);
+    });
+    var nodeDelays = [260, 360, 300, 460, 400];
     nodes.forEach(function(n, i) {
-      setTimeout(function() { n.classList.add('mm-show'); }, delays[i]);
+      setTimeout(function() { n.classList.add('hw-show'); }, nodeDelays[i]);
     });
     if (ts) {
       setTimeout(function() {
         ts.style.transition = 'opacity .5s ease';
         ts.style.opacity    = '1';
-      }, 600);
+      }, 700);
     }
   }
 
