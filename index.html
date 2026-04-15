@@ -347,59 +347,74 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 
 
 /* ══════════════════════════════════════════
+/* ══════════════════════════════════════════
    MODULES (flip cards)
 ══════════════════════════════════════════ */
 #modulos{background:var(--dark);padding:80px 60px}
 #modulos .section-title{color:var(--white)}
 #modulos .section-sub{color:rgba(255,255,255,.42);margin-bottom:52px}
 .modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-.mod-card{height:280px;perspective:1000px;cursor:pointer;text-decoration:none;color:inherit;display:block}
-.mod-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.4,0,.2,1)}
+.mod-card{height:300px;perspective:1000px;cursor:pointer;text-decoration:none;color:inherit;display:block}
+.mod-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.4,0,.2,1)}
 .mod-card:hover .mod-inner{transform:rotateY(180deg)}
-.mod-front,.mod-back{position:absolute;inset:0;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;padding:28px;overflow:hidden}
-.mod-front{background:rgba(255,255,255,.025);justify-content:flex-end}
-.mod-front-icon{font-size:40px;margin-bottom:12px}
-.mod-front-badge{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:4px 10px;border-radius:100px;width:fit-content;margin-bottom:10px}
-.mod-front-name{font-size:22px;font-weight:700;color:var(--white);letter-spacing:-.4px;margin-bottom:6px}
-.mod-front-tagline{font-size:12px;color:rgba(255,255,255,.38);line-height:1.6}
-.mod-front::after{content:'Saiba mais →';position:absolute;bottom:22px;right:22px;font-size:11px;font-weight:600;color:rgba(255,255,255,.2);transition:color .3s}
-.mod-card:hover .mod-front::after{color:rgba(255,255,255,.55)}
+.mod-front,.mod-back{position:absolute;inset:0;border-radius:20px;border:1.5px solid rgba(255,255,255,.08);backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;padding:26px;overflow:hidden}
+.mod-front{background:rgba(255,255,255,.025);justify-content:space-between}
+.mod-front-top{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.mod-icon-wrap{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mod-front-badge{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 10px;border-radius:100px;white-space:nowrap}
+.mod-front-bottom{position:relative;z-index:1}
+.mod-front-name{font-size:21px;font-weight:700;color:var(--white);letter-spacing:-.4px;margin-bottom:5px;line-height:1.2}
+.mod-front-tagline{font-size:12px;color:rgba(255,255,255,.4);line-height:1.55}
+.mod-front::after{content:'Saiba mais →';position:absolute;bottom:22px;right:22px;font-size:10.5px;font-weight:600;color:rgba(255,255,255,.18);transition:color .3s;z-index:1}
+.mod-card:hover .mod-front::after{color:rgba(255,255,255,.5)}
+.mod-deco{position:absolute;top:-50px;right:-50px;width:160px;height:160px;border-radius:50%;pointer-events:none;z-index:0}
+.mod-c-blue .mod-deco{background:radial-gradient(circle,rgba(66,133,244,.22),transparent 70%)}
+.mod-c-green .mod-deco{background:radial-gradient(circle,rgba(52,168,83,.22),transparent 70%)}
+.mod-c-yellow .mod-deco{background:radial-gradient(circle,rgba(251,188,4,.2),transparent 70%)}
+.mod-c-purple .mod-deco{background:radial-gradient(circle,rgba(124,58,237,.22),transparent 70%)}
+.mod-c-gray .mod-deco{background:radial-gradient(circle,rgba(255,255,255,.06),transparent 70%)}
+.mod-c-blue .mod-icon-wrap{background:rgba(66,133,244,.15);color:#93b5fb}
+.mod-c-green .mod-icon-wrap{background:rgba(52,168,83,.15);color:#7ed89a}
+.mod-c-yellow .mod-icon-wrap{background:rgba(251,188,4,.15);color:#fdd84a}
+.mod-c-purple .mod-icon-wrap{background:rgba(124,58,237,.15);color:#c4b5fd}
+.mod-c-gray .mod-icon-wrap{background:rgba(255,255,255,.06);color:rgba(255,255,255,.25)}
 .mod-back{transform:rotateY(180deg);justify-content:space-between}
-.mod-back-name{font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px}
-.mod-back-desc{font-size:12px;color:rgba(255,255,255,.5);line-height:1.75;flex:1;margin-bottom:14px}
-.mod-back-features{list-style:none;margin-bottom:18px}
-.mod-back-features li{font-size:11.5px;color:rgba(255,255,255,.45);padding:3px 0;display:flex;align-items:flex-start;gap:7px}
-.mod-back-features li::before{content:'✓';flex-shrink:0;font-size:10px}
-.mod-back-cta{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:100px;font-size:12px;font-weight:700;text-decoration:none;width:fit-content;transition:opacity .25s,transform .2s}
-.mod-back-cta:hover{opacity:.85;transform:translateY(-1px)}
-.mod-c-blue .mod-front{background:rgba(66,133,244,.04);border-color:rgba(66,133,244,.15)}
-.mod-c-blue .mod-back{background:rgba(66,133,244,.07);border-color:rgba(66,133,244,.25)}
+.mod-back-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.mod-back-title{font-size:15px;font-weight:700;color:var(--white);line-height:1.2}
+.mod-back-desc{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.7;flex:1;margin-bottom:12px}
+.mod-back-features{list-style:none;margin-bottom:14px}
+.mod-back-features li{font-size:11px;color:rgba(255,255,255,.42);padding:2.5px 0;display:flex;align-items:flex-start;gap:7px;line-height:1.5}
+.mod-back-features li::before{content:'—';flex-shrink:0;font-size:10px;opacity:.5}
+.mod-back-cta{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:100px;font-size:11.5px;font-weight:700;text-decoration:none;width:fit-content;transition:opacity .2s,transform .2s}
+.mod-back-cta:hover{opacity:.8;transform:translateY(-1px)}
+.mod-c-blue .mod-front{background:rgba(66,133,244,.04);border-color:rgba(66,133,244,.18)}
+.mod-c-blue .mod-back{background:rgba(66,133,244,.07);border-color:rgba(66,133,244,.28)}
 .mod-c-blue .mod-front-badge{background:rgba(66,133,244,.15);color:#93b5fb}
-.mod-c-blue .mod-back-features li::before{color:#93b5fb}
-.mod-c-blue .mod-back-cta{background:rgba(66,133,244,.2);color:#93b5fb}
-.mod-c-green .mod-front{background:rgba(52,168,83,.04);border-color:rgba(52,168,83,.15)}
-.mod-c-green .mod-back{background:rgba(52,168,83,.07);border-color:rgba(52,168,83,.25)}
+.mod-c-blue .mod-back-features li::before{color:#93b5fb;opacity:1}
+.mod-c-blue .mod-back-cta{background:rgba(66,133,244,.22);color:#93b5fb}
+.mod-c-green .mod-front{background:rgba(52,168,83,.04);border-color:rgba(52,168,83,.18)}
+.mod-c-green .mod-back{background:rgba(52,168,83,.07);border-color:rgba(52,168,83,.28)}
 .mod-c-green .mod-front-badge{background:rgba(52,168,83,.15);color:#7ed89a}
-.mod-c-green .mod-back-features li::before{color:#7ed89a}
-.mod-c-green .mod-back-cta{background:rgba(52,168,83,.2);color:#7ed89a}
-.mod-c-yellow .mod-front{background:rgba(251,188,4,.04);border-color:rgba(251,188,4,.15)}
-.mod-c-yellow .mod-back{background:rgba(251,188,4,.07);border-color:rgba(251,188,4,.25)}
+.mod-c-green .mod-back-features li::before{color:#7ed89a;opacity:1}
+.mod-c-green .mod-back-cta{background:rgba(52,168,83,.22);color:#7ed89a}
+.mod-c-yellow .mod-front{background:rgba(251,188,4,.04);border-color:rgba(251,188,4,.18)}
+.mod-c-yellow .mod-back{background:rgba(251,188,4,.07);border-color:rgba(251,188,4,.28)}
 .mod-c-yellow .mod-front-badge{background:rgba(251,188,4,.15);color:#fdd84a}
-.mod-c-yellow .mod-back-features li::before{color:#fdd84a}
-.mod-c-yellow .mod-back-cta{background:rgba(251,188,4,.2);color:#fdd84a}
-.mod-c-purple .mod-front{background:rgba(124,58,237,.04);border-color:rgba(124,58,237,.15)}
-.mod-c-purple .mod-back{background:rgba(124,58,237,.07);border-color:rgba(124,58,237,.25)}
+.mod-c-yellow .mod-back-features li::before{color:#fdd84a;opacity:1}
+.mod-c-yellow .mod-back-cta{background:rgba(251,188,4,.22);color:#fdd84a}
+.mod-c-purple .mod-front{background:rgba(124,58,237,.04);border-color:rgba(124,58,237,.18)}
+.mod-c-purple .mod-back{background:rgba(124,58,237,.07);border-color:rgba(124,58,237,.28)}
 .mod-c-purple .mod-front-badge{background:rgba(124,58,237,.15);color:#c4b5fd}
-.mod-c-purple .mod-back-features li::before{color:#c4b5fd}
-.mod-c-purple .mod-back-cta{background:rgba(124,58,237,.2);color:#c4b5fd}
+.mod-c-purple .mod-back-features li::before{color:#c4b5fd;opacity:1}
+.mod-c-purple .mod-back-cta{background:rgba(124,58,237,.22);color:#c4b5fd}
 .mod-c-gray .mod-front{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.06);border-style:dashed}
-.mod-c-gray .mod-front-badge{background:rgba(255,255,255,.06);color:rgba(255,255,255,.3)}
-.mod-c-gray .mod-front-name{color:rgba(255,255,255,.3)}
-.mod-c-gray .mod-front-tagline{color:rgba(255,255,255,.18)}
+.mod-c-gray .mod-front-badge{background:rgba(255,255,255,.06);color:rgba(255,255,255,.28)}
+.mod-c-gray .mod-front-name{color:rgba(255,255,255,.28)}
+.mod-c-gray .mod-front-tagline{color:rgba(255,255,255,.16)}
 .mod-c-gray .mod-front::after{display:none}
 @media(hover:none){.mod-card:hover .mod-inner{transform:none}}
 @media(max-width:1100px){.modules-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.modules-grid{grid-template-columns:1fr}.mod-card{height:260px}#modulos{padding:72px 20px}}
+@media(max-width:700px){.modules-grid{grid-template-columns:1fr}.mod-card{height:280px}#modulos{padding:72px 20px}}
 
 
 /* ══════ NÓ HUB ANIMATED ══════ */
@@ -1433,7 +1448,8 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;backgrou
 .hub-url{flex:1;background:#f1f3f4;border-radius:6px;padding:4px 12px;font-family:var(--font);font-size:11px;color:#5f6368;border:1px solid #e3e6ea;text-align:center}
 .hub-user{display:flex;align-items:center;gap:7px;font-family:var(--font);font-size:12px;color:#5f6368}
 .hub-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:grid;place-items:center;font-family:var(--font);font-size:10px;font-weight:700;color:white;flex-shrink:0}
-.hub-mockup .hub-body{display:grid!important;grid-template-columns:180px 1fr!important;min-height:460px!important}
+.hub-mockup .hub-body{display:grid!important;grid-template-columns:180px 1fr!important;height:520px!important;min-height:unset!important;overflow:hidden!important}
+#hubDemoMain2{min-height:0!important;overflow-y:hidden!important}
 .hub-mockup .hub-nav{background:#ffffff!important;border-right:1px solid #e3e6ea!important;padding:12px 0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
 .hub-nav-logo{display:flex;align-items:center;gap:6px;padding:8px 12px 12px;border-bottom:1px solid #e3e6ea;margin-bottom:6px;flex-shrink:0}
 .hub-nav-dots{display:flex;gap:3px}
@@ -2258,31 +2274,41 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
 
   /* ── MODULES ── */
   var MODULES=[
-    {cls:'mod-c-blue',icon:'✏️',badge:'E-commerce · Redes Sociais',
+    {cls:'mod-c-blue',
+     iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/><path d="M15 5l3 3"/></svg>',
+     badge:'E-commerce · Redes Sociais',
      name:'CriativosBR',
-     tagline:'Posts, criativos e copy prontos para publicar nas suas redes.',
-     desc:'IA que gera conteúdo visual e textual no tom da sua marca — e ainda entrega o link para postar diretamente.',
-     features:['Criativos prontos em segundos','Copy com voz da marca','Agendamento e publicação direta'],
+     tagline:'Do briefing ao post — pronto para publicar.',
+     desc:'Gera criativos, copy e legendas no tom da sua marca. Entrega o link para publicar direto nas suas redes — sem abrir outro app.',
+     features:['Templates para Instagram, TikTok e Stories','Copy calibrada com a voz da marca','Agenda e publica no horário certo'],
      ctaText:'Conhecer o CriativosBR',href:'#criativosbr'},
-    {cls:'mod-c-green',icon:'🔍',badge:'Inteligência de Mercado',
+    {cls:'mod-c-green',
+     iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><polyline points="11 8 11 11 13 13"/></svg>',
+     badge:'Inteligência de Mercado',
      name:'RadarIA',
-     tagline:'Monitore seus concorrentes em tempo real com IA.',
-     desc:'Mapeamento automático do posicionamento, preços e campanhas dos concorrentes — atualizado diariamente.',
-     features:['Rastreamento de concorrentes','Alertas de movimentação','Relatório semanal automático'],
+     tagline:'O que a concorrência faz hoje, você sabe amanhã.',
+     desc:'Rastreia preços, campanhas e posicionamento dos seus concorrentes automaticamente. Relatório semanal direto no seu e-mail.',
+     features:['Monitoramento diário de concorrentes','Alertas de mudança de preço e anúncios','Relatório comparativo toda semana'],
      ctaText:'Conhecer o RadarIA',href:'#radaria'},
-    {cls:'mod-c-yellow',icon:'📊',badge:'Financeiro · Gestão',
+    {cls:'mod-c-yellow',
+     iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="13" width="4" height="7" rx="1"/><rect x="9" y="9" width="4" height="11" rx="1"/><rect x="16" y="5" width="4" height="15" rx="1"/></svg>',
+     badge:'Financeiro · Gestão',
      name:'FinanceHub',
-     tagline:'Painel financeiro conectado ao seu checkout e custos.',
-     desc:'Visão unificada de receitas, despesas, margens e fluxo de caixa — conectada ao seu checkout em tempo real.',
-     features:['Integração com checkout','Controle de custos e margens','DRE e fluxo de caixa ao vivo'],
+     tagline:'Receita, custos e margem — tudo ao vivo.',
+     desc:'Painel financeiro conectado direto ao seu checkout. Visualize entradas, saídas, DRE e fluxo de caixa em tempo real — sem planilha.',
+     features:['Integração com Stripe, Pix e boleto','DRE automático atualizado diariamente','Alertas de meta de receita e inadimplência'],
      ctaText:'Conhecer o FinanceHub',href:'#financehub'},
-    {cls:'mod-c-purple',icon:'🏨',badge:'Hotelaria',
+    {cls:'mod-c-purple',
+     iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>',
+     badge:'Hotelaria',
      name:'StaySync',
-     tagline:'Preços sincronizados em todos os canais de venda.',
-     desc:'Altere tarifas no Airbnb, Booking e no seu site ao mesmo tempo — com uma única ação.',
-     features:['Atualização simultânea de canais','Gestão de disponibilidade','Relatório de ocupação e receita'],
+     tagline:'Um clique. Todos os canais. Sem dupla reserva.',
+     desc:'Sincroniza tarifas e disponibilidade no Airbnb, Booking e no seu próprio site simultaneamente — com uma única ação.',
+     features:['Painel unificado de todos os canais','Bloqueio automático após reserva confirmada','Relatório de ocupação e receita por canal'],
      ctaText:'Conhecer o StaySync',href:'#staysync'},
-    {cls:'mod-c-gray',icon:'⚡',badge:'Em breve',
+    {cls:'mod-c-gray',
+     iconSVG:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+     badge:'Em breve',
      name:'Novos módulos',
      tagline:'Mais SaaS em desenvolvimento para cada nicho.',
      features:[],ctaText:'',href:null},
@@ -2294,22 +2320,27 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
     MODULES.forEach(function(m,i){
       var featuresHTML=m.features.map(function(f){return '<li>'+f+'</li>';}).join('');
       var backContent=m.href
-        ? '<div class="mod-back-name">'+m.name+'</div>'
+        ? '<div class="mod-back-head"><span class="mod-back-title">'+m.name+'</span><span class="mod-front-badge" style="flex-shrink:0">'+m.badge+'</span></div>'
           +'<div class="mod-back-desc">'+m.desc+'</div>'
           +'<ul class="mod-back-features">'+featuresHTML+'</ul>'
           +'<a class="mod-back-cta" href="'+m.href+'" onclick="event.stopPropagation()">'+m.ctaText+' ↗</a>'
-        : '<div class="mod-back-name" style="color:rgba(255,255,255,.25)">Em construção</div>'
-          +'<div class="mod-back-desc" style="color:rgba(255,255,255,.18)">Estamos desenvolvendo novos módulos para os nichos de hotelaria, saúde e e-commerce.</div>';
+        : '<div class="mod-back-head"><span class="mod-back-title" style="color:rgba(255,255,255,.25)">'+m.name+'</span></div>'
+          +'<div class="mod-back-desc" style="color:rgba(255,255,255,.16)">Estamos desenvolvendo novos módulos para os nichos de hotelaria, saúde e e-commerce.</div>';
       var el=document.createElement(m.href ? 'a' : 'div');
       el.className='mod-card '+m.cls+' reveal '+(delays[i]||'');
       if(m.href){el.href=m.href;el.target='_blank';el.rel='noopener';}
       el.innerHTML=
         '<div class="mod-inner">'
         +'<div class="mod-front">'
-        +'<div class="mod-front-icon">'+m.icon+'</div>'
+        +'<div class="mod-deco"></div>'
+        +'<div class="mod-front-top">'
+        +'<div class="mod-icon-wrap">'+m.iconSVG+'</div>'
         +'<span class="mod-front-badge">'+m.badge+'</span>'
+        +'</div>'
+        +'<div class="mod-front-bottom">'
         +'<div class="mod-front-name">'+m.name+'</div>'
         +'<div class="mod-front-tagline">'+m.tagline+'</div>'
+        +'</div>'
         +'</div>'
         +'<div class="mod-back">'
         +backContent
