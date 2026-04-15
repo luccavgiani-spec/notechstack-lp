@@ -211,94 +211,61 @@ body{
   overflow:hidden;
 }
 
-/* Canvas: 350 × 370 — 3 nodes top, 2 bottom */
+/* ── Mindmap — responsive grid layout ── */
+.how-mindmap-wrap{
+  width:100%;display:flex;flex-direction:column;
+  align-items:stretch;padding:0 16px;
+}
 .how-mindmap{
-  position:relative;
-  width:350px;height:370px;
+  position:static;width:100%;height:auto;
+  display:flex;flex-direction:column;gap:0;
+  opacity:0;transition:opacity .4s ease;
 }
+.how-mindmap.mm-show{opacity:1}
 
-.mm-svg{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  pointer-events:none;z-index:0;
-  overflow:visible;
-}
+/* Row containers */
+.mm-row{display:grid;gap:8px}
+.mm-row-top{grid-template-columns:1fr 1fr 1fr}
+.mm-row-bot{grid-template-columns:1fr 1fr}
 
-/* ── Marching ants on lines ── */
-@keyframes march{
-  from{stroke-dashoffset:0}
-  to  {stroke-dashoffset:-20}
-}
-/* Lines start hidden; JS fades in, then CSS takes loop */
-.mm-line{
-  opacity:0;
-  stroke-dasharray:6 4;
-}
-.mm-line.marching{
-  opacity:1;
-  animation:march .55s linear infinite;
-}
-/* Each line a slightly different speed for organic feel */
-.mm-line-1.marching{animation-duration:.50s}
-.mm-line-2.marching{animation-duration:.58s}
-.mm-line-3.marching{animation-duration:.52s}
-.mm-line-4.marching{animation-duration:.60s}
-.mm-line-5.marching{animation-duration:.55s}
+/* Hub strip with connector lines */
+.mm-hub-strip{display:flex;align-items:center;padding:10px 0}
+.mm-hub-line{flex:1;height:2px;background:linear-gradient(90deg,rgba(66,133,244,.12),rgba(66,133,244,.35))}
+.mm-hub-line:last-child{background:linear-gradient(270deg,rgba(66,133,244,.12),rgba(66,133,244,.35))}
 
 /* Hub */
 .mm-hub{
-  position:absolute;left:50%;top:50%;
-  transform:translate(-50%,-50%);
-  background:var(--dark);
-  border-radius:58px;
-  padding:22px 35px;
-  text-align:center;
-  z-index:3;
-  box-shadow:0 8px 32px rgba(0,0,0,.25);
-  opacity:0;
-  white-space:nowrap;
+  position:static;transform:none;
+  background:var(--dark);border-radius:44px;padding:14px 24px;
+  text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.25);
+  white-space:nowrap;flex-shrink:0;
+  opacity:0;transition:opacity .4s ease,transform .4s ease;
 }
+.mm-hub.mm-show{opacity:1}
 .mm-hub-logo{
-  height:58px;width:auto;
-  display:block;margin:0 auto;
+  height:46px;width:auto;display:block;margin:0 auto;
   filter:brightness(0) invert(1);
 }
 
 /* Node cards */
 .mm-node{
-  position:absolute;width:102px;
-  background:var(--white);
-  border-radius:14px;
+  position:static;width:100%;
+  background:var(--white);border-radius:14px;
   border:2px solid var(--border);
-  padding:9px 7px 10px;
-  text-align:center;
-  z-index:2;
-  opacity:0;
-  transition:transform .2s ease,box-shadow .2s ease;
+  padding:10px 8px 11px;text-align:center;
+  opacity:0;transform:scale(0.88);
+  transition:opacity .3s ease,transform .32s ease;
 }
+.mm-node.mm-show{opacity:1;transform:scale(1)}
 .mm-node.n-blue  {border-color:var(--blue)}
 .mm-node.n-green {border-color:var(--green)}
 .mm-node.n-yellow{border-color:var(--yellow)}
 .mm-node.n-red   {border-color:var(--red)}
-
-.mm-node-label{
-  font-family:var(--font);font-size:7.5px;font-weight:700;
-  letter-spacing:.09em;text-transform:uppercase;
-  color:var(--mid);margin-bottom:4px;
-}
-.mm-node-icon{
-  display:flex;align-items:center;justify-content:center;
-  margin-bottom:4px;height:22px;
-}
-.mm-node-icon svg{width:18px;height:18px}
-.mm-node-title{
-  font-family:var(--font);font-size:10.5px;font-weight:700;
-  margin-bottom:2px;line-height:1.2;
-}
-.mm-node-desc{
-  font-family:var(--font);font-size:8.5px;
-  color:var(--mid);line-height:1.35;
-}
+.mm-node-label{font-family:var(--font);font-size:7px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mid);margin-bottom:3px}
+.mm-node-icon{display:flex;align-items:center;justify-content:center;margin-bottom:3px;height:20px}
+.mm-node-icon svg{width:16px;height:16px}
+.mm-node-title{font-family:var(--font);font-size:10px;font-weight:700;margin-bottom:2px;line-height:1.2}
+.mm-node-desc{font-family:var(--font);font-size:8px;color:var(--mid);line-height:1.35}
 
 
 /* ════════════════════════════════════════════
@@ -448,109 +415,56 @@ body{
 
 
   <!-- ════════════════════════════════
-       BLOCO 2 — MAPA MENTAL
-       Layout: 3 nós em cima, 2 embaixo
-       Container: 350 × 420 px
-       Hub: (175, 210)
-       Top-3: Site (5,15) · Cadastros (124,5) · IA (243,15)
-       Bot-2: Tarefas (25,335) · Painel (223,335)
+       BLOCO 2 — MAPA DE FUNCIONALIDADES
   ════════════════════════════════ -->
   <div class="how-mindmap-wrap">
     <div class="how-mindmap" id="howMindmap">
 
-      <!-- SVG Lines -->
-      <svg class="mm-svg" viewBox="0 0 350 370" xmlns="http://www.w3.org/2000/svg">
-        <!-- Hub(175,210) → Site center(56,68) -->
-        <line class="mm-line mm-line-1"
-              x1="175" y1="210" x2="56"  y2="68"
-              stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
-        <!-- Hub → Cadastros center(175,58) -->
-        <line class="mm-line mm-line-2"
-              x1="175" y1="210" x2="175" y2="58"
-              stroke="#34A853" stroke-width="2" stroke-linecap="round"/>
-        <!-- Hub → IA center(294,68) -->
-        <line class="mm-line mm-line-3"
-              x1="175" y1="210" x2="294" y2="68"
-              stroke="#EA4335" stroke-width="2" stroke-linecap="round"/>
-        <!-- Hub → Tarefas center(76,333) -->
-        <line class="mm-line mm-line-4"
-              x1="175" y1="210" x2="76"  y2="333"
-              stroke="#FBBC04" stroke-width="2" stroke-linecap="round"/>
-        <!-- Hub → Painel center(274,333) -->
-        <line class="mm-line mm-line-5"
-              x1="175" y1="210" x2="274" y2="333"
-              stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-
-      <!-- Hub: nó logo -->
-      <div class="mm-hub">
-        <img src="/img/logo-footer.png" alt="nó" class="mm-hub-logo">
+      <!-- Top row: 3 nodes -->
+      <div class="mm-row mm-row-top">
+        <div class="mm-node n-blue">
+          <div class="mm-node-label">Presença Digital</div>
+          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div class="mm-node-title">Site ou App</div>
+          <div class="mm-node-desc">Bonito, rápido e que converte</div>
+        </div>
+        <div class="mm-node n-green">
+          <div class="mm-node-label">Dados Seguros</div>
+          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="mm-node-title">Cadastros &amp; Dados</div>
+          <div class="mm-node-desc">Tudo salvo, seguro e acessível</div>
+        </div>
+        <div class="mm-node n-red">
+          <div class="mm-node-label">Int. Artificial</div>
+          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg></div>
+          <div class="mm-node-title">IA Trabalhando</div>
+          <div class="mm-node-desc">Escreve, analisa e decide por você</div>
+        </div>
       </div>
 
-      <!-- TOP ROW — 3 nodes -->
-
-      <!-- Site ou App (blue) — top-left: left:5, top:15 -->
-      <div class="mm-node n-blue" style="left:5px;top:15px">
-        <div class="mm-node-label">Presença Digital</div>
-        <div class="mm-node-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round">
-            <rect x="2" y="3" width="20" height="14" rx="2"/>
-            <path d="M8 21h8M12 17v4"/>
-          </svg>
+      <!-- Hub strip -->
+      <div class="mm-hub-strip">
+        <div class="mm-hub-line"></div>
+        <div class="mm-hub" id="mmHub">
+          <img src="/img/logo-footer.png" alt="nó" class="mm-hub-logo">
         </div>
-        <div class="mm-node-title">Site ou App</div>
-        <div class="mm-node-desc">Bonito, rápido e que converte</div>
+        <div class="mm-hub-line"></div>
       </div>
 
-      <!-- Cadastros & Dados (green) — top-center: left:124, top:5 -->
-      <div class="mm-node n-green" style="left:124px;top:5px">
-        <div class="mm-node-label">Dados Seguros</div>
-        <div class="mm-node-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-          </svg>
+      <!-- Bottom row: 2 nodes -->
+      <div class="mm-row mm-row-bot">
+        <div class="mm-node n-yellow">
+          <div class="mm-node-label">Piloto Automático</div>
+          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+          <div class="mm-node-title">Tarefas Automáticas</div>
+          <div class="mm-node-desc">Mensagens e alertas sem você tocar</div>
         </div>
-        <div class="mm-node-title">Cadastros &amp; Dados</div>
-        <div class="mm-node-desc">Tudo salvo, seguro e acessível</div>
-      </div>
-
-      <!-- IA Trabalhando (red) — top-right: left:243, top:15 -->
-      <div class="mm-node n-red" style="left:243px;top:15px">
-        <div class="mm-node-label">Int. Artificial</div>
-        <div class="mm-node-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linecap="round">
-            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/>
-          </svg>
+        <div class="mm-node n-blue">
+          <div class="mm-node-label">Visão do Negócio</div>
+          <div class="mm-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+          <div class="mm-node-title">Painel de Controle</div>
+          <div class="mm-node-desc">Seus números em tempo real</div>
         </div>
-        <div class="mm-node-title">IA Trabalhando</div>
-        <div class="mm-node-desc">Escreve, analisa e decide por você</div>
-      </div>
-
-      <!-- BOTTOM ROW — 2 nodes -->
-
-      <!-- Tarefas Automáticas (yellow) — bottom-left: left:25, top:280 -->
-      <div class="mm-node n-yellow" style="left:25px;top:280px">
-        <div class="mm-node-label">Piloto Automático</div>
-        <div class="mm-node-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linecap="round">
-            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-          </svg>
-        </div>
-        <div class="mm-node-title">Tarefas Automáticas</div>
-        <div class="mm-node-desc">Mensagens e alertas sem você tocar</div>
-      </div>
-
-      <!-- Painel de Controle (blue) — bottom-right: left:223, top:280 -->
-      <div class="mm-node n-blue" style="left:223px;top:280px">
-        <div class="mm-node-label">Visão do Negócio</div>
-        <div class="mm-node-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round">
-            <path d="M3 3v18h18"/>
-            <path d="m19 9-5 5-4-4-3 3"/>
-          </svg>
-        </div>
-        <div class="mm-node-title">Painel de Controle</div>
-        <div class="mm-node-desc">Seus números em tempo real</div>
       </div>
 
     </div><!-- /how-mindmap -->
@@ -708,93 +622,37 @@ body{
    BLOCO 2 — MIND MAP ANIMATION
 ════════════════════════════════════════════ */
 (function() {
-  var mm     = document.getElementById('howMindmap');
-  /* Scale to fit viewport */
-  if (mm) {
-    var avail = window.innerWidth - 16;
-    if (avail < 350) {
-      var sc = avail / 350;
-      mm.style.transformOrigin = 'top center';
-      mm.style.transform = 'scale(' + sc + ')';
-      mm.style.marginBottom = '-' + Math.round(370 * (1 - sc)) + 'px';
-    }
-  }
-  var ts     = document.getElementById('thoughtSection');
+  var mm  = document.getElementById('howMindmap');
+  var ts  = document.getElementById('thoughtSection');
   if (!mm) return;
 
-  var nodes  = Array.from(mm.querySelectorAll('.mm-node'));
-  var lines  = Array.from(mm.querySelectorAll('.mm-line'));
-  var hub    = mm.querySelector('.mm-hub');
-  var done   = false;
+  var nodes = Array.from(mm.querySelectorAll('.mm-node'));
+  var hub   = mm.querySelector('.mm-hub');
+  var done  = false;
 
   function animate() {
-    if (done) return;
-    done = true;
-
-    /* Hub scales in */
-    if (hub) {
-      hub.style.transition = 'none';
-      hub.style.opacity    = '0';
-      hub.style.transform  = 'translate(-50%,-50%) scale(0.8)';
-      void hub.offsetWidth;
-      setTimeout(function() {
-        hub.style.transition = 'opacity .4s ease, transform .45s ease';
-        hub.style.opacity    = '1';
-        hub.style.transform  = 'translate(-50%,-50%) scale(1)';
-      }, 20);
-    }
-
-    /* Lines fade in + start marching */
-    var lineDelays = [100, 230, 130, 310, 200];
-    lines.forEach(function(l, i) {
-      l.style.opacity = '0';
-      setTimeout(function() {
-        /* Short fade-in transition, then switch to march animation */
-        l.style.transition = 'opacity .4s ease';
-        l.style.opacity    = '1';
-        setTimeout(function() {
-          l.style.transition = 'none'; /* remove transition so CSS anim takes over */
-          l.classList.add('marching');
-        }, 420);
-      }, lineDelays[i] + 20);
-    });
-
-    /* Nodes pop in */
-    var nodeDelays = [150, 260, 200, 380, 310];
+    if (done) return; done = true;
+    mm.classList.add('mm-show');
+    if (hub) { setTimeout(function() { hub.classList.add('mm-show'); }, 80); }
+    var delays = [160, 280, 220, 400, 330];
     nodes.forEach(function(n, i) {
-      n.style.transition = 'none';
-      n.style.opacity    = '0';
-      n.style.transform  = 'scale(0.72)';
-      void n.offsetWidth;
-      setTimeout(function() {
-        n.style.transition = 'opacity .3s ease, transform .32s ease';
-        n.style.opacity    = '1';
-        n.style.transform  = 'scale(1)';
-        setTimeout(function() { n.style.transition = ''; }, 380);
-      }, nodeDelays[i] + 20);
+      setTimeout(function() { n.classList.add('mm-show'); }, delays[i]);
     });
-
-    /* Thought bubble fades in last */
     if (ts) {
       setTimeout(function() {
         ts.style.transition = 'opacity .5s ease';
         ts.style.opacity    = '1';
-      }, 750);
+      }, 600);
     }
   }
 
-  /* Trigger on scroll into view */
   var observer = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
-      if (e.isIntersecting) { animate(); observer.unobserve(mm); }
-    });
-  }, { threshold: 0.15 });
+    if (entries[0].isIntersecting) { animate(); observer.unobserve(mm); }
+  }, { threshold: 0.1 });
   observer.observe(mm);
 
-  /* Fallback */
-  setTimeout(function() {
-    if (!done && mm.getBoundingClientRect().top < window.innerHeight * 0.95) animate();
-  }, 500);
+  /* Fallback for preview renderer */
+  setTimeout(function() { if (!done) animate(); }, 500);
 })();
 </script>
 </body>
