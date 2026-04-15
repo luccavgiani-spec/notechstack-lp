@@ -207,7 +207,8 @@ body{
 .how-mindmap-wrap{
   width:100%;display:flex;
   flex-direction:column;align-items:center;
-  padding:0 20px;
+  padding:0 8px;
+  overflow:hidden;
 }
 
 /* Canvas: 350 × 370 — 3 nodes top, 2 bottom */
@@ -708,6 +709,16 @@ body{
 ════════════════════════════════════════════ */
 (function() {
   var mm     = document.getElementById('howMindmap');
+  /* Scale to fit viewport */
+  if (mm) {
+    var avail = window.innerWidth - 16;
+    if (avail < 350) {
+      var sc = avail / 350;
+      mm.style.transformOrigin = 'top center';
+      mm.style.transform = 'scale(' + sc + ')';
+      mm.style.marginBottom = '-' + Math.round(370 * (1 - sc)) + 'px';
+    }
+  }
   var ts     = document.getElementById('thoughtSection');
   if (!mm) return;
 

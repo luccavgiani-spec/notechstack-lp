@@ -423,7 +423,32 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 .mod-c-orange .mod-back-cta{background:rgba(234,88,12,.22);color:#fdba74}
 @media(hover:none){.mod-card:hover .mod-inner{transform:none}}
 @media(max-width:1100px){.modules-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.modules-grid{grid-template-columns:1fr}.mod-card{height:280px}#modulos{padding:72px 20px}}
+@media(max-width:700px){
+  #modulos{padding:60px 20px}
+  .modules-grid{grid-template-columns:1fr;gap:14px}
+
+  /* Flatten 3D flip — show front + back stacked */
+  .mod-card{height:auto;cursor:default}
+  .mod-card:hover .mod-inner,.mod-card:focus .mod-inner{transform:none!important}
+  .mod-inner{
+    transform-style:flat!important;
+    position:static;height:auto;
+    display:flex;flex-direction:column;
+  }
+  .mod-front,.mod-back{
+    position:static;
+    backface-visibility:visible!important;
+    -webkit-backface-visibility:visible!important;
+    transform:none!important;
+  }
+  .mod-front{border-radius:20px 20px 0 0;border-bottom-color:rgba(255,255,255,.04)!important}
+  .mod-back{border-radius:0 0 20px 20px;border-top:none}
+  .mod-front::after{display:none}
+
+  /* "Coming soon" gray card: front only */
+  .mod-c-gray .mod-front{border-radius:20px!important}
+  .mod-c-gray .mod-back{display:none}
+}
 
 
 /* ══════ NÓ HUB ANIMATED ══════ */
@@ -1049,7 +1074,7 @@ to{opacity:1;transform:translateX(0)}}
   }
 
   /* ── Mindmap canvas ── */
-  .how-mindmap-wrap{width:100%;display:flex;flex-direction:column;align-items:center;padding:0 20px}
+  .how-mindmap-wrap{width:100%;display:flex;flex-direction:column;align-items:center;padding:0 8px;overflow:hidden}
   .how-mindmap{position:relative;width:350px;height:370px}
   .mm-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
   @keyframes mMarch{from{stroke-dashoffset:0}to{stroke-dashoffset:-20}}
@@ -2341,6 +2366,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   /* ── BLOCO 2: Mindmap ── */
   (function() {
     var mm  = document.getElementById('howMindmap');
+    /* Scale to fit viewport */
+    if (mm) {
+      var avail = window.innerWidth - 16; /* 8px padding each side */
+      if (avail < 350) {
+        var sc = avail / 350;
+        mm.style.transformOrigin = 'top center';
+        mm.style.transform = 'scale(' + sc + ')';
+        mm.style.marginBottom = '-' + Math.round(370 * (1 - sc)) + 'px';
+      }
+    }
     var ts  = document.getElementById('thoughtSection');
     if (!mm) return;
     var nodes = Array.from(mm.querySelectorAll('.mm-node'));
