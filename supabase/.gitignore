@@ -1,0 +1,7 @@
+# Supabase CLI state
+.branches
+.temp
+
+# Local env (secrets live in Supabase Vault, never here)
+.env
+.env.local
