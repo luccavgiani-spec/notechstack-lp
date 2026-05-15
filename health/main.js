@@ -236,28 +236,32 @@
 (function () {
   var LOGOS_1 = [
     { n: 'WhatsApp',        slug: 'whatsapp',         c: '25D366' },
+    // BR health brands not on Simple Icons CDN — Lucide category icons
+    { n: 'Memed',       color: '#34A853', svg: '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>' },
+    { n: 'Mevo', raw: 'mevo' },
+    { n: 'Help Global', color: '#EA4335', svg: '<path d="M5 11a7 7 0 0 1 14 0"/><path d="M3 12h3a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M18 12h3v5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/><path d="M19 18a4 4 0 0 1-4 3h-3"/>' },
     { n: 'Google Calendar', slug: 'googlecalendar',   c: '4285F4' },
     { n: 'Stripe',          slug: 'stripe',           c: '635BFF' },
     { n: 'Mercado Pago',    slug: 'mercadopago',      c: '00B1EA' },
-    { n: 'Pix',             ph: 'Pix' },
+    { n: 'Pix', slug: 'pix', c: '00BDAE', fb: '<rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/>', fbColor: '#00BDAE' },
     { n: 'Google Meet',     slug: 'googlemeet',       c: '00897B' },
     { n: 'Zoom',            slug: 'zoom',             c: '0B5CFF' },
     { n: 'Calendly',        slug: 'calendly',         c: '006BFF' },
     { n: 'Notion',          slug: 'notion',           c: '111111' },
-    { n: 'Slack',           slug: 'slack',            c: '4A154B' },
+    { n: 'Slack', raw: 'slack' },
     { n: 'Telegram',        slug: 'telegram',         c: '26A5E4' },
     { n: 'Discord',         slug: 'discord',          c: '5865F2' }
   ];
   var LOGOS_2 = [
-    { n: 'Microsoft Teams', slug: 'microsoftteams',   c: '6264A7' },
+    { n: 'Microsoft Teams', raw: 'teams' },
     { n: 'Google Drive',    slug: 'googledrive',      c: '4285F4' },
     { n: 'Google Sheets',   slug: 'googlesheets',     c: '34A853' },
     { n: 'HubSpot',         slug: 'hubspot',          c: 'FF7A59' },
-    { n: 'ActiveCampaign',  slug: 'activecampaign',   c: '356AE6' },
-    { n: 'RD Station',      ph: 'RD Station' },
-    { n: 'Pipefy',          slug: 'pipefy',           c: '8E44AD' },
-    { n: 'Asaas',           ph: 'Asaas' },
-    { n: 'PagSeguro',       ph: 'PagSeguro' },
+    // ActiveCampaign removed: official clean SVG not available yet (round 7)
+    { n: 'RD Station', color: '#19C9D1', svg: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>' },
+    { n: 'Pipefy', raw: 'pipefy' },
+    { n: 'Asaas', color: '#0072FF', svg: '<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>' },
+    { n: 'PagSeguro', slug: 'pagseguro', c: '0F0F0F', fb: '<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>', fbColor: '#0F0F0F' },
     { n: 'OpenAI',          slug: 'openai',           c: '412991' },
     { n: 'Anthropic',       slug: 'anthropic',        c: 'D97757' },
     { n: 'Make',            slug: 'make',             c: '6D00CC' }
@@ -267,7 +271,15 @@
     var card = document.createElement('div');
     card.className = 'logo-card';
     card.title = l.n;
-    if (l.slug && l.c) {
+    var BRAND = (typeof window !== 'undefined' && window.BRAND_SVGS) || {};
+    if (l.raw && BRAND[l.raw]) {
+      card.classList.add('logo-card-brand');
+      card.innerHTML = BRAND[l.raw];
+    } else if (l.svg) {
+      card.innerHTML = '<svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="' +
+        (l.color || '#34A853') + '" stroke-width="1.7" stroke-linecap="round" ' +
+        'stroke-linejoin="round" aria-label="' + l.n + '">' + l.svg + '</svg>';
+    } else if (l.slug && l.c) {
       var img = document.createElement('img');
       img.src = 'https://cdn.simpleicons.org/' + l.slug + '/' + l.c;
       img.alt = l.n;
@@ -276,10 +288,17 @@
       img.height = 42;
       img.onerror = function () {
         card.removeChild(img);
-        var ph = document.createElement('div');
-        ph.className = 'ph';
-        ph.textContent = l.n;
-        card.appendChild(ph);
+        if (l.fb) {
+          // Simple Icons 404 → Lucide category icon, never an empty card
+          card.innerHTML = '<svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="' +
+            (l.fbColor || '#34A853') + '" stroke-width="1.7" stroke-linecap="round" ' +
+            'stroke-linejoin="round" aria-label="' + l.n + '">' + l.fb + '</svg>';
+        } else {
+          var ph = document.createElement('div');
+          ph.className = 'ph';
+          ph.textContent = l.n;
+          card.appendChild(ph);
+        }
       };
       card.appendChild(img);
     } else {
@@ -338,7 +357,7 @@
   var FAQS = [
     {
       q: 'Acabei de terminar a faculdade, faz sentido investir nisso agora?',
-      a: 'Com certeza! Boa parte dos nossos médicos começou a atender online enquanto estava estudando para a residência. Você mantém uma constância de atendimentos de uma maneira flexível para fazer seus horários e estudar. A {nó} configura e deixa tudo rodando por você.'
+      a: 'Com certeza! Boa parte dos nossos médicos começaram a atender online enquanto estava estudando para a residência. Em poucos plantões, você já paga o investimento total e passa a ter total controle dos seus horários. Você atende e estuda. A {nó} configura e deixa tudo rodando por você.'
     },
     {
       q: 'Quanto eu cobro por consulta? Vocês sugerem?',
