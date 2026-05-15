@@ -6,9 +6,12 @@
 <!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="view-transition" content="same-origin">
 <title>nó — tech stack IA</title>
 <link rel="preload" href="/fonts/dm-sans-v17-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="/shared/pillnav.css">
+<link rel="stylesheet" href="/shared/transitions.css">
 <style>
 /* ─── Self-hosted fonts ─── */
 @font-face{font-family:'DM Sans';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2')}
@@ -28,22 +31,12 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--white);color:var(--dark);overflow-x:hidden}
+body{font-family:var(--font);background:var(--white);color:var(--dark);overflow-x:hidden;padding-top:96px}
+@media (max-width:768px){body{padding-top:80px}}
 
 /* ── CURSOR ── */
 .cursor{width:10px;height:10px;background:var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply}
 .cursor-ring{width:38px;height:38px;border:1.5px solid var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .22s ease;opacity:.45}
-
-/* ── NAV ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;padding:0 60px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0);backdrop-filter:none;border-bottom:1px solid transparent;transition:background .5s,backdrop-filter .5s,border-color .4s}
-nav.scrolled{background:rgba(255,255,255,.95)!important;backdrop-filter:blur(20px)!important;-webkit-backdrop-filter:blur(20px)!important;border-color:var(--border)!important}
-.nav-logo{display:flex;align-items:center;text-decoration:none;height:52px}
-.logo-img{height:52px;width:auto;object-fit:contain}
-.nav-links{display:flex;gap:36px;list-style:none}
-.nav-links a{font-family:var(--font);font-size:14px;font-weight:500;text-decoration:none;color:var(--mid);transition:color .2s}
-.nav-links a:hover{color:var(--dark)}
-.nav-cta{background:var(--dark);color:var(--white);border:none;padding:10px 26px;border-radius:100px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
-.nav-cta:hover{background:var(--blue);transform:translateY(-1px)}
 
 /* ── HERO ── */
 /* hero layout now set by hw grid CSS */
@@ -280,7 +273,6 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  nav{padding:14px 20px}.nav-links,.nav-cta{display:none}
   #hero{padding:110px 20px 56px}.floating-pills{display:none}
   #stats{grid-template-columns:repeat(2,1fr);padding:0 20px}
   section{padding:56px 20px}
@@ -760,12 +752,6 @@ to{opacity:1;transform:translateX(0)}}
   .section-label{font-size:10px}
   .section-title{font-size:clamp(26px,7vw,38px)!important;letter-spacing:-.5px}
   .section-sub{font-size:14px}
-
-  /* ── NAV ── */
-  nav{padding:0 20px;height:52px}
-  .logo-img{height:40px!important}
-  .nav-logo{height:40px!important}
-  .nav-links,.nav-cta{display:none}
 
   /* ── HERO ── */
   #hero{padding:110px 20px 64px;min-height:auto}
@@ -1794,20 +1780,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="cursor" id="cur"></div>
 <div class="cursor-ring" id="curR"></div>
 
-<!-- NAV -->
-<nav id="nav">
-  <a href="#" class="nav-logo">
-    <img src="/img/logo.png" alt="nó" class="logo-img" width="52" height="52" loading="eager">
-  </a>
-  <ul class="nav-links">
-    <li><a href="#how">Como funciona</a></li>
-    <li><a href="#usecases">Soluções</a></li>
-    <li><a href="#modulos">Módulos</a></li>
-    <li><a href="#pricing">Investimento</a></li>
-    <li><a href="#faq">FAQ</a></li>
-  </ul>
-  <button class="nav-cta" onclick="goTo('cta')">Montar meu stack →</button>
-</nav>
+<!-- PILL NAV (floating, primary navigation) -->
+<div id="pill-nav-root"></div>
 
 <!-- HERO -->
 <section id="hero">
@@ -2310,6 +2284,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="ft-txt">© 2026 <span style="font-family:var(--font-accent);color:var(--green);font-weight:700;font-size:1.5em">nó</span>. Todos os direitos reservados.</div>
 </footer>
 
+<script type="module">
+  import { initPillNav } from '/shared/pillnav.js';
+  import { pillNavConfig } from '/shared/pillnav-config.js';
+
+  initPillNav(document.getElementById('pill-nav-root'), {
+    ...pillNavConfig,
+    activeHref: '/'
+  });
+
+  // Smooth scroll to #cta when arriving from another page
+  if (window.location.hash === '#cta') {
+    setTimeout(() => {
+      document.querySelector('#cta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  }
+
+  // Intercept Contact clicks if already on home
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href="/#cta"], a[href="#cta"]');
+    if (!link) return;
+    const path = window.location.pathname;
+    if (path === '/' || path === '/index.html') {
+      e.preventDefault();
+      document.querySelector('#cta')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+</script>
 <script src="/main.js" defer></script>
 <script>
 /* ══ MOBILE HOW-IT-WORKS (chat + mindmap) ══
