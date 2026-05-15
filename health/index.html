@@ -9,8 +9,7 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preload" href="/fonts/dm-sans-v17-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/shared/pillnav.css">
-<link rel="stylesheet" href="/shared/transitions.css">
-<style>
+<link rel="stylesheet" href="/shared/transitions.css"><style>
 /* ─── Self-hosted fonts ─── */
 @font-face{font-family:'DM Sans';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2')}
 @font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2')}
@@ -34,8 +33,10 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;background:var(--health-bg)}
-body{font-family:var(--font);background:var(--white);color:var(--dark);overflow-x:hidden;line-height:1.5;padding-top:96px;position:relative;animation:tint-health 800ms cubic-bezier(0.4,0,0.2,1) 100ms forwards}
-@media (max-width:768px){body{padding-top:80px}}
+/* No padding-top: the pill nav is position:fixed and floats over the
+   content. The old 96px was dead space reserved for the removed
+   traditional navbar and showed as a phantom bar above the hero. */
+body{font-family:var(--font);background:var(--white);color:var(--dark);overflow-x:hidden;line-height:1.5;padding-top:0;position:relative;animation:tint-health 800ms cubic-bezier(0.4,0,0.2,1) 100ms forwards}
 
 @keyframes tint-health{
   0%{background-color:#ffffff}
@@ -78,8 +79,22 @@ button{font-family:inherit}
 
 /* Hero hl tokens (Caveat italic) need their own breathing room since the
    surrounding font-size is huge (8vw) — em-based margin handles all sizes */
-.hero-line .hl{font-family:var(--font-accent);color:var(--green);font-weight:700;font-size:1.22em;line-height:.6;letter-spacing:.02em;display:inline-block;vertical-align:baseline;font-style:italic;margin:0 .35em}
-.hero-line .hl-no{font-size:1.7em;margin:0 .42em}
+/* Caveat highlight words — line-height:1 + small baseline nudge keeps them
+   visually on the same baseline as the surrounding DM Sans (was line-height:.6,
+   which made them float above the line and read like a different sentence). */
+/* Caveat highlight — display:inline (no own box) + line-height:inherit so it
+   never inflates the line; position:relative/top instead of transform so it
+   doesn't create a layout box; margins almost zero = glued to neighbours. */
+/* One single size for every Caveat word (.hl-no no longer overrides
+   font-size) so all 4 slides render the accent identically. margin
+   restored so the word isn't glued to / overlapping its neighbours. */
+.hero-line .hl{font-family:var(--font-accent);color:var(--green);font-weight:700;font-size:1.15em;line-height:inherit;letter-spacing:0;display:inline;vertical-align:baseline;font-style:italic;position:relative;top:.04em;margin:0 .15em;padding:0}
+.hero-line .hl-no{margin:0 .15em}
+
+/* Hero subtitle — DM Sans, sits under the headline on every slide */
+.hero-sub{font-family:var(--font);font-weight:300;font-size:clamp(18px,1.9vw,23px);line-height:1.5;color:var(--mid);max-width:60ch;margin-top:30px;opacity:0;transform:translateY(20px);transition:opacity .7s ease .65s,transform .7s ease .65s}
+.hero-sub .brand{color:var(--green);display:inline;line-height:inherit;position:relative;top:.04em;font-size:1.12em;margin:0 .02em}
+.hero-screen.in .hero-sub{opacity:1;transform:translateY(0)}
 
 /* ─── Custom cursor ─── */
 .cursor{width:10px;height:10px;background:var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply;left:-50px;top:-50px}
@@ -135,11 +150,11 @@ button{font-family:inherit}
 
 /* Each screen is absolutely positioned inside the pin, fades in when active.
    Aligned to ~30% of viewport (eyeline) instead of center for better visual balance. */
-.hero-screen{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:30vh 80px 8vh;opacity:0;pointer-events:none;transition:opacity .55s ease}
+.hero-screen{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:13vh 80px 11vh;opacity:0;pointer-events:none;transition:opacity .55s ease}
 .hero-screen.in{opacity:1;pointer-events:auto}
 .hero-screen-inner{max-width:1200px;margin:0 auto;width:100%}
 
-.hero-line{font-family:var(--font);font-weight:500;font-size:clamp(48px,8vw,120px);line-height:1.05;letter-spacing:-2.4px;word-spacing:.05em;color:var(--dark);display:block}
+.hero-line{font-family:var(--font);font-weight:500;font-size:clamp(38px,6.4vw,96px);line-height:1.15;letter-spacing:-2.4px;word-spacing:.05em;color:var(--dark);display:block}
 .hero-line .word,.hero-line .frag{display:inline-block;opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
 .hero-screen.in .hero-line .word,.hero-screen.in .hero-line .frag{opacity:1;transform:translateY(0)}
 .hero-line .word.d0,.hero-line .frag.d0{transition-delay:.05s}
@@ -161,9 +176,10 @@ button{font-family:inherit}
 
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:44px;opacity:0;transform:translateY(20px);transition:opacity .7s ease 1s,transform .7s ease 1s}
 .hero-screen.in .hero-actions{opacity:1;transform:translateY(0)}
+.hero-actions .btn-primary,.hero-actions .btn-secondary{font-size:14px;padding-top:.7rem;padding-bottom:.7rem;min-height:52px}
 
 /* Screen 5 has CTAs + 4 lines of text — needs slightly smaller type to fit */
-#hs5 .hero-line{font-size:clamp(38px,6.4vw,96px)}
+#hs5 .hero-line{font-size:clamp(30px,5.1vw,76px)}
 #hs5 .hero-actions{margin-top:40px}
 
 /* ═══════════════ SEC 1 — Trust + ECG background ═══════════════ */
@@ -203,6 +219,9 @@ button{font-family:inherit}
 .logo-card{flex-shrink:0;width:112px;height:112px;background:var(--white);border-radius:26px;display:grid;place-items:center;box-shadow:0 1px 2px rgba(15,15,15,.04),0 10px 28px rgba(15,15,15,.06);transition:transform .25s,box-shadow .25s}
 .logo-card:hover{transform:translateY(-3px);box-shadow:0 1px 2px rgba(15,15,15,.04),0 16px 36px rgba(52,168,83,.18)}
 .logo-card img{width:48px;height:48px;object-fit:contain}
+.logo-card .logo-svg{width:48px;height:48px}
+.logo-card-brand{padding:10px}
+.logo-card .brand-svg{display:block;width:90px;height:62px}
 .logo-card .ph{font-family:var(--font);font-size:13px;font-weight:700;color:var(--mid);text-align:center;padding:5px;line-height:1.2}
 
 /* ═══════════════ SEC 3 — Options ═══════════════ */
@@ -212,11 +231,49 @@ button{font-family:inherit}
 .sec3-header h2{margin:0 auto}
 .sec3-header p{margin:22px auto 0;color:var(--mid);font-size:clamp(16px,1.8vw,26px);line-height:1.55;font-weight:300}
 
-.options-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1240px;margin:0 auto}
+.options-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1240px;margin:0 auto;overflow:visible;align-items:stretch;justify-items:stretch}
 .option-card{background:var(--white);border:1.5px solid var(--border);border-radius:22px;padding:44px 36px;transition:all .3s ease;display:flex;flex-direction:column;position:relative}
 .option-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(52,168,83,.1);border-color:rgba(52,168,83,.4)}
 .option-card.featured{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,linear-gradient(135deg,var(--green),var(--blue)) border-box;box-shadow:0 16px 40px rgba(66,133,244,.08)}
 .option-card.featured::before{content:'RECOMENDADO';position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--green),var(--blue));color:var(--white);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.12em;padding:6px 18px;border-radius:100px;box-shadow:0 8px 18px rgba(66,133,244,.3)}
+
+/* ─── Card "Recomendado" (Híbrido): animated conic-gradient border ───
+   Pure CSS, GPU-friendly (animates a registered custom property only).
+   Rotation around the centre is inherently symmetric — no side bleeds
+   more than another. No canvas, no JS. */
+@property --hib-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
+.card-hibrido{border:none;background:var(--white);z-index:1}
+.card-hibrido::before{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:25px;
+  background:conic-gradient(from var(--hib-angle),
+    #2d8f47 0deg,#34A853 60deg,#6FCC85 120deg,#d6f3df 165deg,
+    #6FCC85 210deg,#34A853 290deg,#2d8f47 360deg);
+  z-index:-1;
+  opacity:.64;
+  animation:hib-rotate 5s linear infinite;
+}
+/* soft ambient halo so it reads premium even mid-sweep (static, symmetric) */
+.card-hibrido::after{
+  content:'';
+  position:absolute;
+  inset:-3px;
+  border-radius:25px;
+  z-index:-2;
+  background:rgba(52,168,83,.30);
+  filter:blur(18px);
+  opacity:.64;
+}
+@keyframes hib-rotate{to{--hib-angle:360deg}}
+@media (prefers-reduced-motion: reduce){
+  .card-hibrido::before{animation:none;background:var(--green)}
+  .card-hibrido::after{display:none}
+}
+
+/* "Recomendado" pill on the centre (Híbrido) card — above the border */
+.opt-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--white);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 20px;border-radius:100px;box-shadow:0 8px 20px rgba(52,168,83,.4);white-space:nowrap;z-index:10}
 .opt-icon{width:58px;height:58px;border-radius:18px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin-bottom:22px}
 .opt-icon.blue{background:var(--blue-l);color:var(--blue)}
 .opt-icon.grad{background:linear-gradient(135deg,var(--green),var(--blue));color:var(--white)}
@@ -270,6 +327,35 @@ button{font-family:inherit}
 .faq-a-inner strong{color:var(--dark);font-weight:600}
 .faq-a-inner em{font-style:italic;color:var(--dark)}
 
+/* ═══════════════ CTA FORM (after FAQ) ═══════════════ */
+#cta-form{padding:128px 60px;background:transparent;scroll-margin-top:120px}
+.ctaf-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;max-width:1180px;margin:0 auto;align-items:start}
+.ctaf-left .section-label{margin-bottom:20px}
+.ctaf-left h2{font-family:var(--font);font-size:clamp(32px,4.2vw,60px);font-weight:400;letter-spacing:-1.6px;line-height:1.07;color:var(--dark)}
+.ctaf-sub{margin-top:22px;color:var(--mid);font-size:clamp(16px,1.8vw,22px);line-height:1.55;font-weight:300;max-width:520px}
+.ctaf-points{list-style:none;margin-top:34px;display:flex;flex-direction:column;gap:14px}
+.ctaf-points li{display:flex;align-items:center;gap:12px;font-family:var(--font);font-size:16px;color:var(--dark)}
+.ctaf-points li::before{content:'';width:22px;height:22px;border-radius:50%;background:var(--green-l);flex-shrink:0;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334A853' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");background-repeat:no-repeat;background-position:center;background-size:13px}
+
+.ctaf-card{background:var(--white);border:1.5px solid var(--border);border-radius:24px;padding:38px;box-shadow:0 20px 60px rgba(15,15,15,.06)}
+.ctaf-field{margin-bottom:16px}
+.ctaf-field label{display:block;font-family:var(--font);font-size:13px;font-weight:600;color:var(--dark);margin-bottom:7px}
+.ctaf-input{width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:var(--font);font-size:15px;color:var(--dark);outline:none;transition:border-color .2s;background:var(--white)}
+.ctaf-input::placeholder{color:#b3b8bd}
+.ctaf-input:focus{border-color:var(--green)}
+textarea.ctaf-input{resize:none;height:110px;line-height:1.5}
+.ctaf-submit{width:100%;margin-top:8px;padding:17px;background:var(--dark);color:var(--white);border:none;border-radius:100px;font-family:var(--font);font-size:16px;font-weight:600;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:58px}
+.ctaf-submit:hover{background:var(--green);transform:translateY(-2px);box-shadow:0 14px 32px rgba(52,168,83,.36)}
+.ctaf-submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.ctaf-priv{margin-top:14px;font-family:var(--font);font-size:12px;color:var(--soft);text-align:center;line-height:1.5}
+.ctaf-done{display:none;text-align:center;padding:46px 20px}
+.ctaf-done.show{display:block;animation:fadeUpDone .5s ease}
+@keyframes fadeUpDone{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.ctaf-done .ico{width:72px;height:72px;border-radius:50%;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin:0 auto 18px}
+.ctaf-done .ico svg{width:34px;height:34px}
+.ctaf-done h3{font-family:var(--font);font-size:24px;font-weight:700;color:var(--dark);margin-bottom:10px}
+.ctaf-done p{font-family:var(--font);font-size:15px;color:var(--mid);line-height:1.6}
+
 /* ═══════════════ Footer ═══════════════ */
 footer{background:var(--dark);color:var(--white);padding:52px 64px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:26px}
 footer .ft-logo{display:flex;align-items:center;gap:14px}
@@ -297,13 +383,13 @@ footer .ft-right a:hover{color:var(--green)}
   .btn-ghost{font-size:16px}
   .btn-white{padding:12px 24px;font-size:16px}
 
-  .hero-screen{padding:25vh 24px 8vh}
-  .hero-line{font-size:clamp(36px,9vw,68px);letter-spacing:-1.5px}
-  .hero-line .hl-no{font-size:1.55em}
+  .hero-screen{padding:11vh 24px 10vh}
+  .hero-line{font-size:clamp(29px,7.2vw,54px);letter-spacing:-1.5px}
+  .hero-line .hl-no{font-size:1.35em}
   .hero-badge{font-size:14px;padding:9px 18px;margin-bottom:28px;gap:9px}
   .hero-badge::before{width:8px;height:8px}
   .hero-actions{margin-top:32px;gap:12px}
-  .hero-actions .btn-primary,.hero-actions .btn-secondary{width:100%;justify-content:center;text-align:center;padding:15px 22px;min-height:52px;font-size:16px}
+  .hero-actions .btn-primary,.hero-actions .btn-secondary{width:100%;justify-content:center;text-align:center;padding:13px 22px;min-height:50px;font-size:13px}
 
   #sec1{padding:80px 24px}
   .ecg-canvas-wrap{height:210px;opacity:.55}
@@ -318,6 +404,8 @@ footer .ft-right a:hover{color:var(--green)}
   .sec2-header p{font-size:15px}
   .logo-card{width:84px;height:84px;border-radius:20px}
   .logo-card img{width:38px;height:38px}
+  .logo-card .logo-svg{width:38px;height:38px}
+  .logo-card .brand-svg{width:66px;height:46px}
   .logo-strip{gap:20px}
 
   #sec3{padding:80px 24px}
@@ -354,6 +442,18 @@ footer .ft-right a:hover{color:var(--green)}
   .faq-item.open .faq-a{padding:0 4px 24px}
   .faq-a-inner{font-size:14px;line-height:1.65}
 
+  .hero-sub{font-size:clamp(15px,3vw,18px);margin-top:22px;max-width:none}
+  .opt-badge{font-size:11px;padding:6px 16px;top:-13px}
+
+  #cta-form{padding:80px 24px}
+  .ctaf-grid{grid-template-columns:1fr;gap:36px;max-width:520px}
+  .ctaf-left h2{font-size:clamp(28px,5.5vw,38px)}
+  .ctaf-sub{font-size:15px}
+  .ctaf-points{margin-top:24px;gap:11px}
+  .ctaf-points li{font-size:14px}
+  .ctaf-card{padding:26px 20px;border-radius:18px}
+  .ctaf-submit{padding:15px;font-size:15px;min-height:54px}
+
   footer{flex-direction:column;gap:20px;text-align:center;padding:40px 20px}
   footer .ft-logo img{height:40px}
   footer .ft-tag{font-size:15px}
@@ -373,8 +473,8 @@ footer .ft-right a:hover{color:var(--green)}
 }
 
 @media(max-width:400px){
-  .hero-line{font-size:38px;letter-spacing:-1px}
-  .hero-line .hl-no{font-size:1.45em}
+  .hero-line{font-size:30px;letter-spacing:-1px}
+  .hero-line .hl-no{font-size:1.3em}
   .section-title{font-size:26px!important;letter-spacing:-.4px}
   .section-sub,.sec1-head p,.sec2-header p,.sec3-header p,.faq-left p{font-size:14px}
   .sec1-stats{grid-template-columns:1fr}
@@ -383,7 +483,7 @@ footer .ft-right a:hover{color:var(--green)}
 }
 
 @media(min-width:1024px) and (max-width:1280px){
-  .hero-screen{padding:30vh 48px 8vh}
+  .hero-screen{padding:13vh 48px 11vh}
   #sec1,#sec3,#sec4{padding:112px 40px}
   #sec2{padding:112px 0}
   footer{padding:44px 40px}
@@ -394,6 +494,70 @@ footer .ft-right a:hover{color:var(--green)}
   .compare-table tbody td{padding:18px 20px;font-size:16px}
   .faq-grid{gap:56px;max-width:1100px}
 }
+
+/* ═══════════════════════════════════════════════════════
+   GLOBAL −15% — every section AFTER the hero (sec1…cta-form).
+   Scales typography + component sizes only (calc(orig * .85),
+   so responsive clamp/vw values stay intact). Paddings, margins,
+   gaps and card inner padding are intentionally untouched so the
+   vertical/horizontal rhythm between sections is identical.
+═══════════════════════════════════════════════════════ */
+#sec1 .section-title,#sec2 .section-title,#sec3 .section-title{font-size:calc(clamp(32px,4.2vw,64px) * .85)}
+#sec1 .section-label,#sec2 .section-label,#sec3 .section-label,#sec4 .section-label,#cta-form .section-label{font-size:calc(16px * .85)}
+#sec1 .sec1-head p{font-size:calc(clamp(16px,1.65vw,24px) * .935)}
+#sec1 .stat-card .v{font-size:calc(52px * .85)}
+#sec1 .stat-card .l{font-size:calc(18px * .935)}
+#sec1 .btn-ghost{font-size:calc(16px * .85)}
+#sec2 .sec2-header p{font-size:calc(clamp(16px,1.8vw,26px) * .935)}
+#sec2 .btn-white{font-size:calc(16px * .85)}
+#sec3 .sec3-header p{font-size:calc(clamp(16px,1.8vw,26px) * .935)}
+#sec3 .opt-tag{font-size:calc(14px * .85)}
+#sec3 .opt-title{font-size:calc(clamp(22px,2.4vw,32px) * .85)}
+#sec3 .opt-desc{font-size:calc(18px * .935)}
+#sec3 .opt-features li{font-size:calc(16px * .935)}
+#sec3 .opt-cta{font-size:calc(16px * .85)}
+#sec3 .opt-badge{font-size:calc(12px * .85)}
+#sec3 .opt-icon{width:calc(58px * .85);height:calc(58px * .85)}
+#sec3 .opt-icon svg{width:calc(28px * .85);height:calc(28px * .85)}
+#sec3 .compare-table thead th{font-size:calc(14px * .85)}
+#sec3 .compare-table tbody td{font-size:calc(18px * .935)}
+#sec3 .compare-table .yes{font-size:calc(26px * .935)}
+#sec3 .compare-table .no{font-size:calc(20px * .935)}
+#sec3 .compare-table .v{font-size:calc(16px * .935)}
+#sec3 .sec3-final-cta .btn-primary{font-size:calc(18px * .85)}
+#sec4 .faq-left h2{font-size:calc(clamp(32px,4.2vw,64px) * .85)}
+#sec4 .faq-left p{font-size:calc(18px * .935)}
+#sec4 .faq-q{font-size:calc(24px * .85)}
+#sec4 .faq-plus{width:calc(38px * .85);height:calc(38px * .85)}
+#sec4 .faq-plus svg{width:calc(14px * .85);height:calc(14px * .85)}
+#sec4 .faq-a-inner{font-size:calc(18px * .935)}
+#cta-form .ctaf-left h2{font-size:calc(clamp(32px,4.2vw,60px) * .85)}
+#cta-form .ctaf-sub{font-size:calc(clamp(16px,1.8vw,22px) * .935)}
+#cta-form .ctaf-points li{font-size:calc(16px * .935)}
+#cta-form .ctaf-field label{font-size:calc(13px * .85)}
+#cta-form .ctaf-input{font-size:calc(15px * .85)}
+#cta-form .ctaf-submit{font-size:calc(16px * .85)}
+#cta-form .ctaf-priv{font-size:calc(12px * .85)}
+#cta-form .ctaf-done h3{font-size:calc(24px * .85)}
+#cta-form .ctaf-done p{font-size:calc(15px * .935)}
+#cta-form .ctaf-done .ico{width:calc(72px * .85);height:calc(72px * .85)}
+#cta-form .ctaf-done .ico svg{width:calc(34px * .85);height:calc(34px * .85)}
+
+/* ─── Item 4: compact stat cards on phones (placed after the override
+   block so the #sec1-scoped sizes win the source-order tiebreak) ─── */
+@media(max-width:768px){
+  #sec1 .sec1-stats{grid-template-columns:1fr 1fr;gap:.75rem;margin-top:48px}
+  #sec1 .stat-card{padding:18px 14px;border-radius:16px}
+  #sec1 .stat-card .v{font-size:2.1rem;line-height:1;letter-spacing:-1px}
+  #sec1 .stat-card .l{font-size:.8rem;line-height:1.35;margin-top:6px}
+}
+
+/* ─── Item 5: CTA-form submit button → brand green (hero button stays
+   black — this is scoped to #cta-form only) ─── */
+#cta-form .ctaf-submit{background:var(--green);color:#fff}
+#cta-form .ctaf-submit:hover{background:#2d8f47}
+#cta-form .ctaf-submit:active{background:#25753a}
+#cta-form .ctaf-submit:disabled{background:#a8d8b4;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -429,7 +593,7 @@ footer .ft-right a:hover{color:var(--green)}
       <div class="hero-badge">Telemedicina pronta pra escalar</div>
       <h1 class="hero-line">
         <span class="frag d0">Já pensou em ter uma</span><br>
-        <span class="frag d1">telemedicina&nbsp;</span><span class="hl frag d2">sua?</span>
+        <span class="frag d1">telemedicina </span><span class="hl frag d2">sua?</span>
       </h1>
     </div>
   </div>
@@ -438,9 +602,10 @@ footer .ft-right a:hover{color:var(--green)}
   <div class="hero-screen" id="hs2">
     <div class="hero-screen-inner">
       <h2 class="hero-line">
-        <span class="frag d0">A fila do SUS&nbsp;</span><span class="hl frag d1">só aumenta,</span><br>
-        <span class="frag d2">e rotina de plantão&nbsp;</span><span class="hl frag d3">cansa.</span>
+        <span class="frag d0">A fila do SUS </span><span class="hl frag d1">só aumenta,</span><br>
+        <span class="frag d2">e rotina de plantão </span><span class="hl frag d3">cansa.</span>
       </h2>
+      <p class="hero-sub">Telemedicina pra atender no seu tempo, do seu jeito, sem perder o paciente pra fila.</p>
     </div>
   </div>
 
@@ -448,10 +613,11 @@ footer .ft-right a:hover{color:var(--green)}
   <div class="hero-screen" id="hs3">
     <div class="hero-screen-inner">
       <h2 class="hero-line">
-        <span class="frag d0">A&nbsp;</span><span class="hl hl-no frag d1">nó</span><span class="frag d2">&nbsp;te entrega</span><br>
+        <span class="frag d0">A </span><span class="hl hl-no frag d1">nó</span><span class="frag d2"> te entrega</span><br>
         <span class="frag d3">a estrutura completa.</span><br>
         <span class="strong frag d4">Pronta.</span>
       </h2>
+      <p class="hero-sub">Plataforma de telemedicina white-label <strong style="font-weight:600;color:var(--dark)">ou feita personalizada pra você</strong> em até 8 semanas — você cuida do paciente, a gente do resto.</p>
     </div>
   </div>
 
@@ -459,10 +625,11 @@ footer .ft-right a:hover{color:var(--green)}
   <div class="hero-screen" id="hs4">
     <div class="hero-screen-inner">
       <h2 class="hero-line">
-        <span class="word d0">Videoconsulta,</span> <span class="word d1">prontuário,</span><br>
-        <span class="word d2">prescrição,</span> <span class="word d3">cobrança.</span><br>
-        <span class="muted word d5">Tudo conectado.</span>
+        <span class="frag d0">Sua plataforma.</span><br>
+        <span class="frag d1">Seu nome.</span><br>
+        <span class="frag d2">Seu </span><span class="hl frag d3">bolso.</span>
       </h2>
+      <p class="hero-sub">Vídeo HD, prontuário, prescrição ICP-Brasil e pagamento integrado — você atende com a sua marca e fica com a margem inteira.</p>
     </div>
   </div>
 
@@ -470,13 +637,13 @@ footer .ft-right a:hover{color:var(--green)}
   <div class="hero-screen" id="hs5">
     <div class="hero-screen-inner">
       <h2 class="hero-line">
-        <span class="frag d0">A gente cuida</span><br>
-        <span class="frag d1">da estrutura —</span><br>
-        <span class="frag d2">você dos atendimentos.</span><br>
-        <span class="hl frag d4" style="font-size:1em;opacity:.7">&nbsp;(ou nem isso…)</span>
+        <span class="frag d0">A gente cuida da estrutura —</span><br>
+        <span class="frag d1">você dos atendimentos.</span><br>
+        <span class="hl frag d3" style="opacity:.75">(ou nem isso…)</span>
       </h2>
+      <p class="hero-sub">Quer atender você mesmo, terceirizar pra outros médicos, ou os dois? A <span class="brand">nó</span> se adapta ao seu modelo, não o contrário.</p>
       <div class="hero-actions">
-        <a href="#sec3" class="btn-primary">Quero estruturar meu atendimento →</a>
+        <a href="#cta-form" class="btn-primary" data-scroll-form>Quero estruturar meu atendimento →</a>
         <a href="#sec1" class="btn-secondary">Ver como funciona</a>
       </div>
     </div>
@@ -539,7 +706,7 @@ compliance</div>
     <div class="section-label">Stack conectada</div>
     <h2 class="section-title">Conecta com tudo que você já usa no consultório.</h2>
     <p>
-      WhatsApp, Memed, Doctoralia, sistemas de prontuário, prescrição digital, pagamentos. A <span class="brand">nó</span> encaixa no que você já tem — não te obriga a abandonar nada.
+      WhatsApp, Memed, Help Global, Mevo… Sistemas de prontuário, prescrição digital, pagamentos. A <span class="brand">nó</span> se encaixa no que você já tem — ou não tem — e não te obriga a abandonar nada.
     </p>
     <a href="#sec3" class="btn-white">Ver todas as integrações <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
   </div>
@@ -559,58 +726,59 @@ compliance</div>
   </div>
 
   <div class="options-grid">
-    <!-- Card 1 -->
+    <!-- Card 1 — Videoconsulta própria -->
     <div class="option-card reveal">
       <div class="opt-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
       </div>
       <div class="opt-tag">Máximo controle</div>
-      <div class="opt-title">Videoconsulta Própria</div>
+      <div class="opt-title">Videoconsulta própria</div>
       <div class="opt-desc">Plataforma com a tua cara. Você manda em tudo — agenda, preço, marca, fluxo de atendimento. A <span class="brand">nó</span> cuida da parte chata.</div>
       <ul class="opt-features">
         <li>Sala de vídeo HD com sua marca</li>
         <li>Prontuário eletrônico integrado</li>
         <li>Prescrição com assinatura digital ICP-Brasil</li>
-        <li>Cobrança automática (Pix, cartão)</li>
+        <li>Recebimento de pagamento e cobrança automática (Pix, cartão)</li>
         <li>Suporte técnico exclusivo</li>
       </ul>
-      <a href="/#cta" class="opt-cta">Quero saber mais →</a>
+      <a href="#cta-form" class="opt-cta" data-scroll-form>Quero minha plataforma →</a>
     </div>
 
-    <!-- Card 2 — featured -->
-    <div class="option-card featured reveal reveal-d1">
-      <div class="opt-icon blue">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3.54-3.54a5 5 0 0 0-7.07-7.07l-1.41 1.41"/><path d="M14 11a5 5 0 0 0-7.07 0l-3.54 3.54a5 5 0 0 0 7.07 7.07l1.41-1.41"/></svg>
-      </div>
-      <div class="opt-tag">Mais rápido</div>
-      <div class="opt-title">Integração com Plataforma Existente</div>
-      <div class="opt-desc">Já usa Doctoralia, Conexa, Memed? A <span class="brand">nó</span> integra e turbina o que você já tem — sem te forçar a migrar nada.</div>
-      <ul class="opt-features">
-        <li>Integração com plataformas líderes</li>
-        <li>Centralização de agenda e pagamentos</li>
-        <li>Automação de follow-up no WhatsApp</li>
-        <li>Dashboard único de pacientes</li>
-        <li>Migração gratuita de dados</li>
-      </ul>
-      <a href="/#cta" class="opt-cta">Quero saber mais →</a>
-    </div>
-
-    <!-- Card 3 -->
-    <div class="option-card reveal reveal-d2">
+    <!-- Card 2 — Atendimento Híbrido (centro, recomendado) -->
+    <div class="option-card card-hibrido reveal reveal-d1">
+      <div class="opt-badge">Recomendado</div>
       <div class="opt-icon grad">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
       </div>
       <div class="opt-tag">Melhor dos dois mundos</div>
       <div class="opt-title">Atendimento Híbrido</div>
-      <div class="opt-desc">Plataforma própria + integrações externas, conforme o caso. Flexibilidade total — pra escalar quando começar a bombar.</div>
+      <div class="opt-desc">Plataforma própria + integrações externas, conforme o caso. Flexibilidade total — pra escalar quando começar a bombar, ou pra estudar pra residência sem perder paciente.</div>
       <ul class="opt-features">
         <li>Videoconsulta própria E terceirizada</li>
-        <li>Switch entre canais por paciente</li>
-        <li>Pricing diferenciado por tipo de atendimento</li>
-        <li>Relatórios consolidados</li>
-        <li>Tudo do Plano 1 + Plano 2</li>
+        <li>Switch entre canais de atendimento — você escolhe onde o paciente é atendido (por você ou por médicos terceiros)</li>
+        <li>Preço diferenciado por tipo de atendimento</li>
+        <li>Relatórios consolidados e dashboards interativos</li>
+        <li>Tudo das duas opções anteriores</li>
       </ul>
-      <a href="/#cta" class="opt-cta">Quero saber mais →</a>
+      <a href="#cta-form" class="opt-cta" data-scroll-form>Quero o modelo híbrido →</a>
+    </div>
+
+    <!-- Card 3 — Integração com Plataforma Existente -->
+    <div class="option-card reveal reveal-d2">
+      <div class="opt-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3.54-3.54a5 5 0 0 0-7.07-7.07l-1.41 1.41"/><path d="M14 11a5 5 0 0 0-7.07 0l-3.54 3.54a5 5 0 0 0 7.07 7.07l1.41-1.41"/></svg>
+      </div>
+      <div class="opt-tag">Mais rápido</div>
+      <div class="opt-title">Integração com Plataforma Existente</div>
+      <div class="opt-desc">Você já trabalha com telemedicina e quer replicar o processo de Doctoralia, Conexa, Memed, HelpGlobal? A <span class="brand">nó</span> integra e turbina o que você já tem — sem te forçar a migrar nada.</div>
+      <ul class="opt-features">
+        <li>Integração com plataformas líderes</li>
+        <li>Centralização de agenda e pagamentos</li>
+        <li>Automação de follow-up no WhatsApp e estratégia de posicionamento</li>
+        <li>Dashboard de pacientes, acessos e tráfego</li>
+        <li>Migração gratuita de dados</li>
+      </ul>
+      <a href="#cta-form" class="opt-cta" data-scroll-form>Quero integrar o que já tenho →</a>
     </div>
   </div>
 
@@ -621,25 +789,27 @@ compliance</div>
         <tr>
           <th>Feature</th>
           <th>Própria</th>
-          <th>Terceirizada</th>
           <th>Híbrido</th>
+          <th>Integração</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Marca personalizada</td><td><span class="yes">✓</span></td><td><span class="no">–</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Marca personalizada</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
         <tr><td>Integração com plataformas externas</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
         <tr><td>Prescrição eletrônica ICP-Brasil</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
         <tr><td>WhatsApp automatizado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
         <tr><td>Migração de dados existentes</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
         <tr><td>Suporte dedicado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
-        <tr><td>Setup em semanas</td><td><span class="v">8–12</span></td><td><span class="v">2–4</span></td><td><span class="v">6–10</span></td></tr>
-        <tr><td>Flexibilidade máxima</td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Setup em semanas</td><td><span class="v">8–12</span></td><td><span class="v">6–10</span></td><td><span class="v">2–4</span></td></tr>
+        <tr><td>Flexibilidade máxima</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
+        <tr><td>Checkout Integrado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
+        <tr><td>Videochamada Integrada</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="sec3-final-cta reveal">
-    <a href="/#cta" class="btn-primary">Falar com a <span class="brand" style="color:#fff">nó</span> →</a>
+    <a href="#cta-form" class="btn-primary" data-scroll-form>Falar com a <span class="brand" style="color:#fff">nó</span> →</a>
   </div>
 </section>
 
@@ -649,9 +819,55 @@ compliance</div>
     <div class="faq-left reveal">
       <div class="section-label">FAQ</div>
       <h2>Perguntas que a galera faz.</h2>
-      <p>As dúvidas que aparecem na primeira call. Não achou a sua? <a href="/#cta" style="color:var(--green);font-weight:600">Fala com a gente</a>.</p>
+      <p>As dúvidas que aparecem na primeira call. Não achou a sua? <a href="#cta-form" data-scroll-form style="color:var(--green);font-weight:600">Fala com a gente</a>.</p>
     </div>
     <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ CTA FORM (after FAQ) ═══════════════ -->
+<section id="cta-form">
+  <div class="ctaf-grid">
+    <div class="ctaf-left reveal">
+      <div class="section-label">Bora começar</div>
+      <h2>Bora estruturar seu atendimento?</h2>
+      <p class="ctaf-sub">Em até 8 semanas você está atendendo na sua plataforma. Conta pra gente o que você precisa.</p>
+      <ul class="ctaf-points">
+        <li>Resposta em até 24h, sem robô</li>
+        <li>Conversa sem compromisso</li>
+        <li>Demo personalizada com a sua marca</li>
+      </ul>
+    </div>
+
+    <div class="ctaf-card reveal reveal-d1">
+      <form id="healthLeadForm" novalidate>
+        <div class="ctaf-field">
+          <label for="hf-nm">Nome completo</label>
+          <input class="ctaf-input" id="hf-nm" name="nome" type="text" autocomplete="name" placeholder="Dr(a). seu nome" required>
+        </div>
+        <div class="ctaf-field">
+          <label for="hf-em">E-mail</label>
+          <input class="ctaf-input" id="hf-em" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required>
+        </div>
+        <div class="ctaf-field">
+          <label for="hf-wh">WhatsApp</label>
+          <input class="ctaf-input" id="hf-wh" name="whatsapp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="16" required>
+        </div>
+        <div class="ctaf-field">
+          <label for="hf-msg">Mensagem</label>
+          <textarea class="ctaf-input" id="hf-msg" name="mensagem" placeholder="Me conta seu momento: recém-formado, plantonista, já atende online…? Qual modelo te interessa?"></textarea>
+        </div>
+        <button type="submit" class="ctaf-submit" id="hf-submit">Quero estruturar meu atendimento →</button>
+        <p class="ctaf-priv">Seus dados ficam só com a <span class="brand">nó</span>. Sem spam, prometido.</p>
+      </form>
+      <div class="ctaf-done" id="ctafDone">
+        <div class="ico">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h3>Recebido! 🎉</h3>
+        <p>Já tá com a gente. Em até <strong>24h</strong> a <span class="brand">nó</span> te chama no e-mail e no WhatsApp pra estruturar seu atendimento.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -665,14 +881,14 @@ compliance</div>
   </div>
   <div class="ft-right">
     <a href="/">Home</a>
-    <a href="/#cta">Contato</a>
+    <a href="#cta-form" data-scroll-form>Contato</a>
     <a href="/#faq">FAQ geral</a>
     <span>© 2026 <span class="brand">nó</span></span>
   </div>
 </footer>
 
 <!-- Mobile fixed CTA -->
-<a href="#sec3" class="mobile-cta-fixed">Falar com a nó →</a>
+<a href="#cta-form" class="mobile-cta-fixed" data-scroll-form>Falar com a nó →</a>
 
 <script type="module">
   import { initPillNav } from '/shared/pillnav.js';
@@ -683,7 +899,68 @@ compliance</div>
     activeHref: '/health/'
   });
 </script>
+<script src="./brand-icons.js" defer></script>
 <script src="./main.js" defer></script>
+<script type="module">
+  /* ─── Smooth scroll to the CTA form ─── */
+  function scrollToForm(e) {
+    if (e) e.preventDefault();
+    const t = document.getElementById('cta-form');
+    if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  document.addEventListener('click', (e) => {
+    // On /health, the pill-nav "Contact" (href="/#cta") and any in-page
+    // contact link must scroll to THIS page's #cta-form instead of
+    // navigating to the home form.
+    const link = e.target.closest(
+      '[data-scroll-form], a[href="#cta-form"], a[href="/#cta"], a[href="#cta"]'
+    );
+    if (link) scrollToForm(e);
+  });
+
+  /* ─── WhatsApp mask: (11) 99999-9999 ─── */
+  const wh = document.getElementById('hf-wh');
+  if (wh) {
+    wh.addEventListener('input', () => {
+      let v = wh.value.replace(/\D/g, '').slice(0, 11);
+      if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+      else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+      else if (v.length > 0) v = `(${v}`;
+      wh.value = v;
+    });
+  }
+
+  /* ─── Form submit → same Supabase endpoint the home form uses ─── */
+  const form = document.getElementById('healthLeadForm');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const nm = document.getElementById('hf-nm').value.trim();
+      const em = document.getElementById('hf-em').value.trim();
+      const whv = document.getElementById('hf-wh').value.trim();
+      const msg = document.getElementById('hf-msg').value.trim();
+      if (!nm || !em) { alert('Preencha pelo menos seu nome e e-mail!'); return; }
+      const btn = document.getElementById('hf-submit');
+      btn.disabled = true;
+      btn.textContent = 'Enviando...';
+      try {
+        await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nome: nm, email: em, whatsapp: whv,
+            contexto: 'nó Health — landing page',
+            objetivos: 'Estruturar atendimento (telemedicina)',
+            investimento: '', prazo: '',
+            aiAnalysis: msg
+          })
+        });
+      } catch (err) { console.warn('Email send failed:', err); }
+      form.style.display = 'none';
+      document.getElementById('ctafDone').classList.add('show');
+    });
+  }
+</script>
 <script type="module">
   import { initParticles, hasWebGL } from './particles.js';
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
