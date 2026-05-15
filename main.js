@@ -346,9 +346,6 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
 
 
 
-/* ─── NAV SCROLL ─── */
-window.addEventListener('scroll',function(){document.getElementById('nav').classList.toggle('scrolled',scrollY>40);});
-
 /* ─── REVEAL ─── */
 var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:.08});
 function reobserve(){document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});}

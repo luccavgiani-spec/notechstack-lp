@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="view-transition" content="same-origin">
+<title>nó Health — Telemedicina pronta pra quem quer largar o plantão</title>
+<meta name="description" content="Estrutura completa de telemedicina white-label pra médicos recém-formados, residentes e plantonistas que querem atender online sem montar tudo do zero.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preload" href="/fonts/dm-sans-v17-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/shared/pillnav.css">
+<link rel="stylesheet" href="/shared/transitions.css">
+<style>
+/* ─── Self-hosted fonts ─── */
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:300;font-display:swap;src:url('/fonts/dm-sans-v17-latin-300.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:500;font-display:swap;src:url('/fonts/dm-sans-v17-latin-500.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/dm-sans-v17-latin-600.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/dm-sans-v17-latin-700.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:italic;font-weight:400;font-display:swap;src:url('/fonts/dm-sans-v17-latin-italic.woff2') format('woff2')}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/caveat-v23-latin-700.woff2') format('woff2')}
+
+/* ─── Tokens ─── */
+:root{
+  --font:'DM Sans','Helvetica Neue',system-ui,sans-serif;
+  --font-accent:'Caveat',cursive;
+  --blue:#4285F4; --blue-l:#e8f0fe;
+  --green:#34A853; --green-l:#e6f4ea;
+  --green-d:#1f7a3a;
+  --red:#EA4335; --yellow:#FBBC04;
+  --dark:#0f0f0f; --mid:#5f6368; --soft:#9aa0a6;
+  --light:#f8f9fa; --white:#fff; --border:#e8eaed;
+  --health-bg:#E6F4EA;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;background:var(--health-bg)}
+body{font-family:var(--font);background:var(--white);color:var(--dark);overflow-x:hidden;line-height:1.5;padding-top:96px;position:relative;animation:tint-health 800ms cubic-bezier(0.4,0,0.2,1) 100ms forwards}
+@media (max-width:768px){body{padding-top:80px}}
+
+@keyframes tint-health{
+  0%{background-color:#ffffff}
+  100%{background-color:var(--health-bg)}
+}
+
+/* Radial ripple of green sweeping from the top-center pill nav outward */
+body::before{
+  content:'';
+  position:fixed;
+  top:0;
+  left:50%;
+  width:0;
+  height:0;
+  background:radial-gradient(circle,rgba(52,168,83,0.18),transparent 70%);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  z-index:0;
+  animation:ripple-health 1200ms cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes ripple-health{
+  0%{width:0;height:0;opacity:0}
+  30%{opacity:1}
+  100%{width:300vmax;height:300vmax;opacity:0}
+}
+@media (prefers-reduced-motion: reduce){
+  body{background-color:var(--health-bg);animation:none}
+  body::before{display:none}
+}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+button{font-family:inherit}
+
+/* ─── Brand inline ─── */
+.brand{font-family:var(--font-accent);font-weight:700;color:var(--green);font-size:1.5em;line-height:.6;display:inline-block;letter-spacing:-.02em;vertical-align:baseline;margin:0 .18em}
+.brand-blue{color:var(--blue)}
+.brand-lg{font-size:1.725em;margin:0 .22em}
+.brand-xl{font-size:1.95em;margin:0 .26em}
+
+/* Hero hl tokens (Caveat italic) need their own breathing room since the
+   surrounding font-size is huge (8vw) — em-based margin handles all sizes */
+.hero-line .hl{font-family:var(--font-accent);color:var(--green);font-weight:700;font-size:1.22em;line-height:.6;letter-spacing:.02em;display:inline-block;vertical-align:baseline;font-style:italic;margin:0 .35em}
+.hero-line .hl-no{font-size:1.7em;margin:0 .42em}
+
+/* ─── Custom cursor ─── */
+.cursor{width:10px;height:10px;background:var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply;left:-50px;top:-50px}
+.cursor-ring{width:38px;height:38px;border:1.5px solid var(--blue);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .22s ease;opacity:.45;left:-50px;top:-50px}
+@media(hover:none),(max-width:768px){.cursor,.cursor-ring{display:none}}
+
+/* ─── Scroll progress bar (top) ─── */
+.scroll-progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--green);z-index:9999;transition:width .08s ease;will-change:width}
+
+/* ─── Hero side dots indicator (desktop only) ─── */
+.hero-dots{position:fixed;top:50%;right:28px;transform:translateY(-50%);display:flex;flex-direction:column;gap:18px;z-index:90;opacity:0;pointer-events:none;transition:opacity .3s}
+.hero-dots.show{opacity:1;pointer-events:auto}
+.hero-dots .dot{width:9px;height:9px;border-radius:50%;border:none;cursor:pointer;background:rgba(15,15,15,.18);padding:0;transition:all .3s cubic-bezier(.4,0,.2,1)}
+.hero-dots .dot:hover{background:var(--green)}
+.hero-dots .dot.active{background:var(--green);transform:scale(1.5);box-shadow:0 0 0 5px rgba(52,168,83,.18)}
+@media(max-width:1023px){.hero-dots{display:none}}
+
+/* ─── Common ─── */
+.section-label{display:inline-flex;align-items:center;gap:12px;font-family:var(--font);font-size:16px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--green);margin-bottom:20px}
+.section-label::before{content:'';width:26px;height:2px;border-radius:2px;background:var(--green)}
+.section-label.term::after{content:'';display:inline-block;width:8px;height:18px;background:var(--green);animation:caret 1.1s steps(1) infinite;margin-left:3px}
+@keyframes caret{0%,50%{opacity:1}51%,100%{opacity:0}}
+.section-title{font-family:var(--font);font-size:clamp(32px,4.2vw,64px);font-weight:400;line-height:1.08;letter-spacing:-1.6px;color:var(--dark)}
+.section-sub{font-family:var(--font);font-size:clamp(16px,1.8vw,26px);font-weight:300;color:var(--mid);line-height:1.55;max-width:760px;margin-top:20px}
+
+.btn-primary{background:var(--dark);color:var(--white);padding:16px 32px;border-radius:100px;font-family:var(--font);font-size:18px;font-weight:600;border:none;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:10px;min-height:60px;box-shadow:0 8px 22px rgba(15,15,15,.18)}
+.btn-primary:hover{background:var(--green);transform:translateY(-2px);box-shadow:0 16px 38px rgba(52,168,83,.36)}
+.btn-secondary{background:transparent;color:var(--dark);padding:16px 32px;border-radius:100px;font-family:var(--font);font-size:18px;font-weight:600;border:2px solid var(--border);cursor:pointer;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:10px;min-height:60px}
+.btn-secondary:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--dark);border:none;font-family:var(--font);font-weight:600;font-size:16px;display:inline-flex;align-items:center;gap:10px;cursor:pointer;padding:8px 0}
+.btn-ghost:hover{color:var(--green)}
+.btn-white{background:var(--white);color:var(--dark);padding:14px 28px;border-radius:100px;font-family:var(--font);font-size:16px;font-weight:600;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 8px 22px rgba(0,0,0,.06);transition:all .25s}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 1px 2px rgba(0,0,0,.06),0 16px 36px rgba(52,168,83,.18);color:var(--green)}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}
+.reveal-blur{opacity:0;filter:blur(4px);transform:translateY(20px);transition:opacity .7s,filter .7s,transform .7s}
+.reveal-blur.visible{opacity:1;filter:blur(0);transform:translateY(0)}
+
+/* ═══════════════ HERO — 5-screen scroll narrative ═══════════════ */
+#hero{position:relative;height:500vh;background:transparent;isolation:isolate}
+.hero-bg{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:linear-gradient(rgba(52,168,83,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(52,168,83,.06) 1px,transparent 1px);background-size:64px 64px}
+.hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 50%,transparent 0%,rgba(255,255,255,.55) 100%)}
+
+/* Single sticky pin container: 100vh tall, slides through entire #hero scroll */
+.hero-pin{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;z-index:1}
+
+/* WebGL particles canvas — sits behind grid + content */
+.hero-particles{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-particles canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:auto}
+
+/* Each screen is absolutely positioned inside the pin, fades in when active.
+   Aligned to ~30% of viewport (eyeline) instead of center for better visual balance. */
+.hero-screen{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;padding:30vh 80px 8vh;opacity:0;pointer-events:none;transition:opacity .55s ease}
+.hero-screen.in{opacity:1;pointer-events:auto}
+.hero-screen-inner{max-width:1200px;margin:0 auto;width:100%}
+
+.hero-line{font-family:var(--font);font-weight:500;font-size:clamp(48px,8vw,120px);line-height:1.05;letter-spacing:-2.4px;word-spacing:.05em;color:var(--dark);display:block}
+.hero-line .word,.hero-line .frag{display:inline-block;opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.hero-screen.in .hero-line .word,.hero-screen.in .hero-line .frag{opacity:1;transform:translateY(0)}
+.hero-line .word.d0,.hero-line .frag.d0{transition-delay:.05s}
+.hero-line .word.d1,.hero-line .frag.d1{transition-delay:.2s}
+.hero-line .word.d2,.hero-line .frag.d2{transition-delay:.35s}
+.hero-line .word.d3,.hero-line .frag.d3{transition-delay:.5s}
+.hero-line .word.d4,.hero-line .frag.d4{transition-delay:.65s}
+.hero-line .word.d5,.hero-line .frag.d5{transition-delay:.8s}
+.hero-line .word.d6,.hero-line .frag.d6{transition-delay:.95s}
+.hero-line .word.d7,.hero-line .frag.d7{transition-delay:1.1s}
+
+.hero-line .strong{font-weight:700}
+.hero-line .muted{opacity:.42}
+
+.hero-badge{display:inline-flex;align-items:center;gap:12px;border:1.5px solid var(--border);background:rgba(255,255,255,.85);padding:11px 22px;border-radius:100px;font-family:var(--font);font-size:18px;font-weight:600;letter-spacing:.02em;color:var(--mid);margin-bottom:40px;opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.hero-badge::before{content:'';width:9px;height:9px;background:var(--green);border-radius:50%;animation:blink 1.5s ease-in-out infinite}
+.hero-screen.in .hero-badge{opacity:1;transform:translateY(0)}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.4)}}
+
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:44px;opacity:0;transform:translateY(20px);transition:opacity .7s ease 1s,transform .7s ease 1s}
+.hero-screen.in .hero-actions{opacity:1;transform:translateY(0)}
+
+/* Screen 5 has CTAs + 4 lines of text — needs slightly smaller type to fit */
+#hs5 .hero-line{font-size:clamp(38px,6.4vw,96px)}
+#hs5 .hero-actions{margin-top:40px}
+
+/* ═══════════════ SEC 1 — Trust + ECG background ═══════════════ */
+#sec1{padding:128px 60px;position:relative;overflow:hidden;background:transparent}
+.ecg-canvas-wrap{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);height:300px;pointer-events:none;z-index:0;opacity:.7}
+.ecg-canvas-wrap svg{width:100%;height:100%;display:block}
+.ecg-path{fill:none;stroke:var(--green);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 9px rgba(52,168,83,.6))}
+.ecg-path.front{opacity:.08}
+.ecg-dot{fill:var(--green);filter:drop-shadow(0 0 14px rgba(52,168,83,.95)) drop-shadow(0 0 26px rgba(52,168,83,.55))}
+
+.sec1-inner{position:relative;z-index:2;max-width:1280px;margin:0 auto}
+.sec1-head{max-width:960px;margin:0 auto;text-align:center;padding:24px 24px 0;background:radial-gradient(ellipse 90% 100% at 50% 50%,rgba(255,255,255,.96) 0%,rgba(255,255,255,.7) 70%,transparent 100%);border-radius:28px}
+.sec1-head .section-label{justify-content:center}
+.sec1-head h2{margin:0 auto}
+.sec1-head h2 .muted{color:var(--soft);opacity:.55}
+.sec1-head p{color:var(--mid);line-height:1.55;font-size:clamp(16px,1.65vw,24px);font-weight:300;margin:22px auto 28px;max-width:760px}
+
+.sec1-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:96px;max-width:1280px;margin-left:auto;margin-right:auto;width:100%;position:relative;z-index:2}
+.stat-card{padding:38px 30px;border:1px solid var(--border);border-radius:22px;background:var(--white);transition:transform .3s,border-color .3s,box-shadow .3s}
+.stat-card:hover{transform:translateY(-4px);border-color:rgba(52,168,83,.4);box-shadow:0 16px 36px rgba(52,168,83,.08)}
+.stat-card .v{font-family:var(--font);font-size:52px;font-weight:500;color:var(--green);letter-spacing:-1.6px;line-height:1}
+.stat-card .l{font-family:var(--font);font-size:18px;color:var(--mid);margin-top:14px;line-height:1.45;white-space:pre-line}
+
+/* ═══════════════ SEC 2 — Integrations ═══════════════ */
+#sec2{padding:128px 0;background:transparent;overflow:hidden}
+.sec2-header{text-align:center;padding:0 40px;max-width:920px;margin:0 auto 64px}
+.sec2-header .section-label{justify-content:center}
+.sec2-header h2{margin:0 auto}
+.sec2-header p{margin:22px auto 32px;color:var(--mid);font-size:clamp(16px,1.8vw,26px);line-height:1.55;font-weight:300}
+
+.logo-marquee{width:100%;position:relative}
+.logo-marquee::before,.logo-marquee::after{content:'';position:absolute;top:0;bottom:0;width:160px;z-index:2;pointer-events:none}
+.logo-marquee::before{left:0;background:linear-gradient(to right,var(--health-bg) 5%,transparent)}
+.logo-marquee::after{right:0;background:linear-gradient(to left,var(--health-bg) 5%,transparent)}
+.logo-row{overflow:hidden;padding:14px 0}
+.logo-strip{display:flex;gap:28px;white-space:nowrap;will-change:transform}
+.logo-card{flex-shrink:0;width:112px;height:112px;background:var(--white);border-radius:26px;display:grid;place-items:center;box-shadow:0 1px 2px rgba(15,15,15,.04),0 10px 28px rgba(15,15,15,.06);transition:transform .25s,box-shadow .25s}
+.logo-card:hover{transform:translateY(-3px);box-shadow:0 1px 2px rgba(15,15,15,.04),0 16px 36px rgba(52,168,83,.18)}
+.logo-card img{width:48px;height:48px;object-fit:contain}
+.logo-card .ph{font-family:var(--font);font-size:13px;font-weight:700;color:var(--mid);text-align:center;padding:5px;line-height:1.2}
+
+/* ═══════════════ SEC 3 — Options ═══════════════ */
+#sec3{padding:128px 60px;background:transparent}
+.sec3-header{text-align:center;max-width:920px;margin:0 auto 76px}
+.sec3-header .section-label{justify-content:center}
+.sec3-header h2{margin:0 auto}
+.sec3-header p{margin:22px auto 0;color:var(--mid);font-size:clamp(16px,1.8vw,26px);line-height:1.55;font-weight:300}
+
+.options-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:1240px;margin:0 auto}
+.option-card{background:var(--white);border:1.5px solid var(--border);border-radius:22px;padding:44px 36px;transition:all .3s ease;display:flex;flex-direction:column;position:relative}
+.option-card:hover{transform:translateY(-4px);box-shadow:0 24px 56px rgba(52,168,83,.1);border-color:rgba(52,168,83,.4)}
+.option-card.featured{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,linear-gradient(135deg,var(--green),var(--blue)) border-box;box-shadow:0 16px 40px rgba(66,133,244,.08)}
+.option-card.featured::before{content:'RECOMENDADO';position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--green),var(--blue));color:var(--white);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.12em;padding:6px 18px;border-radius:100px;box-shadow:0 8px 18px rgba(66,133,244,.3)}
+.opt-icon{width:58px;height:58px;border-radius:18px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin-bottom:22px}
+.opt-icon.blue{background:var(--blue-l);color:var(--blue)}
+.opt-icon.grad{background:linear-gradient(135deg,var(--green),var(--blue));color:var(--white)}
+.opt-icon svg{width:28px;height:28px}
+.opt-tag{font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);margin-bottom:10px}
+.option-card.featured .opt-tag{background:linear-gradient(135deg,var(--green),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.opt-title{font-family:var(--font);font-size:clamp(22px,2.4vw,32px);font-weight:700;color:var(--dark);letter-spacing:-.8px;line-height:1.18;margin-bottom:14px}
+.opt-desc{font-family:var(--font);font-size:18px;color:var(--mid);line-height:1.55;font-weight:300;margin-bottom:28px}
+.opt-features{list-style:none;margin-bottom:32px;flex:1}
+.opt-features li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;font-family:var(--font);font-size:16px;line-height:1.45;color:var(--dark)}
+.opt-features li::before{content:'';width:22px;height:22px;border-radius:50%;background:var(--green-l);display:grid;place-items:center;flex-shrink:0;margin-top:2px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2334A853' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='20 6 9 17 4 12'/></svg>");background-repeat:no-repeat;background-position:center;background-size:13px}
+.opt-cta{width:100%;padding:16px;background:var(--dark);color:var(--white);border:none;border-radius:100px;font-family:var(--font);font-weight:600;font-size:16px;cursor:pointer;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;min-height:56px}
+.opt-cta:hover{background:var(--green);transform:translateY(-2px);box-shadow:0 14px 32px rgba(52,168,83,.36)}
+
+/* Comparison table */
+.compare-wrap{max-width:1180px;margin:76px auto 0;border:1.5px solid var(--border);border-radius:24px;overflow:hidden;background:var(--white)}
+.compare-table{width:100%;border-collapse:collapse;font-family:var(--font)}
+.compare-table thead th{background:var(--green-l);color:var(--green-d);padding:22px 20px;font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:center;border-bottom:1px solid var(--border);min-width:150px}
+.compare-table thead th:first-child{text-align:left;color:var(--mid);background:var(--light);min-width:auto}
+.compare-table tbody td{padding:20px 22px;font-size:18px;border-bottom:1px solid var(--border)}
+.compare-table tbody tr:last-child td{border-bottom:none}
+.compare-table tbody td:not(:first-child){text-align:center}
+.compare-table tbody td:first-child{color:var(--dark);font-weight:500}
+.compare-table tbody tr:nth-child(even) td{background:var(--light)}
+.compare-table .yes{color:var(--green);font-weight:700;font-size:26px}
+.compare-table .no{color:var(--soft);font-weight:400;font-size:20px}
+.compare-table .v{color:var(--dark);font-weight:600;font-size:16px}
+
+.sec3-final-cta{text-align:center;margin-top:64px}
+.sec3-final-cta .btn-primary{padding:20px 44px;font-size:18px;background:var(--green);box-shadow:0 12px 30px rgba(52,168,83,.32);min-height:64px}
+.sec3-final-cta .btn-primary:hover{background:var(--green-d);box-shadow:0 18px 42px rgba(52,168,83,.42)}
+
+/* ═══════════════ SEC 4 — FAQ ═══════════════ */
+#sec4{padding:128px 60px;background:transparent}
+.faq-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:76px;max-width:1240px;margin:0 auto;width:100%;align-items:start}
+.faq-left{position:sticky;top:100px}
+.faq-left .section-label{margin-bottom:20px}
+.faq-left h2{font-family:var(--font);font-size:clamp(32px,4.2vw,64px);font-weight:400;letter-spacing:-1.6px;line-height:1.07;color:var(--dark)}
+.faq-left p{margin-top:22px;color:var(--mid);font-size:18px;line-height:1.55;font-weight:300}
+.faq-list{display:flex;flex-direction:column}
+.faq-item{border-bottom:1px solid var(--border)}
+.faq-item:first-child{border-top:1px solid var(--border)}
+.faq-q{width:100%;background:none;border:none;padding:32px 6px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-family:var(--font);font-size:24px;font-weight:600;color:var(--dark);cursor:pointer;text-align:left;transition:opacity .2s;min-height:56px;line-height:1.25;letter-spacing:-.3px}
+.faq-q:hover{opacity:.7}
+.faq-plus{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);display:grid;place-items:center;flex-shrink:0;transition:all .3s ease;color:var(--mid);background:var(--white)}
+.faq-plus svg{width:14px;height:14px}
+.faq-item.open .faq-plus{background:var(--green);border-color:var(--green);color:var(--white);transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s ease,padding .35s ease}
+.faq-item.open .faq-a{max-height:680px;padding:0 6px 32px}
+.faq-a-inner{color:var(--mid);font-size:18px;line-height:1.6;font-weight:300}
+.faq-a-inner strong{color:var(--dark);font-weight:600}
+.faq-a-inner em{font-style:italic;color:var(--dark)}
+
+/* ═══════════════ Footer ═══════════════ */
+footer{background:var(--dark);color:var(--white);padding:52px 64px;border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;gap:26px}
+footer .ft-logo{display:flex;align-items:center;gap:14px}
+footer .ft-logo img{height:46px;width:auto}
+footer .ft-tag{font-family:var(--font);font-size:18px;color:rgba(255,255,255,.6);margin-top:11px;letter-spacing:-.15px}
+footer .ft-tag .brand{color:var(--green)}
+footer .ft-right{display:flex;align-items:center;gap:26px;font-family:var(--font);font-size:15px;color:rgba(255,255,255,.42)}
+footer .ft-right a{color:rgba(255,255,255,.55);transition:color .2s}
+footer .ft-right a:hover{color:var(--green)}
+
+/* ═══════════════ Mobile bottom CTA ═══════════════ */
+.mobile-cta-fixed{display:none;position:fixed;bottom:16px;left:16px;right:16px;z-index:80;background:var(--green);color:var(--white);padding:14px;border-radius:100px;text-align:center;font-family:var(--font);font-weight:600;font-size:15px;box-shadow:0 12px 30px rgba(52,168,83,.36);text-decoration:none;backdrop-filter:blur(8px);min-height:54px;align-items:center;justify-content:center}
+
+/* ═══════════════════════════════════════
+   TABLET (1024px down)
+═══════════════════════════════════════ */
+@media(max-width:1023px){
+  .section-label{font-size:13px;gap:9px}
+  .section-label::before{width:20px;height:2px}
+  .section-label.term::after{width:7px;height:14px}
+  .section-title{font-size:clamp(32px,5.5vw,42px);letter-spacing:-.8px}
+  .section-sub{font-size:clamp(15px,3.2vw,18px)}
+
+  .btn-primary,.btn-secondary{padding:14px 26px;font-size:16px;min-height:52px}
+  .btn-ghost{font-size:16px}
+  .btn-white{padding:12px 24px;font-size:16px}
+
+  .hero-screen{padding:25vh 24px 8vh}
+  .hero-line{font-size:clamp(36px,9vw,68px);letter-spacing:-1.5px}
+  .hero-line .hl-no{font-size:1.55em}
+  .hero-badge{font-size:14px;padding:9px 18px;margin-bottom:28px;gap:9px}
+  .hero-badge::before{width:8px;height:8px}
+  .hero-actions{margin-top:32px;gap:12px}
+  .hero-actions .btn-primary,.hero-actions .btn-secondary{width:100%;justify-content:center;text-align:center;padding:15px 22px;min-height:52px;font-size:16px}
+
+  #sec1{padding:80px 24px}
+  .ecg-canvas-wrap{height:210px;opacity:.55}
+  .sec1-head p{font-size:15px;margin:18px auto 24px}
+  .sec1-stats{grid-template-columns:1fr 1fr;gap:14px;margin-top:64px}
+  .stat-card{padding:26px 20px;border-radius:18px}
+  .stat-card .v{font-size:clamp(32px,8vw,42px)}
+  .stat-card .l{font-size:14px;margin-top:10px}
+
+  #sec2{padding:80px 0}
+  .sec2-header{padding:0 24px;margin-bottom:40px}
+  .sec2-header p{font-size:15px}
+  .logo-card{width:84px;height:84px;border-radius:20px}
+  .logo-card img{width:38px;height:38px}
+  .logo-strip{gap:20px}
+
+  #sec3{padding:80px 24px}
+  .sec3-header p{font-size:15px}
+  .options-grid{grid-template-columns:1fr;gap:20px;max-width:480px}
+  .option-card{padding:30px 24px}
+  .opt-icon{width:50px;height:50px;border-radius:16px;margin-bottom:18px}
+  .opt-icon svg{width:24px;height:24px}
+  .opt-tag{font-size:12px}
+  .opt-title{font-size:clamp(20px,4.2vw,24px)}
+  .opt-desc{font-size:15px;margin-bottom:24px}
+  .opt-features li{font-size:14px;padding:8px 0;gap:10px}
+  .opt-features li::before{width:20px;height:20px;background-size:12px}
+  .opt-cta{padding:14px;font-size:14px;min-height:52px}
+  .compare-wrap{margin-top:52px;overflow-x:auto;-webkit-overflow-scrolling:touch;position:relative;border-radius:18px}
+  .compare-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:32px;background:linear-gradient(to left,rgba(15,15,15,.06),transparent);pointer-events:none}
+  .compare-table{min-width:680px}
+  .compare-table thead{position:sticky;top:0;z-index:1}
+  .compare-table thead th{padding:14px 12px;font-size:12px;min-width:120px}
+  .compare-table tbody td{padding:14px 16px;font-size:14px}
+  .compare-table .yes{font-size:20px}
+  .compare-table .no{font-size:16px}
+  .sec3-final-cta{margin-top:50px}
+  .sec3-final-cta .btn-primary{padding:15px 30px;font-size:15px;min-height:54px}
+
+  #sec4{padding:80px 24px}
+  .faq-grid{grid-template-columns:1fr;gap:30px}
+  .faq-left{position:static}
+  .faq-left h2{font-size:clamp(28px,5.5vw,38px)}
+  .faq-left p{font-size:15px}
+  .faq-q{padding:22px 4px;font-size:16px;gap:14px;min-height:48px}
+  .faq-plus{width:34px;height:34px}
+  .faq-plus svg{width:12px;height:12px}
+  .faq-item.open .faq-a{padding:0 4px 24px}
+  .faq-a-inner{font-size:14px;line-height:1.65}
+
+  footer{flex-direction:column;gap:20px;text-align:center;padding:40px 20px}
+  footer .ft-logo img{height:40px}
+  footer .ft-tag{font-size:15px}
+  footer .ft-right{flex-wrap:wrap;justify-content:center;gap:14px;font-size:13px}
+
+  .mobile-cta-fixed{display:flex}
+  body{padding-bottom:80px}
+}
+
+/* ═══════════════════════════════════════
+   PHONE (768px down)
+═══════════════════════════════════════ */
+@media(max-width:768px){
+  .scroll-progress{height:2px}
+  .hero-bg{background-size:48px 48px;opacity:.6}
+  .sec1-stats{grid-template-columns:1fr 1fr}
+}
+
+@media(max-width:400px){
+  .hero-line{font-size:38px;letter-spacing:-1px}
+  .hero-line .hl-no{font-size:1.45em}
+  .section-title{font-size:26px!important;letter-spacing:-.4px}
+  .section-sub,.sec1-head p,.sec2-header p,.sec3-header p,.faq-left p{font-size:14px}
+  .sec1-stats{grid-template-columns:1fr}
+  #sec1,#sec3,#sec4{padding-left:18px;padding-right:18px}
+  .compare-table{min-width:600px}
+}
+
+@media(min-width:1024px) and (max-width:1280px){
+  .hero-screen{padding:30vh 48px 8vh}
+  #sec1,#sec3,#sec4{padding:112px 40px}
+  #sec2{padding:112px 0}
+  footer{padding:44px 40px}
+  .options-grid{gap:24px}
+  .option-card{padding:36px 28px}
+  .compare-wrap{max-width:1040px}
+  .compare-table thead th{padding:18px 16px;font-size:13px;min-width:130px}
+  .compare-table tbody td{padding:18px 20px;font-size:16px}
+  .faq-grid{gap:56px;max-width:1100px}
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cur"></div>
+<div class="cursor-ring" id="curR"></div>
+
+<!-- Top scroll progress -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- PILL NAV (floating, primary navigation) -->
+<div id="pill-nav-root"></div>
+
+<!-- Hero side dots (desktop only, visible during hero) -->
+<nav class="hero-dots" id="heroDots" aria-label="Telas do hero">
+  <button class="dot active" data-target="0" aria-label="Tela 1"></button>
+  <button class="dot" data-target="1" aria-label="Tela 2"></button>
+  <button class="dot" data-target="2" aria-label="Tela 3"></button>
+  <button class="dot" data-target="3" aria-label="Tela 4"></button>
+  <button class="dot" data-target="4" aria-label="Tela 5"></button>
+</nav>
+
+<!-- ═══════════════ HERO — 5-screen scroll narrative ═══════════════ -->
+<section id="hero" aria-label="Apresentação">
+  <div class="hero-pin">
+    <div class="hero-particles" id="hero-particles" aria-hidden="true"></div>
+    <div class="hero-bg" id="heroBg" aria-hidden="true"></div>
+
+  <!-- TELA H1 -->
+  <div class="hero-screen" id="hs1">
+    <div class="hero-screen-inner">
+      <div class="hero-badge">Telemedicina pronta pra escalar</div>
+      <h1 class="hero-line">
+        <span class="frag d0">Já pensou em ter uma</span><br>
+        <span class="frag d1">telemedicina&nbsp;</span><span class="hl frag d2">sua?</span>
+      </h1>
+    </div>
+  </div>
+
+  <!-- TELA H2 -->
+  <div class="hero-screen" id="hs2">
+    <div class="hero-screen-inner">
+      <h2 class="hero-line">
+        <span class="frag d0">A fila do SUS&nbsp;</span><span class="hl frag d1">só aumenta,</span><br>
+        <span class="frag d2">e rotina de plantão&nbsp;</span><span class="hl frag d3">cansa.</span>
+      </h2>
+    </div>
+  </div>
+
+  <!-- TELA H3 -->
+  <div class="hero-screen" id="hs3">
+    <div class="hero-screen-inner">
+      <h2 class="hero-line">
+        <span class="frag d0">A&nbsp;</span><span class="hl hl-no frag d1">nó</span><span class="frag d2">&nbsp;te entrega</span><br>
+        <span class="frag d3">a estrutura completa.</span><br>
+        <span class="strong frag d4">Pronta.</span>
+      </h2>
+    </div>
+  </div>
+
+  <!-- TELA H4 -->
+  <div class="hero-screen" id="hs4">
+    <div class="hero-screen-inner">
+      <h2 class="hero-line">
+        <span class="word d0">Videoconsulta,</span> <span class="word d1">prontuário,</span><br>
+        <span class="word d2">prescrição,</span> <span class="word d3">cobrança.</span><br>
+        <span class="muted word d5">Tudo conectado.</span>
+      </h2>
+    </div>
+  </div>
+
+  <!-- TELA H5 -->
+  <div class="hero-screen" id="hs5">
+    <div class="hero-screen-inner">
+      <h2 class="hero-line">
+        <span class="frag d0">A gente cuida</span><br>
+        <span class="frag d1">da estrutura —</span><br>
+        <span class="frag d2">você dos atendimentos.</span><br>
+        <span class="hl frag d4" style="font-size:1em;opacity:.7">&nbsp;(ou nem isso…)</span>
+      </h2>
+      <div class="hero-actions">
+        <a href="#sec3" class="btn-primary">Quero estruturar meu atendimento →</a>
+        <a href="#sec1" class="btn-secondary">Ver como funciona</a>
+      </div>
+    </div>
+  </div>
+  </div><!-- /.hero-pin -->
+</section>
+
+<!-- ═══════════════ SEC 1 — Trust + ECG ═══════════════ -->
+<section id="sec1">
+  <div class="ecg-canvas-wrap" aria-hidden="true">
+    <svg id="ecgSvg" viewBox="0 0 1600 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Faint "future" path renders behind the bright "drawn" path -->
+      <path id="ecgPathFront" class="ecg-path front" d="" vector-effect="non-scaling-stroke"/>
+      <path id="ecgPathBack" class="ecg-path" d="" vector-effect="non-scaling-stroke"/>
+      <circle id="ecgDot" class="ecg-dot" r="8" cx="0" cy="150"/>
+    </svg>
+  </div>
+
+  <div class="sec1-inner">
+    <div class="sec1-head reveal">
+      <div class="section-label term">Confiança em escala</div>
+      <h2 class="section-title">
+        Telemedicina sob medida
+        <span class="muted">pra quem quer largar o plantão.</span>
+      </h2>
+      <p>
+        Médicos recém-formados, residentes e plantonistas usam a <span class="brand">nó</span> pra começar a atender online em poucas semanas — sem se preocupar com prontuário, prescrição, cobrança ou bug de sistema às 3 da manhã.
+      </p>
+      <a href="#sec3" class="btn-ghost">Conheça nossa plataforma <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    </div>
+
+    <div class="sec1-stats">
+      <div class="stat-card reveal-blur">
+        <div class="v">+50</div>
+        <div class="l">Médicos largaram o plantão
+com a nó</div>
+      </div>
+      <div class="stat-card reveal-blur reveal-d1">
+        <div class="v">8 semanas</div>
+        <div class="l">Do contrato à
+primeira consulta</div>
+      </div>
+      <div class="stat-card reveal-blur reveal-d2">
+        <div class="v">24/7</div>
+        <div class="l">Suporte que não dorme
+(pra você poder dormir)</div>
+      </div>
+      <div class="stat-card reveal-blur reveal-d3">
+        <div class="v">100%</div>
+        <div class="l">LGPD e CFM
+compliance</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SEC 2 — Integrations ═══════════════ -->
+<section id="sec2">
+  <div class="sec2-header reveal">
+    <div class="section-label">Stack conectada</div>
+    <h2 class="section-title">Conecta com tudo que você já usa no consultório.</h2>
+    <p>
+      WhatsApp, Memed, Doctoralia, sistemas de prontuário, prescrição digital, pagamentos. A <span class="brand">nó</span> encaixa no que você já tem — não te obriga a abandonar nada.
+    </p>
+    <a href="#sec3" class="btn-white">Ver todas as integrações <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+  </div>
+
+  <div class="logo-marquee">
+    <div class="logo-row"><div class="logo-strip" id="lr1"></div></div>
+    <div class="logo-row"><div class="logo-strip" id="lr2"></div></div>
+  </div>
+</section>
+
+<!-- ═══════════════ SEC 3 — Options ═══════════════ -->
+<section id="sec3">
+  <div class="sec3-header reveal">
+    <div class="section-label">Modelos de atendimento</div>
+    <h2 class="section-title">Qual sua ideia?</h2>
+    <p>Três caminhos pra você começar a atender online. Escolhe o que faz sentido pro teu momento — o resto a gente acerta na conversa.</p>
+  </div>
+
+  <div class="options-grid">
+    <!-- Card 1 -->
+    <div class="option-card reveal">
+      <div class="opt-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </div>
+      <div class="opt-tag">Máximo controle</div>
+      <div class="opt-title">Videoconsulta Própria</div>
+      <div class="opt-desc">Plataforma com a tua cara. Você manda em tudo — agenda, preço, marca, fluxo de atendimento. A <span class="brand">nó</span> cuida da parte chata.</div>
+      <ul class="opt-features">
+        <li>Sala de vídeo HD com sua marca</li>
+        <li>Prontuário eletrônico integrado</li>
+        <li>Prescrição com assinatura digital ICP-Brasil</li>
+        <li>Cobrança automática (Pix, cartão)</li>
+        <li>Suporte técnico exclusivo</li>
+      </ul>
+      <a href="/#cta" class="opt-cta">Quero saber mais →</a>
+    </div>
+
+    <!-- Card 2 — featured -->
+    <div class="option-card featured reveal reveal-d1">
+      <div class="opt-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3.54-3.54a5 5 0 0 0-7.07-7.07l-1.41 1.41"/><path d="M14 11a5 5 0 0 0-7.07 0l-3.54 3.54a5 5 0 0 0 7.07 7.07l1.41-1.41"/></svg>
+      </div>
+      <div class="opt-tag">Mais rápido</div>
+      <div class="opt-title">Integração com Plataforma Existente</div>
+      <div class="opt-desc">Já usa Doctoralia, Conexa, Memed? A <span class="brand">nó</span> integra e turbina o que você já tem — sem te forçar a migrar nada.</div>
+      <ul class="opt-features">
+        <li>Integração com plataformas líderes</li>
+        <li>Centralização de agenda e pagamentos</li>
+        <li>Automação de follow-up no WhatsApp</li>
+        <li>Dashboard único de pacientes</li>
+        <li>Migração gratuita de dados</li>
+      </ul>
+      <a href="/#cta" class="opt-cta">Quero saber mais →</a>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="option-card reveal reveal-d2">
+      <div class="opt-icon grad">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="opt-tag">Melhor dos dois mundos</div>
+      <div class="opt-title">Atendimento Híbrido</div>
+      <div class="opt-desc">Plataforma própria + integrações externas, conforme o caso. Flexibilidade total — pra escalar quando começar a bombar.</div>
+      <ul class="opt-features">
+        <li>Videoconsulta própria E terceirizada</li>
+        <li>Switch entre canais por paciente</li>
+        <li>Pricing diferenciado por tipo de atendimento</li>
+        <li>Relatórios consolidados</li>
+        <li>Tudo do Plano 1 + Plano 2</li>
+      </ul>
+      <a href="/#cta" class="opt-cta">Quero saber mais →</a>
+    </div>
+  </div>
+
+  <!-- Comparison -->
+  <div class="compare-wrap reveal">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Própria</th>
+          <th>Terceirizada</th>
+          <th>Híbrido</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Marca personalizada</td><td><span class="yes">✓</span></td><td><span class="no">–</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Integração com plataformas externas</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Prescrição eletrônica ICP-Brasil</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>WhatsApp automatizado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Migração de dados existentes</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Suporte dedicado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Setup em semanas</td><td><span class="v">8–12</span></td><td><span class="v">2–4</span></td><td><span class="v">6–10</span></td></tr>
+        <tr><td>Flexibilidade máxima</td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="yes">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec3-final-cta reveal">
+    <a href="/#cta" class="btn-primary">Falar com a <span class="brand" style="color:#fff">nó</span> →</a>
+  </div>
+</section>
+
+<!-- ═══════════════ SEC 4 — FAQ ═══════════════ -->
+<section id="sec4">
+  <div class="faq-grid">
+    <div class="faq-left reveal">
+      <div class="section-label">FAQ</div>
+      <h2>Perguntas que a galera faz.</h2>
+      <p>As dúvidas que aparecem na primeira call. Não achou a sua? <a href="/#cta" style="color:var(--green);font-weight:600">Fala com a gente</a>.</p>
+    </div>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ Footer ═══════════════ -->
+<footer>
+  <div>
+    <div class="ft-logo">
+      <img src="/img/logo-footer.png" alt="nó" width="36" height="36">
+    </div>
+    <div class="ft-tag">Telemedicina que <span class="brand">encaixa</span> na sua rotina.</div>
+  </div>
+  <div class="ft-right">
+    <a href="/">Home</a>
+    <a href="/#cta">Contato</a>
+    <a href="/#faq">FAQ geral</a>
+    <span>© 2026 <span class="brand">nó</span></span>
+  </div>
+</footer>
+
+<!-- Mobile fixed CTA -->
+<a href="#sec3" class="mobile-cta-fixed">Falar com a nó →</a>
+
+<script type="module">
+  import { initPillNav } from '/shared/pillnav.js';
+  import { pillNavConfig } from '/shared/pillnav-config.js';
+
+  initPillNav(document.getElementById('pill-nav-root'), {
+    ...pillNavConfig,
+    activeHref: '/health/'
+  });
+</script>
+<script src="./main.js" defer></script>
+<script type="module">
+  import { initParticles, hasWebGL } from './particles.js';
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const container = document.getElementById('hero-particles');
+  if (container && hasWebGL() && !reduce) {
+    const isMobile = window.innerWidth <= 768;
+    initParticles(container, {
+      particleCount: isMobile ? 140 : 280,
+      particleSpread: 12,
+      speed: 0.08,
+      particleColors: ['#34A853', '#34A853', '#34A853', '#1f7a3a', '#7BC96F'],
+      moveParticlesOnHover: true,
+      particleHoverFactor: 0.8,
+      alphaParticles: false,
+      particleBaseSize: isMobile ? 168 : 216,
+      sizeRandomness: 1.4,
+      cameraDistance: 20
+    });
+  }
+</script>
+</body>
+</html>
