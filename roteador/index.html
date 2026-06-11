@@ -42,8 +42,8 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
   radial-gradient(900px 500px at 85% -10%, rgba(66,133,244,.07), transparent 60%),
   radial-gradient(700px 400px at -10% 110%, rgba(52,168,83,.06), transparent 60%)}
 .hero-inner{text-align:center;max-width:780px;margin:0 auto}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);background:#fff;padding:8px 16px;border-radius:99px;margin-bottom:28px}
-.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--verde);display:inline-block}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a3a8b3;margin-bottom:26px;opacity:.85}
+.eyebrow img{height:24px;width:auto;display:block}
 h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
 h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:1.08em}
 .hero p{font-size:clamp(17px,2.2vw,21px);color:var(--ink2);margin:24px auto 36px;max-width:560px;line-height:1.5}
@@ -54,13 +54,7 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
 .btn-p:hover{background:var(--azul)}
 .btn-s{background:#fff;color:var(--ink);border:1px solid var(--line)}
 .btn-s:hover{border-color:var(--ink)}
-.hero-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:44px}
-.chip{font-size:13.5px;font-weight:600;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:99px;padding:9px 18px}
-.chip b{color:var(--ink)}
 @keyframes floaty{0%,100%{transform:translate(0,0)}33%{transform:translate(-2px,-5px)}66%{transform:translate(2px,-2px)}}
-.hero-chips .chip{animation:floaty 5.2s ease-in-out infinite;will-change:transform}
-.hero-chips .chip:nth-child(2){animation-duration:6.4s;animation-delay:-2.1s}
-.hero-chips .chip:nth-child(3){animation-duration:7.1s;animation-delay:-3.8s}
 
 /* ---------- JORNADA INTERATIVA (como funciona) ---------- */
 /* paleta da seção escopada no wrapper: a LP usa --bg/--line claros, aqui são escuros */
@@ -69,7 +63,7 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
   --bg:#0A0E17; --panel:#10151F; --line:#1E2533;
   --txt:#E9EDF5; --muted:#8B93A7; --dim:#5A6275;
   height:360vh;position:relative;background:var(--bg);color:var(--txt)}
-.rs-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.rs-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding:96px 0 28px;box-sizing:border-box}
 .rs-progress{position:absolute;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .15s linear;z-index:10}
 
 .rs{width:100%;max-width:1080px;margin:0 auto;padding:0 32px}
@@ -307,6 +301,7 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
 .endnote.in{opacity:1}
 
 @media (max-height:820px){
+  .rs-pin{padding:76px 0 16px}
   .phone{width:236px;height:484px}
   .rs-head{margin-bottom:16px}
   .rs-title{font-size:24px}
@@ -315,6 +310,7 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
   .sp-item.active .sp-notes{max-height:320px}
 }
 @media (max-width:920px){
+  .rs-pin{padding:80px 0 20px}
   .rs{padding:0 14px}
   .rs-head{margin-bottom:34px}
   .rs-title{font-size:21px}
@@ -337,6 +333,15 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
   .bk-note .tag{font-size:9px;margin-bottom:5px}
   .split-bar,.split-leg{display:none}
   .split-flow{display:block}
+  .rs-grid>*{min-width:0}
+  .split{margin-top:6px}
+  .sf-src{padding:5px 10px;font-size:11px}
+  .sf-src small{font-size:8px}
+  .sf-arrows{width:104px;height:27px}
+  .sf-row{gap:5px}
+  .sf-card{padding:5px 4px;min-width:0}
+  .sf-card b{font-size:10.5px}
+  .sf-card span{font-size:6.8px;letter-spacing:.02em}
   .endnote{font-size:15px;margin-top:8px}
   .phone-box{width:176px;height:361px}
   .phone{width:252px;height:516px;transform:scale(.7);transform-origin:top left}
@@ -346,7 +351,7 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
 }
 
 /* ---------- DADO DE MERCADO ---------- */
-.market{padding:110px 0;background:var(--bg);border-bottom:1px solid var(--line)}
+.market{padding:110px 0;background:var(--bg)}
 .market-head{text-align:center;max-width:620px;margin:0 auto 56px}
 .market-head .cv-q{font-family:'Caveat',cursive;font-size:clamp(22px,3vw,28px);color:var(--vermelho);display:block;margin-bottom:14px;transform:rotate(-1.5deg)}
 .market-head p{font-size:16.5px;color:var(--ink2);margin-top:16px;line-height:1.55}
@@ -373,7 +378,7 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
 }
 
 /* ---------- CASE / POOL ---------- */
-.case{padding:110px 0;background:#fff;border-bottom:1px solid var(--line)}
+.case{padding:110px 0;background:#fff}
 .case-top{max-width:680px;margin:0 auto 64px;text-align:center}
 .kicker{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--verde);margin-bottom:16px}
 h2{font-size:clamp(30px,4.2vw,48px);font-weight:800;letter-spacing:-.035em;line-height:1.08}
@@ -426,11 +431,15 @@ h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
 .vs-col.rt li i{background:rgba(52,168,83,.22);color:#7ee2a0}
 
 /* ---------- SPLIT NA ORIGEM ---------- */
-.flowsec{padding:110px 0;background:var(--bg);border-top:1px solid var(--line)}
+.flowsec{padding:110px 0;background:var(--bg)}
 .flow-head{text-align:center;max-width:600px;margin:0 auto 56px}
 .flow-head p{font-size:16.5px;color:var(--ink2);margin-top:16px;line-height:1.55}
 .flow-link{color:var(--azul);font-weight:700;text-decoration:none;border-bottom:2px solid rgba(66,133,244,.3)}
 .flow-link:hover{border-bottom-color:var(--azul)}
+.flow-head p b{color:var(--ink)}
+.pgm-badge{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:13px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:99px;padding:9px 18px;box-shadow:0 6px 18px rgba(26,29,36,.06)}
+.pgm-badge i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--verde);color:#fff;font-style:normal;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pgm-badge span{font-weight:500;color:var(--ink2)}
 .flow-eg{font-family:'Caveat',cursive;font-size:24px;color:var(--vermelho);align-self:flex-start;margin-bottom:10px;transform-origin:center;animation:wiggle 3.6s ease-in-out infinite;display:inline-block}
 @keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(1.5deg)}}
 .flow-diagram{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
@@ -458,7 +467,7 @@ h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
 }
 
 /* ---------- CALCULADORA ---------- */
-.calc{padding:110px 0;background:#fff;border-top:1px solid var(--line)}
+.calc{padding:110px 0;background:#fff}
 .calc-head{text-align:center;max-width:560px;margin:0 auto 48px}
 .calc-head p{font-size:16px;color:var(--ink2);margin-top:14px}
 .calc-card{max-width:880px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
@@ -488,7 +497,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .out-box .cv{font-family:'Caveat',cursive;color:var(--verde);font-size:17px;margin-left:8px}
 
 /* ---------- FORM ---------- */
-.cta-sec{padding:110px 0 90px;background:var(--ink);color:#fff}
+.cta-sec{padding:180px 0 90px;background:var(--ink);color:#fff}
 .cta-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:start}
 .cta-left h2{color:#fff}
 .cta-left p{color:rgba(255,255,255,.6);font-size:16.5px;line-height:1.6;margin-top:18px;max-width:380px}
@@ -519,6 +528,35 @@ footer .wrap{display:flex;flex-direction:column;gap:14px}
 footer .frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 footer .logo{color:#fff;font-size:15px}
 
+/* ---------- BOTÃO DE REPLAY DAS ANIMAÇÕES ---------- */
+.replay-btn{position:absolute;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:8;padding:0;transition:color .15s,border-color .15s,transform .25s}
+.replay-btn:hover{color:var(--azul);border-color:var(--azul);transform:rotate(-65deg)}
+.replay-btn svg{display:block}
+.market-chart{position:relative}
+.market-chart .replay-btn{top:-48px;right:0}
+.growth{position:relative}
+.growth .replay-btn{top:14px;right:14px}
+.rs-replay{top:-7px;right:-7px;background:var(--panel);border-color:var(--line);color:var(--muted)}
+.rs-replay:hover{color:var(--blue);border-color:var(--blue)}
+@media (max-width:920px){
+  .replay-btn{width:28px;height:28px}
+  .rs-replay{top:-5px;right:-5px}
+}
+
+/* ---------- FADES ENTRE SEÇÕES (scrim suave, 1 gradiente por fronteira) ---------- */
+.rs-wrap::before,.rs-wrap::after,.cta-sec::before{content:'';position:absolute;left:0;right:0;pointer-events:none;
+  --scrim:linear-gradient(180deg,
+    rgba(251,251,250,1) 0%, rgba(251,251,250,.95) 12%, rgba(251,251,250,.85) 24%,
+    rgba(251,251,250,.69) 38%, rgba(251,251,250,.5) 50%, rgba(251,251,250,.31) 62%,
+    rgba(251,251,250,.15) 76%, rgba(251,251,250,.05) 88%, rgba(251,251,250,0) 100%)}
+.rs-wrap::before{top:0;height:120px;z-index:6;background:var(--scrim)}
+.rs-wrap::after{bottom:0;height:120px;z-index:6;background:var(--scrim);transform:scaleY(-1)}
+.cta-sec::before{top:0;height:150px;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,1) 0%, rgba(255,255,255,.95) 12%, rgba(255,255,255,.85) 24%,
+    rgba(255,255,255,.69) 38%, rgba(255,255,255,.5) 50%, rgba(255,255,255,.31) 62%,
+    rgba(255,255,255,.15) 76%, rgba(255,255,255,.05) 88%, rgba(255,255,255,0) 100%)}
+
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:900px){
   .cta-grid{grid-template-columns:1fr;gap:40px}
@@ -540,17 +578,12 @@ footer .logo{color:#fff;font-size:15px}
 <!-- HERO -->
 <section class="hero">
   <div class="wrap hero-inner">
-    <div class="eyebrow"><i></i>infraestrutura de telemedicina · by nó</div>
+    <div class="eyebrow">infraestrutura de telemedicina · by <img src="../assets/logos/logo-no-dark.png" alt="nó tech stack IA"></div>
     <h1>Sua marca vende.<br><span class="cv">Nossos médicos atendem.</span></h1>
     <p>Lance sua telemedicina sem montar uma operação: checkout pronto, pagamento dividido na origem e pool médico atendendo em minutos.</p>
     <div class="hero-ctas">
       <a href="#proposta" class="btn btn-p">Quero minha telemedicina</a>
       <a href="#como" class="btn btn-s">Ver como funciona</a>
-    </div>
-    <div class="hero-chips">
-      <div class="chip"><b>Split automático</b> · sua margem cai direto na sua conta</div>
-      <div class="chip"><b>Pool médico parceiro</b> · CFM + LGPD</div>
-      <div class="chip"><b>Sua marca</b> na frente de tudo</div>
     </div>
   </div>
 </section>
@@ -598,7 +631,7 @@ footer .logo{color:#fff;font-size:15px}
 
         <div class="stage">
           <div class="hint" id="hint">role para ver a jornada ↓</div>
-          <div class="phone-box"><div class="phone"><div class="scr" id="scr">
+          <div class="phone-box"><button class="replay-btn rs-replay" id="rsReplay" type="button" aria-label="Reiniciar animação" title="Reiniciar animação"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20.5 3.5v4.8h-4.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><div class="phone"><div class="scr" id="scr">
             <div class="ghost-tap" id="gtap"></div>
 
             <!-- 1. Google SERP iOS -->
@@ -820,6 +853,7 @@ footer .logo{color:#fff;font-size:15px}
       <p>No Brasil, a estimativa é de 2 a 3%. Não é mercado saturado — é mercado que ainda nem aconteceu.</p>
     </div>
     <div class="market-chart" id="marketChart">
+      <button class="replay-btn" id="marketReplay" type="button" aria-label="Reiniciar animação" title="Reiniciar animação"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20.5 3.5v4.8h-4.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="mrow"><span class="mname">Estônia</span><div class="mtrack"><i class="mbar" data-w="36" style="background:var(--azul)"></i></div><span class="mval">36%</span></div>
       <div class="mrow"><span class="mname">Portugal</span><div class="mtrack"><i class="mbar" data-w="26" style="background:var(--azul)"></i></div><span class="mval">26%</span></div>
       <div class="mrow"><span class="mname">Suécia</span><div class="mtrack"><i class="mbar" data-w="25" style="background:var(--azul)"></i></div><span class="mval">25%</span></div>
@@ -849,6 +883,7 @@ footer .logo{color:#fff;font-size:15px}
       </div>
     </div>
     <div class="growth" id="growth">
+      <button class="replay-btn" id="growthReplay" type="button" aria-label="Reiniciar animação" title="Reiniciar animação"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 12a8 8 0 1 1-2.34-5.66" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M20.5 3.5v4.8h-4.8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="growth-head">
         <div class="growth-big">de <b class="gnum" data-v="5">0</b> a <b class="gnum gh" data-v="300">0</b> consultas/dia</div>
         <span class="cv growth-note">crescimento real, mês a mês ↓</span>
@@ -888,7 +923,7 @@ footer .logo{color:#fff;font-size:15px}
         <h4>Roteador</h4>
         <ul>
           <li><i>✓</i>Operação completa rodando no go-live</li>
-          <li><i>✓</i>Pool médico da Prontia já incluso</li>
+          <li><i>✓</i>Pool médico parceiro já incluso</li>
           <li><i>✓</i>Split na origem — cada parte fica com sua margem automaticamente</li>
           <li><i>✓</i>Compliance CFM e LGPD resolvidos por desenho</li>
         </ul>
@@ -903,7 +938,8 @@ footer .logo{color:#fff;font-size:15px}
     <div class="flow-head">
       <div class="kicker" style="color:var(--azul)">como o dinheiro flui</div>
       <h2>Sua margem cai na sua conta.<br><span class="cv" style="color:var(--verde)">A parte do médico, na dele.</span></h2>
-      <p>Utilizamos tecnologia da <a href="https://www.pagar.me/" target="_blank" rel="noopener" class="flow-link">pagar.me</a> que divide o valor no momento da aprovação. Você nunca recebe o valor cheio pra depois pagar o atendimento — cada parte já chega na conta certa.</p>
+      <p>Somos <b>credenciados pela <a href="https://www.pagar.me/" target="_blank" rel="noopener" class="flow-link">pagar.me</a></b> e parceiros oficiais nesse modelo de split — uma homologação que pouquíssimas operações no Brasil possuem. O valor é dividido no momento da aprovação: você nunca recebe o valor cheio pra depois pagar o atendimento — cada parte já chega na conta certa.</p>
+      <div class="pgm-badge"><i>✓</i> Credenciado &amp; parceiro pagar.me <span>· split de pagamentos</span></div>
     </div>
     <div class="flow-diagram">
       <span class="cv flow-eg">Exemplo:</span>
@@ -1026,7 +1062,7 @@ footer .logo{color:#fff;font-size:15px}
     items.forEach((li,k)=>{
       li.classList.toggle('done', k<active);
       li.classList.toggle('active', k===active);
-      if(k!==active) li.querySelector('.sp-notes').innerHTML='';
+      li.querySelector('.sp-notes').innerHTML='';
     });
   }
   function note(step, tone, label, html, extra){
@@ -1079,22 +1115,22 @@ footer .logo{color:#fff;font-size:15px}
     function(){
       goScreen(0);
       $('#gMain').classList.add('hl');
-      t(()=>note(0,'t-blue','captação',
-        '<b>O paciente achou a sua marca.</b> Tráfego, social e anúncio continuam 100% seus — o Roteador não toca na sua captação.'), 700);
+      note(0,'t-blue','captação',
+        '<b>O paciente achou a sua marca.</b> Tráfego, social e anúncio continuam 100% seus — o Roteador não toca na sua captação.');
       t(()=>ghostTap($('#gMain'), ()=>{}), 2600);
     },
     // 1 — LP + cadastro
     function(){
       $('#gMain').classList.remove('hl');
       goScreen(1);
+      note(1,'t-blue','checkout',
+        'Após tocar em <b>“Agendar consulta”</b> no site da sua marca, o paciente é redirecionado para a <b>sua página do Roteador vestindo a sua identidade</b>, no seu domínio. Ele nunca sai da sua marca.');
+      note(1,'t-green','seu banco de dados',
+        '<b>Cadastro salvo no banco isolado da sua telemedicina.</b> Dados de venda e histórico ficam na sua base, separados de qualquer outra marca.');
       t(()=>ghostTap($('#btnCta'), ()=>{
         goScreen(2);
-        t(()=>note(1,'t-blue','checkout',
-          'Após tocar em <b>“Agendar consulta”</b> no site da sua marca, o paciente é redirecionado para a <b>sua página do Roteador vestindo a sua identidade</b>, no seu domínio. Ele nunca sai da sua marca.'), 500);
         t(()=>typeFields(()=>{
           $('#btnCad').classList.add('ready');
-          note(1,'t-green','seu banco de dados',
-            '<b>Cadastro salvo no banco isolado da sua telemedicina.</b> Dados de venda e histórico ficam na sua base, separados de qualquer outra marca.');
           t(()=>ghostTap($('#btnCad'), ()=>{}), 1600);
         }), 1400);
       }), 2800);
@@ -1102,8 +1138,7 @@ footer .logo{color:#fff;font-size:15px}
     // 2 — PIX + split
     function(){
       goScreen(3);
-      t(()=>{
-        $('#pxOk').classList.add('show');
+      (()=>{
         const split = document.createElement('div');
         split.className = 'split';
         split.innerHTML = `
@@ -1127,14 +1162,15 @@ footer .logo{color:#fff;font-size:15px}
             </svg>
             <div class="sf-row">
               <div class="sf-card sf-voce"><span>Sua conta</span><b>R$ 29,90</b></div>
-              <div class="sf-card sf-op"><span>Custo operacional</span><b>R$ 30,00</b></div>
+              <div class="sf-card sf-op"><span>Operação</span><b>R$ 30,00</b></div>
             </div>
           </div>`;
         note(2,'t-yellow','split na origem',
           'Os R$ 59,90 <b>dividiram no momento do pagamento</b>. Sua margem cai na sua conta. A parte do médico, na dele.',
           split);
         requestAnimationFrame(()=>requestAnimationFrame(()=>split.classList.add('go')));
-      }, 3000);
+      })();
+      t(()=>{ $('#pxOk').classList.add('show'); }, 3000);
     },
     // 3 — fila + médico
     function(){
@@ -1167,6 +1203,8 @@ footer .logo{color:#fff;font-size:15px}
     // 4 — consulta + fim
     function(){
       goScreen(5);
+      note(4,'t-green','pós-consulta',
+        '<b>Receita, atestado e prontuário ficam com o pool médico</b>, como manda o CFM. A venda já apareceu no seu dashboard, em tempo real.');
       let s = 0;
       const tv = iv(()=>{
         s++;
@@ -1174,8 +1212,6 @@ footer .logo{color:#fff;font-size:15px}
         if(s>=5){
           clearInterval(tv);
           $('#fim').classList.add('show');
-          note(4,'t-green','pós-consulta',
-            '<b>Receita, atestado e prontuário ficam com o pool médico</b>, como manda o CFM. A venda já apareceu no seu dashboard, em tempo real.');
           $('#endnote').classList.add('in');
         }
       }, 850);
@@ -1226,6 +1262,13 @@ footer .logo{color:#fff;font-size:15px}
   }
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
+
+  /* ---------- replay do step atual ---------- */
+  document.getElementById('rsReplay').addEventListener('click', ()=>{
+    const i = Math.max(0, curStep);
+    curStep = -1;
+    runStep(i);
+  });
 })();
 
 /* ---------- Curva de crescimento ---------- */
@@ -1245,18 +1288,22 @@ footer .logo{color:#fff;font-size:15px}
     }
     requestAnimationFrame(tick);
   }
+  function play(){
+    bars.forEach(b=>{b.style.transition='none';b.style.height='4px';});
+    void g.offsetHeight;
+    bars.forEach((b,i)=>{
+      b.style.transition='';
+      setTimeout(()=>{b.style.height=Math.max(2,(+b.dataset.h/MAX)*100)+'%';},i*130);
+    });
+    nums.forEach(n=>countUp(n,+n.dataset.v,1400));
+  }
   const io=new IntersectionObserver(entries=>{
     entries.forEach(e=>{
-      if(e.isIntersecting){
-        bars.forEach((b,i)=>setTimeout(()=>{
-          b.style.height=Math.max(2,(+b.dataset.h/MAX)*100)+'%';
-        },i*130));
-        nums.forEach(n=>countUp(n,+n.dataset.v,1400));
-        io.disconnect();
-      }
+      if(e.isIntersecting){ play(); io.disconnect(); }
     });
   },{threshold:.4});
   io.observe(g);
+  document.getElementById('growthReplay').addEventListener('click',play);
 })();
 
 /* ---------- Gráfico de mercado ---------- */
@@ -1264,15 +1311,21 @@ footer .logo{color:#fff;font-size:15px}
   const chart=document.getElementById('marketChart');
   if(!chart)return;
   const bars=[...chart.querySelectorAll('.mbar')];
+  function play(){
+    bars.forEach(b=>{b.style.transition='none';b.style.width='0';});
+    void chart.offsetWidth;
+    bars.forEach((b,i)=>{
+      b.style.transition='';
+      setTimeout(()=>{b.style.width=b.dataset.w+'%';},i*90);
+    });
+  }
   const io=new IntersectionObserver(entries=>{
     entries.forEach(e=>{
-      if(e.isIntersecting){
-        bars.forEach((b,i)=>setTimeout(()=>{b.style.width=b.dataset.w+'%';},i*90));
-        io.disconnect();
-      }
+      if(e.isIntersecting){ play(); io.disconnect(); }
     });
   },{threshold:.35});
   io.observe(chart);
+  document.getElementById('marketReplay').addEventListener('click',play);
 })();
 
 /* ---------- Calculadora ---------- */
@@ -1315,14 +1368,35 @@ footer .logo{color:#fff;font-size:15px}
   });
 })();
 
-/* ---------- Form (protótipo) ---------- */
+/* ---------- Form → e-mail (notechstack@gmail.com via edge function) ---------- */
 (function(){
   document.querySelectorAll('.check input').forEach(c=>{
     c.addEventListener('change',()=>c.closest('.check').classList.toggle('on',c.checked));
   });
-    document.getElementById('leadForm').addEventListener('submit',e=>{
+  document.getElementById('leadForm').addEventListener('submit',async e=>{
     e.preventDefault();
-    const btn=e.target.querySelector('.f-submit');
+    const f=e.target;
+    const nome=f.nome.value.trim(), email=f.email.value.trim(), wh=f.whatsapp.value.trim();
+    if(!nome||!email){alert('Preencha pelo menos seu nome e e-mail!');return;}
+    const btn=f.querySelector('.f-submit');
+    btn.disabled=true;btn.textContent='Enviando...';
+    const marcas=[];
+    if(f.tem_telemed.checked)marcas.push('Já tem telemedicina rodando');
+    if(f.quero_atender.checked)marcas.push('Quer atender também, além de encaminhar');
+    try{
+      await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          nome, email, whatsapp:wh,
+          contexto:'Roteador — landing page',
+          objetivos:marcas.join(', '),
+          investimento:'', prazo:'',
+          aiAnalysis:f.msg.value.trim()
+        })
+      });
+    }catch(err){console.warn('Email send failed:',err);}
+    btn.disabled=false;
     btn.textContent='Recebido ✓ — falamos ainda hoje';
     btn.style.background='var(--verde)';
   });
