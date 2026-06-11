@@ -381,7 +381,7 @@
     },
     {
       q: 'Quanto tempo até eu começar a atender de verdade?',
-      a: '<strong>Plano Terceirizado:</strong> 2–4 semanas. <strong>Plano Próprio:</strong> 8–12 semanas. <strong>Plano Híbrido:</strong> 6–10 semanas. Em todos, você sai com plataforma rodando + treinamento + primeiros pacientes captados via tráfego.'
+      a: '<strong>Integração:</strong> 2–4 semanas. <strong>Roteador (pool médico atende pela sua marca):</strong> 4–6 semanas. <strong>Plataforma própria:</strong> 8–12 semanas. Em todos, você sai com a operação rodando + treinamento + primeiros pacientes captados via tráfego.'
     },
     {
       q: 'E os pacientes? Vocês captam ou eu tenho que ir atrás?',

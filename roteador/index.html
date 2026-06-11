@@ -42,7 +42,8 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
   radial-gradient(900px 500px at 85% -10%, rgba(66,133,244,.07), transparent 60%),
   radial-gradient(700px 400px at -10% 110%, rgba(52,168,83,.06), transparent 60%)}
 .hero-inner{text-align:center;max-width:780px;margin:0 auto}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a3a8b3;margin-bottom:26px;opacity:.85}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a3a8b3;margin-bottom:26px;opacity:.85;text-decoration:none;transition:opacity .15s}
+.eyebrow:hover{opacity:1}
 .eyebrow img{height:24px;width:auto;display:block}
 h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
 h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:1.08em}
@@ -429,6 +430,10 @@ h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
 .vs-col li i{flex:none;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:1px}
 .vs-col.wl li i{background:rgba(234,67,53,.1);color:var(--vermelho)}
 .vs-col.rt li i{background:rgba(52,168,83,.22);color:#7ee2a0}
+.cross-health{text-align:center;margin:36px auto 0;font-size:15px;color:var(--ink2);max-width:560px;line-height:1.55}
+.cross-health b{color:var(--ink)}
+.cross-health a{color:var(--verde);font-weight:700;text-decoration:none;border-bottom:2px solid rgba(52,168,83,.3)}
+.cross-health a:hover{border-bottom-color:var(--verde)}
 
 /* ---------- SPLIT NA ORIGEM ---------- */
 .flowsec{padding:110px 0;background:var(--bg)}
@@ -502,6 +507,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .cta-left h2{color:#fff}
 .cta-left p{color:rgba(255,255,255,.6);font-size:16.5px;line-height:1.6;margin-top:18px;max-width:380px}
 .cta-left .cv-note{font-family:'Caveat',cursive;color:var(--amarelo);font-size:22px;margin-top:26px;display:block}
+.cta-hlink{color:#7ee2a0;font-weight:600;text-decoration:none;border-bottom:1.5px solid rgba(126,226,160,.35)}
+.cta-hlink:hover{border-bottom-color:#7ee2a0}
 .form-card{background:#fff;color:var(--ink);border-radius:24px;padding:36px}
 .form-card h3{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:22px}
 .f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -527,6 +534,8 @@ footer{background:#13151a;color:rgba(255,255,255,.45);padding:44px 0;font-size:1
 footer .wrap{display:flex;flex-direction:column;gap:14px}
 footer .frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 footer .logo{color:#fff;font-size:15px}
+footer .f-link{color:rgba(255,255,255,.65);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2)}
+footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 
 /* ---------- BOTÃO DE REPLAY DAS ANIMAÇÕES ---------- */
 .replay-btn{position:absolute;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink2);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:8;padding:0;transition:color .15s,border-color .15s,transform .25s}
@@ -578,7 +587,7 @@ footer .logo{color:#fff;font-size:15px}
 <!-- HERO -->
 <section class="hero">
   <div class="wrap hero-inner">
-    <div class="eyebrow">infraestrutura de telemedicina · by <img src="../assets/logos/logo-no-dark.png" alt="nó tech stack IA"></div>
+    <a href="/health" class="eyebrow" title="Conheça a nó health">infraestrutura de telemedicina · by <img src="../assets/logos/logo-no-dark.png" alt="nó tech stack IA"></a>
     <h1>Sua marca vende.<br><span class="cv">Nossos médicos atendem.</span></h1>
     <p>Lance sua telemedicina sem montar uma operação: checkout pronto, pagamento dividido na origem e pool médico atendendo em minutos.</p>
     <div class="hero-ctas">
@@ -929,6 +938,7 @@ footer .logo{color:#fff;font-size:15px}
         </ul>
       </div>
     </div>
+    <p class="cross-health">Prefere <b>você mesmo</b> atender seus pacientes, com plataforma própria? Isso é outro produto — conheça a <a href="/health">nó health</a>.</p>
   </div>
 </section>
 
@@ -993,7 +1003,7 @@ footer .logo{color:#fff;font-size:15px}
   <div class="wrap cta-grid">
     <div class="cta-left">
       <h2>Conta como é o seu caso.<br>A proposta sai <span class="cv" style="color:var(--amarelo)">sob medida.</span></h2>
-      <p>Cada operação é diferente: tem quem já tem telemedicina rodando, tem médico montando a própria marca, tem quem quer atender junto. Marca o que vale pra você que a gente monta o desenho certo.</p>
+      <p>Cada operação é diferente: tem quem já tem telemedicina rodando, tem médico <a href="/health" class="cta-hlink">montando a própria plataforma</a>, tem quem quer atender junto. Marca o que vale pra você que a gente monta o desenho certo.</p>
       <span class="cv-note">respondemos no mesmo dia! ✦</span>
     </div>
     <form class="form-card" id="leadForm">
@@ -1019,7 +1029,7 @@ footer .logo{color:#fff;font-size:15px}
   <div class="wrap">
     <div class="frow">
       <div class="logo"><div class="dots"><span style="background:var(--azul)"></span><span style="background:var(--vermelho)"></span><span style="background:var(--amarelo)"></span><span style="background:var(--verde)"></span></div>roteador · by nó tech stack</div>
-      <div>nó tech stack · notechstack.com.br</div>
+      <div>nó tech stack · <a href="/" class="f-link">notechstack.com.br</a> · <a href="/health" class="f-link">nó health</a></div>
     </div>
     <div>Os atendimentos médicos realizados pelas operações conectadas ao Roteador são prestados pela Prontia Saúde, e os respectivos prontuários médicos são armazenados e custodiados por ela, em conformidade com a Resolução CFM 1.821/2007 e a LGPD. O Roteador atua exclusivamente como operação tecnológica de captação, pagamento e roteamento.</div>
   </div>
