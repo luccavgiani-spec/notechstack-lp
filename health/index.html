@@ -237,13 +237,13 @@ button{font-family:inherit}
 .option-card.featured{border:2px solid transparent;background:linear-gradient(var(--white),var(--white)) padding-box,linear-gradient(135deg,var(--green),var(--blue)) border-box;box-shadow:0 16px 40px rgba(66,133,244,.08)}
 .option-card.featured::before{content:'RECOMENDADO';position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--green),var(--blue));color:var(--white);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.12em;padding:6px 18px;border-radius:100px;box-shadow:0 8px 18px rgba(66,133,244,.3)}
 
-/* ─── Card "Recomendado" (Híbrido): animated conic-gradient border ───
+/* ─── Card destaque (Roteador): animated conic-gradient border ───
    Pure CSS, GPU-friendly (animates a registered custom property only).
    Rotation around the centre is inherently symmetric — no side bleeds
    more than another. No canvas, no JS. */
 @property --hib-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
-.card-hibrido{border:none;background:var(--white);z-index:1}
-.card-hibrido::before{
+.card-roteador{border:none;background:var(--white);z-index:1}
+.card-roteador::before{
   content:'';
   position:absolute;
   inset:-3px;
@@ -256,7 +256,7 @@ button{font-family:inherit}
   animation:hib-rotate 5s linear infinite;
 }
 /* soft ambient halo so it reads premium even mid-sweep (static, symmetric) */
-.card-hibrido::after{
+.card-roteador::after{
   content:'';
   position:absolute;
   inset:-3px;
@@ -268,11 +268,11 @@ button{font-family:inherit}
 }
 @keyframes hib-rotate{to{--hib-angle:360deg}}
 @media (prefers-reduced-motion: reduce){
-  .card-hibrido::before{animation:none;background:var(--green)}
-  .card-hibrido::after{display:none}
+  .card-roteador::before{animation:none;background:var(--green)}
+  .card-roteador::after{display:none}
 }
 
-/* "Recomendado" pill on the centre (Híbrido) card — above the border */
+/* Badge pill on the centre (Roteador) card — above the border */
 .opt-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--green);color:var(--white);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:7px 20px;border-radius:100px;box-shadow:0 8px 20px rgba(52,168,83,.4);white-space:nowrap;z-index:10}
 .opt-icon{width:58px;height:58px;border-radius:18px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin-bottom:22px}
 .opt-icon.blue{background:var(--blue-l);color:var(--blue)}
@@ -721,19 +721,19 @@ compliance</div>
 <section id="sec3">
   <div class="sec3-header reveal">
     <div class="section-label">Modelos de atendimento</div>
-    <h2 class="section-title">Qual sua ideia?</h2>
-    <p>Três caminhos pra você começar a atender online. Escolhe o que faz sentido pro teu momento — o resto a gente acerta na conversa.</p>
+    <h2 class="section-title">Quem atende seus pacientes?</h2>
+    <p>Essa pergunta define o modelo certo. Você na tela, a plataforma que você já usa — ou um pool médico parceiro atendendo pela sua marca. Três caminhos, um pra cada resposta.</p>
   </div>
 
   <div class="options-grid">
-    <!-- Card 1 — Videoconsulta própria -->
+    <!-- Card 1 — Videoconsulta e atendimento próprio -->
     <div class="option-card reveal">
       <div class="opt-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
       </div>
-      <div class="opt-tag">Máximo controle</div>
+      <div class="opt-tag">Você atende</div>
       <div class="opt-title">Videoconsulta própria</div>
-      <div class="opt-desc">Plataforma com a tua cara. Você manda em tudo — agenda, preço, marca, fluxo de atendimento. A <span class="brand">nó</span> cuida da parte chata.</div>
+      <div class="opt-desc">Seu consultório, online. Plataforma de telemedicina com a sua cara — sala de vídeo, agenda, prontuário e pagamento. Você na tela, sua marca em tudo, margem inteira sua. A <span class="brand">nó</span> cuida da parte chata.</div>
       <ul class="opt-features">
         <li>Sala de vídeo HD com sua marca</li>
         <li>Prontuário eletrônico integrado</li>
@@ -744,23 +744,23 @@ compliance</div>
       <a href="#cta-form" class="opt-cta" data-scroll-form>Quero minha plataforma →</a>
     </div>
 
-    <!-- Card 2 — Atendimento Híbrido (centro, recomendado) -->
-    <div class="option-card card-hibrido reveal reveal-d1">
-      <div class="opt-badge">Recomendado</div>
+    <!-- Card 2 — Roteador: marca própria sem atendimento próprio (centro, destaque) -->
+    <div class="option-card card-roteador reveal reveal-d1">
+      <div class="opt-badge">Novo · Roteador</div>
       <div class="opt-icon grad">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"/><circle cx="18" cy="5" r="3"/><path d="M12 19h4.5a3.5 3.5 0 0 0 0-7h-9a3.5 3.5 0 0 1 0-7H12"/></svg>
       </div>
-      <div class="opt-tag">Melhor dos dois mundos</div>
-      <div class="opt-title">Atendimento Híbrido</div>
-      <div class="opt-desc">Plataforma própria + integrações externas, conforme o caso. Flexibilidade total — pra escalar quando começar a bombar, ou pra estudar pra residência sem perder paciente.</div>
+      <div class="opt-tag">Você só vende</div>
+      <div class="opt-title">Sua marca vende. O pool atende.</div>
+      <div class="opt-desc">Lance uma telemedicina com a sua marca <b>sem montar operação médica</b>: site e checkout prontos, pagamento dividido na origem e pool médico parceiro atendendo em minutos. É o Roteador, a infraestrutura de telemedicina da <span class="brand">nó</span>.</div>
       <ul class="opt-features">
-        <li>Videoconsulta própria E terceirizada</li>
-        <li>Switch entre canais de atendimento — você escolhe onde o paciente é atendido (por você ou por médicos terceiros)</li>
-        <li>Preço diferenciado por tipo de atendimento</li>
-        <li>Relatórios consolidados e dashboards interativos</li>
-        <li>Tudo das duas opções anteriores</li>
+        <li>Site e checkout prontos, vestindo a sua identidade</li>
+        <li>Pool médico parceiro 24h — você não contrata ninguém</li>
+        <li>Split na origem: sua margem cai direto na sua conta (credenciado pagar.me)</li>
+        <li>Compliance CFM e LGPD resolvidos por desenho</li>
+        <li>Operação completa rodando no go-live</li>
       </ul>
-      <a href="#cta-form" class="opt-cta" data-scroll-form>Quero o modelo híbrido →</a>
+      <a href="/roteador" class="opt-cta">Conhecer o Roteador →</a>
     </div>
 
     <!-- Card 3 — Integração com Plataforma Existente -->
@@ -768,9 +768,9 @@ compliance</div>
       <div class="opt-icon blue">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3.54-3.54a5 5 0 0 0-7.07-7.07l-1.41 1.41"/><path d="M14 11a5 5 0 0 0-7.07 0l-3.54 3.54a5 5 0 0 0 7.07 7.07l1.41-1.41"/></svg>
       </div>
-      <div class="opt-tag">Mais rápido</div>
-      <div class="opt-title">Integração com Plataforma Existente</div>
-      <div class="opt-desc">Você já trabalha com telemedicina e quer replicar o processo de Doctoralia, Conexa, Memed, HelpGlobal? A <span class="brand">nó</span> integra e turbina o que você já tem — sem te forçar a migrar nada.</div>
+      <div class="opt-tag">Você já atende</div>
+      <div class="opt-title">Integração com plataforma existente</div>
+      <div class="opt-desc">Já atende por Doctoralia, Conexa, Memed, HelpGlobal? A <span class="brand">nó</span> integra e turbina o que você já tem — automação, dados e captação — sem te forçar a migrar nada.</div>
       <ul class="opt-features">
         <li>Integração com plataformas líderes</li>
         <li>Centralização de agenda e pagamentos</li>
@@ -787,23 +787,24 @@ compliance</div>
     <table class="compare-table">
       <thead>
         <tr>
-          <th>Feature</th>
+          <th>Como funciona</th>
           <th>Própria</th>
-          <th>Híbrido</th>
+          <th>Roteador</th>
           <th>Integração</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td>Marca personalizada</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
-        <tr><td>Integração com plataformas externas</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Quem está na tela com o paciente</td><td><span class="v">Você</span></td><td><span class="v">Pool médico parceiro</span></td><td><span class="v">Você</span></td></tr>
+        <tr><td>Sua marca na frente de tudo</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
+        <tr><td>Funciona sem você atender (nem precisar ser médico)</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
+        <tr><td>Checkout e videochamada integrados</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
+        <tr><td>Split automático na origem (pagar.me)</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
         <tr><td>Prescrição eletrônica ICP-Brasil</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
         <tr><td>WhatsApp automatizado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
-        <tr><td>Migração de dados existentes</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Integração com plataformas externas</td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="yes">✓</span></td></tr>
+        <tr><td>Migração de dados existentes</td><td><span class="no">–</span></td><td><span class="no">–</span></td><td><span class="yes">✓</span></td></tr>
         <tr><td>Suporte dedicado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td></tr>
-        <tr><td>Setup em semanas</td><td><span class="v">8–12</span></td><td><span class="v">6–10</span></td><td><span class="v">2–4</span></td></tr>
-        <tr><td>Flexibilidade máxima</td><td><span class="no">–</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
-        <tr><td>Checkout Integrado</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
-        <tr><td>Videochamada Integrada</td><td><span class="yes">✓</span></td><td><span class="yes">✓</span></td><td><span class="no">–</span></td></tr>
+        <tr><td>Setup em semanas</td><td><span class="v">8–12</span></td><td><span class="v">4–6</span></td><td><span class="v">2–4</span></td></tr>
       </tbody>
     </table>
   </div>
