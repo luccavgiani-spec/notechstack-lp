@@ -760,7 +760,7 @@ compliance</div>
         <li>Compliance CFM e LGPD resolvidos por desenho</li>
         <li>Operação completa rodando no go-live</li>
       </ul>
-      <a href="/roteador" class="opt-cta">Conhecer o Roteador →</a>
+      <a href="/roteador/" class="opt-cta">Conhecer o Roteador →</a>
     </div>
 
     <!-- Card 3 — Integração com Plataforma Existente -->
@@ -900,8 +900,8 @@ compliance</div>
     activeHref: '/health/'
   });
 </script>
-<script src="./brand-icons.js" defer></script>
-<script src="./main.js" defer></script>
+<script src="/health/brand-icons.js" defer></script>
+<script src="/health/main.js" defer></script>
 <script type="module">
   /* ─── Smooth scroll to the CTA form ─── */
   function scrollToForm(e) {
@@ -963,7 +963,7 @@ compliance</div>
   }
 </script>
 <script type="module">
-  import { initParticles, hasWebGL } from './particles.js';
+  import { initParticles, hasWebGL } from '/health/particles.js';
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const container = document.getElementById('hero-particles');
   if (container && hasWebGL() && !reduce) {
