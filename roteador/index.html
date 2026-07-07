@@ -393,7 +393,9 @@ h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
 .case p.lead b{color:var(--ink)}
 .case-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
 .cchip{font-size:13px;font-weight:600;color:var(--ink2);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:9px 18px;animation:floaty 5.8s ease-in-out infinite;will-change:transform}
-.case-chips .cchip:nth-child(2){animation-duration:6.9s;animation-delay:-2.7s}
+.cchip-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;transition:border-color .15s,color .15s}
+.cchip-link img{height:16px;width:auto;display:block}
+.cchip-link:hover{border-color:var(--verde);color:var(--ink)}
 .growth{max-width:880px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:40px 40px 30px}
 .growth-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:34px}
 .growth-big{font-size:clamp(20px,2.6vw,27px);font-weight:800;letter-spacing:-.03em}
@@ -894,8 +896,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
       <h2>Construímos uma telemedicina <span class="cv" style="color:var(--verde)">do zero.</span><br>Hoje ela é o pool médico do Roteador.</h2>
       <p class="lead">Antes de virar produto, o Roteador foi testado no caso mais difícil: a nossa própria operação. A telemedicina que a nó desenvolveu escalou sozinha — e hoje é a <b>parceira de atendimento médico</b> de todas as marcas conectadas.</p>
       <div class="case-chips">
-        <span class="cchip">Pool credenciado · prontuário sob custódia médica (CFM)</span>
-        <span class="cchip">Do pagamento ao médico na tela em minutos</span>
+        <a class="cchip cchip-link" href="/health/" target="_blank" rel="noopener" title="Conheça a nó health">Eu também quero uma plataforma assim! <img src="/assets/logos/logo-no-dark.png" alt="nó health"></a>
       </div>
     </div>
     <div class="growth" id="growth">
