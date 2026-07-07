@@ -919,8 +919,8 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
   </div>
 </section>
 
-<!-- ANTI WHITE-LABEL -->
-<section class="anti">
+<!-- ANTI WHITE-LABEL — DESATIVADA PRO GO-LIVE: religar via SHOW_WHITELABEL=true no <script> -->
+<section class="anti" id="whitelabel" hidden>
   <div class="wrap">
     <div class="anti-head">
       <h2>White-label te dá um software.<br>O Roteador te dá <span class="cv" style="color:var(--vermelho)">uma operação.</span></h2>
@@ -1044,6 +1044,10 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 </footer>
 
 <script>
+/* ---------- Comparativo White Label (oculto pro go-live; mude pra true pra religar) ---------- */
+const SHOW_WHITELABEL = false;
+if(SHOW_WHITELABEL) document.getElementById('whitelabel').hidden = false;
+
 /* ---------- JORNADA INTERATIVA ---------- */
 (function(){
   const $ = s => document.querySelector(s);
