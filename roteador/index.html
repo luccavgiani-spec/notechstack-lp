@@ -10,10 +10,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="brand/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="brand/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="brand/favicon-16.png">
+<link rel="apple-touch-icon" href="brand/apple-touch-icon-180.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0A2540">
 <style>
 :root{
   --azul:#4285F4; --vermelho:#EA4335; --amarelo:#FBBC04; --verde:#34A853;
-  --ink:#1a1d24; --ink2:#5f6573; --bg:#fbfbfa; --card:#ffffff; --line:#e8e8e4;
+  --navy:#0A2540;
+  --ink:var(--navy); --ink2:#5f6573; --bg:#fbfbfa; --card:#ffffff; --line:#e8e8e4;
   --r:18px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -28,12 +36,10 @@ a{color:inherit}
 nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);background:rgba(251,251,250,.82);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.02em}
-.logo .dots{display:flex;gap:4px}
-.logo .dots span{width:9px;height:9px;border-radius:50%}
-.logo .dots span:nth-child(1){background:var(--azul)}
-.logo .dots span:nth-child(2){background:var(--vermelho)}
-.logo .dots span:nth-child(3){background:var(--amarelo)}
-.logo .dots span:nth-child(4){background:var(--verde)}
+.logo img{width:auto;display:block}
+nav .logo img{height:30px}
+footer .logo img{height:22px}
+footer .logo .byline{font-weight:500;font-size:12.5px;color:rgba(255,255,255,.45);letter-spacing:0}
 .nav-cta{background:var(--ink);color:#fff;border:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
 .nav-cta:hover{background:var(--azul)}
 
@@ -46,7 +52,9 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
 .eyebrow:hover{opacity:1}
 .eyebrow .cv-by{font-family:'Caveat',cursive;font-size:15px;font-weight:700;letter-spacing:0;transform:rotate(-4deg)}
 .eyebrow img{height:18px;width:auto;display:block}
-h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
+.hero-mark{display:flex;justify-content:center;margin-bottom:22px}
+.hero-mark svg{width:clamp(84px,10vw,116px);height:auto}
+h1{font-size:clamp(40px,6.2vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
 h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:1.08em}
 .hero p{font-size:clamp(17px,2.2vw,21px);color:var(--ink2);margin:24px auto 36px;max-width:560px;line-height:1.5}
 .hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
@@ -534,7 +542,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .f-foot{font-size:12px;color:var(--ink2);text-align:center;margin-top:14px}
 
 /* ---------- FOOTER ---------- */
-footer{background:#13151a;color:rgba(255,255,255,.45);padding:44px 0;font-size:12.5px;line-height:1.65}
+footer{background:#071A2E;color:rgba(255,255,255,.45);padding:44px 0;font-size:12.5px;line-height:1.65}
 footer .wrap{display:flex;flex-direction:column;gap:14px}
 footer .frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 footer .logo{color:#fff;font-size:15px}
@@ -583,7 +591,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 
 <nav>
   <div class="wrap">
-    <div class="logo"><div class="dots"><span></span><span></span><span></span><span></span></div>roteador</div>
+    <div class="logo"><picture><source srcset="brand/roteador-lockup-transparente.webp" type="image/webp"><img src="brand/roteador-lockup-transparente.png" alt="roteador"></picture></div>
     <a href="#proposta" class="nav-cta">Pedir proposta</a>
   </div>
 </nav>
@@ -591,6 +599,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 <!-- HERO -->
 <section class="hero">
   <div class="wrap hero-inner">
+    <div class="hero-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 104"><defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4285F4"/><stop offset=".5" stop-color="#FBBC04"/><stop offset="1" stop-color="#34A853"/></linearGradient></defs><path d="M22 74 C 44 26, 76 26, 98 74" fill="none" stroke="url(#rgrad)" stroke-width="8" stroke-linecap="round"/><circle cx="22" cy="74" r="13" fill="#4285F4"/><circle cx="60" cy="38" r="14" fill="none" stroke="#FBBC04" stroke-width="6"><animate attributeName="stroke-opacity" values="0.15;0.55;0.15" dur="2.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="38" r="14" fill="#FBBC04"/><circle cx="98" cy="74" r="13" fill="#34A853"/><g><circle r="9" fill="#0A2540" opacity="0.14"/><circle r="6" fill="#0A2540" opacity="0.28"/><circle r="4" fill="#0A2540"/><animateMotion dur="2.2s" repeatCount="indefinite" rotate="0" path="M22 74 C 44 26, 76 26, 98 74"/></g></svg></div>
     <a href="/health/" class="eyebrow" title="Conheça a nó health">infraestrutura de telemedicina <span class="cv-by">by</span> <img src="/assets/logos/logo-no-dark.png" alt="nó tech stack IA"></a>
     <h1>Atendimento médico<br><span class="cv">dentro da sua operação.</span></h1>
     <p>O Roteador conecta sua operação a um pool médico via API. Você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.</p>
@@ -1032,7 +1041,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 <footer>
   <div class="wrap">
     <div class="frow">
-      <div class="logo"><div class="dots"><span style="background:var(--azul)"></span><span style="background:var(--vermelho)"></span><span style="background:var(--amarelo)"></span><span style="background:var(--verde)"></span></div>roteador · by nó tech stack</div>
+      <div class="logo"><picture><source srcset="brand/roteador-lockup-footer.webp" type="image/webp"><img src="brand/roteador-lockup-footer.png" alt="roteador"></picture><span class="byline">by nó tech stack</span></div>
       <div>nó tech stack · <a href="/" class="f-link">notechstack.com.br</a> · <a href="/health/" class="f-link">nó health</a></div>
     </div>
     <div>Os atendimentos médicos realizados pelas operações conectadas ao Roteador são prestados pela Prontia Saúde, e os respectivos prontuários médicos são armazenados e custodiados por ela, em conformidade com a Resolução CFM 1.821/2007 e a LGPD. O Roteador atua exclusivamente como operação tecnológica de captação, pagamento e roteamento.</div>
