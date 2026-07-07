@@ -3,17 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roteador — Venda consultas. Só isso.</title>
-<meta name="description" content="Lance sua marca de telemedicina sem montar uma operação: checkout pronto, split de pagamento na origem e pool médico atendendo em minutos.">
-<meta property="og:title" content="Roteador — Venda consultas. Só isso.">
-<meta property="og:description" content="Lance sua marca de telemedicina sem montar uma operação: checkout pronto, split de pagamento na origem e pool médico atendendo em minutos.">
+<title>Roteador — Atendimento médico dentro da sua operação</title>
+<meta name="description" content="O Roteador conecta sua operação a um pool médico via API: você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.">
+<meta property="og:title" content="Roteador — Atendimento médico dentro da sua operação">
+<meta property="og:description" content="O Roteador conecta sua operação a um pool médico via API: você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="brand/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="brand/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="brand/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="brand/favicon-16.png">
+<link rel="apple-touch-icon" href="brand/apple-touch-icon-180.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0A2540">
 <style>
 :root{
   --azul:#4285F4; --vermelho:#EA4335; --amarelo:#FBBC04; --verde:#34A853;
-  --ink:#1a1d24; --ink2:#5f6573; --bg:#fbfbfa; --card:#ffffff; --line:#e8e8e4;
+  --navy:#0A2540;
+  --ink:var(--navy); --ink2:#5f6573; --bg:#fbfbfa; --card:#ffffff; --line:#e8e8e4;
   --r:18px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -28,12 +36,10 @@ a{color:inherit}
 nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);background:rgba(251,251,250,.82);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.02em}
-.logo .dots{display:flex;gap:4px}
-.logo .dots span{width:9px;height:9px;border-radius:50%}
-.logo .dots span:nth-child(1){background:var(--azul)}
-.logo .dots span:nth-child(2){background:var(--vermelho)}
-.logo .dots span:nth-child(3){background:var(--amarelo)}
-.logo .dots span:nth-child(4){background:var(--verde)}
+.logo img{width:auto;display:block}
+nav .logo img{height:30px}
+footer .logo img{height:22px}
+footer .logo .byline{font-weight:500;font-size:12.5px;color:rgba(255,255,255,.45);letter-spacing:0}
 .nav-cta{background:var(--ink);color:#fff;border:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
 .nav-cta:hover{background:var(--azul)}
 
@@ -42,10 +48,13 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
   radial-gradient(900px 500px at 85% -10%, rgba(66,133,244,.07), transparent 60%),
   radial-gradient(700px 400px at -10% 110%, rgba(52,168,83,.06), transparent 60%)}
 .hero-inner{text-align:center;max-width:780px;margin:0 auto}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a3a8b3;margin-bottom:26px;opacity:.85;text-decoration:none;transition:opacity .15s}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.05em;color:#a3a8b3;margin-bottom:26px;opacity:.85;text-decoration:none;transition:opacity .15s}
 .eyebrow:hover{opacity:1}
-.eyebrow img{height:24px;width:auto;display:block}
-h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
+.eyebrow .cv-by{font-family:'Caveat',cursive;font-size:15px;font-weight:700;letter-spacing:0;transform:rotate(-4deg)}
+.eyebrow img{height:18px;width:auto;display:block}
+.hero-mark{display:flex;justify-content:center;margin-bottom:22px}
+.hero-mark svg{width:clamp(84px,10vw,116px);height:auto}
+h1{font-size:clamp(40px,6.2vw,72px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
 h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:1.08em}
 .hero p{font-size:clamp(17px,2.2vw,21px);color:var(--ink2);margin:24px auto 36px;max-width:560px;line-height:1.5}
 .hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
@@ -369,8 +378,12 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
 .src-det summary{cursor:pointer;font-weight:700;color:var(--azul);font-size:12px;list-style:none;user-select:none}
 .src-det summary::-webkit-details-marker{display:none}
 .src-det summary::before{content:'+ '}
-.src-det[open] summary::before{content:'– '}
-.src-det-body{max-width:560px;margin:12px auto 0;text-align:left;font-size:12.5px;color:var(--ink2);line-height:1.65;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.src-det.open summary::before{content:'– '}
+.src-acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s ease}
+.src-acc-inner{overflow:hidden;min-height:0}
+.src-det.open .src-acc{grid-template-rows:1fr}
+.src-det-body{max-width:560px;margin:12px auto 0;text-align:left;font-size:12.5px;color:var(--ink2);line-height:1.65;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;opacity:0;transform:translateY(-4px);transition:opacity .3s ease,transform .3s ease}
+.src-det.open .src-det-body{opacity:1;transform:none;transition-delay:.08s}
 .src-det-body b{color:var(--ink)}
 @media (max-width:640px){
   .mrow{grid-template-columns:78px 1fr 44px;gap:9px}
@@ -388,7 +401,9 @@ h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
 .case p.lead b{color:var(--ink)}
 .case-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
 .cchip{font-size:13px;font-weight:600;color:var(--ink2);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:9px 18px;animation:floaty 5.8s ease-in-out infinite;will-change:transform}
-.case-chips .cchip:nth-child(2){animation-duration:6.9s;animation-delay:-2.7s}
+.cchip-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;transition:border-color .15s,color .15s}
+.cchip-link img{height:16px;width:auto;display:block}
+.cchip-link:hover{border-color:var(--verde);color:var(--ink)}
 .growth{max-width:880px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:40px 40px 30px}
 .growth-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:34px}
 .growth-big{font-size:clamp(20px,2.6vw,27px);font-weight:800;letter-spacing:-.03em}
@@ -442,9 +457,6 @@ h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
 .flow-link{color:var(--azul);font-weight:700;text-decoration:none;border-bottom:2px solid rgba(66,133,244,.3)}
 .flow-link:hover{border-bottom-color:var(--azul)}
 .flow-head p b{color:var(--ink)}
-.pgm-badge{display:inline-flex;align-items:center;gap:8px;margin-top:18px;font-size:13px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:99px;padding:9px 18px;box-shadow:0 6px 18px rgba(26,29,36,.06)}
-.pgm-badge i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--verde);color:#fff;font-style:normal;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
-.pgm-badge span{font-weight:500;color:var(--ink2)}
 .flow-eg{font-family:'Caveat',cursive;font-size:24px;color:var(--vermelho);align-self:flex-start;margin-bottom:10px;transform-origin:center;animation:wiggle 3.6s ease-in-out infinite;display:inline-block}
 @keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(1.5deg)}}
 .flow-diagram{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
@@ -530,7 +542,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .f-foot{font-size:12px;color:var(--ink2);text-align:center;margin-top:14px}
 
 /* ---------- FOOTER ---------- */
-footer{background:#13151a;color:rgba(255,255,255,.45);padding:44px 0;font-size:12.5px;line-height:1.65}
+footer{background:#071A2E;color:rgba(255,255,255,.45);padding:44px 0;font-size:12.5px;line-height:1.65}
 footer .wrap{display:flex;flex-direction:column;gap:14px}
 footer .frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
 footer .logo{color:#fff;font-size:15px}
@@ -579,7 +591,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 
 <nav>
   <div class="wrap">
-    <div class="logo"><div class="dots"><span></span><span></span><span></span><span></span></div>roteador</div>
+    <div class="logo"><picture><source srcset="brand/roteador-lockup-transparente.webp" type="image/webp"><img src="brand/roteador-lockup-transparente.png" alt="roteador"></picture></div>
     <a href="#proposta" class="nav-cta">Pedir proposta</a>
   </div>
 </nav>
@@ -587,11 +599,12 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 <!-- HERO -->
 <section class="hero">
   <div class="wrap hero-inner">
-    <a href="/health/" class="eyebrow" title="Conheça a nó health">infraestrutura de telemedicina · by <img src="/assets/logos/logo-no-dark.png" alt="nó tech stack IA"></a>
-    <h1>Sua marca vende.<br><span class="cv">Nossos médicos atendem.</span></h1>
-    <p>Lance sua telemedicina sem montar uma operação: checkout pronto, pagamento dividido na origem e pool médico atendendo em minutos.</p>
+    <div class="hero-mark" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 104"><defs><linearGradient id="rgrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4285F4"/><stop offset=".5" stop-color="#FBBC04"/><stop offset="1" stop-color="#34A853"/></linearGradient></defs><path d="M22 74 C 44 26, 76 26, 98 74" fill="none" stroke="url(#rgrad)" stroke-width="8" stroke-linecap="round"/><circle cx="22" cy="74" r="13" fill="#4285F4"/><circle cx="60" cy="38" r="14" fill="none" stroke="#FBBC04" stroke-width="6"><animate attributeName="stroke-opacity" values="0.15;0.55;0.15" dur="2.2s" repeatCount="indefinite"/></circle><circle cx="60" cy="38" r="14" fill="#FBBC04"/><circle cx="98" cy="74" r="13" fill="#34A853"/><g><circle r="9" fill="#0A2540" opacity="0.14"/><circle r="6" fill="#0A2540" opacity="0.28"/><circle r="4" fill="#0A2540"/><animateMotion dur="2.2s" repeatCount="indefinite" rotate="0" path="M22 74 C 44 26, 76 26, 98 74"/></g></svg></div>
+    <a href="/health/" class="eyebrow" title="Conheça a nó health">infraestrutura de telemedicina <span class="cv-by">by</span> <img src="/assets/logos/logo-no-dark.png" alt="nó tech stack IA"></a>
+    <h1>Atendimento médico<br><span class="cv">dentro da sua operação.</span></h1>
+    <p>O Roteador conecta sua operação a um pool médico via API. Você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.</p>
     <div class="hero-ctas">
-      <a href="#proposta" class="btn btn-p">Quero minha telemedicina</a>
+      <a href="#proposta" class="btn btn-p">Quero integrar atendimento médico</a>
       <a href="#como" class="btn btn-s">Ver como funciona</a>
     </div>
   </div>
@@ -605,7 +618,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
     <div class="rs">
       <div class="rs-head">
         <div class="rs-eyebrow">Como funciona</div>
-        <h2 class="rs-title">Seja o paciente da <span class="cv">sua</span> telemedicina.</h2>
+        <h2 class="rs-title">Seja o paciente da <span class="cv">sua</span> operação.</h2>
         <p class="rs-sub">Role a página e acompanhe a jornada real, do anúncio à consulta — e o que acontece nos bastidores sem você mexer um dedo.</p>
       </div>
 
@@ -873,7 +886,9 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
     <div class="market-src">
       Participação de teleconsultas no total de consultas médicas. Fonte: OCDE — Organização para a Cooperação e Desenvolvimento Econômico, que reúne estatísticas comparáveis de 38 países — e Eurostat, 2023.
       <details class="src-det"><summary>e os 2-3% do Brasil, de onde vêm?</summary>
+        <div class="src-acc"><div class="src-acc-inner">
         <div class="src-det-body">O Brasil não publica uma estatística tão limpa quanto a da OCDE, mas dá pra estimar: foram <b>mais de 30 milhões de atendimentos médicos a distância em 2023</b>, segundo a Fenasaúde — crescimento de 172% sobre os 11 milhões acumulados de 2020 ao fim de 2022. Como o país realiza <b>mais de 1 bilhão de consultas por ano</b> somando SUS e rede privada, 30 milhões representam algo em torno de 2-3% do total.</div>
+        </div></div>
       </details>
     </div>
   </div>
@@ -887,8 +902,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
       <h2>Construímos uma telemedicina <span class="cv" style="color:var(--verde)">do zero.</span><br>Hoje ela é o pool médico do Roteador.</h2>
       <p class="lead">Antes de virar produto, o Roteador foi testado no caso mais difícil: a nossa própria operação. A telemedicina que a nó desenvolveu escalou sozinha — e hoje é a <b>parceira de atendimento médico</b> de todas as marcas conectadas.</p>
       <div class="case-chips">
-        <span class="cchip">Pool credenciado · prontuário sob custódia médica (CFM)</span>
-        <span class="cchip">Do pagamento ao médico na tela em minutos</span>
+        <a class="cchip cchip-link" href="/health/" target="_blank" rel="noopener" title="Conheça a nó health">Eu também quero uma plataforma assim! <img src="/assets/logos/logo-no-dark.png" alt="nó health"></a>
       </div>
     </div>
     <div class="growth" id="growth">
@@ -911,8 +925,8 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
   </div>
 </section>
 
-<!-- ANTI WHITE-LABEL -->
-<section class="anti">
+<!-- ANTI WHITE-LABEL — DESATIVADA PRO GO-LIVE: religar via SHOW_WHITELABEL=true no <script> -->
+<section class="anti" id="whitelabel" hidden>
   <div class="wrap">
     <div class="anti-head">
       <h2>White-label te dá um software.<br>O Roteador te dá <span class="cv" style="color:var(--vermelho)">uma operação.</span></h2>
@@ -949,7 +963,6 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
       <div class="kicker" style="color:var(--azul)">como o dinheiro flui</div>
       <h2>Sua margem cai na sua conta.<br><span class="cv" style="color:var(--verde)">A parte do médico, na dele.</span></h2>
       <p>Somos <b>credenciados pela <a href="https://www.pagar.me/" target="_blank" rel="noopener" class="flow-link">pagar.me</a></b> e parceiros oficiais nesse modelo de split — uma homologação que pouquíssimas operações no Brasil possuem. O valor é dividido no momento da aprovação: você nunca recebe o valor cheio pra depois pagar o atendimento — cada parte já chega na conta certa.</p>
-      <div class="pgm-badge"><i>✓</i> Credenciado &amp; parceiro pagar.me <span>· split de pagamentos</span></div>
     </div>
     <div class="flow-diagram">
       <span class="cv flow-eg">Exemplo:</span>
@@ -1028,7 +1041,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 <footer>
   <div class="wrap">
     <div class="frow">
-      <div class="logo"><div class="dots"><span style="background:var(--azul)"></span><span style="background:var(--vermelho)"></span><span style="background:var(--amarelo)"></span><span style="background:var(--verde)"></span></div>roteador · by nó tech stack</div>
+      <div class="logo"><picture><source srcset="brand/roteador-lockup-footer.webp" type="image/webp"><img src="brand/roteador-lockup-footer.png" alt="roteador"></picture><span class="byline">by nó tech stack</span></div>
       <div>nó tech stack · <a href="/" class="f-link">notechstack.com.br</a> · <a href="/health/" class="f-link">nó health</a></div>
     </div>
     <div>Os atendimentos médicos realizados pelas operações conectadas ao Roteador são prestados pela Prontia Saúde, e os respectivos prontuários médicos são armazenados e custodiados por ela, em conformidade com a Resolução CFM 1.821/2007 e a LGPD. O Roteador atua exclusivamente como operação tecnológica de captação, pagamento e roteamento.</div>
@@ -1036,6 +1049,10 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 </footer>
 
 <script>
+/* ---------- Comparativo White Label (oculto pro go-live; mude pra true pra religar) ---------- */
+const SHOW_WHITELABEL = false;
+if(SHOW_WHITELABEL) document.getElementById('whitelabel').hidden = false;
+
 /* ---------- JORNADA INTERATIVA ---------- */
 (function(){
   const $ = s => document.querySelector(s);
@@ -1136,7 +1153,7 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
       note(1,'t-blue','checkout',
         'Após tocar em <b>“Agendar consulta”</b> no site da sua marca, o paciente é redirecionado para a <b>sua página do Roteador vestindo a sua identidade</b>, no seu domínio. Ele nunca sai da sua marca.');
       note(1,'t-green','seu banco de dados',
-        '<b>Cadastro salvo no banco isolado da sua telemedicina.</b> Dados de venda e histórico ficam na sua base, separados de qualquer outra marca.');
+        '<b>Cadastro salvo no banco isolado da sua operação.</b> Dados de venda e histórico ficam na sua base, separados de qualquer outra marca.');
       t(()=>ghostTap($('#btnCta'), ()=>{
         goScreen(2);
         t(()=>typeFields(()=>{
@@ -1367,6 +1384,26 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
   });
   rT.addEventListener('input',calc);rQ.addEventListener('input',calc);
   calc();
+})();
+
+/* ---------- Accordion animado (FAQ 2-3% do Brasil) ---------- */
+(function(){
+  const det=document.querySelector('.src-det');
+  if(!det)return;
+  const summary=det.querySelector('summary');
+  const acc=det.querySelector('.src-acc');
+  let closing=null;
+  summary.addEventListener('click',e=>{
+    e.preventDefault();
+    if(det.classList.contains('open')){
+      det.classList.remove('open');
+      closing=setTimeout(()=>{det.open=false;closing=null;},400);
+    }else{
+      clearTimeout(closing);closing=null;
+      det.open=true;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>det.classList.add('open')));
+    }
+  });
 })();
 
 /* ---------- Popover do custo ---------- */
