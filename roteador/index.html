@@ -370,8 +370,12 @@ h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:
 .src-det summary{cursor:pointer;font-weight:700;color:var(--azul);font-size:12px;list-style:none;user-select:none}
 .src-det summary::-webkit-details-marker{display:none}
 .src-det summary::before{content:'+ '}
-.src-det[open] summary::before{content:'– '}
-.src-det-body{max-width:560px;margin:12px auto 0;text-align:left;font-size:12.5px;color:var(--ink2);line-height:1.65;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.src-det.open summary::before{content:'– '}
+.src-acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s ease}
+.src-acc-inner{overflow:hidden;min-height:0}
+.src-det.open .src-acc{grid-template-rows:1fr}
+.src-det-body{max-width:560px;margin:12px auto 0;text-align:left;font-size:12.5px;color:var(--ink2);line-height:1.65;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;opacity:0;transform:translateY(-4px);transition:opacity .3s ease,transform .3s ease}
+.src-det.open .src-det-body{opacity:1;transform:none;transition-delay:.08s}
 .src-det-body b{color:var(--ink)}
 @media (max-width:640px){
   .mrow{grid-template-columns:78px 1fr 44px;gap:9px}
@@ -874,7 +878,9 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
     <div class="market-src">
       Participação de teleconsultas no total de consultas médicas. Fonte: OCDE — Organização para a Cooperação e Desenvolvimento Econômico, que reúne estatísticas comparáveis de 38 países — e Eurostat, 2023.
       <details class="src-det"><summary>e os 2-3% do Brasil, de onde vêm?</summary>
+        <div class="src-acc"><div class="src-acc-inner">
         <div class="src-det-body">O Brasil não publica uma estatística tão limpa quanto a da OCDE, mas dá pra estimar: foram <b>mais de 30 milhões de atendimentos médicos a distância em 2023</b>, segundo a Fenasaúde — crescimento de 172% sobre os 11 milhões acumulados de 2020 ao fim de 2022. Como o país realiza <b>mais de 1 bilhão de consultas por ano</b> somando SUS e rede privada, 30 milhões representam algo em torno de 2-3% do total.</div>
+        </div></div>
       </details>
     </div>
   </div>
@@ -1368,6 +1374,26 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
   });
   rT.addEventListener('input',calc);rQ.addEventListener('input',calc);
   calc();
+})();
+
+/* ---------- Accordion animado (FAQ 2-3% do Brasil) ---------- */
+(function(){
+  const det=document.querySelector('.src-det');
+  if(!det)return;
+  const summary=det.querySelector('summary');
+  const acc=det.querySelector('.src-acc');
+  let closing=null;
+  summary.addEventListener('click',e=>{
+    e.preventDefault();
+    if(det.classList.contains('open')){
+      det.classList.remove('open');
+      closing=setTimeout(()=>{det.open=false;closing=null;},400);
+    }else{
+      clearTimeout(closing);closing=null;
+      det.open=true;
+      requestAnimationFrame(()=>requestAnimationFrame(()=>det.classList.add('open')));
+    }
+  });
 })();
 
 /* ---------- Popover do custo ---------- */
