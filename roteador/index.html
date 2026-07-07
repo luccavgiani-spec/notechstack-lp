@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Roteador — Venda consultas. Só isso.</title>
-<meta name="description" content="Lance sua marca de telemedicina sem montar uma operação: checkout pronto, split de pagamento na origem e pool médico atendendo em minutos.">
-<meta property="og:title" content="Roteador — Venda consultas. Só isso.">
-<meta property="og:description" content="Lance sua marca de telemedicina sem montar uma operação: checkout pronto, split de pagamento na origem e pool médico atendendo em minutos.">
+<title>Roteador — Atendimento médico dentro da sua operação</title>
+<meta name="description" content="O Roteador conecta sua operação a um pool médico via API: você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.">
+<meta property="og:title" content="Roteador — Atendimento médico dentro da sua operação">
+<meta property="og:description" content="O Roteador conecta sua operação a um pool médico via API: você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
@@ -42,9 +42,10 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
   radial-gradient(900px 500px at 85% -10%, rgba(66,133,244,.07), transparent 60%),
   radial-gradient(700px 400px at -10% 110%, rgba(52,168,83,.06), transparent 60%)}
 .hero-inner{text-align:center;max-width:780px;margin:0 auto}
-.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#a3a8b3;margin-bottom:26px;opacity:.85;text-decoration:none;transition:opacity .15s}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:600;letter-spacing:.05em;color:#a3a8b3;margin-bottom:26px;opacity:.85;text-decoration:none;transition:opacity .15s}
 .eyebrow:hover{opacity:1}
-.eyebrow img{height:24px;width:auto;display:block}
+.eyebrow .cv-by{font-family:'Caveat',cursive;font-size:15px;font-weight:700;letter-spacing:0;transform:rotate(-4deg)}
+.eyebrow img{height:18px;width:auto;display:block}
 h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
 h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:1.08em}
 .hero p{font-size:clamp(17px,2.2vw,21px);color:var(--ink2);margin:24px auto 36px;max-width:560px;line-height:1.5}
@@ -587,11 +588,11 @@ footer .f-link:hover{color:#fff;border-bottom-color:rgba(255,255,255,.6)}
 <!-- HERO -->
 <section class="hero">
   <div class="wrap hero-inner">
-    <a href="/health/" class="eyebrow" title="Conheça a nó health">infraestrutura de telemedicina · by <img src="/assets/logos/logo-no-dark.png" alt="nó tech stack IA"></a>
-    <h1>Sua marca vende.<br><span class="cv">Nossos médicos atendem.</span></h1>
-    <p>Lance sua telemedicina sem montar uma operação: checkout pronto, pagamento dividido na origem e pool médico atendendo em minutos.</p>
+    <a href="/health/" class="eyebrow" title="Conheça a nó health">infraestrutura de telemedicina <span class="cv-by">by</span> <img src="/assets/logos/logo-no-dark.png" alt="nó tech stack IA"></a>
+    <h1>Atendimento médico<br><span class="cv">dentro da sua operação.</span></h1>
+    <p>O Roteador conecta sua operação a um pool médico via API. Você vende a consulta, o split distribui o pagamento automaticamente e o paciente é atendido em minutos.</p>
     <div class="hero-ctas">
-      <a href="#proposta" class="btn btn-p">Quero minha telemedicina</a>
+      <a href="#proposta" class="btn btn-p">Quero integrar atendimento médico</a>
       <a href="#como" class="btn btn-s">Ver como funciona</a>
     </div>
   </div>
