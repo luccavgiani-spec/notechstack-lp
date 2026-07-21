@@ -380,8 +380,13 @@ async function sub(){
   var inv = document.querySelector('.form-step#s3 .form-opt.sel .form-opt-txt strong');
   var prz = document.querySelector('.form-step#s4 .form-opt.sel .form-opt-txt strong');
   var aiTxt = (document.getElementById('atf')||{}).textContent||'';
+  /* A resposta da function precisa ser LIDA. Antes o fetch era disparado e
+     descartado, então uma falha de envio era invisível daqui — o visitante via
+     "recebemos" e ninguém ficava sabendo que o e-mail não saiu.
+     A tela de sucesso continua aparecendo mesmo com e-mail falho, porque o
+     lead já foi gravado no banco: o problema é nosso, não dele. */
   try {
-    await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email',{
+    var resp = await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -393,7 +398,10 @@ async function sub(){
         aiAnalysis: aiTxt
       })
     });
-  } catch(e){ console.warn('Email send failed:',e); }
+    var out = await resp.json().catch(function(){ return {}; });
+    if (!resp.ok || !out.saved)   console.error('Lead NÃO gravado:', resp.status, out.saveError || out.error || out);
+    if (!out.emailSent)           console.error('E-mail do lead NÃO enviado:', out.emailError || out);
+  } catch(e){ console.error('Falha ao enviar lead:',e); }
   document.querySelectorAll('.form-step').forEach(function(s){s.classList.remove('active');});
   document.getElementById('fdone').classList.add('show');
   document.querySelector('.form-prog').style.display='none';
