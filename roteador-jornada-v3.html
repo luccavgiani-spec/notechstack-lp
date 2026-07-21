@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roteador — Jornada interativa v2</title>
+<link rel="stylesheet" href="/brand/fonts/fonts.css">
+<link rel="stylesheet" href="/brand/tokens/tokens.css">
+<link rel="stylesheet" href="/shared/brand-derived.css">
+<style>
+  /* apelidos locais que CONSOMEM brand/tokens/tokens.css.
+     Peça dark, contexto Roteador → acento AZUL. */
+  :root{
+    --font:var(--no-font-sans); --font-mono:var(--no-font-mono);
+    --blue:var(--no-azul); --red:var(--no-vermelho);
+    --yellow:var(--no-ambar); --green:var(--no-verde);
+    /* a peça usa os dois nomes; mantidos em sincronia */
+    --azul:var(--no-azul); --vermelho:var(--no-vermelho);
+    --amarelo:var(--no-ambar); --verde:var(--no-verde);
+    --accent:var(--no-azul);
+    --bg:var(--no-tinta); --panel:var(--no-tinta-alt); --line:var(--no-borda-dark);
+    --txt:var(--no-osso); --muted:var(--no-cinza-claro); --dim:var(--no-cinza);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--txt);font-family:var(--font),sans-serif;-webkit-font-smoothing:antialiased}
+
+  /* espaço antes/depois só pra simular a página em volta */
+  .filler{height:60vh;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+
+  /* ---------- wrapper scroll-driven ---------- */
+  .rs-wrap{height:360vh;position:relative}
+  .rs-pin{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  .rs-progress{position:absolute;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .15s linear;z-index:10}
+
+  .rs{width:100%;max-width:1080px;margin:0 auto;padding:0 32px}
+
+  /* ---------- header compacto ---------- */
+  .rs-head{margin-bottom:30px}
+  .rs-eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue);margin-bottom:8px}
+  .rs-title{font-size:clamp(23px,2.9vw,32px);font-weight:var(--no-weight-display);text-transform:uppercase;line-height:1.12;letter-spacing:-.02em}
+  .rs-title .cv{color:var(--amarelo);font-weight:inherit}
+  .rs-sub{margin-top:8px;font-size:14.5px;color:var(--muted);max-width:520px;line-height:1.5}
+
+  /* ---------- layout ---------- */
+  .rs-grid{display:grid;grid-template-columns:1fr 280px;gap:56px;align-items:center}
+
+  /* ---------- spine ---------- */
+  .spine{list-style:none;position:relative}
+  .sp-item{position:relative;padding:0 0 28px 50px;min-height:62px}
+  .sp-item:last-child{padding-bottom:0}
+  .sp-item::before{content:'';position:absolute;left:14px;top:34px;bottom:0;width:2px;background:var(--line);transition:background .5s}
+  .sp-item:last-child::before{display:none}
+  .sp-item.done::before{background:var(--green)}
+  .sp-dot{position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:var(--panel);
+    display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:var(--dim);transition:all .35s}
+  .sp-item.active .sp-dot{border-color:var(--blue);color:var(--blue);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(61,99,219,.45)}70%{box-shadow:0 0 0 10px rgba(61,99,219,0)}100%{box-shadow:0 0 0 0 rgba(61,99,219,0)}}
+  .sp-item.done .sp-dot{border-color:var(--green);background:var(--green);color:#08120b}
+  .sp-item.done .sp-dot::after{content:'✓';font-size:13px}
+  .sp-item.done .sp-dot span{display:none}
+  .sp-label{font-size:17px;font-weight:700;color:var(--dim);padding-top:6px;transition:color .35s;letter-spacing:-.01em}
+  .sp-item.active .sp-label{color:var(--txt)}
+  .sp-item.done .sp-label{color:var(--muted)}
+  .sp-now{display:none;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-left:9px}
+  .sp-item.active .sp-now{display:inline}
+
+  .sp-notes{overflow:hidden;max-height:0;transition:max-height .5s ease}
+  .sp-item.active .sp-notes{max-height:360px}
+
+  .bk-note{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:13px 15px;
+    font-size:13px;line-height:1.55;color:var(--muted);opacity:0;transform:translateY(8px);transition:opacity .45s,transform .45s}
+  .bk-note.in{opacity:1;transform:none}
+  .bk-note b{color:var(--txt);font-weight:600}
+  .bk-note .tag{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+  .bk-note .tag i{width:6px;height:6px;border-radius:50%;display:inline-block}
+  .t-blue{color:var(--blue)} .t-blue i{background:var(--blue)}
+  .t-green{color:var(--green)} .t-green i{background:var(--green)}
+  .t-yellow{color:var(--yellow)} .t-yellow i{background:var(--yellow)}
+
+  /* ---------- split widget ---------- */
+  .split{margin-top:10px}
+  .split-bar{display:flex;height:30px;border-radius:9px;overflow:hidden;background:var(--line)}
+  .split-seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#141414;
+    width:0;overflow:hidden;white-space:nowrap;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+  .seg-voce{background:var(--blue);color:#fff}
+  .seg-med{background:var(--green)}
+  .seg-plat{background:var(--yellow)}
+  .split.go .seg-voce{width:50%}
+  .split.go .seg-med{width:45%}
+  .split.go .seg-plat{width:5%}
+  .split-leg{margin-top:8px;display:grid;gap:4px}
+  .split-leg div{display:flex;justify-content:space-between;font-size:12.5px;opacity:0;transform:translateX(-8px);transition:opacity .4s,transform .4s}
+  .split.go .split-leg div{opacity:1;transform:none}
+  .split.go .split-leg div:nth-child(1){transition-delay:.55s}
+  .split.go .split-leg div:nth-child(2){transition-delay:.75s}
+  .split.go .split-leg div:nth-child(3){transition-delay:.95s}
+  .split-leg b{font-weight:700;color:var(--txt)}
+  .split-leg .lg{display:flex;align-items:center;gap:7px;color:var(--muted)}
+  .split-leg .lg i{width:8px;height:8px;border-radius:3px;display:inline-block}
+
+  /* split mobile: fluxo com setas (1 origem → 2 destinos) */
+  .split-flow{display:none;margin-top:4px}
+  .sf-src{margin:0 auto;width:max-content;background:#1a2232;border:1px solid var(--line);border-radius:9px;padding:6px 14px;font-size:12px;font-weight:800;color:var(--txt);text-align:center}
+  .sf-src small{display:block;font-weight:500;font-size:8.5px;color:var(--muted);letter-spacing:.03em;margin-top:1px}
+  .sf-arrows{display:block;margin:0 auto}
+  .sf-a{fill:none;stroke:var(--dim);stroke-width:1.6;stroke-dasharray:60;stroke-dashoffset:60;transition:stroke-dashoffset .9s ease .35s}
+  .split.go .sf-a{stroke-dashoffset:0}
+  .sf-head{fill:var(--dim);opacity:0;transition:opacity .3s ease 1.15s}
+  .split.go .sf-head{opacity:1}
+  .sf-row{display:flex;gap:6px;justify-content:center}
+  .sf-card{flex:1;border-radius:9px;padding:6px 7px;text-align:center;opacity:0;transform:translateY(6px);transition:opacity .4s ease 1.2s,transform .4s ease 1.2s}
+  .split.go .sf-card{opacity:1;transform:none}
+  .sf-card span{display:block;font-size:7.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;opacity:.85;margin-bottom:2px;white-space:nowrap}
+  .sf-card b{font-size:12.5px;font-weight:800;color:#fff;white-space:nowrap}
+  .sf-voce{background:rgba(61,99,219,.16);border:1px solid rgba(61,99,219,.5);color:#9bbcf9}
+  .sf-op{background:rgba(48,164,108,.13);border:1px solid rgba(48,164,108,.45);color:#7fd29a}
+
+  /* ---------- phone ---------- */
+  .stage{display:flex;flex-direction:column;align-items:center}
+  .hint{font-family:var(--font-mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:var(--no-tracking-label);color:var(--no-ambar-escuro);margin-bottom:10px;transition:opacity .4s}
+  .hint.off{opacity:0}
+  .phone-box{position:relative}
+  .phone{width:252px;height:516px;background:#05070c;border-radius:40px;padding:9px;
+    box-shadow:0 0 0 1.5px #232b3c,0 24px 60px -20px rgba(0,0,0,.85),0 0 80px -28px rgba(61,99,219,.28)}
+  .scr{position:relative;width:100%;height:100%;background:#fff;border-radius:33px;overflow:hidden;color:#1f1f1d}
+  .screen{position:absolute;inset:0;opacity:0;transform:translateX(24px);pointer-events:none;
+    transition:opacity .4s,transform .4s cubic-bezier(.2,.8,.25,1);display:flex;flex-direction:column;overflow:hidden}
+  .screen.on{opacity:1;transform:none}
+  .screen.bye{transform:translateX(-24px)}
+
+  /* status bar iOS */
+  .sbar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:10px 22px 4px;font-size:12px;font-weight:700;color:#1f1f1d}
+  .sbar .ic{display:flex;align-items:center;gap:5px}
+  .dark-sbar .sbar{color:#fff}
+
+  /* tap "fantasma" */
+  .ghost-tap{position:absolute;width:34px;height:34px;border-radius:50%;background:rgba(61,99,219,.35);border:2px solid rgba(61,99,219,.7);
+    transform:scale(.4);opacity:0;pointer-events:none;z-index:50}
+  .ghost-tap.go{animation:gtap .7s ease forwards}
+  @keyframes gtap{0%{opacity:0;transform:scale(.4)}25%{opacity:1;transform:scale(.85)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+
+  /* ===== screen 1: Google SERP iOS ===== */
+  .g-top{flex:none;padding:6px 14px 0}
+  .g-logo{text-align:center;font-size:21px;font-weight:700;letter-spacing:-.5px;font-family:Arial,var(--font),sans-serif;margin-bottom:8px}
+  .g-logo b{font-weight:700}
+  .g-pill{display:flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:10px 14px;box-shadow:0 1px 6px rgba(20,20,20,.22);font-size:13px;color:#141414}
+  .g-pill .q{flex:1;white-space:nowrap;overflow:hidden}
+  .g-tabs{display:flex;gap:18px;padding:12px 16px 0;font-size:12.5px;color:#6b6f76;border-bottom:1px solid #ecebe6}
+  .g-tabs span{padding-bottom:9px}
+  .g-tabs .on{color:#1a73e8;font-weight:600;border-bottom:2.5px solid #1a73e8}
+  .g-body{flex:1;overflow:hidden;padding:12px 16px;background:#fff}
+  .g-spon{font-size:11.5px;font-weight:700;color:#141414;margin-bottom:7px}
+  .g-res{position:relative}
+  .g-site{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .g-fav{width:24px;height:24px;border-radius:50%;background:#f3f2ed;display:flex;align-items:center;justify-content:center}
+  .g-fav .mini{width:15px;height:15px;border-radius:5px;background:var(--green);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center}
+  .g-site .nm{font-size:12px;color:#141414;font-weight:500}
+  .g-site .ur{font-size:10.5px;color:#6b6f76;display:block;margin-top:1px}
+  .g-tt{font-size:16.5px;color:#1558d6;font-weight:400;line-height:1.3;font-family:Arial,var(--font),sans-serif}
+  .g-ds{font-size:12.5px;color:#4d5156;line-height:1.45;margin-top:4px}
+  .g-links{display:flex;gap:16px;margin-top:8px;font-size:13px;color:#1558d6}
+  .g-div{height:1px;background:#ecebe6;margin:14px 0}
+  .g-ghost{opacity:.55}
+  .g-res.hl{animation:hlres 1.8s ease infinite}
+  @keyframes hlres{0%,100%{background:transparent}50%{background:rgba(61,99,219,.06)}}
+
+  /* ===== screen 2: LP telemed ===== */
+  .pad{padding:0 16px 14px;display:flex;flex-direction:column;flex:1;overflow:hidden}
+  .vp-nav{display:flex;align-items:center;gap:8px;padding:8px 0 12px}
+  .vp-logo{width:24px;height:24px;border-radius:7px;background:var(--green);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px}
+  .vp-name{font-weight:800;font-size:15px;letter-spacing:-.01em}
+  .vp-hero h3{font-size:21px;font-weight:800;line-height:1.15;letter-spacing:-.02em}
+  .vp-hero h3 em{font-style:normal;color:var(--green)}
+  .vp-hero p{margin-top:7px;font-size:12.5px;color:#6b6f76;line-height:1.5}
+  .vp-points{margin:13px 0 0;display:grid;gap:7px;font-size:12px;color:#3a3a36}
+  .vp-points div{display:flex;gap:7px;align-items:center}
+  .vp-points i{color:var(--green);font-style:normal;font-weight:800}
+  .vp-cta{margin-top:auto;background:var(--blue);color:#fff;border:none;border-radius:13px;padding:14px;font:700 14px var(--font),sans-serif;width:100%;position:relative}
+  .vp-cta small{display:block;font-weight:500;font-size:11px;opacity:.85;margin-top:2px}
+
+  /* ===== screen 3: cadastro ===== */
+  .ck-top{display:flex;align-items:center;gap:7px;padding:6px 0 4px}
+  .ck-top .vp-logo{width:20px;height:20px;font-size:11px;border-radius:6px}
+  .ck-top span{font-weight:700;font-size:12px;color:#3a3a36}
+  .ck-h{font-size:18px;font-weight:800;margin:6px 0 2px;letter-spacing:-.01em}
+  .ck-s{font-size:11.5px;color:#6b6f76;margin-bottom:11px}
+  .fld{margin-bottom:9px}
+  .fld label{display:block;font-size:10px;font-weight:700;color:#6b6f76;letter-spacing:.04em;text-transform:uppercase;margin-bottom:4px}
+  .fld input{width:100%;border:1.5px solid #ecebe6;border-radius:10px;padding:9px 12px;font:500 13px var(--font),sans-serif;color:#1a1a18;background:#fafbfc;pointer-events:none}
+  .fld input.fill{border-color:var(--green);background:#fff}
+  .ck-btn{margin-top:auto;background:#c9ced9;color:#fff;border:none;border-radius:13px;padding:13px;font:700 14px var(--font),sans-serif;width:100%;transition:background .3s;position:relative}
+  .ck-btn.ready{background:var(--blue)}
+
+  /* ===== screen 4: pix ===== */
+  .px-h{font-size:17px;font-weight:800;letter-spacing:-.01em;margin-top:4px}
+  .px-s{font-size:11.5px;color:#6b6f76;margin-top:2px}
+  .px-amt{margin:10px 0;font-size:25px;font-weight:800;letter-spacing:-.02em}
+  .px-amt small{font-size:12px;color:#6b6f76;font-weight:600}
+  .qrwrap{align-self:center;border:1.5px solid #ecebe6;border-radius:14px;padding:11px;background:#fff}
+  .px-wait{margin-top:13px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;color:#6b6f76}
+  .spin{width:14px;height:14px;border:2.5px solid #ecebe6;border-top-color:var(--blue);border-radius:50%;animation:rot .8s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .px-ok{position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    opacity:0;pointer-events:none;transition:opacity .4s;z-index:5;padding:0 24px;text-align:center}
+  .px-ok.show{opacity:1}
+  .bigcheck{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:29px;font-weight:800;
+    transform:scale(.5);transition:transform .45s cubic-bezier(.2,1.6,.4,1)}
+  .px-ok.show .bigcheck{transform:scale(1)}
+  .px-ok h4{font-size:17px;font-weight:800}
+  .px-ok p{font-size:12px;color:#6b6f76;line-height:1.5}
+
+  /* ===== screen 5: fila (redesenhada) ===== */
+  .fl-wrap{flex:1;display:flex;flex-direction:column;padding:0 16px 14px;background:linear-gradient(180deg,#f6f9ff 0%,#fff 45%)}
+  .fl-nav{display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px}
+  .fl-nav .l{display:flex;align-items:center;gap:7px}
+  .fl-nav .vp-logo{width:20px;height:20px;font-size:11px;border-radius:6px}
+  .fl-nav .nm{font-weight:800;font-size:13px}
+  .fl-paid{font-size:10px;font-weight:700;color:#1c7a3d;background:#e9f7ee;border-radius:999px;padding:4px 9px}
+  .fl-ring{position:relative;width:128px;height:128px;align-self:center;margin-top:10px}
+  .fl-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+  .fl-ring .tr{fill:none;stroke:#e6ecf7;stroke-width:7}
+  .fl-ring .pr{fill:none;stroke:var(--blue);stroke-width:7;stroke-linecap:round;stroke-dasharray:339;stroke-dashoffset:339;transition:stroke-dashoffset 1s ease}
+  .fl-ring .core{position:absolute;inset:13px;border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(26,79,214,.13);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .fl-ring .core .big{font-size:25px;font-weight:800;letter-spacing:-.02em;color:#1a1a18}
+  .fl-ring .core .lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b6f76}
+  .fl-tt{text-align:center;margin-top:12px;font-size:14.5px;font-weight:800}
+  .fl-st{text-align:center;font-size:11.5px;color:#6b6f76;margin-top:3px}
+  .fl-steps{margin-top:13px;display:grid;gap:7px}
+  .fl-step{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#a4a7ab;background:#fff;border:1px solid #edf0f5;border-radius:10px;padding:8px 11px;transition:color .3s,border-color .3s}
+  .fl-step .st-ic{width:17px;height:17px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;background:#eef1f6;color:#a4a7ab;transition:all .3s}
+  .fl-step.run{color:#3a3a36;border-color:#e9eefb}
+  .fl-step.run .st-ic{background:transparent}
+  .fl-step.run .st-ic::after{content:'';width:11px;height:11px;border:2px solid #e9eefb;border-top-color:var(--blue);border-radius:50%;animation:rot .8s linear infinite;display:block}
+  .fl-step.ok{color:#3a3a36}
+  .fl-step.ok .st-ic{background:var(--green);color:#fff}
+  .fl-step.ok .st-ic::before{content:'✓'}
+  .fl-btn{margin-top:auto;background:#e6e9f0;color:#9aa1b0;border:none;border-radius:12px;padding:13px;font:700 13.5px var(--font),sans-serif;width:100%;transition:background .35s,color .35s;position:relative}
+  .fl-btn.ready{background:var(--green);color:#fff;box-shadow:0 8px 20px -8px rgba(48,164,108,.55)}
+
+  /* ===== screen 6: consulta ===== */
+  .call{position:absolute;inset:0;background:#0d1118;display:flex;flex-direction:column;padding:0 14px 14px}
+  .call .sbar{color:#fff}
+  .call-stage{position:relative;flex:1;border-radius:16px;background:linear-gradient(160deg,#18202e,#0f1420);display:flex;align-items:flex-end;justify-content:center;margin-top:4px;overflow:hidden}
+  .bust-doc{position:absolute;inset:0;width:100%;height:100%}
+  .nametag{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;font-weight:600;padding:4px 9px;border-radius:7px;z-index:2}
+  .pip{position:absolute;right:10px;top:10px;width:64px;height:84px;border-radius:12px;background:#2a2a27;border:1.5px solid rgba(255,255,255,.16);overflow:hidden;z-index:2;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+  .bust-pat{position:absolute;inset:0;width:100%;height:100%}
+  .pip-tag{position:absolute;left:4px;bottom:3px;font-size:7.5px;font-weight:700;color:rgba(255,255,255,.8);background:rgba(0,0,0,.5);padding:1.5px 5px;border-radius:5px}
+  .tmr{position:absolute;top:10px;left:10px;background:rgba(224,84,60,.92);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;display:flex;align-items:center;gap:5px;z-index:2}
+  .tmr i{width:5px;height:5px;border-radius:50%;background:#fff;animation:blink 1.2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+  .call-foot{display:flex;justify-content:center;gap:12px;padding-top:12px}
+  .cbtn{width:38px;height:38px;border-radius:50%;border:none;background:#222b3c;color:#fff;font-size:14px}
+  .cbtn.end{background:var(--red)}
+  .fim{position:absolute;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:11px;padding:0 24px;text-align:center;
+    opacity:0;pointer-events:none;transition:opacity .45s;z-index:6}
+  .fim.show{opacity:1}
+  .fim h4{font-size:18px;font-weight:800}
+  .fim p{font-size:12px;color:#6b6f76;line-height:1.5}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .chip{font-size:11px;font-weight:700;border-radius:999px;padding:6px 11px;display:inline-flex;align-items:center;gap:5px}
+  .chip.c1{background:#e9f1fe;color:#1a4fd6}
+  .chip.c2{background:#fef7e0;color:#a06b00}
+
+  .endnote{margin-top:12px;font-family:var(--font-mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:var(--no-tracking-label);color:var(--no-verde-escuro);opacity:0;transition:opacity .6s}
+  .endnote.in{opacity:1}
+
+  @media (max-height:820px){
+    .phone{width:236px;height:484px}
+    .rs-head{margin-bottom:16px}
+    .rs-title{font-size:24px}
+    .rs-sub{font-size:13px}
+    .sp-item{padding-bottom:20px;min-height:54px}
+    .sp-item.active .sp-notes{max-height:320px}
+  }
+  @media (max-width:920px){
+    .rs{padding:0 14px}
+    .rs-head{margin-bottom:34px}
+    .rs-title{font-size:21px}
+    .rs-sub{font-size:12px;margin-top:6px}
+    .rs-grid{grid-template-columns:1fr auto;gap:16px;align-items:center}
+    .hint{font-size:15px;margin-bottom:6px}
+    .sp-item{padding:0 0 16px 34px;min-height:44px;transition:padding .4s ease}
+    .sp-item.active{padding-top:12px;padding-bottom:28px}
+    .sp-item:first-child.active{padding-top:0}
+    .sp-dot{width:24px;height:24px;font-size:10.5px;transition:top .4s ease}
+    .sp-item.active .sp-dot{top:12px}
+    .sp-item:first-child.active .sp-dot{top:0}
+    .sp-item::before{left:11px;top:28px}
+    .sp-item.active::before{top:40px}
+    .sp-item:first-child.active::before{top:28px}
+    .sp-item.done .sp-dot::after{font-size:11px}
+    .sp-label{font-size:12.5px;padding-top:4px}
+    .sp-now{display:none!important}
+    .bk-note{font-size:10.5px;line-height:1.5;padding:9px 10px;border-radius:10px;margin-top:11px}
+    .bk-note .tag{font-size:9px;margin-bottom:5px}
+    .split-bar,.split-leg{display:none}
+    .split-flow{display:block}
+    .endnote{font-size:15px;margin-top:8px}
+    .phone-box{width:176px;height:361px}
+    .phone{width:252px;height:516px;transform:scale(.7);transform-origin:top left}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+
+<div class="filler">↓ seção anterior da LP ↓</div>
+
+<div class="rs-wrap" id="wrap">
+  <div class="rs-pin">
+    <div class="rs-progress" id="prog"></div>
+    <div class="rs">
+      <div class="rs-head">
+        <div class="rs-eyebrow">Como funciona</div>
+        <h1 class="rs-title">Seja o paciente da <span class="cv">sua</span> telemedicina.</h1>
+        <p class="rs-sub">Role a página e acompanhe a jornada real, do anúncio à consulta — e o que acontece nos bastidores sem você mexer um dedo.</p>
+      </div>
+
+      <div class="rs-grid">
+        <ol class="spine">
+          <li class="sp-item" data-step="0">
+            <div class="sp-dot"><span>1</span></div>
+            <div class="sp-label">Paciente encontra a sua marca<span class="sp-now">agora</span></div>
+            <div class="sp-notes"></div>
+          </li>
+          <li class="sp-item" data-step="1">
+            <div class="sp-dot"><span>2</span></div>
+            <div class="sp-label">Checkout com a sua cara<span class="sp-now">agora</span></div>
+            <div class="sp-notes"></div>
+          </li>
+          <li class="sp-item" data-step="2">
+            <div class="sp-dot"><span>3</span></div>
+            <div class="sp-label">Pagamento dividido na origem<span class="sp-now">agora</span></div>
+            <div class="sp-notes"></div>
+          </li>
+          <li class="sp-item" data-step="3">
+            <div class="sp-dot"><span>4</span></div>
+            <div class="sp-label">Médico do pool atende<span class="sp-now">agora</span></div>
+            <div class="sp-notes"></div>
+          </li>
+          <li class="sp-item" data-step="4">
+            <div class="sp-dot"><span>5</span></div>
+            <div class="sp-label">Pós-consulta automático<span class="sp-now">agora</span></div>
+            <div class="sp-notes"></div>
+          </li>
+        </ol>
+
+        <div class="stage">
+          <div class="hint" id="hint">role para ver a jornada ↓</div>
+          <div class="phone-box"><div class="phone"><div class="scr" id="scr">
+            <div class="ghost-tap" id="gtap"></div>
+
+            <!-- 1. Google SERP iOS -->
+            <div class="screen on" id="sc-busca">
+              <div class="sbar">
+                <span>9:41</span>
+                <span class="ic">
+                  <svg width="15" height="10" viewBox="0 0 15 10"><rect x="0" y="6" width="2.5" height="4" rx="0.8" fill="#1f1f1d"/><rect x="4" y="4" width="2.5" height="6" rx="0.8" fill="#1f1f1d"/><rect x="8" y="2" width="2.5" height="8" rx="0.8" fill="#1f1f1d"/><rect x="12" y="0" width="2.5" height="10" rx="0.8" fill="#1f1f1d" opacity=".35"/></svg>
+                  <svg width="14" height="10" viewBox="0 0 14 10"><path d="M7 9.5 1 3.8C2.6 2.2 4.7 1.3 7 1.3s4.4.9 6 2.5L7 9.5Z" fill="#1f1f1d"/></svg>
+                  <svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.6" stroke="#1f1f1d" fill="none"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="#1f1f1d"/><rect x="19.8" y="3.4" width="1.8" height="4.2" rx="0.9" fill="#1f1f1d"/></svg>
+                </span>
+              </div>
+              <div class="g-top">
+                <div class="g-logo"><b style="color:#4285F4">G</b><b style="color:#EA4335">o</b><b style="color:#FBBC04">o</b><b style="color:#4285F4">g</b><b style="color:#34A853">l</b><b style="color:#EA4335">e</b></div>
+                <div class="g-pill">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#a4a7ab" stroke-width="2"/><path d="M16.5 16.5 21 21" stroke="#a4a7ab" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span class="q">consulta médica online agora</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z" fill="#3D63DB"/><path d="M18 11a6 6 0 0 1-12 0H4a8 8 0 0 0 7 7.9V22h2v-3.1A8 8 0 0 0 20 11h-2Z" fill="#30A46C"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3" fill="none" stroke="#a4a7ab" stroke-width="2"/><circle cx="12" cy="12" r="3.5" fill="#EDA33B"/></svg>
+                </div>
+              </div>
+              <div class="g-tabs">
+                <span class="on">Todas</span><span>Imagens</span><span>Vídeos</span><span>Notícias</span><span>Maps</span>
+              </div>
+              <div class="g-body">
+                <div class="g-spon">Patrocinado</div>
+                <div class="g-res" id="gMain">
+                  <div class="g-site">
+                    <div class="g-fav"><div class="mini">+</div></div>
+                    <div><span class="nm">VidaPlena</span><span class="ur">https://vidaplena.com.br</span></div>
+                  </div>
+                  <div class="g-tt">Consulta Médica Online Agora | Atendimento em Minutos</div>
+                  <div class="g-ds">Fale com um médico por vídeo, 24 horas. Receita e atestado digitais na hora. Pague com PIX ou cartão.</div>
+                  <div class="g-links"><span>Agendar consulta</span><span>Como funciona</span></div>
+                </div>
+                <div class="g-div"></div>
+                <div class="g-res g-ghost">
+                  <div class="g-site">
+                    <div class="g-fav"><div class="mini" style="background:#a4a7ab">i</div></div>
+                    <div><span class="nm">Portal Saúde</span><span class="ur">https://portal-saude.example</span></div>
+                  </div>
+                  <div class="g-tt">O que é telemedicina e como funciona a consulta…</div>
+                  <div class="g-ds">Entenda as regras do atendimento a distância no Brasil e quando ele é indicado…</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. LP da telemed -->
+            <div class="screen" id="sc-lp">
+              <div class="sbar"><span>9:41</span><span class="ic"><svg width="15" height="10" viewBox="0 0 15 10"><rect x="0" y="6" width="2.5" height="4" rx="0.8" fill="#1f1f1d"/><rect x="4" y="4" width="2.5" height="6" rx="0.8" fill="#1f1f1d"/><rect x="8" y="2" width="2.5" height="8" rx="0.8" fill="#1f1f1d"/><rect x="12" y="0" width="2.5" height="10" rx="0.8" fill="#1f1f1d" opacity=".35"/></svg><svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.6" stroke="#1f1f1d" fill="none"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="#1f1f1d"/><rect x="19.8" y="3.4" width="1.8" height="4.2" rx="0.9" fill="#1f1f1d"/></svg></span></div>
+              <div class="pad">
+                <div class="vp-nav"><div class="vp-logo">+</div><div class="vp-name">VidaPlena</div></div>
+                <div class="vp-hero">
+                  <h3>Fale com um médico <em>agora</em>, sem sair de casa.</h3>
+                  <p>Atendimento por vídeo em poucos minutos, todos os dias, a qualquer hora.</p>
+                </div>
+                <div class="vp-points">
+                  <div><i>✓</i> Médicos disponíveis 24h</div>
+                  <div><i>✓</i> Receita e atestado digitais</div>
+                  <div><i>✓</i> Pagamento por PIX ou cartão</div>
+                </div>
+                <button class="vp-cta" id="btnCta">Agendar consulta<small>R$ 59,90 · pagamento seguro</small></button>
+              </div>
+            </div>
+
+            <!-- 3. cadastro -->
+            <div class="screen" id="sc-cad">
+              <div class="sbar"><span>9:41</span><span class="ic"><svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.6" stroke="#1f1f1d" fill="none"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="#1f1f1d"/><rect x="19.8" y="3.4" width="1.8" height="4.2" rx="0.9" fill="#1f1f1d"/></svg></span></div>
+              <div class="pad">
+                <div class="ck-top"><div class="vp-logo">+</div><span>VidaPlena · Checkout</span></div>
+                <div class="ck-h">Criar sua conta</div>
+                <div class="ck-s">Leva menos de um minuto.</div>
+                <div class="fld"><label>Nome completo</label><input id="f-nome" value=""></div>
+                <div class="fld"><label>CPF</label><input id="f-cpf" value=""></div>
+                <div class="fld"><label>Celular</label><input id="f-cel" value=""></div>
+                <div class="fld"><label>E-mail</label><input id="f-mail" value=""></div>
+                <button class="ck-btn" id="btnCad">Ir para o pagamento</button>
+              </div>
+            </div>
+
+            <!-- 4. pix -->
+            <div class="screen" id="sc-pix">
+              <div class="sbar"><span>9:41</span><span class="ic"><svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.6" stroke="#1f1f1d" fill="none"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="#1f1f1d"/><rect x="19.8" y="3.4" width="1.8" height="4.2" rx="0.9" fill="#1f1f1d"/></svg></span></div>
+              <div class="pad">
+                <div class="px-h">Pague com PIX</div>
+                <div class="px-s">Escaneie o código no app do seu banco.</div>
+                <div class="px-amt">R$ 59,90 <small>· Consulta pronto-atendimento</small></div>
+                <div class="qrwrap"><svg id="qr" width="146" height="146" viewBox="0 0 29 29"></svg></div>
+                <div class="px-wait"><div class="spin"></div> Aguardando pagamento…</div>
+              </div>
+              <div class="px-ok" id="pxOk">
+                <div class="bigcheck">✓</div>
+                <h4>Pagamento aprovado</h4>
+                <p>Preparando sua consulta…</p>
+              </div>
+            </div>
+
+            <!-- 5. fila redesenhada -->
+            <div class="screen" id="sc-fila">
+              <div class="sbar"><span>9:41</span><span class="ic"><svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.6" stroke="#1f1f1d" fill="none"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="#1f1f1d"/><rect x="19.8" y="3.4" width="1.8" height="4.2" rx="0.9" fill="#1f1f1d"/></svg></span></div>
+              <div class="fl-wrap">
+                <div class="fl-nav">
+                  <div class="l"><div class="vp-logo">+</div><div class="nm">VidaPlena</div></div>
+                  <div class="fl-paid">Pago ✓</div>
+                </div>
+                <div class="fl-ring">
+                  <svg viewBox="0 0 120 120"><circle class="tr" cx="60" cy="60" r="54"/><circle class="pr" id="ringPr" cx="60" cy="60" r="54"/></svg>
+                  <div class="core">
+                    <div class="big" id="ringBig">0:05</div>
+                    <div class="lbl" id="ringLbl">na fila</div>
+                  </div>
+                </div>
+                <div class="fl-tt" id="flTt">Conectando você a um médico</div>
+                <div class="fl-st" id="flSt">Tempo estimado: menos de 2 minutos</div>
+                <div class="fl-steps">
+                  <div class="fl-step" id="fls1"><div class="st-ic"></div>Pagamento confirmado</div>
+                  <div class="fl-step" id="fls2"><div class="st-ic"></div>Ficha enviada à equipe médica</div>
+                  <div class="fl-step" id="fls3"><div class="st-ic"></div>Médico revisando seu atendimento</div>
+                </div>
+                <button class="fl-btn" id="btnEntrar" disabled>Aguardando médico…</button>
+              </div>
+            </div>
+
+            <!-- 6. consulta -->
+            <div class="screen" id="sc-call">
+              <div class="call">
+                <div class="sbar"><span>9:41</span><span class="ic"><svg width="22" height="11" viewBox="0 0 22 11"><rect x="0.5" y="0.5" width="18" height="10" rx="2.6" stroke="#fff" fill="none"/><rect x="2" y="2" width="13" height="7" rx="1.4" fill="#fff"/><rect x="19.8" y="3.4" width="1.8" height="4.2" rx="0.9" fill="#fff"/></svg></span></div>
+                <div class="call-stage">
+                  <svg class="bust-doc" viewBox="0 0 240 185" preserveAspectRatio="xMidYMax slice">
+                    <defs>
+                      <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e2f0"/>
+                      </linearGradient>
+                      <linearGradient id="shirt" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#5b96f7"/><stop offset="1" stop-color="#3b76d8"/>
+                      </linearGradient>
+                    </defs>
+                    <!-- fundo consultório -->
+                    <circle cx="120" cy="40" r="120" fill="#1d2738" opacity=".6"/>
+                    <circle cx="208" cy="120" r="60" fill="#222e44" opacity=".5"/>
+                    <!-- ombros / jaleco -->
+                    <path d="M22 185 Q26 132 70 120 L95 112 L145 112 L170 120 Q214 132 218 185 Z" fill="url(#coat)"/>
+                    <!-- camisa -->
+                    <path d="M95 112 L120 150 L145 112 L138 108 L102 108 Z" fill="url(#shirt)"/>
+                    <!-- lapelas -->
+                    <path d="M95 112 L88 150 L106 128 Z" fill="#e9eefb"/>
+                    <path d="M145 112 L152 150 L134 128 Z" fill="#e9eefb"/>
+                    <path d="M95 112 L88 150 L92 152 L108 129 Z" fill="#c3cff0" opacity=".55"/>
+                    <path d="M145 112 L152 150 L148 152 L132 129 Z" fill="#c3cff0" opacity=".55"/>
+                    <!-- estetoscópio -->
+                    <path d="M98 122 Q92 152 104 168" stroke="#39414f" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                    <circle cx="105" cy="170" r="8" fill="#4a5364"/>
+                    <circle cx="105" cy="170" r="4.5" fill="#9fb0c8"/>
+                    <!-- pescoço -->
+                    <path d="M106 88 L106 108 Q120 122 134 108 L134 88 Z" fill="#d9a87f"/>
+                    <path d="M106 96 Q120 106 134 96 L134 88 L106 88 Z" fill="#c4936b"/>
+                    <!-- cabeça -->
+                    <ellipse cx="120" cy="66" rx="29" ry="32" fill="#e3b289"/>
+                    <ellipse cx="91" cy="66" rx="5" ry="7" fill="#d9a87f"/>
+                    <ellipse cx="149" cy="66" rx="5" ry="7" fill="#d9a87f"/>
+                    <!-- brincos -->
+                    <circle cx="91" cy="73" r="2.2" fill="#EDA33B"/>
+                    <circle cx="149" cy="73" r="2.2" fill="#EDA33B"/>
+                    <!-- cabelo + coque -->
+                    <path d="M88 60 Q86 30 120 28 Q154 30 152 60 Q152 44 120 42 Q88 44 88 60 Z" fill="#4a3526"/>
+                    <path d="M88 60 Q92 38 120 36 Q148 38 152 60 L152 52 Q150 34 120 32 Q90 34 88 52 Z" fill="#5a4231"/>
+                    <circle cx="120" cy="26" r="13" fill="#4a3526"/>
+                  </svg>
+                  <div class="nametag">Dra. Ana Couto · Clínica geral</div>
+                  <div class="pip">
+                    <svg class="bust-pat" viewBox="0 0 70 92" preserveAspectRatio="xMidYMax slice">
+                      <rect width="70" height="92" fill="#2a2a27"/>
+                      <circle cx="35" cy="14" r="34" fill="#2e3b57" opacity=".7"/>
+                      <!-- corpo -->
+                      <path d="M8 92 Q10 70 24 65 L31 62 L39 62 L46 65 Q60 70 62 92 Z" fill="#f2b134"/>
+                      <!-- pescoço -->
+                      <path d="M29 48 L29 62 Q35 68 41 62 L41 48 Z" fill="#e3b289"/>
+                      <!-- cabeça -->
+                      <ellipse cx="35" cy="36" rx="14" ry="15.5" fill="#eec096"/>
+                      <!-- cabelo longo -->
+                      <path d="M21 34 Q20 17 35 16 Q50 17 49 34 L49 60 Q46 64 43 60 L43 36 Q43 25 35 24 Q27 25 27 36 L27 60 Q24 64 21 60 Z" fill="#5a3825"/>
+                    </svg>
+                    <div class="pip-tag">Você</div>
+                  </div>
+                  <div class="tmr"><i></i><span id="tmr">00:00</span></div>
+                </div>
+                <div class="call-foot">
+                  <button class="cbtn">🎤</button>
+                  <button class="cbtn">🎥</button>
+                  <button class="cbtn end">✕</button>
+                </div>
+              </div>
+              <div class="fim" id="fim">
+                <div class="bigcheck" style="transform:scale(1)">✓</div>
+                <h4>Consulta realizada</h4>
+                <p>Documentos enviados por e-mail e WhatsApp:</p>
+                <div class="chips">
+                  <span class="chip c1">📄 Receita digital</span>
+                  <span class="chip c2">📋 Atestado</span>
+                </div>
+              </div>
+            </div>
+
+          </div></div></div>
+          <div class="endnote" id="endnote">tudo isso sem você fazer nada ✦</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="filler">↓ próxima seção da LP ↓</div>
+
+<script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const items = [...document.querySelectorAll('.sp-item')];
+  const screens = ['sc-busca','sc-lp','sc-cad','sc-pix','sc-fila','sc-call'].map(id=>document.getElementById(id));
+  let curStep = -1, timers = [];
+
+  /* ---------- QR fake ---------- */
+  (function qr(){
+    const svg = $('#qr'); let h = '';
+    const finder = (x,y)=>`<rect x="${x}" y="${y}" width="7" height="7" fill="#1a1a18"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="#1a1a18"/>`;
+    h += finder(0,0)+finder(22,0)+finder(0,22);
+    let seed = 42;
+    const rnd = ()=>{seed=(seed*9301+49297)%233280;return seed/233280};
+    for(let y=0;y<29;y++)for(let x=0;x<29;x++){
+      const inF = (x<9&&y<9)||(x>19&&y<9)||(x<9&&y>19);
+      if(!inF && rnd()>0.52) h += `<rect x="${x}" y="${y}" width="1" height="1" fill="#1a1a18"/>`;
+    }
+    svg.innerHTML = h;
+  })();
+
+  /* ---------- helpers ---------- */
+  function t(fn,ms){ timers.push(setTimeout(fn,ms)); }
+  function iv(fn,ms){ const i=setInterval(fn,ms); timers.push(i); return i; }
+  function clearAll(){ timers.forEach(x=>{clearTimeout(x);clearInterval(x)}); timers=[]; }
+
+  function goScreen(i){
+    screens.forEach((s,k)=>{
+      s.classList.toggle('on', k===i);
+      s.classList.toggle('bye', k<i);
+    });
+  }
+  function spine(active){
+    items.forEach((li,k)=>{
+      li.classList.toggle('done', k<active);
+      li.classList.toggle('active', k===active);
+      if(k!==active) li.querySelector('.sp-notes').innerHTML='';
+    });
+  }
+  function note(step, tone, label, html, extra){
+    const box = document.createElement('div');
+    box.className = 'bk-note';
+    box.innerHTML = `<div class="tag ${tone}"><i></i>${label}</div>${html}`;
+    if(extra) box.appendChild(extra);
+    items[step].querySelector('.sp-notes').appendChild(box);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>box.classList.add('in')));
+  }
+  // tap fantasma sobre um elemento do phone (compensa scale do mobile)
+  function ghostTap(el, cb){
+    const g = $('#gtap'), scr = $('#scr');
+    const r = el.getBoundingClientRect(), sr = scr.getBoundingClientRect();
+    const k = sr.width ? scr.offsetWidth / sr.width : 1;
+    g.style.left = ((r.left - sr.left + r.width/2)*k - 17)+'px';
+    g.style.top  = ((r.top  - sr.top  + r.height/2)*k - 17)+'px';
+    g.classList.remove('go'); void g.offsetWidth; g.classList.add('go');
+    t(cb, 520);
+  }
+
+  /* ---------- reset de telas (pra scroll reverso) ---------- */
+  function resetPhone(){
+    const f = ['f-nome','f-cpf','f-cel','f-mail'];
+    f.forEach(id=>{const el=document.getElementById(id);el.value='';el.classList.remove('fill')});
+    $('#btnCad').classList.remove('ready');
+    $('#pxOk').classList.remove('show');
+    ['fls1','fls2','fls3'].forEach(id=>document.getElementById(id).classList.remove('run','ok'));
+    const be = $('#btnEntrar');
+    be.disabled = true; be.classList.remove('ready'); be.textContent='Aguardando médico…';
+    $('#ringPr').style.strokeDashoffset = 339;
+    $('#ringBig').textContent='0:05'; $('#ringLbl').textContent='na fila';
+    $('#flTt').textContent='Conectando você a um médico';
+    $('#flSt').textContent='Tempo estimado: menos de 2 minutos';
+    $('#fim').classList.remove('show');
+    $('#tmr').textContent='00:00';
+    $('#endnote').classList.remove('in');
+  }
+
+  /* ---------- timelines por step ---------- */
+  const fields = [
+    ['f-nome','Maria Oliveira'],
+    ['f-cpf','123.456.789-00'],
+    ['f-cel','(11) 9 8888-7777'],
+    ['f-mail','maria.oliveira@email.com']
+  ];
+
+  const steps = [
+    // 0 — busca Google
+    function(){
+      goScreen(0);
+      $('#gMain').classList.add('hl');
+      t(()=>note(0,'t-blue','captação',
+        '<b>O paciente achou a sua marca.</b> Tráfego, social e anúncio continuam 100% seus — o Roteador não toca na sua captação.'), 700);
+      t(()=>ghostTap($('#gMain'), ()=>{}), 2600);
+    },
+    // 1 — LP + cadastro
+    function(){
+      $('#gMain').classList.remove('hl');
+      goScreen(1);
+      t(()=>ghostTap($('#btnCta'), ()=>{
+        goScreen(2);
+        t(()=>note(1,'t-blue','checkout',
+          'Após tocar em <b>“Agendar consulta”</b> no site da sua marca, o paciente é redirecionado para a <b>sua página do Roteador vestindo a sua identidade</b>, no seu domínio. Ele nunca sai da sua marca.'), 500);
+        t(()=>typeFields(()=>{
+          $('#btnCad').classList.add('ready');
+          note(1,'t-green','seu banco de dados',
+            '<b>Cadastro salvo no banco isolado da sua telemedicina.</b> Dados de venda e histórico ficam na sua base, separados de qualquer outra marca.');
+          t(()=>ghostTap($('#btnCad'), ()=>{}), 1600);
+        }), 1400);
+      }), 2800);
+    },
+    // 2 — PIX + split
+    function(){
+      goScreen(3);
+      t(()=>{
+        $('#pxOk').classList.add('show');
+        const split = document.createElement('div');
+        split.className = 'split';
+        split.innerHTML = `
+          <div class="split-bar">
+            <div class="split-seg seg-voce">R$ 29,90</div>
+            <div class="split-seg seg-med">R$ 27,00</div>
+            <div class="split-seg seg-plat">3</div>
+          </div>
+          <div class="split-leg">
+            <div><span class="lg"><i style="background:var(--blue)"></i>Sua conta</span><b>R$ 29,90</b></div>
+            <div><span class="lg"><i style="background:var(--green)"></i>Conta do médico</span><b>R$ 27,00</b></div>
+            <div><span class="lg"><i style="background:var(--yellow)"></i>Plataforma</span><b>R$ 3,00</b></div>
+          </div>
+          <div class="split-flow">
+            <div class="sf-src">R$ 59,90<small>pagamento do paciente</small></div>
+            <svg class="sf-arrows" viewBox="0 0 140 36" width="140" height="36">
+              <path class="sf-a" d="M70 3 C70 20 40 15 36 27"/>
+              <path class="sf-a" d="M70 3 C70 20 100 15 104 27"/>
+              <path class="sf-head" d="M36 34 L31.5 26.5 L40.5 27.5 Z"/>
+              <path class="sf-head" d="M104 34 L99.5 27.5 L108.5 26.5 Z"/>
+            </svg>
+            <div class="sf-row">
+              <div class="sf-card sf-voce"><span>Sua conta</span><b>R$ 29,90</b></div>
+              <div class="sf-card sf-op"><span>Custo operacional</span><b>R$ 30,00</b></div>
+            </div>
+          </div>`;
+        note(2,'t-yellow','split na origem',
+          'Os R$ 59,90 <b>dividiram no momento do pagamento</b>. Sua margem cai na sua conta. A parte do médico, na dele.',
+          split);
+        requestAnimationFrame(()=>requestAnimationFrame(()=>split.classList.add('go')));
+      }, 3000);
+    },
+    // 3 — fila + médico
+    function(){
+      goScreen(4);
+      note(3,'t-blue','pool médico',
+        '<b>O pool médico parceiro foi acionado via API.</b> Fila, plantão 24h e sala de vídeo já estavam rodando — nada disso é problema seu.');
+      const ring = $('#ringPr');
+      let rem = 5;
+      ring.style.strokeDashoffset = 339;
+      const cd = iv(()=>{
+        rem--;
+        if(rem<=0){
+          clearInterval(cd);
+          ring.style.strokeDashoffset = 0;
+          $('#ringBig').textContent='✓'; $('#ringLbl').textContent='médico pronto';
+          $('#flTt').textContent='Dra. Ana Couto vai te atender';
+          $('#flSt').textContent='Sua sala está aberta.';
+          const b = $('#btnEntrar');
+          b.disabled = false; b.classList.add('ready'); b.textContent='Acessar consulta';
+          t(()=>ghostTap(b, ()=>{}), 1400);
+        } else {
+          $('#ringBig').textContent='0:0'+rem;
+          ring.style.strokeDashoffset = 339*(rem/5);
+        }
+      }, 1000);
+      t(()=>{ $('#fls1').classList.add('ok'); }, 600);
+      t(()=>{ $('#fls2').classList.add('ok'); $('#fls3').classList.add('run'); }, 2000);
+      t(()=>{ $('#fls3').classList.remove('run'); $('#fls3').classList.add('ok'); }, 4200);
+    },
+    // 4 — consulta + fim
+    function(){
+      goScreen(5);
+      let s = 0;
+      const tv = iv(()=>{
+        s++;
+        $('#tmr').textContent = '0'+Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+        if(s>=5){
+          clearInterval(tv);
+          $('#fim').classList.add('show');
+          note(4,'t-green','pós-consulta',
+            '<b>Receita, atestado e prontuário ficam com o pool médico</b>, como manda o CFM. A venda já apareceu no seu dashboard, em tempo real.');
+          $('#endnote').classList.add('in');
+        }
+      }, 850);
+    }
+  ];
+
+  function typeFields(done){
+    let fi = 0;
+    (function nextField(){
+      if(fi>=fields.length){ done(); return; }
+      const [id,val] = fields[fi++];
+      const el = document.getElementById(id);
+      el.classList.add('fill');
+      let c = 0;
+      const x = iv(()=>{
+        el.value = val.slice(0,++c);
+        if(c>=val.length){ clearInterval(x); t(nextField,240); }
+      }, 28);
+    })();
+  }
+
+  /* ---------- step dispatcher ---------- */
+  function runStep(i){
+    if(i===curStep) return;
+    clearAll();
+    resetPhone();
+    curStep = i;
+    spine(i);
+    $('#hint').classList.toggle('off', i>0);
+    steps[i]();
+  }
+
+  /* ---------- scroll driver ---------- */
+  const wrap = $('#wrap'), prog = $('#prog');
+  const N = steps.length;
+  let ticking = false;
+  function onScroll(){
+    if(ticking) return; ticking = true;
+    requestAnimationFrame(()=>{
+      ticking = false;
+      const r = wrap.getBoundingClientRect();
+      const total = wrap.offsetHeight - window.innerHeight;
+      const p = Math.min(1, Math.max(0, -r.top / total));
+      prog.style.width = (p*100)+'%';
+      const i = Math.min(N-1, Math.floor(p * N));
+      runStep(i);
+    });
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+})();
+</script>
+</body>
+</html>
