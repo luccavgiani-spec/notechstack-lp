@@ -4,19 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=390, initial-scale=1.0">
 <title>PREVIEW MOBILE — Como Funciona</title>
+<link rel="icon" type="image/svg+xml" href="/brand/favicon/favicon.svg">
+<link rel="stylesheet" href="/brand/fonts/fonts.css">
+<link rel="stylesheet" href="/brand/tokens/tokens.css">
+<link rel="stylesheet" href="/shared/brand-derived.css">
 <style>
-/* ─── Fonts ─── */
-@font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/dm-sans-v17-latin-regular.woff2') format('woff2')}
-@font-face{font-family:'DM Sans';font-style:normal;font-weight:600;font-display:swap;src:url('/fonts/dm-sans-v17-latin-600.woff2') format('woff2')}
-@font-face{font-family:'DM Sans';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/dm-sans-v17-latin-700.woff2') format('woff2')}
-@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('/fonts/caveat-v23-latin-700.woff2') format('woff2')}
-
+/* Apelidos locais que CONSOMEM brand/tokens/tokens.css.
+   Contexto: preview da home → acento ÂMBAR. */
 :root {
-  --font: 'DM Sans','Helvetica Neue',system-ui,sans-serif;
-  --font-accent: 'Caveat',cursive;
-  --blue:#4285F4; --red:#EA4335; --yellow:#FBBC04; --green:#34A853;
-  --blue-l:#e8f0fe; --red-l:#fce8e6; --yellow-l:#fef9e3; --green-l:#e6f4ea;
-  --dark:#0f0f0f; --mid:#5f6368; --light:#f8f9fa; --white:#fff; --border:#e8eaed;
+  --font: var(--no-font-sans);
+  --font-mono: var(--no-font-mono);
+  --blue: var(--no-azul);   --red: var(--no-vermelho);
+  --yellow: var(--no-ambar); --green: var(--no-verde);
+  --blue-l: var(--no-azul-tint);   --red-l: var(--no-vermelho-tint);
+  --yellow-l: var(--no-ambar-tint); --green-l: var(--no-verde-tint);
+  --accent: var(--no-ambar); --accent-ink: var(--no-ambar-escuro);
+  --dark: var(--no-tinta); --mid: var(--no-cinza); --light: var(--no-osso);
+  --white: #fff; --border: var(--no-borda);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -52,14 +56,15 @@ body{
 #how{background:var(--light);padding:48px 0 60px}
 .how-inner{padding:0 20px}
 .how-header{text-align:center;margin-bottom:28px;padding:0 20px}
+/* label de seção: JetBrains Mono UPPERCASE + linha lateral (BRAND.md §5) */
 .section-label{
   display:inline-flex;align-items:center;gap:7px;
-  font-family:var(--font);font-size:11px;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;
-  margin-bottom:12px;color:var(--blue);
+  font-family:var(--font-mono);font-size:10px;font-weight:500;
+  letter-spacing:var(--no-tracking-label);text-transform:uppercase;
+  margin-bottom:12px;color:var(--accent-ink);
 }
-.section-label::before{content:'';width:18px;height:2px;border-radius:2px;background:var(--blue)}
-.section-title{font-family:var(--font);font-size:27px;font-weight:700;line-height:1.13;letter-spacing:-1px;margin-bottom:10px}
+.section-label::before{content:'';width:18px;height:2px;border-radius:2px;background:var(--accent)}
+.section-title{font-family:var(--font);font-size:25px;font-weight:var(--no-weight-titulo);line-height:1.13;text-transform:uppercase;letter-spacing:var(--no-tracking-headline);margin-bottom:10px}
 .section-sub{font-family:var(--font);font-size:14px;font-weight:300;color:var(--mid);line-height:1.65}
 
 
@@ -71,10 +76,16 @@ body{
 .how-header .section-title{
   font-size:24px;letter-spacing:-.5px;
 }
+/* logo textual: Sora 800 minúscula, palavra tinta, ponto quadrado no acento
+   (BRAND.md §1 — a palavra do logo nunca é colorida) */
 .how-header .section-title .accent{
-  font-family:var(--font-accent);
-  color:var(--blue);
-  font-size:28px;
+  font-family:var(--font);font-weight:var(--no-weight-display);
+  text-transform:lowercase;color:var(--dark);font-size:1.12em;
+  display:inline-flex;align-items:baseline;gap:.12em;line-height:1;
+}
+.how-header .section-title .accent::after{
+  content:'';display:inline-block;flex:none;
+  width:.17em;height:.17em;background:var(--accent);
 }
 
 /* Chat section wrapper */
@@ -245,9 +256,9 @@ body{
   transition:opacity .4s ease,transform .4s ease;
 }
 .hw-hub.hw-show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+/* SVG já é a versão branca com ponto âmbar — sem filtro, senão o ponto some */
 .hw-hub-logo{
   height:36px;width:auto;display:block;margin:0 auto;
-  filter:brightness(0) invert(1);
 }
 
 .hw-node{
@@ -427,34 +438,34 @@ body{
 
       <!-- SVG radial lines -->
       <svg class="hw-svg" viewBox="0 0 350 370" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-        <line class="hw-line hw-l1" x1="175" y1="185" x2="56"  y2="58"  stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
-        <line class="hw-line hw-l2" x1="175" y1="185" x2="175" y2="48"  stroke="#34A853" stroke-width="2" stroke-linecap="round"/>
-        <line class="hw-line hw-l3" x1="175" y1="185" x2="294" y2="58"  stroke="#EA4335" stroke-width="2" stroke-linecap="round"/>
-        <line class="hw-line hw-l4" x1="175" y1="185" x2="76"  y2="320" stroke="#FBBC04" stroke-width="2" stroke-linecap="round"/>
-        <line class="hw-line hw-l5" x1="175" y1="185" x2="274" y2="320" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l1" x1="175" y1="185" x2="56"  y2="58"  stroke="#3D63DB" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l2" x1="175" y1="185" x2="175" y2="48"  stroke="#30A46C" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l3" x1="175" y1="185" x2="294" y2="58"  stroke="#E0543C" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l4" x1="175" y1="185" x2="76"  y2="320" stroke="#EDA33B" stroke-width="2" stroke-linecap="round"/>
+        <line class="hw-line hw-l5" x1="175" y1="185" x2="274" y2="320" stroke="#3D63DB" stroke-width="2" stroke-linecap="round"/>
       </svg>
 
       <!-- Hub — absolute center -->
       <div class="hw-hub" id="mmHub">
-        <img src="/img/logo-footer.png" alt="nó" class="hw-hub-logo">
+        <img src="/brand/logo/svg/no-branca-ponto-ambar.svg" alt="nó" class="hw-hub-logo">
       </div>
 
       <!-- 3 top nodes -->
       <div class="hw-node n-blue" style="left:1.4%;top:1%">
         <div class="hw-node-label">Presença Digital</div>
-        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3D63DB" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
         <div class="hw-node-title">Site ou App</div>
         <div class="hw-node-desc">Bonito, rápido e que converte</div>
       </div>
       <div class="hw-node n-green" style="left:35.4%;top:0">
         <div class="hw-node-label">Dados Seguros</div>
-        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#34A853" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#30A46C" stroke-width="1.8" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
         <div class="hw-node-title">Cadastros &amp; Dados</div>
         <div class="hw-node-desc">Tudo salvo, seguro e acessível</div>
       </div>
       <div class="hw-node n-red" style="left:69.4%;top:1%">
         <div class="hw-node-label">Int. Artificial</div>
-        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg></div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#E0543C" stroke-width="1.8" stroke-linecap="round"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-1.14M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-1.14"/></svg></div>
         <div class="hw-node-title">IA Trabalhando</div>
         <div class="hw-node-desc">Escreve, analisa e decide por você</div>
       </div>
@@ -462,13 +473,13 @@ body{
       <!-- 2 bottom nodes -->
       <div class="hw-node n-yellow" style="left:7.1%;top:76%">
         <div class="hw-node-label">Piloto Automático</div>
-        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#FBBC04" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#EDA33B" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
         <div class="hw-node-title">Tarefas Automáticas</div>
         <div class="hw-node-desc">Mensagens e alertas sem você tocar</div>
       </div>
       <div class="hw-node n-blue" style="left:63.7%;top:76%">
         <div class="hw-node-label">Visão do Negócio</div>
-        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
+        <div class="hw-node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3D63DB" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
         <div class="hw-node-title">Painel de Controle</div>
         <div class="hw-node-desc">Seus números em tempo real</div>
       </div>

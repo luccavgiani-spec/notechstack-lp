@@ -237,9 +237,9 @@
   var LOGOS_1 = [
     { n: 'WhatsApp',        slug: 'whatsapp',         c: '25D366' },
     // BR health brands not on Simple Icons CDN — Lucide category icons
-    { n: 'Memed',       color: '#34A853', svg: '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>' },
+    { n: 'Memed',       color: '#30A46C', svg: '<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/>' },
     { n: 'Mevo', raw: 'mevo' },
-    { n: 'Help Global', color: '#EA4335', svg: '<path d="M5 11a7 7 0 0 1 14 0"/><path d="M3 12h3a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M18 12h3v5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/><path d="M19 18a4 4 0 0 1-4 3h-3"/>' },
+    { n: 'Help Global', color: '#E0543C', svg: '<path d="M5 11a7 7 0 0 1 14 0"/><path d="M3 12h3a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M18 12h3v5a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/><path d="M19 18a4 4 0 0 1-4 3h-3"/>' },
     { n: 'Google Calendar', slug: 'googlecalendar',   c: '4285F4' },
     { n: 'Stripe',          slug: 'stripe',           c: '635BFF' },
     { n: 'Mercado Pago',    slug: 'mercadopago',      c: '00B1EA' },
@@ -261,7 +261,7 @@
     { n: 'RD Station', color: '#19C9D1', svg: '<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>' },
     { n: 'Pipefy', raw: 'pipefy' },
     { n: 'Asaas', color: '#0072FF', svg: '<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>' },
-    { n: 'PagSeguro', slug: 'pagseguro', c: '0F0F0F', fb: '<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>', fbColor: '#0F0F0F' },
+    { n: 'PagSeguro', slug: 'pagseguro', c: '0F0F0F', fb: '<path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M3 5v14a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>', fbColor: '#141414' },
     { n: 'OpenAI',          slug: 'openai',           c: '412991' },
     { n: 'Anthropic',       slug: 'anthropic',        c: 'D97757' },
     { n: 'Make',            slug: 'make',             c: '6D00CC' }
@@ -277,7 +277,7 @@
       card.innerHTML = BRAND[l.raw];
     } else if (l.svg) {
       card.innerHTML = '<svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="' +
-        (l.color || '#34A853') + '" stroke-width="1.7" stroke-linecap="round" ' +
+        (l.color || '#30A46C') + '" stroke-width="1.7" stroke-linecap="round" ' +
         'stroke-linejoin="round" aria-label="' + l.n + '">' + l.svg + '</svg>';
     } else if (l.slug && l.c) {
       var img = document.createElement('img');
@@ -291,7 +291,7 @@
         if (l.fb) {
           // Simple Icons 404 → Lucide category icon, never an empty card
           card.innerHTML = '<svg class="logo-svg" viewBox="0 0 24 24" fill="none" stroke="' +
-            (l.fbColor || '#34A853') + '" stroke-width="1.7" stroke-linecap="round" ' +
+            (l.fbColor || '#30A46C') + '" stroke-width="1.7" stroke-linecap="round" ' +
             'stroke-linejoin="round" aria-label="' + l.n + '">' + l.fb + '</svg>';
         } else {
           var ph = document.createElement('div');

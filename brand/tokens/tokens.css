@@ -1,0 +1,37 @@
+/* nó · tech stack — Design Tokens · Identidade v2 · julho 2026 */
+/* Fonte da verdade: brand/BRAND.md + manual da marca v2 */
+
+:root {
+  /* ── Cores principais (ordem canônica: azul → vermelho → âmbar → verde) ── */
+  --no-azul: #3D63DB;      /* info · conteúdo · vertical ecommerce/roteador */
+  --no-vermelho: #E0543C;  /* destaque · alerta · vertical hotelaria */
+  --no-ambar: #EDA33B;     /* atenção · nó principal (IA & sistemas) */
+  --no-verde: #30A46C;     /* sucesso · CTA · vertical saúde (nó health) */
+
+  /* ── Tints (fundos suaves) ── */
+  --no-azul-tint: #E9EEFB;
+  --no-vermelho-tint: #FBEAE5;
+  --no-ambar-tint: #FCF3E0;
+  --no-verde-tint: #E5F4EC;
+
+  /* ── Neutros ── */
+  --no-tinta: #141414;     /* fundos dark, texto */
+  --no-osso: #FAFAF7;      /* fundo claro */
+  --no-cinza: #6B6F76;     /* texto secundário */
+  --no-borda: #ECEBE6;     /* separadores */
+
+  /* ── Tipografia ── */
+  --no-font-sans: 'Sora', system-ui, -apple-system, sans-serif;
+  --no-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --no-weight-display: 800;   /* ExtraBold — display, logo */
+  --no-weight-titulo: 700;    /* Bold — títulos */
+  --no-weight-subtitulo: 600; /* SemiBold — subtítulos, botões */
+  --no-weight-corpo: 300;     /* Light — corpo (300–400) */
+
+  --no-tracking-headline: -0.03em;  /* headlines CAIXA ALTA: -0.02 a -0.04em */
+  --no-tracking-label: 0.16em;      /* labels mono UPPERCASE */
+
+  /* ── Elevação ── */
+  --no-shadow-card: 0 8px 24px rgba(20, 20, 20, 0.07); /* nunca mais pesada que 0.07 */
+}

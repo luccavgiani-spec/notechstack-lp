@@ -14,25 +14,42 @@ URL: `https://notechstack.com.br/health/`
 health/
 ├── index.html      Markup + estilo inline (mesma convenção da LP principal)
 ├── main.js         Interações: hero scroll narrativo, ECG, marquee, FAQ
+├── particles.js    Fundo de partículas (ogl/WebGL) nos verdes da vertical
+├── brand-icons.js  SVGs de marcas parceiras (Mevo, Pipefy, Slack, Teams)
+├── brand/          Identidade da vertical — ver BRAND-HEALTH.md
 └── README.md       (este arquivo)
 ```
 
 A página reutiliza:
 
-- **Fontes** self-hosted em `/fonts/` (DM Sans 300/400/500/600/700 + Caveat 700)
-- **Logos** da nó em `/img/logo.png` e `/img/logo-footer.png`
-- **Favicon** em `/favicon.png`
-- **Tokens de design** (`--blue`, `--green`, `--dark`, etc) — duplicados localmente para que a página seja standalone
+- **Fontes** self-hosted em `/brand/fonts/` (Sora 300/400/600/700/800 + JetBrains Mono 400/500/700)
+- **Logo** da nó em `/brand/logo/svg/no-{tinta|branca}-ponto-verde.svg` (nav e rodapé)
+- **Lockup da vertical** `nó.health` em `/health/brand/lockup/svg/` — só na capa/hero
+- **Favicon próprio** (ponto verde) em `/health/brand/favicon/`
+- **Tokens de design** — `brand/tokens/tokens.css` (base) + `health/brand/tokens-health.css`
+  (semânticos `--health-*`), carregados nessa ordem. Os apelidos locais
+  (`--green`, `--dark`, …) só consomem esses tokens.
 
 Tudo é servido pelo mesmo deploy estático (Vercel) da LP principal.
 
 ## Identidade visual
 
-Mantém os tokens da nó mas com **paleta restrita**: verde (#34A853, principal) + azul (#4285F4, secundária) + preto/branco. Vermelho/amarelo só em micro-acentos.
+Identidade **v2** (julho 2026). Fonte da verdade: `brand/BRAND.md` + a extensão da
+vertical em `health/brand/BRAND-HEALTH.md`.
 
-Botões CTA primários: preto → **hover verde** (e não azul como na LP principal) — verde reforça o eixo saúde/vida.
+Acento de contexto: **verde `#30A46C`** (tint `#E5F4EC`) — CTA, links, cursor,
+barra de acento de card e linha lateral dos labels, sempre via os semânticos
+`--health-*`. As **4 cores do sistema seguem juntas** nos elementos estruturais
+(barra de 4 cores no topo, rodapé com 4 pontos): o verde é acento da vertical,
+não substitui o sistema da marca-mãe.
 
-A palavra `nó` inline aparece em Caveat **verde** por padrão (`.brand`) ou azul (`.brand-blue`). Versões maiores: `.brand-lg`, `.brand-xl`.
+Botões CTA primários: preto → **hover verde** — verde reforça o eixo saúde/vida.
+
+A palavra `nó` **nunca** é pintada de verde. Em texto corrido ela aparece em
+Sora 800 na cor do texto (`.brand`); a ênfase verde vai para a palavra que de
+fato carrega o ponto (`.hl` na headline, `.hl-word` no corpo). O ponto quadrado
+pertence ao logo — que aparece em SVG na nav, no rodapé e, como lockup
+`nó.health`, só na capa.
 
 ## Tom de voz
 

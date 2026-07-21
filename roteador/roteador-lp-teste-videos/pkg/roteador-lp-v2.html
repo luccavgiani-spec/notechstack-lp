@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roteador — Venda consultas. Só isso.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --azul:#4285F4; --vermelho:#EA4335; --amarelo:#FBBC04; --verde:#34A853;
+  --ink:#1a1d24; --ink2:#5f6573; --bg:#fbfbfa; --card:#ffffff; --line:#e8e8e4;
+  --r:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.caveat{font-family:'Caveat',cursive}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+section{position:relative}
+a{color:inherit}
+
+/* ---------- NAV ---------- */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);background:rgba(251,251,250,.82);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;letter-spacing:-.02em}
+.logo .dots{display:flex;gap:4px}
+.logo .dots span{width:9px;height:9px;border-radius:50%}
+.logo .dots span:nth-child(1){background:var(--azul)}
+.logo .dots span:nth-child(2){background:var(--vermelho)}
+.logo .dots span:nth-child(3){background:var(--amarelo)}
+.logo .dots span:nth-child(4){background:var(--verde)}
+.nav-cta{background:var(--ink);color:#fff;border:none;padding:10px 22px;border-radius:99px;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none}
+.nav-cta:hover{background:var(--azul)}
+
+/* ---------- HERO ---------- */
+.hero{min-height:92vh;display:flex;align-items:center;padding-top:64px;background:
+  radial-gradient(900px 500px at 85% -10%, rgba(66,133,244,.07), transparent 60%),
+  radial-gradient(700px 400px at -10% 110%, rgba(52,168,83,.06), transparent 60%)}
+.hero-inner{text-align:center;max-width:780px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);border:1px solid var(--line);background:#fff;padding:8px 16px;border-radius:99px;margin-bottom:28px}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--verde);display:inline-block}
+h1{font-size:clamp(44px,7vw,84px);font-weight:800;letter-spacing:-.04em;line-height:1.02}
+h1 .cv{font-family:'Caveat',cursive;font-weight:700;color:var(--azul);font-size:1.08em}
+.hero p{font-size:clamp(17px,2.2vw,21px);color:var(--ink2);margin:24px auto 36px;max-width:560px;line-height:1.5}
+.hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:16px 32px;border-radius:99px;font-weight:700;font-size:16px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:transform .15s, background .15s}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--ink);color:#fff;border:none}
+.btn-p:hover{background:var(--azul)}
+.btn-s{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn-s:hover{border-color:var(--ink)}
+.hero-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:44px}
+.chip{font-size:13.5px;font-weight:600;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:99px;padding:9px 18px}
+.chip b{color:var(--ink)}
+@keyframes floaty{0%,100%{transform:translate(0,0)}33%{transform:translate(-2px,-5px)}66%{transform:translate(2px,-2px)}}
+.hero-chips .chip{animation:floaty 5.2s ease-in-out infinite;will-change:transform}
+.hero-chips .chip:nth-child(2){animation-duration:6.4s;animation-delay:-2.1s}
+.hero-chips .chip:nth-child(3){animation-duration:7.1s;animation-delay:-3.8s}
+
+/* ---------- STEPS (pinned) ---------- */
+.steps-wrap{height:450vh;background:var(--ink)}
+.steps-sticky{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden;color:#fff}
+.steps-head{text-align:center;padding:0 24px;margin-bottom:36px}
+.steps-kicker{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8ab4f8;margin-bottom:14px}
+.steps-title{color:#fff;font-size:clamp(26px,3.8vw,44px);font-weight:800;letter-spacing:-.035em;line-height:1.08}
+.steps-title .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
+.steps-sub{font-family:'Caveat',cursive;color:rgba(255,255,255,.45);font-size:clamp(18px,2vw,22px);display:block;margin-top:12px}
+.steps-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:56px;max-width:1080px;width:100%;margin:0 auto;padding:0 24px;align-items:center}
+.stepper{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:28px 30px;backdrop-filter:blur(6px)}
+.sstep{display:grid;grid-template-columns:32px 1fr;gap:16px;cursor:pointer}
+.s-ind{display:flex;flex-direction:column;align-items:center}
+.s-circle{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;flex:none;border:2px solid rgba(255,255,255,.22);color:rgba(255,255,255,.45);background:transparent;transition:background .35s,border-color .35s,color .35s,box-shadow .35s}
+.s-circle .ck{display:none;font-size:13px}
+.s-line{width:2px;flex:1;background:rgba(255,255,255,.13);margin:6px 0;min-height:16px;border-radius:2px;transition:background .4s}
+.sstep:last-child .s-line{display:none}
+.s-body{padding:4px 0 20px}
+.sstep:last-child .s-body{padding-bottom:0}
+.s-body small{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.32);display:block;margin-bottom:3px}
+.s-body h3{font-size:17px;font-weight:700;letter-spacing:-.01em;color:rgba(255,255,255,.5);transition:color .3s;display:inline;line-height:1.2}
+.s-pill{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:3px 10px;opacity:0;transition:opacity .3s;margin-left:9px;vertical-align:2px}
+.s-desc{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s cubic-bezier(.22,1,.36,1),opacity .35s,margin .4s;font-size:13.5px;line-height:1.55;color:rgba(255,255,255,.6);margin-top:0}
+.sstep.done .s-circle{background:var(--verde);border-color:var(--verde);color:#fff}
+.sstep.done .s-circle .n{display:none}
+.sstep.done .s-circle .ck{display:block}
+.sstep.done .s-line{background:var(--verde)}
+.sstep.done h3{color:rgba(255,255,255,.78)}
+.sstep.done .s-pill{opacity:1;background:rgba(52,168,83,.18);color:#7ee2a0}
+.sstep.done .s-pill::after{content:'concluído'}
+.sstep.active .s-circle{background:var(--azul);border-color:var(--azul);color:#fff;box-shadow:0 0 0 5px rgba(66,133,244,.22);animation:ring 2.2s ease-in-out infinite}
+@keyframes ring{0%,100%{box-shadow:0 0 0 4px rgba(66,133,244,.22)}50%{box-shadow:0 0 0 8px rgba(66,133,244,.1)}}
+.sstep.active h3{color:#fff;font-weight:800}
+.sstep.active .s-pill{opacity:1;background:rgba(66,133,244,.2);color:#8ab4f8}
+.sstep.active .s-pill::after{content:'agora'}
+.sstep.pend .s-pill::after{content:''}
+.sstep.active .s-desc{max-height:130px;opacity:1;margin-top:8px}
+.step-visual{position:relative;min-height:420px}
+.vis{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transform:translateY(26px) scale(.97);transition:opacity .5s ease,transform .5s ease}
+.vis.active{opacity:1;transform:none}
+.vis-video{display:none;width:min(560px,96%);max-height:72vh;border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08);object-fit:cover;background:#000}
+.vis.has-video .vis-video{display:block}
+.vis.has-video>:not(.vis-video){display:none}
+.m-active{display:none}
+/* visual cards */
+.mock-foot{display:flex;gap:8px;margin-top:14px}
+.mf-tag{font-size:11px;font-weight:800;letter-spacing:.04em;border-radius:99px;padding:5px 12px}
+.qr-row{display:flex;gap:16px;align-items:center;margin-bottom:14px}
+.qr{width:96px;height:96px;flex:none;border-radius:12px;border:1px solid var(--line);background:
+  repeating-linear-gradient(0deg,var(--ink) 0 6px,transparent 6px 12px),
+  repeating-linear-gradient(90deg,var(--ink) 0 6px,#fff 6px 12px);
+  background-blend-mode:screen;opacity:.85}
+.qr-info b{font-size:20px;font-weight:800;letter-spacing:-.02em;display:block}
+.qr-info span{display:block;font-size:12.5px;color:var(--ink2);margin-top:3px}
+.qr-timer{color:var(--vermelho)!important;font-weight:700}
+.v-name{position:absolute;left:14px;bottom:14px;font-size:11.5px;font-weight:700;color:#fff;background:rgba(0,0,0,.45);border-radius:99px;padding:5px 12px}
+.dash-top{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-bottom:14px}
+.dot-on{width:8px;height:8px;border-radius:50%;background:var(--verde);display:inline-block;animation:pulse 1.6s infinite}
+
+.mock{background:#fff;color:var(--ink);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.45);width:min(380px,86%);overflow:hidden}
+.mock .bar{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--ink2);font-weight:600}
+.mock .bar .b-dots{display:flex;gap:5px}
+.mock .bar .b-dots i{width:8px;height:8px;border-radius:50%;background:#e4e4e0;display:block}
+.mock .body{padding:22px}
+.brand-pill{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:15px}
+.brand-pill i{width:12px;height:12px;border-radius:4px;background:var(--azul);display:block}
+.mock h5{font-size:19px;font-weight:800;letter-spacing:-.02em;margin:14px 0 4px}
+.mock .sub{font-size:13px;color:var(--ink2);margin-bottom:16px}
+.mock .cta-line{background:var(--azul);color:#fff;text-align:center;border-radius:12px;padding:13px;font-weight:700;font-size:14.5px}
+.field{border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:13px;color:var(--ink2);margin-bottom:10px;background:#fafaf8}
+.pay-toggle{display:flex;gap:8px;margin-bottom:14px}
+.pay-toggle span{flex:1;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:9px;font-size:13px;font-weight:700;color:var(--ink2)}
+.pay-toggle span.on{border-color:var(--verde);color:var(--verde);background:rgba(52,168,83,.06)}
+.split-vis{width:min(420px,90%)}
+.split-total{background:#fff;color:var(--ink);border-radius:16px;padding:16px 22px;text-align:center;font-weight:800;font-size:20px;letter-spacing:-.02em;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.split-total small{display:block;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:2px}
+.split-arrows{display:flex;justify-content:space-around;padding:6px 30px}
+.split-arrows span{color:rgba(255,255,255,.45);font-size:22px;line-height:1}
+.split-row{display:flex;gap:14px}
+.split-box{flex:1;border-radius:16px;padding:16px 18px;color:#fff}
+.split-box small{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-bottom:4px}
+.split-box b{font-size:19px;letter-spacing:-.02em}
+.split-box .who{font-size:12px;opacity:.85;margin-top:3px}
+.sb-green{background:linear-gradient(135deg,#34A853,#2d9249)}
+.sb-blue{background:linear-gradient(135deg,#4285F4,#3372d6)}
+.split-note{text-align:center;font-size:13px;color:rgba(255,255,255,.5);margin-top:16px}
+.split-note b{color:var(--amarelo)}
+.video-mock{width:min(400px,88%);background:#0f1115;border-radius:22px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.08)}
+.video-stage{height:190px;background:linear-gradient(160deg,#1b2330,#10151d);display:flex;align-items:center;justify-content:center;position:relative}
+.avatar{width:74px;height:74px;border-radius:50%;background:linear-gradient(135deg,var(--azul),#7baaf7);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:24px;color:#fff}
+.live-dot{position:absolute;top:14px;left:16px;display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.08em;color:#fff;background:rgba(234,67,53,.92);padding:5px 12px;border-radius:99px}
+.live-dot i{width:7px;height:7px;border-radius:50%;background:#fff;display:block;animation:pulse 1.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.pip{position:absolute;right:14px;bottom:14px;width:64px;height:46px;border-radius:10px;background:#2a3242;border:1.5px solid rgba(255,255,255,.18)}
+.video-foot{display:flex;gap:8px;padding:14px;flex-wrap:wrap}
+.doc-badge{font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:99px;padding:7px 14px;display:flex;align-items:center;gap:6px}
+.doc-badge i{width:7px;height:7px;border-radius:50%;display:block}
+.dash-mock{width:min(420px,90%);background:#fff;color:var(--ink);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.45);padding:22px}
+.dash-cards{display:flex;gap:10px;margin-bottom:18px}
+.dash-card{flex:1;border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.dash-card small{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);display:block;margin-bottom:4px}
+.dash-card b{font-size:18px;letter-spacing:-.02em}
+.dash-card .up{font-size:11px;color:var(--verde);font-weight:700}
+.bars{display:flex;align-items:flex-end;gap:7px;height:90px}
+.bars i{flex:1;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,var(--azul),#6ea1f7);display:block}
+
+/* ---------- DADO DE MERCADO ---------- */
+.market{padding:110px 0;background:var(--bg);border-bottom:1px solid var(--line)}
+.market-head{text-align:center;max-width:620px;margin:0 auto 56px}
+.market-head .cv-q{font-family:'Caveat',cursive;font-size:clamp(22px,3vw,28px);color:var(--vermelho);display:block;margin-bottom:14px;transform:rotate(-1.5deg)}
+.market-head p{font-size:16.5px;color:var(--ink2);margin-top:16px;line-height:1.55}
+.market-chart{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:13px}
+.mrow{display:grid;grid-template-columns:110px 1fr 52px;align-items:center;gap:14px}
+.mname{font-size:13.5px;font-weight:700;color:var(--ink2);text-align:right}
+.mtrack{position:relative;height:30px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow:visible}
+.mbar{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:7px 0 0 7px;transition:width 1.1s cubic-bezier(.22,1,.36,1);display:block}
+.mval{font-size:14px;font-weight:800;letter-spacing:-.02em}
+.mrow.br .mname{color:var(--ink);font-weight:800}
+.m-note{position:absolute;left:6%;top:50%;transform:translateY(-50%);font-family:'Caveat',cursive;font-size:17px;color:var(--verde);white-space:nowrap;padding-left:10px}
+.market-src{text-align:center;font-size:11.5px;color:#a3a8b3;margin-top:34px;max-width:640px;margin-left:auto;margin-right:auto;line-height:1.55}
+.src-det{margin-top:10px}
+.src-det summary{cursor:pointer;font-weight:700;color:var(--azul);font-size:12px;list-style:none;user-select:none}
+.src-det summary::-webkit-details-marker{display:none}
+.src-det summary::before{content:'+ '}
+.src-det[open] summary::before{content:'– '}
+.src-det-body{max-width:560px;margin:12px auto 0;text-align:left;font-size:12.5px;color:var(--ink2);line-height:1.65;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+.src-det-body b{color:var(--ink)}
+@media (max-width:640px){
+  .mrow{grid-template-columns:78px 1fr 44px;gap:9px}
+  .mname{font-size:11.5px}
+  .m-note{font-size:13px;left:10%}
+}
+
+/* ---------- CASE / POOL ---------- */
+.case{padding:110px 0;background:#fff;border-bottom:1px solid var(--line)}
+.case-top{max-width:680px;margin:0 auto 64px;text-align:center}
+.kicker{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--verde);margin-bottom:16px}
+h2{font-size:clamp(30px,4.2vw,48px);font-weight:800;letter-spacing:-.035em;line-height:1.08}
+h2 .cv{font-family:'Caveat',cursive;font-weight:700;font-size:1.1em}
+.case p.lead{font-size:17px;color:var(--ink2);line-height:1.6;margin-top:20px}
+.case p.lead b{color:var(--ink)}
+.case-chips{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:26px}
+.cchip{font-size:13px;font-weight:600;color:var(--ink2);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:9px 18px;animation:floaty 5.8s ease-in-out infinite;will-change:transform}
+.case-chips .cchip:nth-child(2){animation-duration:6.9s;animation-delay:-2.7s}
+.growth{max-width:880px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:40px 40px 30px}
+.growth-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:34px}
+.growth-big{font-size:clamp(20px,2.6vw,27px);font-weight:800;letter-spacing:-.03em}
+.growth-big b{font-size:1.25em}
+.growth-big .gh{color:var(--verde)}
+.growth-note{font-family:'Caveat',cursive;font-size:20px;color:var(--ink2)}
+.gchart{display:flex;align-items:flex-end;gap:clamp(8px,2vw,22px);height:260px}
+.gcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:7px}
+.gpct{font-size:11.5px;font-weight:800;color:var(--azul);text-align:center;line-height:1.25}
+.gbar{display:block;width:100%;max-width:64px;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--azul),#6ea1f7);height:4px;transition:height 1.2s cubic-bezier(.22,1,.36,1)}
+.gcol.hoje .gbar{background:linear-gradient(180deg,var(--verde),#2d9249)}
+.gval{font-size:clamp(14px,1.8vw,19px);font-weight:800;letter-spacing:-.02em}
+.gcol.hoje .gval{color:var(--verde)}
+.glab{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.gcol.hoje .glab{color:var(--ink);font-weight:800}
+.growth-src{text-align:center;font-size:11.5px;color:#a3a8b3;margin-top:24px}
+@media (max-width:640px){
+  .growth{padding:26px 18px 22px}
+  .gchart{height:200px;gap:6px}
+  .gpct{font-size:9.5px}
+  .gval{font-size:13px}
+  .glab{font-size:9px}
+}
+
+/* ---------- ANTI WHITE-LABEL ---------- */
+.anti{padding:110px 0;background:var(--bg)}
+.anti-head{text-align:center;max-width:640px;margin:0 auto 56px}
+.anti-head p{font-size:16.5px;color:var(--ink2);margin-top:16px;line-height:1.55}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:880px;margin:0 auto}
+.vs-col{border-radius:var(--r);padding:32px}
+.vs-col.wl{background:#fff;border:1px solid var(--line)}
+.vs-col.rt{background:var(--ink);color:#fff}
+.vs-col h4{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
+.vs-col.wl h4{color:var(--ink2)}
+.vs-col.rt h4{color:var(--amarelo)}
+.vs-col ul{list-style:none}
+.vs-col li{display:flex;gap:11px;font-size:15px;line-height:1.45;padding:9px 0}
+.vs-col.wl li{color:var(--ink2)}
+.vs-col li i{flex:none;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:1px}
+.vs-col.wl li i{background:rgba(234,67,53,.1);color:var(--vermelho)}
+.vs-col.rt li i{background:rgba(52,168,83,.22);color:#7ee2a0}
+
+/* ---------- SPLIT NA ORIGEM ---------- */
+.flowsec{padding:110px 0;background:var(--bg);border-top:1px solid var(--line)}
+.flow-head{text-align:center;max-width:600px;margin:0 auto 56px}
+.flow-head p{font-size:16.5px;color:var(--ink2);margin-top:16px;line-height:1.55}
+.flow-link{color:var(--azul);font-weight:700;text-decoration:none;border-bottom:2px solid rgba(66,133,244,.3)}
+.flow-link:hover{border-bottom-color:var(--azul)}
+.flow-eg{font-family:'Caveat',cursive;font-size:24px;color:var(--vermelho);align-self:flex-start;margin-bottom:10px;transform-origin:center;animation:wiggle 3.6s ease-in-out infinite;display:inline-block}
+@keyframes wiggle{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(1.5deg)}}
+.flow-diagram{max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:0}
+.fl-src{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 38px;text-align:center;box-shadow:0 12px 40px rgba(26,29,36,.06)}
+.fl-src small,.fl-box small{display:block;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+.fl-src b{font-size:28px;font-weight:800;letter-spacing:-.03em}
+.fl-src span,.fl-box span{display:block;font-size:12.5px;color:var(--ink2);margin-top:5px}
+.fl-pipe{display:flex;flex-direction:column;align-items:center;padding:4px 0}
+.fl-line{width:2px;height:26px;background:linear-gradient(180deg,var(--line),#c9cdd6)}
+.fl-badge{font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--ink);border-radius:99px;padding:7px 16px;margin:4px 0}
+.fl-dest{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:640px}
+.fl-box{border-radius:18px;padding:22px 24px;color:#fff;text-align:center}
+.fl-box small{color:rgba(255,255,255,.8)}
+.fl-box span{color:rgba(255,255,255,.85)}
+.fl-box b{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.fl-you{background:linear-gradient(135deg,#34A853,#2d9249)}
+.fl-op{background:linear-gradient(135deg,#4285F4,#3372d6)}
+.flow-points{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:880px;margin:48px auto 0}
+.fp{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.fp b{display:block;font-size:14.5px;font-weight:800;letter-spacing:-.01em;margin-bottom:5px}
+.fp span{font-size:13px;color:var(--ink2);line-height:1.5}
+@media (max-width:760px){
+  .fl-dest{grid-template-columns:1fr}
+  .flow-points{grid-template-columns:1fr}
+}
+
+/* ---------- CALCULADORA ---------- */
+.calc{padding:110px 0;background:#fff;border-top:1px solid var(--line)}
+.calc-head{text-align:center;max-width:560px;margin:0 auto 48px}
+.calc-head p{font-size:16px;color:var(--ink2);margin-top:14px}
+.calc-card{max-width:880px;margin:0 auto;background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:40px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.calc-in label{display:block;font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:10px}
+.calc-in .val{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
+input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:99px;background:#e6e6e2;outline:none;margin:6px 0 34px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--azul);cursor:pointer;border:4px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.qtd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.period-toggle{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:4px}
+.period-toggle button{border:none;background:transparent;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--ink2);padding:6px 14px;border-radius:99px;cursor:pointer;transition:background .15s,color .15s}
+.period-toggle button.on{background:var(--ink);color:#fff}
+.cost-line{position:relative;font-size:13.5px;color:var(--ink2);background:#fff;border:1px dashed var(--line);border-radius:12px;padding:14px 16px;line-height:1.5}
+.cost-det{margin-top:8px}
+.cost-det summary{cursor:pointer;font-weight:700;color:var(--azul);font-size:12.5px;list-style:none;user-select:none}
+.cost-det summary::-webkit-details-marker{display:none}
+.cost-det summary::before{content:'+ '}
+.cost-det[open] summary::before{content:'– '}
+.cost-det-body{position:absolute;left:-1px;right:-1px;top:calc(100% + 8px);background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 18px 50px rgba(26,29,36,.14);z-index:6;font-size:13px;line-height:1.55}
+.cost-line b{color:var(--ink)}
+.calc-out{display:flex;flex-direction:column;justify-content:center;gap:14px}
+.out-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px}
+.out-box small{display:block;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin-bottom:5px}
+.out-box b{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-.03em}
+.out-box.hl{background:var(--ink);color:#fff;border-color:var(--ink)}
+.out-box.hl small{color:var(--amarelo)}
+.out-box.hl b{color:#fff}
+.out-box .cv{font-family:'Caveat',cursive;color:var(--verde);font-size:17px;margin-left:8px}
+
+/* ---------- FORM ---------- */
+.cta-sec{padding:110px 0 90px;background:var(--ink);color:#fff}
+.cta-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:64px;align-items:start}
+.cta-left h2{color:#fff}
+.cta-left p{color:rgba(255,255,255,.6);font-size:16.5px;line-height:1.6;margin-top:18px;max-width:380px}
+.cta-left .cv-note{font-family:'Caveat',cursive;color:var(--amarelo);font-size:22px;margin-top:26px;display:block}
+.form-card{background:#fff;color:var(--ink);border-radius:24px;padding:36px}
+.form-card h3{font-size:20px;font-weight:800;letter-spacing:-.02em;margin-bottom:22px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f-group{margin-bottom:14px}
+.f-group label{display:block;font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:6px}
+.f-group input[type=text],.f-group input[type=email],.f-group input[type=tel],.f-group select,.f-group textarea{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font-size:14.5px;font-family:inherit;background:#fafaf8;color:var(--ink);outline:none;transition:border .15s}
+.f-group input:focus,.f-group select:focus,.f-group textarea:focus{border-color:var(--azul);background:#fff}
+.f-group textarea{resize:vertical;min-height:84px}
+.checks{margin:6px 0 18px}
+.checks .checks-label{font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:10px}
+.check{display:flex;gap:12px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:9px;cursor:pointer;transition:border .15s,background .15s}
+.check:hover{border-color:#cfcfca}
+.check input{margin-top:2px;width:17px;height:17px;accent-color:var(--azul);cursor:pointer;flex:none}
+.check span{font-size:14px;line-height:1.4;font-weight:600}
+.check small{display:block;font-size:12.5px;color:var(--ink2);font-weight:500;margin-top:2px}
+.check.on{border-color:var(--azul);background:rgba(66,133,244,.04)}
+.f-submit{width:100%;background:var(--ink);color:#fff;border:none;border-radius:99px;padding:17px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;transition:background .15s;margin-top:6px}
+.f-submit:hover{background:var(--azul)}
+.f-foot{font-size:12px;color:var(--ink2);text-align:center;margin-top:14px}
+
+/* ---------- FOOTER ---------- */
+footer{background:#13151a;color:rgba(255,255,255,.45);padding:44px 0;font-size:12.5px;line-height:1.65}
+footer .wrap{display:flex;flex-direction:column;gap:14px}
+footer .frow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+footer .logo{color:#fff;font-size:15px}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:900px){
+  .steps-grid{grid-template-columns:1fr;gap:16px}
+  .steps-head{margin-bottom:18px}
+  .stepper{display:flex;flex-direction:row;padding:12px 10px;border-radius:16px;gap:2px}
+  .sstep{display:flex;flex-direction:column;align-items:center;flex:1;gap:6px}
+  .s-ind{flex-direction:row;width:100%;justify-content:center}
+  .s-line{display:none}
+  .s-circle{width:26px;height:26px;font-size:11px}
+  .s-body{padding:0;text-align:center}
+  .s-body small,.s-pill,.s-desc{display:none}
+  .s-body h3{font-size:9px;color:rgba(255,255,255,.45);display:block;line-height:1.25}
+  .sstep.active .s-desc{display:none}
+  .m-active{display:block;text-align:center;padding:14px 28px 0;max-width:480px;margin:0 auto}
+  .m-active b{display:block;font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:5px}
+  .m-active span{font-size:13px;line-height:1.5;color:rgba(255,255,255,.6)}
+  .step-visual{min-height:280px}
+  .cta-grid{grid-template-columns:1fr;gap:40px}
+  .calc-card{grid-template-columns:1fr;padding:28px;gap:32px}
+  .vs{grid-template-columns:1fr}
+  .f-row{grid-template-columns:1fr}
+}
+@media (max-height:700px){
+  .step-visual{min-height:240px}
+  .mock,.video-mock,.dash-mock{transform:scale(.85)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo"><div class="dots"><span></span><span></span><span></span><span></span></div>roteador</div>
+    <a href="#proposta" class="nav-cta">Pedir proposta</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div class="eyebrow"><i></i>infraestrutura de telemedicina · by nó</div>
+    <h1>Sua marca vende.<br><span class="cv">Nossos médicos atendem.</span></h1>
+    <p>Lance sua telemedicina sem montar uma operação: checkout pronto, pagamento dividido na origem e pool médico atendendo em minutos.</p>
+    <div class="hero-ctas">
+      <a href="#proposta" class="btn btn-p">Quero minha telemedicina</a>
+      <a href="#como" class="btn btn-s">Ver como funciona</a>
+    </div>
+    <div class="hero-chips">
+      <div class="chip"><b>Split automático</b> · sua margem cai direto na sua conta</div>
+      <div class="chip"><b>Pool médico parceiro</b> · CFM + LGPD</div>
+      <div class="chip"><b>Sua marca</b> na frente de tudo</div>
+    </div>
+  </div>
+</section>
+
+<!-- STEPS PINADOS -->
+<section class="steps-wrap" id="como">
+  <div class="steps-sticky">
+    <div class="steps-head">
+      <div class="steps-kicker">como funciona</div>
+      <h2 class="steps-title">Do clique à consulta,<br>sem você operar <span class="cv" style="color:var(--amarelo)">nada.</span></h2>
+      <span class="cv steps-sub">5 passos — só o primeiro é seu ↓</span>
+    </div>
+    <div class="steps-grid">
+
+      <div class="stepper" id="stepper">
+        <div class="sstep active" data-i="0">
+          <div class="s-ind"><span class="s-circle"><span class="n">1</span><span class="ck">✓</span></span><span class="s-line"></span></div>
+          <div class="s-body"><small>passo 1 · sua parte</small><h3>Sua marca capta</h3><span class="s-pill"></span>
+            <div class="s-desc">LP, Instagram, anúncios. A captação é 100% sua — e é a única coisa que você precisa fazer.</div>
+          </div>
+        </div>
+        <div class="sstep" data-i="1">
+          <div class="s-ind"><span class="s-circle"><span class="n">2</span><span class="ck">✓</span></span><span class="s-line"></span></div>
+          <div class="s-body"><small>passo 2 · automático</small><h3>Paciente paga no seu checkout</h3><span class="s-pill"></span>
+            <div class="s-desc">PIX ou cartão, no seu domínio, com a sua identidade visual.</div>
+          </div>
+        </div>
+        <div class="sstep" data-i="2">
+          <div class="s-ind"><span class="s-circle"><span class="n">3</span><span class="ck">✓</span></span><span class="s-line"></span></div>
+          <div class="s-body"><small>passo 3 · automático</small><h3>O dinheiro nasce dividido</h3><span class="s-pill"></span>
+            <div class="s-desc">Sua margem cai na sua conta, a parte do atendimento vai pro pool médico. Você nunca toca no valor cheio.</div>
+          </div>
+        </div>
+        <div class="sstep" data-i="3">
+          <div class="s-ind"><span class="s-circle"><span class="n">4</span><span class="ck">✓</span></span><span class="s-line"></span></div>
+          <div class="s-body"><small>passo 4 · automático</small><h3>Um médico atende em minutos</h3><span class="s-pill"></span>
+            <div class="s-desc">Nosso pool médico parceiro assume: vídeo, receita e atestado assinados digitalmente, prontuário sob custódia médica (CFM).</div>
+          </div>
+        </div>
+        <div class="sstep" data-i="4">
+          <div class="s-ind"><span class="s-circle"><span class="n">5</span><span class="ck">✓</span></span><span class="s-line"></span></div>
+          <div class="s-body"><small>passo 5 · seu controle</small><h3>Você acompanha tudo</h3><span class="s-pill"></span>
+            <div class="s-desc">Painel com vendas, consultas e conversão em tempo real. Sua operação, seus números.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-visual">
+
+        <!-- 01: marca -->
+        <div class="vis active" data-i="0">
+          <div class="mock">
+            <div class="bar"><div class="b-dots"><i></i><i></i><i></i></div>suamarca.com.br</div>
+            <div class="body">
+              <div class="brand-pill"><i></i>Sua Marca Saúde</div>
+              <h5>Consulta online agora</h5>
+              <div class="sub">Atendimento médico por vídeo, sem sair de casa</div>
+              <div class="cta-line">Agendar consulta — R$ 59,90</div>
+              <div class="mock-foot"><span class="mf-tag" style="color:var(--azul);background:rgba(66,133,244,.08)">tráfego seu</span><span class="mf-tag" style="color:var(--verde);background:rgba(52,168,83,.08)">marca sua</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02: checkout -->
+        <div class="vis" data-i="1">
+          <div class="mock">
+            <div class="bar"><div class="b-dots"><i></i><i></i><i></i></div>checkout.suamarca.com.br</div>
+            <div class="body">
+              <div class="pay-toggle"><span class="on">PIX</span><span>Cartão</span></div>
+              <div class="qr-row">
+                <div class="qr"></div>
+                <div class="qr-info"><b>R$ 59,90</b><span>escaneie pra pagar</span><span class="qr-timer">expira em 09:58</span></div>
+              </div>
+              <div class="cta-line" style="background:var(--verde)">Copiar código PIX</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03: split -->
+        <div class="vis" data-i="2">
+          <div class="split-vis">
+            <div class="split-total"><small>pagamento aprovado</small>R$ 59,90</div>
+            <div class="split-arrows"><span>↙</span><span>↘</span></div>
+            <div class="split-row">
+              <div class="split-box sb-green"><small>sua conta</small><b>R$ 29,90</b><div class="who">margem da venda</div></div>
+              <div class="split-box sb-blue"><small>operação médica</small><b>R$ 30,00</b><div class="who">direto pro atendimento</div></div>
+            </div>
+            <div class="split-note">dividido <b>na origem</b>, dentro do próprio pagamento</div>
+          </div>
+        </div>
+
+        <!-- 04: consulta -->
+        <div class="vis" data-i="3">
+          <div class="video-mock">
+            <div class="video-stage">
+              <div class="live-dot"><i></i>AO VIVO</div>
+              <div class="avatar">Dr</div>
+              <div class="pip"></div>
+              <div class="v-name">Dr. Andrade · clínico geral</div>
+            </div>
+            <div class="video-foot">
+              <div class="doc-badge"><i style="background:var(--verde)"></i>Receita assinada</div>
+              <div class="doc-badge"><i style="background:var(--amarelo)"></i>Atestado</div>
+              <div class="doc-badge"><i style="background:var(--azul)"></i>Pós no WhatsApp</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05: painel -->
+        <div class="vis" data-i="4">
+          <div class="dash-mock">
+            <div class="dash-top"><span class="dot-on"></span>painel · hoje</div>
+            <div class="dash-cards">
+              <div class="dash-card"><small>consultas hoje</small><b>23</b> <span class="up">↑ 12%</span></div>
+              <div class="dash-card"><small>receita mês</small><b>R$ 18,4k</b> <span class="up">↑ 8%</span></div>
+              <div class="dash-card"><small>conversão</small><b>4,1%</b></div>
+            </div>
+            <div class="bars">
+              <i style="height:38%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:66%"></i><i style="height:58%"></i><i style="height:80%"></i><i style="height:72%"></i><i style="height:94%"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="m-active"><b id="mTitle"></b><span id="mDesc"></span></div>
+  </div>
+</section>
+
+<!-- DADO DE MERCADO / OBJEÇÃO -->
+<section class="market">
+  <div class="wrap">
+    <div class="market-head">
+      <span class="cv-q">"ué, mas o mercado já não tá saturado?"</span>
+      <h2>Na Europa, 1 em cada 4 consultas<br>já é <span class="cv" style="color:var(--azul)">remota.</span></h2>
+      <p>No Brasil, a estimativa é de 2 a 3%. Não é mercado saturado — é mercado que ainda nem aconteceu.</p>
+    </div>
+    <div class="market-chart" id="marketChart">
+      <div class="mrow"><span class="mname">Estônia</span><div class="mtrack"><i class="mbar" data-w="36" style="background:var(--azul)"></i></div><span class="mval">36%</span></div>
+      <div class="mrow"><span class="mname">Portugal</span><div class="mtrack"><i class="mbar" data-w="26" style="background:var(--azul)"></i></div><span class="mval">26%</span></div>
+      <div class="mrow"><span class="mname">Suécia</span><div class="mtrack"><i class="mbar" data-w="25" style="background:var(--azul)"></i></div><span class="mval">25%</span></div>
+      <div class="mrow"><span class="mname">Dinamarca</span><div class="mtrack"><i class="mbar" data-w="25" style="background:var(--azul)"></i></div><span class="mval">25%</span></div>
+      <div class="mrow"><span class="mname">Espanha</span><div class="mtrack"><i class="mbar" data-w="22" style="background:var(--azul)"></i></div><span class="mval">22%</span></div>
+      <div class="mrow br"><span class="mname">Brasil</span><div class="mtrack"><i class="mbar" data-w="3" style="background:var(--verde)"></i><span class="m-note cv">← o espaço em branco é o seu mercado</span></div><span class="mval" style="color:var(--verde)">2-3%</span></div>
+    </div>
+    <div class="market-src">
+      Participação de teleconsultas no total de consultas médicas. Fonte: OCDE — Organização para a Cooperação e Desenvolvimento Econômico, que reúne estatísticas comparáveis de 38 países — e Eurostat, 2023.
+      <details class="src-det"><summary>e os 2-3% do Brasil, de onde vêm?</summary>
+        <div class="src-det-body">O Brasil não publica uma estatística tão limpa quanto a da OCDE, mas dá pra estimar: foram <b>mais de 30 milhões de atendimentos médicos a distância em 2023</b>, segundo a Fenasaúde — crescimento de 172% sobre os 11 milhões acumulados de 2020 ao fim de 2022. Como o país realiza <b>mais de 1 bilhão de consultas por ano</b> somando SUS e rede privada, 30 milhões representam algo em torno de 2-3% do total.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CASE / POOL MÉDICO -->
+<section class="case">
+  <div class="wrap">
+    <div class="case-top">
+      <div class="kicker">quem atende os seus pacientes</div>
+      <h2>Construímos uma telemedicina <span class="cv" style="color:var(--verde)">do zero.</span><br>Hoje ela é o pool médico do Roteador.</h2>
+      <p class="lead">Antes de virar produto, o Roteador foi testado no caso mais difícil: a nossa própria operação. A telemedicina que a nó desenvolveu escalou sozinha — e hoje é a <b>parceira de atendimento médico</b> de todas as marcas conectadas.</p>
+      <div class="case-chips">
+        <span class="cchip">Pool credenciado · prontuário sob custódia médica (CFM)</span>
+        <span class="cchip">Do pagamento ao médico na tela em minutos</span>
+      </div>
+    </div>
+    <div class="growth" id="growth">
+      <div class="growth-head">
+        <div class="growth-big">de <b class="gnum" data-v="5">0</b> a <b class="gnum gh" data-v="300">0</b> consultas/dia</div>
+        <span class="cv growth-note">crescimento real, mês a mês ↓</span>
+      </div>
+      <div class="gchart">
+        <div class="gcol"><span class="gpct">&nbsp;</span><i class="gbar" data-h="5"></i><b class="gval gnum" data-v="5">0</b><span class="glab">mês 1</span></div>
+        <div class="gcol"><span class="gpct">+140%</span><i class="gbar" data-h="12"></i><b class="gval gnum" data-v="12">0</b><span class="glab">mês 2</span></div>
+        <div class="gcol"><span class="gpct">+83%</span><i class="gbar" data-h="22"></i><b class="gval gnum" data-v="22">0</b><span class="glab">mês 3</span></div>
+        <div class="gcol"><span class="gpct">+109%</span><i class="gbar" data-h="46"></i><b class="gval gnum" data-v="46">0</b><span class="glab">mês 4</span></div>
+        <div class="gcol"><span class="gpct">+80%</span><i class="gbar" data-h="83"></i><b class="gval gnum" data-v="83">0</b><span class="glab">mês 5</span></div>
+        <div class="gcol"><span class="gpct">+45%</span><i class="gbar" data-h="120"></i><b class="gval gnum" data-v="120">0</b><span class="glab">mês 6</span></div>
+        <div class="gcol hoje"><span class="gpct" style="color:var(--verde)">+5.900%<br>acumulado</span><i class="gbar" data-h="300"></i><b class="gval gnum" data-v="300">0</b><span class="glab">hoje</span></div>
+      </div>
+      <div class="growth-src">consultas/dia da operação própria, do mês 1 ao patamar atual</div>
+    </div>
+  </div>
+</section>
+
+<!-- ANTI WHITE-LABEL -->
+<section class="anti">
+  <div class="wrap">
+    <div class="anti-head">
+      <h2>White-label te dá um software.<br>O Roteador te dá <span class="cv" style="color:var(--vermelho)">uma operação.</span></h2>
+      <p>A diferença entre ter um sistema parado e ter pacientes sendo atendidos hoje.</p>
+    </div>
+    <div class="vs">
+      <div class="vs-col wl">
+        <h4>White-label comum</h4>
+        <ul>
+          <li><i>✕</i>Te entrega o software e some</li>
+          <li><i>✕</i>Médicos? Problema seu</li>
+          <li><i>✕</i>Você recebe tudo e repassa na mão</li>
+          <li><i>✕</i>Prontuário e CFM por sua conta e risco</li>
+        </ul>
+      </div>
+      <div class="vs-col rt">
+        <h4>Roteador</h4>
+        <ul>
+          <li><i>✓</i>Operação completa rodando no go-live</li>
+          <li><i>✓</i>Pool médico da Prontia já incluso</li>
+          <li><i>✓</i>Split na origem — cada parte fica com sua margem automaticamente</li>
+          <li><i>✓</i>Compliance CFM e LGPD resolvidos por desenho</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPLIT NA ORIGEM -->
+<section class="flowsec">
+  <div class="wrap">
+    <div class="flow-head">
+      <div class="kicker" style="color:var(--azul)">como o dinheiro flui</div>
+      <h2>Sua margem cai na sua conta.<br><span class="cv" style="color:var(--verde)">A parte do médico, na dele.</span></h2>
+      <p>Utilizamos tecnologia da <a href="https://www.pagar.me/" target="_blank" rel="noopener" class="flow-link">pagar.me</a> que divide o valor no momento da aprovação. Você nunca recebe o valor cheio pra depois pagar o atendimento — cada parte já chega na conta certa.</p>
+    </div>
+    <div class="flow-diagram">
+      <span class="cv flow-eg">Exemplo:</span>
+      <div class="fl-src"><small>paciente paga</small><b>R$ 59,90</b><span>PIX ou cartão, no seu checkout</span></div>
+      <div class="fl-pipe"><span class="fl-line"></span><span class="fl-badge">split automático</span><span class="fl-line"></span></div>
+      <div class="fl-dest">
+        <div class="fl-box fl-you"><small>sua conta</small><b>R$ 29,90</b><span>margem da venda, direto na sua conta do banco</span></div>
+        <div class="fl-box fl-op"><small>operação médica</small><b>R$ 30,00</b><span>atendimento (R$ 27) + plataforma (R$ 3)</span></div>
+      </div>
+    </div>
+    <div class="flow-points">
+      <div class="fp"><b>Você não paga o médico</b><span>a parte do atendimento vai direto pro pool — sem boleto, sem planilha, sem acerto no fim do mês</span></div>
+      <div class="fp"><b>Cada venda no seu extrato</b><span>toda consulta aparece identificada na sua conta</span></div>
+      <div class="fp"><b>Você não segura dinheiro de terceiros</b><span>sem custódia, sem risco fiscal de intermediação financeira</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULADORA -->
+<section class="calc">
+  <div class="wrap">
+    <div class="calc-head">
+      <h2>Faça a conta <span class="cv" style="color:var(--azul)">você mesmo</span></h2>
+      <p>Custo de operação fixo por consulta. O resto é seu.</p>
+    </div>
+    <div class="calc-card">
+      <div class="calc-in">
+        <label>Preço da sua consulta</label>
+        <div class="val" id="vTicket">R$ 60,00</div>
+        <input type="range" id="rTicket" min="39" max="149" step="1" value="60">
+        <div class="qtd-head"><label style="margin-bottom:0">Consultas</label>
+          <div class="period-toggle"><button type="button" class="on" data-p="dia">por dia</button><button type="button" data-p="mes">por mês</button></div>
+        </div>
+        <div class="val" id="vQtd">10/dia</div>
+        <input type="range" id="rQtd" min="2" max="70" step="1" value="10">
+        <div class="cost-line">Custo de operação: <b>R$ 30 por consulta</b> (R$ 27 do atendimento médico + R$ 3 da plataforma) + <b>R$ 300/mês</b> de manutenção e suporte.
+          <details class="cost-det"><summary>o que os R$ 300 cobrem?</summary>
+          <div class="cost-det-body">Infraestrutura e hospedagem do checkout, banco de dados dedicado da sua operação, atualizações de segurança, suporte direto com o time e evolução contínua do sistema — sem custo extra por feature nova.</div></details>
+        </div>
+      </div>
+      <div class="calc-out">
+        <div class="out-box"><small>sua margem por consulta</small><b id="oMargem">R$ 30,00</b></div>
+        <div class="out-box hl"><small>sua margem por mês</small><b id="oMes">R$ 8.700</b><span class="cv">já descontados os R$ 300/mês</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / FORM -->
+<section class="cta-sec" id="proposta">
+  <div class="wrap cta-grid">
+    <div class="cta-left">
+      <h2>Conta como é o seu caso.<br>A proposta sai <span class="cv" style="color:var(--amarelo)">sob medida.</span></h2>
+      <p>Cada operação é diferente: tem quem já tem telemedicina rodando, tem médico montando a própria marca, tem quem quer atender junto. Marca o que vale pra você que a gente monta o desenho certo.</p>
+      <span class="cv-note">respondemos no mesmo dia! ✦</span>
+    </div>
+    <form class="form-card" id="leadForm">
+      <h3>Pedir proposta</h3>
+      <div class="f-row">
+        <div class="f-group"><label>Nome</label><input type="text" name="nome" placeholder="Seu nome" required></div>
+        <div class="f-group"><label>WhatsApp</label><input type="tel" name="whatsapp" placeholder="(11) 99999-9999" required></div>
+      </div>
+      <div class="f-group"><label>E-mail</label><input type="email" name="email" placeholder="voce@email.com" required></div>
+      <div class="checks">
+        <div class="checks-label">Marque o que se aplica a você:</div>
+        <label class="check"><input type="checkbox" name="tem_telemed"><span>Já tenho uma telemedicina rodando<small>quero migrar ou melhorar a operação atual</small></span></label>
+        <label class="check"><input type="checkbox" name="quero_atender"><span>Quero atender também, além de encaminhar<small>realizo atendimentos na operação junto com o pool médico</small></span></label>
+      </div>
+      <div class="f-group"><label>Conte um pouco do seu projeto (opcional)</label><textarea name="msg" placeholder="Marca, público, como capta pacientes hoje..."></textarea></div>
+      <button type="submit" class="f-submit">Enviar e receber proposta</button>
+      <div class="f-foot">Sem compromisso. Seus dados não são compartilhados.</div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="frow">
+      <div class="logo"><div class="dots"><span style="background:var(--azul)"></span><span style="background:var(--vermelho)"></span><span style="background:var(--amarelo)"></span><span style="background:var(--verde)"></span></div>roteador · by nó tech stack</div>
+      <div>nó tech stack · notechstack.com.br</div>
+    </div>
+    <div>Os atendimentos médicos realizados pelas operações conectadas ao Roteador são prestados pela Prontia Saúde, e os respectivos prontuários médicos são armazenados e custodiados por ela, em conformidade com a Resolução CFM 1.821/2007 e a LGPD. O Roteador atua exclusivamente como operação tecnológica de captação, pagamento e roteamento.</div>
+  </div>
+</footer>
+
+<script>
+/* ---------- STEPS pinados ---------- */
+(function(){
+  const wrap=document.querySelector('.steps-wrap');
+  const steps=[...document.querySelectorAll('.sstep')];
+  const viss=[...document.querySelectorAll('.vis')];
+  const mT=document.getElementById('mTitle'),mD=document.getElementById('mDesc');
+  /* vídeos opcionais: videos/step1.mp4 ... step5.mp4 — se existir, substitui o mockup */
+  viss.forEach(v=>{
+    const vid=document.createElement('video');
+    vid.className='vis-video';
+    vid.muted=true;vid.loop=true;vid.playsInline=true;vid.preload='metadata';
+    vid.src='videos/step'+(+v.dataset.i+1)+'.mp4';
+    vid.addEventListener('loadeddata',()=>v.classList.add('has-video'));
+    vid.addEventListener('error',()=>vid.remove());
+    v.appendChild(vid);
+  });
+  function syncVideos(i){
+    viss.forEach(v=>{
+      const vid=v.querySelector('.vis-video');
+      if(!vid)return;
+      if(+v.dataset.i===i){vid.play().catch(()=>{});}
+      else{vid.pause();vid.currentTime=0;}
+    });
+  }
+  let current=-1;
+  function setActive(i){
+    if(i===current)return;
+    current=i;
+    steps.forEach(s=>{
+      const si=+s.dataset.i;
+      s.classList.toggle('done',si<i);
+      s.classList.toggle('active',si===i);
+      s.classList.toggle('pend',si>i);
+    });
+    viss.forEach(v=>v.classList.toggle('active',+v.dataset.i===i));
+    syncVideos(i);
+    if(mT){mT.textContent=steps[i].querySelector('h3').textContent;mD.textContent=steps[i].querySelector('.s-desc').textContent;}
+  }
+  function onScroll(){
+    const rect=wrap.getBoundingClientRect();
+    const scrollable=wrap.offsetHeight-window.innerHeight;
+    if(scrollable<=0)return;
+    const p=Math.min(.9999,Math.max(0,-rect.top/scrollable));
+    setActive(Math.floor(p*5));
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  window.addEventListener('resize',onScroll);
+  setActive(0);onScroll();
+  steps.forEach(s=>s.addEventListener('click',()=>{
+    const i=+s.dataset.i;
+    const scrollable=wrap.offsetHeight-window.innerHeight;
+    window.scrollTo({top:wrap.offsetTop+(i+0.5)/5*scrollable,behavior:'smooth'});
+  }));
+})();
+
+/* ---------- Curva de crescimento ---------- */
+(function(){
+  const g=document.getElementById('growth');
+  if(!g)return;
+  const bars=[...g.querySelectorAll('.gbar')];
+  const nums=[...g.querySelectorAll('.gnum')];
+  const MAX=300;
+  function countUp(el,target,dur){
+    const t0=performance.now();
+    function tick(now){
+      const p=Math.min(1,(now-t0)/dur);
+      const eased=1-Math.pow(1-p,3);
+      el.textContent=Math.round(target*eased);
+      if(p<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        bars.forEach((b,i)=>setTimeout(()=>{
+          b.style.height=Math.max(2,(+b.dataset.h/MAX)*100)+'%';
+        },i*130));
+        nums.forEach(n=>countUp(n,+n.dataset.v,1400));
+        io.disconnect();
+      }
+    });
+  },{threshold:.4});
+  io.observe(g);
+})();
+
+/* ---------- Gráfico de mercado ---------- */
+(function(){
+  const chart=document.getElementById('marketChart');
+  if(!chart)return;
+  const bars=[...chart.querySelectorAll('.mbar')];
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        bars.forEach((b,i)=>setTimeout(()=>{b.style.width=b.dataset.w+'%';},i*90));
+        io.disconnect();
+      }
+    });
+  },{threshold:.35});
+  io.observe(chart);
+})();
+
+/* ---------- Calculadora ---------- */
+(function(){
+  const CUSTO=30, MENSAL=300; // R$27 médico + R$3 plataforma; R$300/mês manutenção
+  const rT=document.getElementById('rTicket'),rQ=document.getElementById('rQtd');
+  const vT=document.getElementById('vTicket'),vQ=document.getElementById('vQtd');
+  const oM=document.getElementById('oMargem'),oMes=document.getElementById('oMes');
+  const brl=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  const cfg={dia:{min:2,max:70,step:1,val:10},mes:{min:50,max:2000,step:50,val:300}};
+  let periodo='dia';
+  function calc(){
+    const t=+rT.value,q=+rQ.value;
+    const qMes=periodo==='dia'?q*30:q;
+    vT.textContent=brl(t);
+    vQ.textContent=periodo==='dia'?q+'/dia':q.toLocaleString('pt-BR')+'/mês';
+    const m=Math.max(0,t-CUSTO);
+    oM.textContent=brl(m);
+    oMes.textContent=brl(Math.max(0,m*qMes-MENSAL)).replace(',00','');
+  }
+  document.querySelectorAll('.period-toggle button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      periodo=b.dataset.p;
+      document.querySelectorAll('.period-toggle button').forEach(x=>x.classList.toggle('on',x===b));
+      const c=cfg[periodo];
+      rQ.min=c.min;rQ.max=c.max;rQ.step=c.step;rQ.value=c.val;
+      calc();
+    });
+  });
+  rT.addEventListener('input',calc);rQ.addEventListener('input',calc);
+  calc();
+})();
+
+/* ---------- Popover do custo ---------- */
+(function(){
+  const det=document.querySelector('.cost-det');
+  if(!det)return;
+  document.addEventListener('click',e=>{
+    if(det.open&&!det.contains(e.target))det.open=false;
+  });
+})();
+
+/* ---------- Form (protótipo) ---------- */
+(function(){
+  document.querySelectorAll('.check input').forEach(c=>{
+    c.addEventListener('change',()=>c.closest('.check').classList.toggle('on',c.checked));
+  });
+    document.getElementById('leadForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const btn=e.target.querySelector('.f-submit');
+    btn.textContent='Recebido ✓ — falamos ainda hoje';
+    btn.style.background='var(--verde)';
+  });
+})();
+</script>
+</body>
+</html>

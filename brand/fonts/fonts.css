@@ -1,0 +1,27 @@
+/* nó · tech stack — Tipografia oficial · Identidade v2
+   Sora (display → corpo) + JetBrains Mono (labels, métricas, tokens)
+   Caminhos relativos a brand/fonts/ — ajuste conforme onde servir. */
+
+/* ── Sora ── */
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 300; font-display: swap;
+  src: url('sora/sora-latin-300-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('sora/sora-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 600; font-display: swap;
+  src: url('sora/sora-latin-600-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('sora/sora-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('sora/sora-latin-800-normal.woff2') format('woff2'); }
+
+/* Alternativa: fonte variável (um arquivo, wght 100–800)
+@font-face { font-family: 'Sora'; font-style: normal; font-weight: 100 800; font-display: swap;
+  src: url('sora/sora-variable-wght.woff2') format('woff2-variations'); } */
+
+/* ── JetBrains Mono ── */
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('jetbrains-mono/jetbrains-mono-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('jetbrains-mono/jetbrains-mono-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('jetbrains-mono/jetbrains-mono-latin-700-normal.woff2') format('woff2'); }

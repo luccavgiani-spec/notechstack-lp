@@ -1,0 +1,27 @@
+/* nó health — Tokens da vertical saúde · Identidade v2 · julho 2026
+   Importa a base da marca-mãe (brand/tokens/tokens.css) e fixa o acento em VERDE.
+   Uso: <link> este arquivo DEPOIS do tokens.css da raiz. */
+
+:root {
+  /* Acento da vertical saúde */
+  --health-accent: var(--no-verde, #30A46C);
+  --health-accent-tint: var(--no-verde-tint, #E5F4EC);
+
+  /* Semânticos da página /health */
+  --health-cta-bg: var(--health-accent);
+  --health-cta-text: #FFFFFF;
+  --health-link: var(--health-accent);
+  --health-card-accent: var(--health-accent);      /* barra de acento à esquerda dos cards */
+  --health-label-line: var(--health-accent);       /* linha lateral dos labels mono */
+  --health-dot: var(--health-accent);              /* ponto do logo no contexto health */
+
+  /* Neutros herdados (referência) */
+  --health-bg-dark: var(--no-tinta, #141414);
+  --health-bg-light: var(--no-osso, #FAFAF7);
+  --health-text-secondary: var(--no-cinza, #6B6F76);
+  --health-border: var(--no-borda, #ECEBE6);
+}
+
+/* Regra da marca: as 4 cores continuam aparecendo JUNTAS nos elementos de
+   sistema (barra topo 4 cores, rodapé 4 pontos) — o verde é o acento de
+   contexto, não substitui o sistema. */
