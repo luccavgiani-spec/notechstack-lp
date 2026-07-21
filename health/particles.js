@@ -5,7 +5,10 @@
 
 import { Renderer, Camera, Geometry, Program, Mesh } from 'https://cdn.jsdelivr.net/npm/ogl/+esm';
 
-const defaultColors = ['#A8D8B9', '#7BC96F', '#C8E6C9', '#E6F4EA'];
+/* verdes da vertical saúde — derivados de --no-verde #30A46C e do tint
+   #E5F4EC (brand/tokens/tokens.css). WebGL não lê custom properties, então
+   aqui os hex ficam literais de propósito. */
+const defaultColors = ['#8BCBAC', '#30A46C', '#C3E3D3', '#E5F4EC'];
 
 const hexToRgb = (hex) => {
   hex = hex.replace(/^#/, '');
