@@ -1,12 +1,14 @@
 /* Pill nav — identidade v2.
    Cores dos itens saem da paleta da marca (brand/tokens/tokens.css):
    Home = âmbar (marca-mãe / nó principal) · Health = verde (vertical saúde)
-   · Contact = azul. As 4 cores do sistema aparecem juntas na barra de topo
-   e no rodapé das páginas — aqui a nav mostra o acento de cada destino. */
+   · Roteador = azul · Contact = vermelho. As 4 cores do sistema aparecem
+   juntas na barra de topo e no rodapé das páginas — aqui a nav mostra o
+   acento de cada destino, uma cor por item, sem repetir. */
 export const pillNavItems = [
-  { label: 'Home',    href: '/',        color: '#EDA33B' },
-  { label: 'Health',  href: '/health/', color: '#30A46C' },
-  { label: 'Contact', href: '/#cta',    color: '#3D63DB' }
+  { label: 'Home',     href: '/',          color: '#EDA33B' },
+  { label: 'Health',   href: '/health/',   color: '#30A46C' },
+  { label: 'Roteador', href: '/roteador/', color: '#3D63DB' },
+  { label: 'Contact',  href: '/#cta',      color: '#E0543C' }
 ];
 
 export const pillNavConfig = {
