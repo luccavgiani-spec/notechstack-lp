@@ -146,29 +146,29 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
       '<div class="mock-scroll">'+
         /* ── Navbar ── */
         '<div style="background:#fff;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e5e7eb;">'+
-          '<div style="font-weight:800;color:#15803d;font-size:13px;letter-spacing:-.4px;">Cl&#237;nica Conecta</div>'+
+          '<div style="font-weight:800;color:#2a8459;font-size:13px;letter-spacing:-.4px;">Cl&#237;nica Conecta</div>'+
           '<div style="display:flex;gap:10px;font-size:9px;color:#9ca3af;">'+
             '<span>Especialidades</span><span>M&#233;dicos</span><span>Login</span>'+
           '</div>'+
         '</div>'+
         /* ── Hero ── */
-        '<div style="background:linear-gradient(145deg,#f0fdf4,#dcfce7);padding:16px 16px 14px;">'+
+        '<div style="background:linear-gradient(145deg,#e5f4ec,#dcfce7);padding:16px 16px 14px;">'+
           '<div style="font-size:16px;font-weight:800;color:#14532d;line-height:1.25;margin-bottom:5px;">Consulte com<br>especialistas</div>'+
           '<div style="font-size:9px;color:#6b7280;margin-bottom:12px;">Online &#183; R&#225;pido &#183; Seguro</div>'+
-          '<div style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:7px 14px;border-radius:6px;display:inline-block;">&#9654; Agendar Consulta</div>'+
+          '<div style="background:#30a46c;color:#fff;font-size:9px;font-weight:700;padding:7px 14px;border-radius:6px;display:inline-block;">&#9654; Agendar Consulta</div>'+
         '</div>'+
         /* ── Doctor cards ── */
         '<div style="background:#f9fafb;padding:10px;">'+
           '<div style="font-size:9px;font-weight:700;color:#374151;margin-bottom:8px;">M&#233;dicos dispon&#237;veis</div>'+
           /* card 1 */
           '<div style="background:#fff;border-radius:10px;padding:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:8px;align-items:center;margin-bottom:8px;">'+
-            '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#86efac,#22c55e);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">&#x1f9ba;</div>'+
+            '<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#8bcbac,#22c55e);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;">&#x1f9ba;</div>'+
             '<div style="flex:1;">'+
               '<div style="font-size:10px;font-weight:700;color:#111827;">Dr. Carlos Lima</div>'+
               '<div style="font-size:8px;color:#6b7280;">Cl&#237;nica Geral &#183; &#11088; 4.9</div>'+
-              '<div style="font-size:8px;color:#16a34a;margin-top:2px;">&#9679; Dispon&#237;vel agora</div>'+
+              '<div style="font-size:8px;color:#30a46c;margin-top:2px;">&#9679; Dispon&#237;vel agora</div>'+
             '</div>'+
-            '<div style="background:#f0fdf4;color:#16a34a;font-size:7px;font-weight:700;padding:4px 8px;border-radius:5px;white-space:nowrap;">Agendar</div>'+
+            '<div style="background:#e5f4ec;color:#30a46c;font-size:7px;font-weight:700;padding:4px 8px;border-radius:5px;white-space:nowrap;">Agendar</div>'+
           '</div>'+
           /* card 2 */
           '<div style="background:#fff;border-radius:10px;padding:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;gap:8px;align-items:center;">'+
@@ -176,21 +176,21 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
             '<div style="flex:1;">'+
               '<div style="font-size:10px;font-weight:700;color:#111827;">Dra. Ana Souza</div>'+
               '<div style="font-size:8px;color:#6b7280;">Dermatologia &#183; &#11088; 5.0</div>'+
-              '<div style="font-size:8px;color:#16a34a;margin-top:2px;">&#9679; Pr&#243;x. consulta: 14h</div>'+
+              '<div style="font-size:8px;color:#30a46c;margin-top:2px;">&#9679; Pr&#243;x. consulta: 14h</div>'+
             '</div>'+
-            '<div style="background:#f0fdf4;color:#16a34a;font-size:7px;font-weight:700;padding:4px 8px;border-radius:5px;white-space:nowrap;">Agendar</div>'+
+            '<div style="background:#e5f4ec;color:#30a46c;font-size:7px;font-weight:700;padding:4px 8px;border-radius:5px;white-space:nowrap;">Agendar</div>'+
           '</div>'+
         '</div>'+
         /* ── Schedule ── */
         '<div style="background:#fff;padding:10px 10px 12px;">'+
           '<div style="font-size:9px;font-weight:700;color:#374151;margin-bottom:8px;">Escolha um hor&#225;rio</div>'+
           '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;">'+
-            '<div style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:8px;padding:4px 8px;border-radius:5px;">09:00</div>'+
-            '<div style="background:#16a34a;color:#fff;font-size:8px;padding:4px 8px;border-radius:5px;">10:30</div>'+
-            '<div style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:8px;padding:4px 8px;border-radius:5px;">14:00</div>'+
-            '<div style="background:#f0fdf4;border:1px solid #86efac;color:#15803d;font-size:8px;padding:4px 8px;border-radius:5px;">16:30</div>'+
+            '<div style="background:#e5f4ec;border:1px solid #8bcbac;color:#2a8459;font-size:8px;padding:4px 8px;border-radius:5px;">09:00</div>'+
+            '<div style="background:#30a46c;color:#fff;font-size:8px;padding:4px 8px;border-radius:5px;">10:30</div>'+
+            '<div style="background:#e5f4ec;border:1px solid #8bcbac;color:#2a8459;font-size:8px;padding:4px 8px;border-radius:5px;">14:00</div>'+
+            '<div style="background:#e5f4ec;border:1px solid #8bcbac;color:#2a8459;font-size:8px;padding:4px 8px;border-radius:5px;">16:30</div>'+
           '</div>'+
-          '<div style="background:#16a34a;color:#fff;font-size:9px;font-weight:700;padding:8px;border-radius:6px;text-align:center;">Confirmar Agendamento</div>'+
+          '<div style="background:#30a46c;color:#fff;font-size:9px;font-weight:700;padding:8px;border-radius:6px;text-align:center;">Confirmar Agendamento</div>'+
         '</div>'+
       '</div>'+
       '<div class="mock-cur"></div>'+
@@ -201,7 +201,7 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
       '<div class="mock-scroll">'+
         /* ── Navbar ── */
         '<div style="background:#0f0904;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(214,176,128,.15);">'+
-          '<div style="font-weight:800;color:#d6b080;font-size:11px;letter-spacing:2.5px;">MAISON S&#201;NSORI</div>'+
+          '<div style="font-weight:800;color:#eda33b;font-size:11px;letter-spacing:2.5px;">MAISON S&#201;NSORI</div>'+
           '<div style="display:flex;gap:10px;font-size:8px;color:rgba(214,176,128,.45);">'+
             '<span>Cole&#231;&#227;o</span><span>Ritual</span><span>&#10022;</span>'+
           '</div>'+
@@ -214,8 +214,8 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
           '</div>'+
           '<div style="font-size:8px;color:rgba(214,176,128,.55);letter-spacing:3px;margin-bottom:4px;">&#201;DITION LIMIT&#201;E</div>'+
           '<div style="font-size:14px;font-weight:800;color:#f5e6c8;margin-bottom:4px;">Elixir de S&#226;ndalo</div>'+
-          '<div style="font-size:12px;color:#d6b080;margin-bottom:12px;font-weight:600;">R$ 890,00</div>'+
-          '<div style="background:linear-gradient(90deg,#d6b080,#a07840);color:#0f0904;font-size:8px;font-weight:800;padding:8px 18px;border-radius:3px;display:inline-block;letter-spacing:.8px;">+ ADICIONAR AO CARRINHO</div>'+
+          '<div style="font-size:12px;color:#eda33b;margin-bottom:12px;font-weight:600;">R$ 890,00</div>'+
+          '<div style="background:linear-gradient(90deg,#eda33b,#805c28);color:#0f0904;font-size:8px;font-weight:800;padding:8px 18px;border-radius:3px;display:inline-block;letter-spacing:.8px;">+ ADICIONAR AO CARRINHO</div>'+
         '</div>'+
         /* ── Benefits ── */
         '<div style="background:#150d05;padding:12px 12px 10px;">'+
@@ -240,7 +240,7 @@ var VID_SRC='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAA
         '<div style="background:#0f0904;padding:12px;">'+
           '<div style="font-size:8px;color:rgba(214,176,128,.45);letter-spacing:2px;margin-bottom:8px;">AVALIA&#199;&#213;ES</div>'+
           '<div style="background:rgba(214,176,128,.05);border:1px solid rgba(214,176,128,.12);border-radius:8px;padding:8px;">'+
-            '<div style="font-size:8px;color:#d6b080;margin-bottom:4px;">&#11088;&#11088;&#11088;&#11088;&#11088; &#8212; Isabela M.</div>'+
+            '<div style="font-size:8px;color:#eda33b;margin-bottom:4px;">&#11088;&#11088;&#11088;&#11088;&#11088; &#8212; Isabela M.</div>'+
             '<div style="font-size:8px;color:rgba(245,230,200,.6);line-height:1.5;">"Experi&#234;ncia inesquec&#237;vel. A embalagem j&#225; &#233; uma obra de arte."</div>'+
           '</div>'+
         '</div>'+
@@ -473,7 +473,7 @@ var curModule  = 'dashboard';
 var PROFILES = {
   all: {
     label: 'Todos',
-    color: 'var(--blue)',
+    color: 'var(--yellow)',
     title: 'Hub nó — visão geral',
     desc:  'Um painel centralizado para qualquer segmento. Site, anúncios, posts, atendimento e financeiro num só lugar.',
     pills: ['Site','Meta Ads','Posts IA','WhatsApp','Relatórios'],
@@ -493,7 +493,7 @@ var PROFILES = {
   },
   conteudo: {
     label: 'Conteúdo',
-    color: 'var(--green)',
+    color: 'var(--blue)',
     title: 'Carol Cria · Criadora de Conteúdo',
     desc:  'Pipeline de conteúdo com IA. Posts gerados, agendados e analisados automaticamente toda semana.',
     pills: ['Claude AI','Canva','Instagram','Make','Midjourney'],
@@ -503,7 +503,7 @@ var PROFILES = {
   },
   servicos: {
     label: 'Serviços',
-    color: '#d4960a',
+    color: 'var(--green)',
     title: 'Dr. Pedro · Clínica & Consultório',
     desc:  'Agenda inteligente, prontuário digital, lembretes automáticos e financeiro integrado.',
     pills: ['Cal.com','Supabase','WhatsApp','Stripe','n8n'],
@@ -513,7 +513,7 @@ var PROFILES = {
   },
   gestao: {
     label: 'Gestão',
-    color: 'var(--red)',
+    color: 'var(--yellow)',
     title: 'Marcos CEO · Gestão & Analytics',
     desc:  'Visão 360 do negócio. CRM, campanhas, analytics e relatórios de IA toda semana no WhatsApp.',
     pills: ['Metabase','Supabase','Google Ads','n8n','Claude AI'],
@@ -523,7 +523,7 @@ var PROFILES = {
   },
   digital: {
     label: 'Cursos & Educação',
-    color: '#7c3aed',
+    color: 'var(--blue)',
     title: 'Prof. Julia · Cursos & Membros',
     desc:  'Plataforma de cursos própria. Alunos, comunidade, quizzes por IA e receita sem pagar comissão.',
     pills: ['Lovable','Supabase','Stripe','Claude AI','Vercel'],
@@ -533,7 +533,7 @@ var PROFILES = {
   },
   hotelaria: {
     label: 'Hotelaria',
-    color: '#34A853',
+    color: 'var(--red)',
     title: 'Hotelaria · Gestão de Pousadas',
     desc:  'Ocupação em tempo real, reservas de múltiplos canais, CRM de hóspedes e financeiro num painel só.',
     pills: ['Booking.com','Airbnb','WhatsApp','Supabase','n8n'],
@@ -618,13 +618,13 @@ function animateMain(el){
 /* Generic dashboard (used by "all" profile) */
 function renderDashboardGeneric(el){
   el.innerHTML=stitle('Visão Geral','Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Receita do mês','R$42k','↑ +18%','#4285F4')+hkpi('Visitantes','3.840','↑ +31%','#34A853')+hkpi('Custo/lead','R$4,20','↓ -22%','#FBBC04')+hkpi('Posts gerados','12','✓ semana','#EA4335')+'</div>'+
+    '<div class="hd-grid4">'+hkpi('Receita do mês','R$42k','↑ +18%','#3D63DB')+hkpi('Visitantes','3.840','↑ +31%','#30A46C')+hkpi('Custo/lead','R$4,20','↓ -22%','#EDA33B')+hkpi('Posts gerados','12','✓ semana','#E0543C')+'</div>'+
     '<div class="hd-grid2">'+
-    hcard('<div class="hd-card-title">Receita — 12 meses</div><div class="hd-bars" style="height:72px">'+hbars([38,52,45,68,72,85,78,92,88,96,90,100],['#4285F4','#34A853'])+'</div>','hd-span2')+
+    hcard('<div class="hd-card-title">Receita — 12 meses</div><div class="hd-bars" style="height:72px">'+hbars([38,52,45,68,72,85,78,92,88,96,90,100],['#3D63DB','#30A46C'])+'</div>','hd-span2')+
     '</div>'+
     '<div class="hd-grid3">'+
-    hcard('<div class="hd-card-title">Módulos ativos</div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#28c840"></div><span>Site ·</span><strong>Online</strong></div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#4285F4"></div><span>Meta Ads ·</span><strong>3 camp.</strong></div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#FBBC04"></div><span>Posts IA ·</span><strong>12/sem</strong></div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#EA4335"></div><span>WhatsApp ·</span><strong>47 chats</strong></div>')+
-    hcard('<div class="hd-card-title">Meta diária</div>'+donut(68,'#4285F4',72)+'<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px">68% da meta</div>')+
+    hcard('<div class="hd-card-title">Módulos ativos</div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#28c840"></div><span>Site ·</span><strong>Online</strong></div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#3D63DB"></div><span>Meta Ads ·</span><strong>3 camp.</strong></div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#EDA33B"></div><span>Posts IA ·</span><strong>12/sem</strong></div><div class="hd-mod-row"><div class="hd-mod-dot" style="background:#E0543C"></div><span>WhatsApp ·</span><strong>47 chats</strong></div>')+
+    hcard('<div class="hd-card-title">Meta diária</div>'+donut(68,'#3D63DB',72)+'<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px">68% da meta</div>')+
     hcard('<div class="hd-card-title">Alertas IA</div><div class="hd-alert hd-alert-y">⚡ CPM subiu 12% — revisar</div><div class="hd-alert hd-alert-g">✓ Taxa abertura acima da média</div><div class="hd-alert hd-alert-b">ℹ 3 leads aguardam contato</div>')+
     '</div>';
   animateMain(el);
@@ -633,25 +633,25 @@ function renderDashboardGeneric(el){
 /* ── VENDAS renderers ── */
 function renderVendasDashboard(el){
   el.innerHTML=stitle('Ana Loja','Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Faturamento','R$28.400','↑ +24%','#4285F4')+hkpi('Pedidos','312','↑ +18%','#34A853')+hkpi('Ticket médio','R$91','↑ +5%','#FBBC04')+hkpi('Abandono cart.','14%','↓ -6%','#EA4335')+'</div>'+
-    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Vendas — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([3200,4100,2900,5200,4800,6100,3900],['#4285F4'])+'</div>')+hcard('<div class="hd-card-title">Origem dos pedidos</div>'+hrow('Orgânico','48%',48,'#34A853')+hrow('Meta Ads','31%',31,'#0866FF')+hrow('WhatsApp','14%',14,'#25D366')+hrow('Direto','7%',7,'#FBBC04'))+'</div>';
+    '<div class="hd-grid4">'+hkpi('Faturamento','R$28.400','↑ +24%','#3D63DB')+hkpi('Pedidos','312','↑ +18%','#30A46C')+hkpi('Ticket médio','R$91','↑ +5%','#EDA33B')+hkpi('Abandono cart.','14%','↓ -6%','#E0543C')+'</div>'+
+    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Vendas — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([3200,4100,2900,5200,4800,6100,3900],['#3D63DB'])+'</div>')+hcard('<div class="hd-card-title">Origem dos pedidos</div>'+hrow('Orgânico','48%',48,'#30A46C')+hrow('Meta Ads','31%',31,'#0866FF')+hrow('WhatsApp','14%',14,'#25D366')+hrow('Direto','7%',7,'#EDA33B'))+'</div>';
   animateMain(el);
 }
 function renderVendasLoja(el){
   el.innerHTML=stitle('Minha Loja','Catálogo')+
-    '<div class="hd-grid4">'+hkpi('Produtos ativos','87','↑ +3 hoje','#4285F4')+hkpi('Estoque crítico','5','⚠ repor','#EA4335')+hkpi('Mais vendido','Kit P. Rosa','#34A853')+hkpi('Avaliação','4.8★','128 avaliações','#FBBC04')+'</div>'+
-    hcard('<div class="hd-card-title">Produtos com estoque baixo</div>'+hrow('Kit Premium Rosa','3 un.',30,'#EA4335')+hrow('Vela Âmbar 200g','7 un.',70,'#FBBC04')+hrow('Óleo Essencial','12 un.',100,'#34A853'),'');
+    '<div class="hd-grid4">'+hkpi('Produtos ativos','87','↑ +3 hoje','#3D63DB')+hkpi('Estoque crítico','5','⚠ repor','#E0543C')+hkpi('Mais vendido','Kit P. Rosa','#30A46C')+hkpi('Avaliação','4.8★','128 avaliações','#EDA33B')+'</div>'+
+    hcard('<div class="hd-card-title">Produtos com estoque baixo</div>'+hrow('Kit Premium Rosa','3 un.',30,'#E0543C')+hrow('Vela Âmbar 200g','7 un.',70,'#EDA33B')+hrow('Óleo Essencial','12 un.',100,'#30A46C'),'');
   animateMain(el);
 }
 function renderVendasPedidos(el){
   el.innerHTML=stitle('Pedidos','Hoje')+
-    '<div class="hd-grid4">'+hkpi('Novos','23','hoje','#4285F4')+hkpi('Em separação','11','#FBBC04')+hkpi('Despachados','34','#34A853')+hkpi('Devolvidos','2','↓ melhorou','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Últimos pedidos</div><div class="hd-trans"><span class="hd-trans-name">#4821 — Maria S.</span><span class="hd-trans-date">14:32</span><span class="hd-trans-val" style="color:#34A853">+ R$214</span></div><div class="hd-trans"><span class="hd-trans-name">#4820 — João A.</span><span class="hd-trans-date">13:18</span><span class="hd-trans-val" style="color:#34A853">+ R$87</span></div><div class="hd-trans"><span class="hd-trans-name">#4819 — Carol M.</span><span class="hd-trans-date">12:45</span><span class="hd-trans-val" style="color:#34A853">+ R$342</span></div>','');
+    '<div class="hd-grid4">'+hkpi('Novos','23','hoje','#3D63DB')+hkpi('Em separação','11','#EDA33B')+hkpi('Despachados','34','#30A46C')+hkpi('Devolvidos','2','↓ melhorou','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Últimos pedidos</div><div class="hd-trans"><span class="hd-trans-name">#4821 — Maria S.</span><span class="hd-trans-date">14:32</span><span class="hd-trans-val" style="color:#30A46C">+ R$214</span></div><div class="hd-trans"><span class="hd-trans-name">#4820 — João A.</span><span class="hd-trans-date">13:18</span><span class="hd-trans-val" style="color:#30A46C">+ R$87</span></div><div class="hd-trans"><span class="hd-trans-name">#4819 — Carol M.</span><span class="hd-trans-date">12:45</span><span class="hd-trans-val" style="color:#30A46C">+ R$342</span></div>','');
   animateMain(el);
 }
 function renderVendasMetaAds(el){
   el.innerHTML=stitle('Meta Ads','Campanhas')+
-    '<div class="hd-grid4">'+hkpi('Investido','R$1.240','este mês','#0866FF')+hkpi('Alcance','32.400','pessoas','#34A853')+hkpi('CPL','R$3,90','↓ -18%','#FBBC04')+hkpi('ROAS','4,2×','↑ meta:3×','#EA4335')+'</div>'+
+    '<div class="hd-grid4">'+hkpi('Investido','R$1.240','este mês','#0866FF')+hkpi('Alcance','32.400','pessoas','#30A46C')+hkpi('CPL','R$3,90','↓ -18%','#EDA33B')+hkpi('ROAS','4,2×','↑ meta:3×','#E0543C')+'</div>'+
     hcard('<div class="hd-card-title">Alcance diário — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([3800,5200,4400,6100,5700,7300,5100],['#0866FF'])+'</div>','');
   animateMain(el);
 }
@@ -659,105 +659,105 @@ function renderVendasMetaAds(el){
 /* ── CONTEÚDO renderers ── */
 function renderContentDashboard(el){
   el.innerHTML=stitle('Carol Cria','Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Posts publicados','28','este mês','#34A853')+hkpi('Alcance total','148k','↑ +42%','#4285F4')+hkpi('Engajamento','8,4%','↑ +1,2pp','#FBBC04')+hkpi('Seguidores novos','1.840','↑ +31%','#EA4335')+'</div>'+
-    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Alcance — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([12000,18000,15000,22000,19000,28000,21000],['#34A853'])+'</div>')+hcard('<div class="hd-card-title">Rede por engajamento</div>'+hrow('Instagram','9,2%',92,'#E1306C')+hrow('TikTok','11,4%',100,'#000000')+hrow('Facebook','4,1%',41,'#0866FF')+hrow('LinkedIn','3,8%',38,'#0A66C2'))+'</div>';
+    '<div class="hd-grid4">'+hkpi('Posts publicados','28','este mês','#30A46C')+hkpi('Alcance total','148k','↑ +42%','#3D63DB')+hkpi('Engajamento','8,4%','↑ +1,2pp','#EDA33B')+hkpi('Seguidores novos','1.840','↑ +31%','#E0543C')+'</div>'+
+    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Alcance — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([12000,18000,15000,22000,19000,28000,21000],['#30A46C'])+'</div>')+hcard('<div class="hd-card-title">Rede por engajamento</div>'+hrow('Instagram','9,2%',92,'#E1306C')+hrow('TikTok','11,4%',100,'#000000')+hrow('Facebook','4,1%',41,'#0866FF')+hrow('LinkedIn','3,8%',38,'#0A66C2'))+'</div>';
   animateMain(el);
 }
 function renderContentPosts(el){
   el.innerHTML=stitle('Posts IA','Gerados esta semana')+
-    '<div class="hd-grid4">'+hkpi('Gerados','12','✓ meta','#34A853')+hkpi('Agendados','8','próx. 7 dias','#4285F4')+hkpi('Publicados','4','hoje','#FBBC04')+hkpi('Melhor post','42k','views','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Fila de publicação</div><div class="hd-trans"><span class="hd-trans-name">Reels — Rotina matinal</span><span class="hd-trans-date">Amanhã 08:00</span><span class="hd-trans-val" style="color:#4285F4">Instagram</span></div><div class="hd-trans"><span class="hd-trans-name">Carrossel — 5 dicas</span><span class="hd-trans-date">Ter 12:00</span><span class="hd-trans-val" style="color:#0866FF">Facebook</span></div><div class="hd-trans"><span class="hd-trans-name">TikTok — Tendência</span><span class="hd-trans-date">Qua 18:00</span><span class="hd-trans-val" style="color:#000">TikTok</span></div>','');
+    '<div class="hd-grid4">'+hkpi('Gerados','12','✓ meta','#30A46C')+hkpi('Agendados','8','próx. 7 dias','#3D63DB')+hkpi('Publicados','4','hoje','#EDA33B')+hkpi('Melhor post','42k','views','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Fila de publicação</div><div class="hd-trans"><span class="hd-trans-name">Reels — Rotina matinal</span><span class="hd-trans-date">Amanhã 08:00</span><span class="hd-trans-val" style="color:#3D63DB">Instagram</span></div><div class="hd-trans"><span class="hd-trans-name">Carrossel — 5 dicas</span><span class="hd-trans-date">Ter 12:00</span><span class="hd-trans-val" style="color:#0866FF">Facebook</span></div><div class="hd-trans"><span class="hd-trans-name">TikTok — Tendência</span><span class="hd-trans-date">Qua 18:00</span><span class="hd-trans-val" style="color:#000">TikTok</span></div>','');
   animateMain(el);
 }
 function renderContentCalendario(el){
   el.innerHTML=stitle('Calendário','Abril 2026')+
-    hcard('<div class="hd-card-title">Conteúdo planejado — semana atual</div>'+hrow('Segunda','Reels motivacional',100,'#34A853')+hrow('Terça','Carrossel dicas',100,'#34A853')+hrow('Quarta','Story + link',80,'#FBBC04')+hrow('Quinta','TikTok tendência',60,'#4285F4')+hrow('Sexta','Post engajamento',40,'#EA4335'),'');
+    hcard('<div class="hd-card-title">Conteúdo planejado — semana atual</div>'+hrow('Segunda','Reels motivacional',100,'#30A46C')+hrow('Terça','Carrossel dicas',100,'#30A46C')+hrow('Quarta','Story + link',80,'#EDA33B')+hrow('Quinta','TikTok tendência',60,'#3D63DB')+hrow('Sexta','Post engajamento',40,'#E0543C'),'');
   animateMain(el);
 }
 function renderContentAnalytics(el){
   el.innerHTML=stitle('Analytics','Últimos 30 dias')+
-    '<div class="hd-grid4">'+hkpi('Impressões','420k','↑ +38%','#4285F4')+hkpi('Cliques no link','8.240','↑ +52%','#34A853')+hkpi('CTR médio','1,96%','↑ +0,4pp','#FBBC04')+hkpi('Salvos','12.400','↑ +61%','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Crescimento de seguidores — 14 dias</div>'+sparkline([1200,1240,1280,1310,1390,1420,1480,1510,1570,1640,1700,1780,1840,1920],'#34A853'),'');
+    '<div class="hd-grid4">'+hkpi('Impressões','420k','↑ +38%','#3D63DB')+hkpi('Cliques no link','8.240','↑ +52%','#30A46C')+hkpi('CTR médio','1,96%','↑ +0,4pp','#EDA33B')+hkpi('Salvos','12.400','↑ +61%','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Crescimento de seguidores — 14 dias</div>'+sparkline([1200,1240,1280,1310,1390,1420,1480,1510,1570,1640,1700,1780,1840,1920],'#30A46C'),'');
   animateMain(el);
 }
 
 /* ── SERVIÇOS renderers ── */
 function renderServDashboard(el){
   el.innerHTML=stitle('Dr. Pedro','Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Consultas/mês','142','↑ +12%','#EA4335')+hkpi('Taxa faltas','4,2%','↓ -62%','#34A853')+hkpi('Receita','R$31.200','↑ +18%','#4285F4')+hkpi('Pacientes novos','28','este mês','#FBBC04')+'</div>'+
-    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Consultas — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([6,8,7,9,8,10,4],['#EA4335'])+'</div>')+hcard('<div class="hd-card-title">Ocupação por dia</div>'+hrow('Segunda','91%',91,'#34A853')+hrow('Terça','88%',88,'#34A853')+hrow('Quarta','95%',95,'#34A853')+hrow('Quinta','72%',72,'#FBBC04')+hrow('Sexta','68%',68,'#FBBC04'))+'</div>';
+    '<div class="hd-grid4">'+hkpi('Consultas/mês','142','↑ +12%','#E0543C')+hkpi('Taxa faltas','4,2%','↓ -62%','#30A46C')+hkpi('Receita','R$31.200','↑ +18%','#3D63DB')+hkpi('Pacientes novos','28','este mês','#EDA33B')+'</div>'+
+    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Consultas — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([6,8,7,9,8,10,4],['#E0543C'])+'</div>')+hcard('<div class="hd-card-title">Ocupação por dia</div>'+hrow('Segunda','91%',91,'#30A46C')+hrow('Terça','88%',88,'#30A46C')+hrow('Quarta','95%',95,'#30A46C')+hrow('Quinta','72%',72,'#EDA33B')+hrow('Sexta','68%',68,'#EDA33B'))+'</div>';
   animateMain(el);
 }
 function renderServAgenda(el){
   el.innerHTML=stitle('Agenda','Hoje — 23 Mar')+
-    '<div class="hd-grid4">'+hkpi('Confirmadas','8','✓ todas','#34A853')+hkpi('Pendentes','2','aguardam','#FBBC04')+hkpi('Horários livres','3','disponíveis','#4285F4')+hkpi('Alertas','0','✓ sem faltas','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Próximas consultas</div><div class="hd-trans"><span class="hd-trans-name">Ana M. — Retorno</span><span class="hd-trans-date">14:00</span><span class="hd-trans-val" style="color:#34A853">Confirmada</span></div><div class="hd-trans"><span class="hd-trans-name">Carlos R. — 1ª consulta</span><span class="hd-trans-date">15:00</span><span class="hd-trans-val" style="color:#FBBC04">Pendente</span></div><div class="hd-trans"><span class="hd-trans-name">Lucia F. — Pós-op</span><span class="hd-trans-date">16:30</span><span class="hd-trans-val" style="color:#34A853">Confirmada</span></div>','');
+    '<div class="hd-grid4">'+hkpi('Confirmadas','8','✓ todas','#30A46C')+hkpi('Pendentes','2','aguardam','#EDA33B')+hkpi('Horários livres','3','disponíveis','#3D63DB')+hkpi('Alertas','0','✓ sem faltas','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Próximas consultas</div><div class="hd-trans"><span class="hd-trans-name">Ana M. — Retorno</span><span class="hd-trans-date">14:00</span><span class="hd-trans-val" style="color:#30A46C">Confirmada</span></div><div class="hd-trans"><span class="hd-trans-name">Carlos R. — 1ª consulta</span><span class="hd-trans-date">15:00</span><span class="hd-trans-val" style="color:#EDA33B">Pendente</span></div><div class="hd-trans"><span class="hd-trans-name">Lucia F. — Pós-op</span><span class="hd-trans-date">16:30</span><span class="hd-trans-val" style="color:#30A46C">Confirmada</span></div>','');
   animateMain(el);
 }
 function renderServClientes(el){
   el.innerHTML=stitle('Clientes','Base ativa')+
-    '<div class="hd-grid4">'+hkpi('Total','384','pacientes','#4285F4')+hkpi('Retorno','61%','voltaram','#34A853')+hkpi('NPS','87','excelente','#FBBC04')+hkpi('Inativos +90d','24','reativar','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Distribuição por especialidade</div>'+hrow('Clínica geral','42%',42,'#EA4335')+hrow('Pediatria','28%',28,'#4285F4')+hrow('Dermatologia','18%',18,'#34A853')+hrow('Outros','12%',12,'#FBBC04'),'');
+    '<div class="hd-grid4">'+hkpi('Total','384','pacientes','#3D63DB')+hkpi('Retorno','61%','voltaram','#30A46C')+hkpi('NPS','87','excelente','#EDA33B')+hkpi('Inativos +90d','24','reativar','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Distribuição por especialidade</div>'+hrow('Clínica geral','42%',42,'#E0543C')+hrow('Pediatria','28%',28,'#3D63DB')+hrow('Dermatologia','18%',18,'#30A46C')+hrow('Outros','12%',12,'#EDA33B'),'');
   animateMain(el);
 }
 
 /* ── GESTÃO renderers ── */
 function renderGestDashboard(el){
   el.innerHTML=stitle('Marcos CEO','Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Receita total','R$184k','↑ +22%','#4285F4')+hkpi('CAC','R$87','↓ -14%','#34A853')+hkpi('LTV médio','R$2.100','↑ +18%','#FBBC04')+hkpi('Churn','3,1%','↓ -0,8pp','#EA4335')+'</div>'+
-    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">MRR — 6 meses</div><div class="hd-bars" style="height:72px">'+hbars([140,152,148,162,171,184],['#4285F4'])+'</div>')+hcard('<div class="hd-card-title">Canais de aquisição</div>'+hrow('Orgânico','38%',38,'#34A853')+hrow('Paid (Google)','29%',29,'#4285F4')+hrow('Indicação','22%',22,'#FBBC04')+hrow('Eventos','11%',11,'#EA4335'))+'</div>';
+    '<div class="hd-grid4">'+hkpi('Receita total','R$184k','↑ +22%','#3D63DB')+hkpi('CAC','R$87','↓ -14%','#30A46C')+hkpi('LTV médio','R$2.100','↑ +18%','#EDA33B')+hkpi('Churn','3,1%','↓ -0,8pp','#E0543C')+'</div>'+
+    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">MRR — 6 meses</div><div class="hd-bars" style="height:72px">'+hbars([140,152,148,162,171,184],['#3D63DB'])+'</div>')+hcard('<div class="hd-card-title">Canais de aquisição</div>'+hrow('Orgânico','38%',38,'#30A46C')+hrow('Paid (Google)','29%',29,'#3D63DB')+hrow('Indicação','22%',22,'#EDA33B')+hrow('Eventos','11%',11,'#E0543C'))+'</div>';
   animateMain(el);
 }
 function renderGestCRM(el){
   el.innerHTML=stitle('CRM','Funil de vendas')+
-    '<div class="hd-grid4">'+hkpi('Leads','248','no funil','#4285F4')+hkpi('Qualificados','84','34% conv.','#34A853')+hkpi('Propostas','31','em negociação','#FBBC04')+hkpi('Fechados/mês','18','↑ +4','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Conversão por etapa</div>'+hrow('Lead → Qualif.','34%',34,'#4285F4')+hrow('Qualif. → Proposta','37%',37,'#34A853')+hrow('Proposta → Fechado','58%',58,'#FBBC04'),'');
+    '<div class="hd-grid4">'+hkpi('Leads','248','no funil','#3D63DB')+hkpi('Qualificados','84','34% conv.','#30A46C')+hkpi('Propostas','31','em negociação','#EDA33B')+hkpi('Fechados/mês','18','↑ +4','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Conversão por etapa</div>'+hrow('Lead → Qualif.','34%',34,'#3D63DB')+hrow('Qualif. → Proposta','37%',37,'#30A46C')+hrow('Proposta → Fechado','58%',58,'#EDA33B'),'');
   animateMain(el);
 }
 function renderGestAnalytics(el){
   el.innerHTML=stitle('Analytics','Performance')+
-    '<div class="hd-grid4">'+hkpi('Sessões/mês','42.800','↑ +28%','#4285F4')+hkpi('Taxa conv.','3,8%','↑ +0,9pp','#34A853')+hkpi('Tempo médio','3m42s','↑ +18s','#FBBC04')+hkpi('Bounce','38%','↓ -4pp','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Sessões — 14 dias</div>'+sparkline([2800,3200,2900,3800,4100,3600,4400,4800,4200,5100,4700,5400,4900,5600],'#4285F4'),'');
+    '<div class="hd-grid4">'+hkpi('Sessões/mês','42.800','↑ +28%','#3D63DB')+hkpi('Taxa conv.','3,8%','↑ +0,9pp','#30A46C')+hkpi('Tempo médio','3m42s','↑ +18s','#EDA33B')+hkpi('Bounce','38%','↓ -4pp','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Sessões — 14 dias</div>'+sparkline([2800,3200,2900,3800,4100,3600,4400,4800,4200,5100,4700,5400,4900,5600],'#3D63DB'),'');
   animateMain(el);
 }
 function renderGestCampanhas(el){
   el.innerHTML=stitle('Campanhas','Google + Meta')+
-    '<div class="hd-grid4">'+hkpi('Investido','R$8.400','mês','#4285F4')+hkpi('Leads gerados','248','↑ +38%','#34A853')+hkpi('CPL','R$33,87','↓ -12%','#FBBC04')+hkpi('ROAS','3,2×','↑ meta:3×','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Leads por canal — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([18,24,21,32,28,38,29],['#4285F4','#EA4335'])+'</div>','');
+    '<div class="hd-grid4">'+hkpi('Investido','R$8.400','mês','#3D63DB')+hkpi('Leads gerados','248','↑ +38%','#30A46C')+hkpi('CPL','R$33,87','↓ -12%','#EDA33B')+hkpi('ROAS','3,2×','↑ meta:3×','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Leads por canal — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([18,24,21,32,28,38,29],['#3D63DB','#E0543C'])+'</div>','');
   animateMain(el);
 }
 
 /* ── DIGITAL renderers ── */
 function renderDigitalDashboard(el){
   el.innerHTML=stitle('Prof. Julia','Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Alunos ativos','1.248','↑ +142','#7c3aed')+hkpi('Receita MRR','R$24.800','↑ +18%','#34A853')+hkpi('Taxa conclusão','74%','↑ +8pp','#4285F4')+hkpi('NPS','91','excelente','#FBBC04')+'</div>'+
-    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Novos alunos — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([18,24,21,32,28,38,29],['#7c3aed'])+'</div>')+hcard('<div class="hd-card-title">Progresso dos cursos</div>'+hrow('Marketing Digital','78%',78,'#7c3aed')+hrow('Tráfego Pago','64%',64,'#4285F4')+hrow('Copywriting','81%',81,'#34A853')+hrow('Instagram Pro','52%',52,'#E1306C'))+'</div>';
+    '<div class="hd-grid4">'+hkpi('Alunos ativos','1.248','↑ +142','#3d63db')+hkpi('Receita MRR','R$24.800','↑ +18%','#30A46C')+hkpi('Taxa conclusão','74%','↑ +8pp','#3D63DB')+hkpi('NPS','91','excelente','#EDA33B')+'</div>'+
+    '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Novos alunos — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([18,24,21,32,28,38,29],['#3d63db'])+'</div>')+hcard('<div class="hd-card-title">Progresso dos cursos</div>'+hrow('Marketing Digital','78%',78,'#3d63db')+hrow('Tráfego Pago','64%',64,'#3D63DB')+hrow('Copywriting','81%',81,'#30A46C')+hrow('Instagram Pro','52%',52,'#E1306C'))+'</div>';
   animateMain(el);
 }
 function renderDigitalCursos(el){
   el.innerHTML=stitle('Cursos','Catálogo')+
-    '<div class="hd-grid4">'+hkpi('Cursos ativos','4','↑ +1 novo','#7c3aed')+hkpi('Aulas total','186','horas','#4285F4')+hkpi('Certificados','312','emitidos','#34A853')+hkpi('Avaliação','4.9★','⭐ destaque','#FBBC04')+'</div>'+
-    hcard('<div class="hd-card-title">Cursos por inscrições</div>'+hrow('Marketing Digital','610 alunos',100,'#7c3aed')+hrow('Tráfego Pago','384 alunos',63,'#4285F4')+hrow('Copywriting','198 alunos',32,'#34A853')+hrow('Instagram Pro','56 alunos',9,'#E1306C'),'');
+    '<div class="hd-grid4">'+hkpi('Cursos ativos','4','↑ +1 novo','#3d63db')+hkpi('Aulas total','186','horas','#3D63DB')+hkpi('Certificados','312','emitidos','#30A46C')+hkpi('Avaliação','4.9★','⭐ destaque','#EDA33B')+'</div>'+
+    hcard('<div class="hd-card-title">Cursos por inscrições</div>'+hrow('Marketing Digital','610 alunos',100,'#3d63db')+hrow('Tráfego Pago','384 alunos',63,'#3D63DB')+hrow('Copywriting','198 alunos',32,'#30A46C')+hrow('Instagram Pro','56 alunos',9,'#E1306C'),'');
   animateMain(el);
 }
 function renderDigitalComunidade(el){
   el.innerHTML=stitle('Comunidade','Feed')+
-    '<div class="hd-grid4">'+hkpi('Membros','1.248','ativos','#7c3aed')+hkpi('Posts/semana','34','↑ +12%','#4285F4')+hkpi('Comentários','218','esta semana','#34A853')+hkpi('Lives','2','agendadas','#FBBC04')+'</div>'+
-    hcard('<div class="hd-card-title">Últimas discussões</div><div class="hd-trans"><span class="hd-trans-name">Como otimizar copy para ads?</span><span class="hd-trans-date">2h atrás</span><span class="hd-trans-val" style="color:#7c3aed">48 resp.</span></div><div class="hd-trans"><span class="hd-trans-name">Resultados do desafio semana 3</span><span class="hd-trans-date">5h atrás</span><span class="hd-trans-val" style="color:#34A853">32 resp.</span></div>','');
+    '<div class="hd-grid4">'+hkpi('Membros','1.248','ativos','#3d63db')+hkpi('Posts/semana','34','↑ +12%','#3D63DB')+hkpi('Comentários','218','esta semana','#30A46C')+hkpi('Lives','2','agendadas','#EDA33B')+'</div>'+
+    hcard('<div class="hd-card-title">Últimas discussões</div><div class="hd-trans"><span class="hd-trans-name">Como otimizar copy para ads?</span><span class="hd-trans-date">2h atrás</span><span class="hd-trans-val" style="color:#3d63db">48 resp.</span></div><div class="hd-trans"><span class="hd-trans-name">Resultados do desafio semana 3</span><span class="hd-trans-date">5h atrás</span><span class="hd-trans-val" style="color:#30A46C">32 resp.</span></div>','');
   animateMain(el);
 }
 function renderDigitalAlunos(el){
   el.innerHTML=stitle('Alunos','Gestão')+
-    '<div class="hd-grid4">'+hkpi('Total','1.248','↑ +142 mês','#7c3aed')+hkpi('Completos','312','25% da base','#34A853')+hkpi('Em progresso','840','67%','#4285F4')+hkpi('Inativos','96','8% — reativar','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Engajamento semanal</div>'+sparkline([820,890,840,920,980,1040,1100,1180,1248,1320,1410,1480,1560,1640],'#7c3aed'),'');
+    '<div class="hd-grid4">'+hkpi('Total','1.248','↑ +142 mês','#3d63db')+hkpi('Completos','312','25% da base','#30A46C')+hkpi('Em progresso','840','67%','#3D63DB')+hkpi('Inativos','96','8% — reativar','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Engajamento semanal</div>'+sparkline([820,890,840,920,980,1040,1100,1180,1248,1320,1410,1480,1560,1640],'#3d63db'),'');
   animateMain(el);
 }
 
 /* ── SHARED module renderers used across profiles ── */
 function renderAtendimento(el){
   el.innerHTML=stitle('Atendimento','WhatsApp')+
-    '<div class="hd-grid4">'+hkpi('Conversas','23','↑ +4 hoje','#25D366')+hkpi('Respondidas','19','83%','#34A853')+hkpi('Tempo médio','4m12s','↓ melhorou','#4285F4')+hkpi('Conversões','6','26%','#FBBC04')+'</div>'+
-    hcard('<div class="hd-card-title">Conversas recentes</div><div class="hd-trans"><span class="hd-trans-name">Maria C. — quer plano mensal</span><span class="hd-trans-date">14:32</span><span class="hd-trans-val" style="color:#EA4335">Novo</span></div><div class="hd-trans"><span class="hd-trans-name">Pedro A. — confirmou pagamento</span><span class="hd-trans-date">13:18</span><span class="hd-trans-val" style="color:#34A853">Feito</span></div><div class="hd-trans"><span class="hd-trans-name">Ana R. — prazo de entrega?</span><span class="hd-trans-date">12:50</span><span class="hd-trans-val" style="color:#FBBC04">Aberto</span></div>','');
+    '<div class="hd-grid4">'+hkpi('Conversas','23','↑ +4 hoje','#25D366')+hkpi('Respondidas','19','83%','#30A46C')+hkpi('Tempo médio','4m12s','↓ melhorou','#3D63DB')+hkpi('Conversões','6','26%','#EDA33B')+'</div>'+
+    hcard('<div class="hd-card-title">Conversas recentes</div><div class="hd-trans"><span class="hd-trans-name">Maria C. — quer plano mensal</span><span class="hd-trans-date">14:32</span><span class="hd-trans-val" style="color:#E0543C">Novo</span></div><div class="hd-trans"><span class="hd-trans-name">Pedro A. — confirmou pagamento</span><span class="hd-trans-date">13:18</span><span class="hd-trans-val" style="color:#30A46C">Feito</span></div><div class="hd-trans"><span class="hd-trans-name">Ana R. — prazo de entrega?</span><span class="hd-trans-date">12:50</span><span class="hd-trans-val" style="color:#EDA33B">Aberto</span></div>','');
   animateMain(el);
 }
 function renderFinanceiro(el,receita,custos){
@@ -766,15 +766,15 @@ function renderFinanceiro(el,receita,custos){
   var total = receita[receita.length-1];
   var custo = custos[custos.length-1];
   el.innerHTML=stitle('Financeiro','Visão completa')+
-    '<div class="hd-grid4">'+hkpi('Receita','R$'+Math.round(total/1000)+'k','↑ +30%','#34A853')+hkpi('Custos','R$'+Math.round(custo/1000)+'k','controlado','#4285F4')+hkpi('Lucro','R$'+Math.round((total-custo)/1000)+'k',Math.round((total-custo)/total*100)+'% margem','#FBBC04')+hkpi('A receber','R$3,2k','2 faturas','#EA4335')+'</div>'+
+    '<div class="hd-grid4">'+hkpi('Receita','R$'+Math.round(total/1000)+'k','↑ +30%','#30A46C')+hkpi('Custos','R$'+Math.round(custo/1000)+'k','controlado','#3D63DB')+hkpi('Lucro','R$'+Math.round((total-custo)/1000)+'k',Math.round((total-custo)/total*100)+'% margem','#EDA33B')+hkpi('A receber','R$3,2k','2 faturas','#E0543C')+'</div>'+
     hcard('<div class="hd-card-title">Receita vs Custos — 6 meses</div><div class="hd-bars" style="height:80px;gap:12px">'+
-      receita.map(function(r,i){var mx=Math.max.apply(null,receita);return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="flex:1;display:flex;align-items:flex-end;gap:2px;width:100%"><div class="hd-bar" style="flex:1;height:'+Math.round(r/mx*100)+'%;background:#34A853;border-radius:2px 2px 0 0"></div><div class="hd-bar" style="flex:1;height:'+Math.round(custos[i]/mx*100)+'%;background:#EA4335;border-radius:2px 2px 0 0"></div></div></div>';}).join('')+
+      receita.map(function(r,i){var mx=Math.max.apply(null,receita);return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="flex:1;display:flex;align-items:flex-end;gap:2px;width:100%"><div class="hd-bar" style="flex:1;height:'+Math.round(r/mx*100)+'%;background:#30A46C;border-radius:2px 2px 0 0"></div><div class="hd-bar" style="flex:1;height:'+Math.round(custos[i]/mx*100)+'%;background:#E0543C;border-radius:2px 2px 0 0"></div></div></div>';}).join('')+
     '</div>','');
   animateMain(el);
 }
 function renderRelatorios(el,segmento){
   el.innerHTML=stitle('Relatórios IA',segmento||'Março 2026')+
-    '<div class="hd-grid4">'+hkpi('Gerados/mês','8','automáticos','#4285F4')+hkpi('Enviados','8','via WhatsApp','#34A853')+hkpi('Alertas','3','anomalias','#FBBC04')+hkpi('Próximo','Dom 07:00','agendado','#EA4335')+'</div>'+
+    '<div class="hd-grid4">'+hkpi('Gerados/mês','8','automáticos','#3D63DB')+hkpi('Enviados','8','via WhatsApp','#30A46C')+hkpi('Alertas','3','anomalias','#EDA33B')+hkpi('Próximo','Dom 07:00','agendado','#E0543C')+'</div>'+
     hcard('<div class="hd-card-title">Sumário IA — semana passada</div><div class="hd-alert hd-alert-g">✓ Receita +18% vs semana anterior. Meta de leads atingida.</div><div class="hd-alert hd-alert-y">⚡ Custo de tráfego subiu 9% — ajustar lances na quinta.</div><div class="hd-alert hd-alert-b">ℹ Melhor dia: terça-feira com 42% das conversões.</div>','');
   animateMain(el);
 }
@@ -790,49 +790,49 @@ function renderRelatorios(el,segmento){
 
     // ── helpers de cor de tag ──────────────────────────────────────
     var TAG_COLORS = {
-      'meta-ads':    {bg:'rgba(251,188,4,.15)',  color:'#92650a', border:'rgba(251,188,4,.3)'},
-      'google-ads':  {bg:'rgba(66,133,244,.15)', color:'#1a5ccf', border:'rgba(66,133,244,.3)'},
-      'wpp-orgânico':{bg:'rgba(52,168,83,.15)',  color:'#1e7e34', border:'rgba(52,168,83,.3)'},
-      'orgânico':    {bg:'rgba(52,168,83,.15)',  color:'#1e7e34', border:'rgba(52,168,83,.3)'},
-      'consulta':    {bg:'rgba(66,133,244,.12)', color:'#1a5ccf', border:'rgba(66,133,244,.25)'},
-      'fup-ativo':   {bg:'rgba(234,67,53,.15)',  color:'#b71c1c', border:'rgba(234,67,53,.3)'},
-      'vip':         {bg:'rgba(212,150,10,.15)', color:'#7a5200', border:'rgba(212,150,10,.3)'},
-      'com-plano':   {bg:'rgba(52,168,83,.15)',  color:'#1e7e34', border:'rgba(52,168,83,.3)'},
-      'sumiu':       {bg:'rgba(95,99,104,.12)',  color:'#3c4043', border:'rgba(95,99,104,.2)'},
-      'exame':       {bg:'rgba(234,67,53,.12)',  color:'#b71c1c', border:'rgba(234,67,53,.25)'},
-      'procedimento':{bg:'rgba(124,58,237,.12)', color:'#5b21b6', border:'rgba(124,58,237,.25)'},
-      '1º-vez':      {bg:'rgba(66,133,244,.12)', color:'#1a5ccf', border:'rgba(66,133,244,.25)'},
-      'reserva':     {bg:'rgba(66,133,244,.15)', color:'#1a5ccf', border:'rgba(66,133,244,.3)'},
-      'retorno':     {bg:'rgba(52,168,83,.15)',  color:'#1e7e34', border:'rgba(52,168,83,.3)'},
+      'meta-ads':    {bg:'rgba(237,163,59,.15)',  color:'#805c28', border:'rgba(237,163,59,.3)'},
+      'google-ads':  {bg:'rgba(61,99,219,.15)', color:'#3452af', border:'rgba(61,99,219,.3)'},
+      'wpp-orgânico':{bg:'rgba(48,164,108,.15)',  color:'#2a8459', border:'rgba(48,164,108,.3)'},
+      'orgânico':    {bg:'rgba(48,164,108,.15)',  color:'#2a8459', border:'rgba(48,164,108,.3)'},
+      'consulta':    {bg:'rgba(61,99,219,.12)', color:'#3452af', border:'rgba(61,99,219,.25)'},
+      'fup-ativo':   {bg:'rgba(224,84,60,.15)',  color:'#b71c1c', border:'rgba(224,84,60,.3)'},
+      'vip':         {bg:'rgba(237,163,59,.15)', color:'#7a5200', border:'rgba(237,163,59,.3)'},
+      'com-plano':   {bg:'rgba(48,164,108,.15)',  color:'#2a8459', border:'rgba(48,164,108,.3)'},
+      'sumiu':       {bg:'rgba(107,111,118,.12)',  color:'#3c4043', border:'rgba(107,111,118,.2)'},
+      'exame':       {bg:'rgba(224,84,60,.12)',  color:'#b71c1c', border:'rgba(224,84,60,.25)'},
+      'procedimento':{bg:'rgba(61,99,219,.12)', color:'#5b21b6', border:'rgba(61,99,219,.25)'},
+      '1º-vez':      {bg:'rgba(61,99,219,.12)', color:'#3452af', border:'rgba(61,99,219,.25)'},
+      'reserva':     {bg:'rgba(61,99,219,.15)', color:'#3452af', border:'rgba(61,99,219,.3)'},
+      'retorno':     {bg:'rgba(48,164,108,.15)',  color:'#2a8459', border:'rgba(48,164,108,.3)'},
     };
     function tagChip(t) {
-      var s = TAG_COLORS[t] || {bg:'rgba(95,99,104,.1)',color:'#5f6368',border:'rgba(95,99,104,.2)'};
+      var s = TAG_COLORS[t] || {bg:'rgba(107,111,118,.1)',color:'#6b6f76',border:'rgba(107,111,118,.2)'};
       return '<span style="display:inline-flex;align-items:center;font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:'+s.bg+';color:'+s.color+';border:1px solid '+s.border+';white-space:nowrap">'+t+'</span>';
     }
 
     // ── render principal ───────────────────────────────────────────
     function render() {
       el.innerHTML = '';
-      el.style.cssText = 'display:flex;flex-direction:column;height:100%;overflow:hidden;background:#f4f6f9;padding:0';
+      el.style.cssText = 'display:flex;flex-direction:column;height:100%;overflow:hidden;background:#f3f2ed;padding:0';
 
       // TOP BAR
       var top = document.createElement('div');
       top.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;flex-shrink:0';
       top.innerHTML = '<div style="display:flex;align-items:baseline;gap:8px">'
-        +'<div style="font-family:var(--font);font-size:15px;font-weight:700;color:#1a1a1a">'+C.title+'</div>'
-        +'<div style="font-family:var(--font);font-size:10px;font-weight:700;background:#e8f0fe;color:var(--blue);padding:2px 8px;border-radius:100px">'+C.badge+'</div>'
+        +'<div style="font-family:var(--font);font-size:15px;font-weight:700;color:#141414">'+C.title+'</div>'
+        +'<div style="font-family:var(--font);font-size:10px;font-weight:700;background:#e9eefb;color:var(--blue);padding:2px 8px;border-radius:100px">'+C.badge+'</div>'
         +'</div>'
         +'<button style="font-family:var(--font);font-size:11px;font-weight:600;background:var(--blue);color:#fff;border:none;padding:5px 12px;border-radius:8px;cursor:pointer">+ Novo lead</button>';
       el.appendChild(top);
 
       // TABS
       var tabs = document.createElement('div');
-      tabs.style.cssText = 'display:flex;gap:0;padding:10px 18px 0;border-bottom:1px solid #e3e6ea;flex-shrink:0';
+      tabs.style.cssText = 'display:flex;gap:0;padding:10px 18px 0;border-bottom:1px solid #ecebe6;flex-shrink:0';
       ['pipeline','fup','templates','contatos'].forEach(function(t) {
         var labels = {pipeline:'Pipeline', fup:'Réguas de FUP', templates:'Templates', contatos:'Contatos'};
         var btn = document.createElement('button');
         var active = state.tab === t;
-        btn.style.cssText = 'font-family:var(--font);font-size:12px;font-weight:'+(active?'700':'500')+';padding:7px 14px;background:none;border:none;border-bottom:2px solid '+(active?'var(--blue)':'transparent')+';color:'+(active?'var(--blue)':'#5f6368')+';cursor:pointer;margin-bottom:-1px;transition:all .15s';
+        btn.style.cssText = 'font-family:var(--font);font-size:12px;font-weight:'+(active?'700':'500')+';padding:7px 14px;background:none;border:none;border-bottom:2px solid '+(active?'var(--blue)':'transparent')+';color:'+(active?'var(--blue)':'#6b6f76')+';cursor:pointer;margin-bottom:-1px;transition:all .15s';
         btn.textContent = labels[t];
         btn.addEventListener('click', function() { state.tab = t; state.selected = null; render(); });
         tabs.appendChild(btn);
@@ -857,19 +857,19 @@ function renderRelatorios(el,segmento){
       var flowBar = document.createElement('div');
       flowBar.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 18px;flex-shrink:0';
       var flowLabel = document.createElement('span');
-      flowLabel.style.cssText = 'font-family:var(--font);font-size:11px;color:#5f6368;font-weight:600;margin-right:4px';
+      flowLabel.style.cssText = 'font-family:var(--font);font-size:11px;color:#6b6f76;font-weight:600;margin-right:4px';
       flowLabel.textContent = 'Fluxo:';
       flowBar.appendChild(flowLabel);
       C.flows.forEach(function(f, i) {
         var btn = document.createElement('button');
         var active = state.flow === i;
-        btn.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;'+(active ? 'background:var(--blue);color:#fff;border:1px solid var(--blue)' : 'background:#fff;color:#5f6368;border:1px solid #e3e6ea');
+        btn.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;cursor:pointer;transition:all .15s;'+(active ? 'background:var(--blue);color:#fff;border:1px solid var(--blue)' : 'background:#fff;color:#6b6f76;border:1px solid #ecebe6');
         btn.textContent = f.name;
         btn.addEventListener('click', function() { state.flow = i; state.selected = null; renderPipeline(wrap); });
         flowBar.appendChild(btn);
       });
       var newFlowBtn = document.createElement('button');
-      newFlowBtn.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;cursor:pointer;background:transparent;color:#9aa0a6;border:1.5px dashed #d0d5dd';
+      newFlowBtn.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:600;padding:4px 12px;border-radius:6px;cursor:pointer;background:transparent;color:#a4a7ab;border:1.5px dashed #ecebe6';
       newFlowBtn.textContent = '+ Novo fluxo';
       flowBar.appendChild(newFlowBtn);
       wrap.appendChild(flowBar);
@@ -880,7 +880,7 @@ function renderRelatorios(el,segmento){
 
       // Kanban
       var kanban = document.createElement('div');
-      kanban.style.cssText = 'flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:10px;padding:0 18px 12px;scrollbar-width:thin;scrollbar-color:#d0d5dd transparent';
+      kanban.style.cssText = 'flex:1;overflow-x:auto;overflow-y:hidden;display:flex;gap:10px;padding:0 18px 12px;scrollbar-width:thin;scrollbar-color:#ecebe6 transparent';
       var flow = C.flows[state.flow];
       flow.cols.forEach(function(col, ci) {
         var colLeads = flow.leads.filter(function(l) { return l.col === ci; });
@@ -889,8 +889,8 @@ function renderRelatorios(el,segmento){
 
         var colHead = document.createElement('div');
         colHead.style.cssText = 'display:flex;align-items:center;gap:6px;padding:8px 0 8px';
-        colHead.innerHTML = '<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a">'+col+'</span>'
-          +'<span style="font-family:var(--font);font-size:10px;font-weight:700;background:#e3e6ea;color:#5f6368;padding:1px 7px;border-radius:100px">'+colLeads.length+'</span>';
+        colHead.innerHTML = '<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414">'+col+'</span>'
+          +'<span style="font-family:var(--font);font-size:10px;font-weight:700;background:#ecebe6;color:#6b6f76;padding:1px 7px;border-radius:100px">'+colLeads.length+'</span>';
         colEl.appendChild(colHead);
 
         var cards = document.createElement('div');
@@ -898,14 +898,14 @@ function renderRelatorios(el,segmento){
         colLeads.forEach(function(lead) {
           var card = document.createElement('div');
           var sel = state.selected && state.selected.id === lead.id;
-          card.style.cssText = 'background:#fff;border:1.5px solid '+(sel?'var(--blue)':'#e3e6ea')+';border-radius:10px;padding:10px 11px;cursor:pointer;transition:all .15s;'+(sel?'box-shadow:0 0 0 3px rgba(66,133,244,.15)':'');
+          card.style.cssText = 'background:#fff;border:1.5px solid '+(sel?'var(--blue)':'#ecebe6')+';border-radius:10px;padding:10px 11px;cursor:pointer;transition:all .15s;'+(sel?'box-shadow:0 0 0 3px rgba(61,99,219,.15)':'');
           var tagsHtml = (lead.tags||[]).map(tagChip).join(' ');
-          card.innerHTML = '<div style="font-family:var(--font);font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:2px">'+lead.name+'</div>'
-            +'<div style="font-family:var(--font);font-size:10px;color:#9aa0a6;margin-bottom:6px">'+lead.email+'</div>'
+          card.innerHTML = '<div style="font-family:var(--font);font-size:12px;font-weight:700;color:#141414;margin-bottom:2px">'+lead.name+'</div>'
+            +'<div style="font-family:var(--font);font-size:10px;color:#a4a7ab;margin-bottom:6px">'+lead.email+'</div>'
             +(tagsHtml?'<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px">'+tagsHtml+'</div>':'')
             +'<div style="display:flex;align-items:center;justify-content:space-between">'
-            +'<span style="font-family:var(--font);font-size:10px;color:#9aa0a6">'+lead.time+'</span>'
-            +(lead.val?'<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#34A853">'+lead.val+'</span>':'')
+            +'<span style="font-family:var(--font);font-size:10px;color:#a4a7ab">'+lead.time+'</span>'
+            +(lead.val?'<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#30A46C">'+lead.val+'</span>':'')
             +'</div>';
           card.addEventListener('click', function() {
             state.selected = lead;
@@ -922,7 +922,7 @@ function renderRelatorios(el,segmento){
       // Detail panel
       if (state.selected) {
         var panel = document.createElement('div');
-        panel.style.cssText = 'width:300px;flex-shrink:0;background:#fff;border-left:1px solid #e3e6ea;display:flex;flex-direction:column;overflow:hidden';
+        panel.style.cssText = 'width:300px;flex-shrink:0;background:#fff;border-left:1px solid #ecebe6;display:flex;flex-direction:column;overflow:hidden';
         renderDetailPanel(panel, state.selected);
         board.appendChild(panel);
       }
@@ -934,25 +934,25 @@ function renderRelatorios(el,segmento){
     function renderDetailPanel(panel, lead) {
       // Header
       var hdr = document.createElement('div');
-      hdr.style.cssText = 'padding:14px 16px;border-bottom:1px solid #f1f3f4;flex-shrink:0';
+      hdr.style.cssText = 'padding:14px 16px;border-bottom:1px solid #f3f2ed;flex-shrink:0';
       var initials = lead.name.split(' ').map(function(w){return w[0];}).slice(0,2).join('');
       var tagsHtml = (lead.tags||[]).map(tagChip).join(' ');
       hdr.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
         +'<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:12px;font-weight:700;color:#fff;flex-shrink:0">'+initials+'</div>'
-        +'<div><div style="font-family:var(--font);font-size:13px;font-weight:700;color:#1a1a1a">'+lead.name+'</div>'
-        +'<div style="font-family:var(--font);font-size:10px;color:#9aa0a6">'+(lead.service||'')+(lead.origin?' · '+lead.origin:'')+'</div></div>'
+        +'<div><div style="font-family:var(--font);font-size:13px;font-weight:700;color:#141414">'+lead.name+'</div>'
+        +'<div style="font-family:var(--font);font-size:10px;color:#a4a7ab">'+(lead.service||'')+(lead.origin?' · '+lead.origin:'')+'</div></div>'
         +'</div>'
         +(tagsHtml?'<div style="display:flex;gap:3px;flex-wrap:wrap">'+tagsHtml+'</div>':'');
       panel.appendChild(hdr);
 
       // Grid 2×2
       var grid = document.createElement('div');
-      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #f1f3f4;flex-shrink:0';
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #f3f2ed;flex-shrink:0';
       [['SERVIÇO',lead.service||'—'],['ORIGEM',lead.origin||'—'],['ENTRADA',lead.entry||'—'],['VALOR',lead.val||'—']].forEach(function(item) {
         var cell = document.createElement('div');
-        cell.style.cssText = 'padding:10px 16px;border-right:1px solid #f1f3f4;border-bottom:1px solid #f1f3f4';
-        cell.innerHTML = '<div style="font-family:var(--font);font-size:9px;font-weight:700;color:#9aa0a6;letter-spacing:.06em;margin-bottom:3px">'+item[0]+'</div>'
-          +'<div style="font-family:var(--font);font-size:12px;font-weight:600;color:#1a1a1a">'+item[1]+'</div>';
+        cell.style.cssText = 'padding:10px 16px;border-right:1px solid #f3f2ed;border-bottom:1px solid #f3f2ed';
+        cell.innerHTML = '<div style="font-family:var(--font);font-size:9px;font-weight:700;color:#a4a7ab;letter-spacing:.06em;margin-bottom:3px">'+item[0]+'</div>'
+          +'<div style="font-family:var(--font);font-size:12px;font-weight:600;color:#141414">'+item[1]+'</div>';
         grid.appendChild(cell);
       });
       panel.appendChild(grid);
@@ -967,23 +967,23 @@ function renderRelatorios(el,segmento){
         var isFup  = m.type === 'fup';
         var bubble = document.createElement('div');
         bubble.style.cssText = 'display:flex;flex-direction:column;align-items:'+(isUser?'flex-end':'flex-start');
-        var bg = isAuto ? 'rgba(52,168,83,.08)' : isFup ? 'rgba(251,188,4,.1)' : isUser ? 'rgba(66,133,244,.15)' : '#f1f3f4';
-        var tc = isAuto ? '#1e7e34' : isFup ? '#92650a' : '#1a1a1a';
+        var bg = isAuto ? 'rgba(48,164,108,.08)' : isFup ? 'rgba(237,163,59,.1)' : isUser ? 'rgba(61,99,219,.15)' : '#f3f2ed';
+        var tc = isAuto ? '#2a8459' : isFup ? '#805c28' : '#141414';
         var fs = isAuto ? 'italic' : 'normal';
-        var badgeHtml = isAuto ? '<span style="font-size:8px;font-weight:700;background:rgba(52,168,83,.15);color:#1e7e34;padding:1px 5px;border-radius:3px;margin-left:5px">automática</span>'
-                      : isFup  ? '<span style="font-size:8px;font-weight:700;background:rgba(251,188,4,.2);color:#92650a;padding:1px 5px;border-radius:3px;margin-left:5px">FUP</span>' : '';
+        var badgeHtml = isAuto ? '<span style="font-size:8px;font-weight:700;background:rgba(48,164,108,.15);color:#2a8459;padding:1px 5px;border-radius:3px;margin-left:5px">automática</span>'
+                      : isFup  ? '<span style="font-size:8px;font-weight:700;background:rgba(237,163,59,.2);color:#805c28;padding:1px 5px;border-radius:3px;margin-left:5px">FUP</span>' : '';
         bubble.innerHTML = '<div style="background:'+bg+';color:'+tc+';font-family:var(--font);font-size:11px;line-height:1.55;font-style:'+fs+';padding:8px 11px;border-radius:12px;'+(isUser?'border-bottom-right-radius:3px':'border-bottom-left-radius:3px')+';max-width:90%">'
           +m.text+badgeHtml+'</div>'
-          +'<div style="font-family:var(--font);font-size:9px;color:#9aa0a6;margin-top:2px">'+m.time+'</div>';
+          +'<div style="font-family:var(--font);font-size:9px;color:#a4a7ab;margin-top:2px">'+m.time+'</div>';
         chatWrap.appendChild(bubble);
       });
 
       // IA suggestion
       if (lead.iaSuggestion) {
         var sugg = document.createElement('div');
-        sugg.style.cssText = 'background:rgba(66,133,244,.08);border:1px solid rgba(66,133,244,.2);border-radius:8px;padding:8px 10px;cursor:pointer;flex-shrink:0;margin-top:4px';
+        sugg.style.cssText = 'background:rgba(61,99,219,.08);border:1px solid rgba(61,99,219,.2);border-radius:8px;padding:8px 10px;cursor:pointer;flex-shrink:0;margin-top:4px';
         sugg.innerHTML = '<div style="display:flex;align-items:flex-start;gap:6px"><span style="color:var(--blue);font-size:13px;flex-shrink:0">✦</span>'
-          +'<span style="font-family:var(--font);font-size:10px;color:#1a5ccf;line-height:1.5">IA sugere: "'+lead.iaSuggestion+'"</span></div>';
+          +'<span style="font-family:var(--font);font-size:10px;color:#3452af;line-height:1.5">IA sugere: "'+lead.iaSuggestion+'"</span></div>';
         sugg.addEventListener('click', function() {
           inputEl.value = lead.iaSuggestion;
           inputEl.focus();
@@ -994,9 +994,9 @@ function renderRelatorios(el,segmento){
 
       // Action buttons
       var actions = document.createElement('div');
-      actions.style.cssText = 'display:flex;gap:6px;padding:8px 16px;border-top:1px solid #f1f3f4;flex-shrink:0';
+      actions.style.cssText = 'display:flex;gap:6px;padding:8px 16px;border-top:1px solid #f3f2ed;flex-shrink:0';
       var tplBtn = document.createElement('button');
-      tplBtn.style.cssText = 'flex:1;font-family:var(--font);font-size:10px;font-weight:600;padding:5px 8px;border-radius:7px;background:#f1f3f4;border:1px solid #e3e6ea;color:#5f6368;cursor:pointer';
+      tplBtn.style.cssText = 'flex:1;font-family:var(--font);font-size:10px;font-weight:600;padding:5px 8px;border-radius:7px;background:#f3f2ed;border:1px solid #ecebe6;color:#6b6f76;cursor:pointer';
       tplBtn.textContent = 'Ver templates';
       var moveBtn = document.createElement('button');
       moveBtn.style.cssText = 'flex:1;font-family:var(--font);font-size:10px;font-weight:600;padding:5px 8px;border-radius:7px;background:var(--blue);border:1px solid var(--blue);color:#fff;cursor:pointer';
@@ -1008,7 +1008,7 @@ function renderRelatorios(el,segmento){
       var inputBar = document.createElement('div');
       inputBar.style.cssText = 'display:flex;gap:6px;padding:8px 16px 12px;flex-shrink:0';
       var inputEl = document.createElement('input');
-      inputEl.style.cssText = 'flex:1;font-family:var(--font);font-size:11px;padding:7px 11px;border-radius:8px;border:1.5px solid #e3e6ea;outline:none;background:#f8f9fa;color:#1a1a1a';
+      inputEl.style.cssText = 'flex:1;font-family:var(--font);font-size:11px;padding:7px 11px;border-radius:8px;border:1.5px solid #ecebe6;outline:none;background:#fafaf7;color:#141414';
       inputEl.placeholder = 'Responder via WhatsApp...';
       var sendBtn = document.createElement('button');
       sendBtn.style.cssText = 'width:30px;height:30px;border-radius:50%;background:var(--blue);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0';
@@ -1027,28 +1027,28 @@ function renderRelatorios(el,segmento){
     // ── RÉGUAS DE FUP ────────────────────────────────────────────
     function renderFUP(wrap) {
       wrap.style.cssText = 'flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin';
-      var stepTypeColors = {auto:{bg:'rgba(52,168,83,.12)',color:'#1e7e34',label:'automático'},fup:{bg:'rgba(251,188,4,.15)',color:'#92650a',label:'FUP'},alert:{bg:'rgba(234,67,53,.12)',color:'#b71c1c',label:'alerta'}};
+      var stepTypeColors = {auto:{bg:'rgba(48,164,108,.12)',color:'#2a8459',label:'automático'},fup:{bg:'rgba(237,163,59,.15)',color:'#805c28',label:'FUP'},alert:{bg:'rgba(224,84,60,.12)',color:'#b71c1c',label:'alerta'}};
       C.fupFlows.forEach(function(flow) {
         var card = document.createElement('div');
-        card.style.cssText = 'background:#fff;border:1px solid #e3e6ea;border-radius:12px;overflow:hidden';
+        card.style.cssText = 'background:#fff;border:1px solid #ecebe6;border-radius:12px;overflow:hidden';
         var fhdr = document.createElement('div');
-        fhdr.style.cssText = 'display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f1f3f4;background:#fafbfc';
-        fhdr.innerHTML = '<span style="font-family:var(--font);font-size:13px;font-weight:700;color:#1a1a1a">'+flow.name+'</span>'
-          +'<span style="font-family:var(--font);font-size:9px;font-weight:700;background:rgba(52,168,83,.15);color:#1e7e34;padding:2px 7px;border-radius:100px">ativo</span>'
-          +'<label style="margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer"><span style="font-family:var(--font);font-size:10px;color:#5f6368">Ativo</span>'
+        fhdr.style.cssText = 'display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #f3f2ed;background:#fafbfc';
+        fhdr.innerHTML = '<span style="font-family:var(--font);font-size:13px;font-weight:700;color:#141414">'+flow.name+'</span>'
+          +'<span style="font-family:var(--font);font-size:9px;font-weight:700;background:rgba(48,164,108,.15);color:#2a8459;padding:2px 7px;border-radius:100px">ativo</span>'
+          +'<label style="margin-left:auto;display:flex;align-items:center;gap:6px;cursor:pointer"><span style="font-family:var(--font);font-size:10px;color:#6b6f76">Ativo</span>'
           +'<div style="width:32px;height:18px;background:var(--green);border-radius:100px;position:relative"><div style="width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px"></div></div></label>';
         card.appendChild(fhdr);
         flow.steps.forEach(function(step, si) {
           var tc = stepTypeColors[step.type] || stepTypeColors.auto;
           var stepEl = document.createElement('div');
-          stepEl.style.cssText = 'display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid #f8f9fa';
+          stepEl.style.cssText = 'display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-bottom:1px solid #fafaf7';
           stepEl.innerHTML = '<div style="width:22px;height:22px;border-radius:50%;background:'+tc.bg+';color:'+tc.color+';display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px">'+(si+1)+'</div>'
             +'<div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">'
-            +'<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a">'+step.title+'</span>'
+            +'<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414">'+step.title+'</span>'
             +'<span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px;background:'+tc.bg+';color:'+tc.color+'">'+tc.label+'</span>'
-            +'<span style="font-family:var(--font);font-size:9px;color:#9aa0a6;margin-left:auto">'+step.delay+'</span>'
+            +'<span style="font-family:var(--font);font-size:9px;color:#a4a7ab;margin-left:auto">'+step.delay+'</span>'
             +'</div>'
-            +'<div style="background:#f4f6f9;border-radius:7px;padding:7px 10px;font-family:var(--font);font-size:10px;color:#5f6368;line-height:1.5">'+step.preview+'</div>'
+            +'<div style="background:#f3f2ed;border-radius:7px;padding:7px 10px;font-family:var(--font);font-size:10px;color:#6b6f76;line-height:1.5">'+step.preview+'</div>'
             +'</div>'
             +'<div style="width:28px;height:16px;background:var(--green);border-radius:100px;position:relative;flex-shrink:0;margin-top:3px"><div style="width:12px;height:12px;background:#fff;border-radius:50%;position:absolute;top:2px;right:2px"></div></div>';
           card.appendChild(stepEl);
@@ -1056,7 +1056,7 @@ function renderRelatorios(el,segmento){
         wrap.appendChild(card);
       });
       var addBtn = document.createElement('button');
-      addBtn.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:600;padding:10px;border-radius:10px;border:1.5px dashed #d0d5dd;background:transparent;color:#9aa0a6;cursor:pointer;width:100%';
+      addBtn.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:600;padding:10px;border-radius:10px;border:1.5px dashed #ecebe6;background:transparent;color:#a4a7ab;cursor:pointer;width:100%';
       addBtn.textContent = '+ Novo fluxo';
       wrap.appendChild(addBtn);
     }
@@ -1066,25 +1066,25 @@ function renderRelatorios(el,segmento){
       wrap.style.cssText = 'flex:1;overflow-y:auto;padding:16px 18px;scrollbar-width:thin';
       C.templates.forEach(function(section) {
         var secTitle = document.createElement('div');
-        secTitle.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:700;color:#9aa0a6;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;margin-top:'+(section===C.templates[0]?'0':'18px');
+        secTitle.style.cssText = 'font-family:var(--font);font-size:11px;font-weight:700;color:#a4a7ab;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;margin-top:'+(section===C.templates[0]?'0':'18px');
         secTitle.textContent = section.title;
         wrap.appendChild(secTitle);
         var grid = document.createElement('div');
         grid.style.cssText = 'display:grid;grid-template-columns:repeat(2,1fr);gap:8px';
         section.items.forEach(function(tpl) {
           var card = document.createElement('div');
-          card.style.cssText = 'background:#fff;border:1px solid #e3e6ea;border-radius:10px;padding:12px 13px';
-          var varsHtml = (tpl.vars||[]).map(function(v){ return '<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(66,133,244,.1);color:var(--blue);border:1px solid rgba(66,133,244,.2)">'+v+'</span>'; }).join(' ');
-          var badgeBg = tpl.type==='Meta'?'rgba(0,102,255,.1)':'rgba(52,168,83,.1)';
-          var badgeC  = tpl.type==='Meta'?'#0055cc':'#1e7e34';
+          card.style.cssText = 'background:#fff;border:1px solid #ecebe6;border-radius:10px;padding:12px 13px';
+          var varsHtml = (tpl.vars||[]).map(function(v){ return '<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:rgba(61,99,219,.1);color:var(--blue);border:1px solid rgba(61,99,219,.2)">'+v+'</span>'; }).join(' ');
+          var badgeBg = tpl.type==='Meta'?'rgba(0,102,255,.1)':'rgba(48,164,108,.1)';
+          var badgeC  = tpl.type==='Meta'?'#0055cc':'#2a8459';
           card.innerHTML = '<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
-            +'<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(66,133,244,.08);color:var(--blue)">'+tpl.stage+'</span>'
+            +'<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:rgba(61,99,219,.08);color:var(--blue)">'+tpl.stage+'</span>'
             +'<span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;background:'+badgeBg+';color:'+badgeC+';margin-left:auto">'+tpl.type+'</span>'
             +'</div>'
-            +'<div style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:4px">'+tpl.title+'</div>'
-            +'<div style="font-family:var(--font);font-size:10px;color:#5f6368;line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+tpl.preview+'</div>'
+            +'<div style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414;margin-bottom:4px">'+tpl.title+'</div>'
+            +'<div style="font-family:var(--font);font-size:10px;color:#6b6f76;line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+tpl.preview+'</div>'
             +(varsHtml?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">'+varsHtml+'</div>':'')
-            +'<button style="font-family:var(--font);font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid #e3e6ea;background:#f8f9fa;color:#5f6368;cursor:pointer;width:100%">'+(tpl.type==='Meta'?'Editar':'Usar no chat')+'</button>';
+            +'<button style="font-family:var(--font);font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid #ecebe6;background:#fafaf7;color:#6b6f76;cursor:pointer;width:100%">'+(tpl.type==='Meta'?'Editar':'Usar no chat')+'</button>';
           grid.appendChild(card);
         });
         wrap.appendChild(grid);
@@ -1099,24 +1099,24 @@ function renderRelatorios(el,segmento){
       toolbar.style.cssText = 'display:flex;gap:8px;flex-shrink:0';
       var searchInput = document.createElement('input');
       searchInput.id = 'crm-search-'+Date.now();
-      searchInput.style.cssText = 'flex:1;font-family:var(--font);font-size:11px;padding:6px 11px;border-radius:8px;border:1.5px solid #e3e6ea;background:#fff;color:#1a1a1a;outline:none';
+      searchInput.style.cssText = 'flex:1;font-family:var(--font);font-size:11px;padding:6px 11px;border-radius:8px;border:1.5px solid #ecebe6;background:#fff;color:#141414;outline:none';
       searchInput.placeholder = 'Buscar contato...';
       toolbar.appendChild(searchInput);
       ['Tag','Fluxo','Estágio'].forEach(function(f) {
         var sel = document.createElement('select');
-        sel.style.cssText = 'font-family:var(--font);font-size:10px;padding:5px 8px;border-radius:7px;border:1px solid #e3e6ea;background:#fff;color:#5f6368;cursor:pointer';
+        sel.style.cssText = 'font-family:var(--font);font-size:10px;padding:5px 8px;border-radius:7px;border:1px solid #ecebe6;background:#fff;color:#6b6f76;cursor:pointer';
         sel.innerHTML = '<option>'+f+'</option>';
         toolbar.appendChild(sel);
       });
       var expBtn = document.createElement('button');
-      expBtn.style.cssText = 'font-family:var(--font);font-size:10px;font-weight:600;padding:5px 11px;border-radius:7px;border:1px solid #e3e6ea;background:#fff;color:#5f6368;cursor:pointer;white-space:nowrap;flex-shrink:0';
+      expBtn.style.cssText = 'font-family:var(--font);font-size:10px;font-weight:600;padding:5px 11px;border-radius:7px;border:1px solid #ecebe6;background:#fff;color:#6b6f76;cursor:pointer;white-space:nowrap;flex-shrink:0';
       expBtn.textContent = 'Exportar CSV';
       toolbar.appendChild(expBtn);
       wrap.appendChild(toolbar);
 
       // Table
       var tableWrap = document.createElement('div');
-      tableWrap.style.cssText = 'flex:1;overflow:auto;background:#fff;border-radius:10px;border:1px solid #e3e6ea;scrollbar-width:thin';
+      tableWrap.style.cssText = 'flex:1;overflow:auto;background:#fff;border-radius:10px;border:1px solid #ecebe6;scrollbar-width:thin';
       var allContacts = [];
       C.flows.forEach(function(f) { allContacts = allContacts.concat(f.leads); });
       // deduplicate by id
@@ -1126,20 +1126,20 @@ function renderRelatorios(el,segmento){
         var rows = filter ? allContacts.filter(function(c){ var q=filter.toLowerCase(); return c.name.toLowerCase().includes(q)||c.email.toLowerCase().includes(q); }) : allContacts;
         var cols = ['Nome','Telefone','Email','Serviço','Tags','Estágio','Origem','Último contato','Ações'];
         var t = '<table style="width:100%;border-collapse:collapse"><thead><tr>';
-        cols.forEach(function(c){ t+='<th style="font-family:var(--font);font-size:9px;font-weight:700;color:#9aa0a6;letter-spacing:.05em;text-transform:uppercase;padding:10px 12px;text-align:left;background:#fafbfc;border-bottom:1px solid #e3e6ea;white-space:nowrap">'+c+'</th>'; });
+        cols.forEach(function(c){ t+='<th style="font-family:var(--font);font-size:9px;font-weight:700;color:#a4a7ab;letter-spacing:.05em;text-transform:uppercase;padding:10px 12px;text-align:left;background:#fafbfc;border-bottom:1px solid #ecebe6;white-space:nowrap">'+c+'</th>'; });
         t+='</tr></thead><tbody>';
         rows.forEach(function(r,i){
           var tagsHtml=(r.tags||[]).map(tagChip).join(' ');
-          t+='<tr style="border-bottom:1px solid #f4f6f9;transition:background .1s" onmouseover="this.style.background=\'#f8f9fa\'" onmouseout="this.style.background=\'#fff\'">'
-            +'<td style="padding:9px 12px;font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a;white-space:nowrap">'+r.name+'</td>'
-            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#5f6368;white-space:nowrap">'+(r.phone||'—')+'</td>'
-            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#5f6368">'+r.email+'</td>'
-            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#1a1a1a;white-space:nowrap">'+(r.service||'—')+'</td>'
+          t+='<tr style="border-bottom:1px solid #f3f2ed;transition:background .1s" onmouseover="this.style.background=\'#fafaf7\'" onmouseout="this.style.background=\'#fff\'">'
+            +'<td style="padding:9px 12px;font-family:var(--font);font-size:11px;font-weight:700;color:#141414;white-space:nowrap">'+r.name+'</td>'
+            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#6b6f76;white-space:nowrap">'+(r.phone||'—')+'</td>'
+            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#6b6f76">'+r.email+'</td>'
+            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#141414;white-space:nowrap">'+(r.service||'—')+'</td>'
             +'<td style="padding:9px 12px"><div style="display:flex;gap:3px;flex-wrap:wrap">'+tagsHtml+'</div></td>'
-            +'<td style="padding:9px 12px"><span style="font-family:var(--font);font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;background:#e8f0fe;color:var(--blue)">'+(r.stage||'—')+'</span></td>'
-            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#5f6368">'+(r.origin||'—')+'</td>'
-            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#9aa0a6;white-space:nowrap">'+r.time+'</td>'
-            +'<td style="padding:9px 12px"><button style="font-family:var(--font);font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #e3e6ea;background:#fff;color:#5f6368;cursor:pointer">Abrir</button></td>'
+            +'<td style="padding:9px 12px"><span style="font-family:var(--font);font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;background:#e9eefb;color:var(--blue)">'+(r.stage||'—')+'</span></td>'
+            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#6b6f76">'+(r.origin||'—')+'</td>'
+            +'<td style="padding:9px 12px;font-family:var(--font);font-size:10px;color:#a4a7ab;white-space:nowrap">'+r.time+'</td>'
+            +'<td style="padding:9px 12px"><button style="font-family:var(--font);font-size:10px;font-weight:600;padding:3px 9px;border-radius:6px;border:1px solid #ecebe6;background:#fff;color:#6b6f76;cursor:pointer">Abrir</button></td>'
             +'</tr>';
         });
         t+='</tbody></table>';
@@ -1339,14 +1339,14 @@ var RENDERERS = {
   // generic
   dashboard:   renderDashboardGeneric,
   site:        function(el){ el.innerHTML=stitle('Meu Site','Performance')+
-    '<div class="hd-grid4">'+hkpi('Visitantes','247','↑ vs ontem','#4285F4')+hkpi('Tempo médio','2m34s','bom','#34A853')+hkpi('Rejeição','38%','↓ melhorou','#FBBC04')+hkpi('Conversões','14','↑ +6 hoje','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Tráfego por origem</div>'+hrow('Orgânico','58%',58,'#34A853')+hrow('Direto','25%',25,'#4285F4')+hrow('Social','12%',12,'#0866FF')+hrow('E-mail','5%',5,'#FBBC04'),''); animateMain(el); },
+    '<div class="hd-grid4">'+hkpi('Visitantes','247','↑ vs ontem','#3D63DB')+hkpi('Tempo médio','2m34s','bom','#30A46C')+hkpi('Rejeição','38%','↓ melhorou','#EDA33B')+hkpi('Conversões','14','↑ +6 hoje','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Tráfego por origem</div>'+hrow('Orgânico','58%',58,'#30A46C')+hrow('Direto','25%',25,'#3D63DB')+hrow('Social','12%',12,'#0866FF')+hrow('E-mail','5%',5,'#EDA33B'),''); animateMain(el); },
   metaads:     function(el){ el.innerHTML=stitle('Meta Ads','Campanhas')+
-    '<div class="hd-grid4">'+hkpi('Investido','R$1.840','este mês','#0866FF')+hkpi('Alcance','48.200','pessoas','#34A853')+hkpi('CPL','R$4,20','↓ -22%','#FBBC04')+hkpi('ROAS','3,8×','↑ meta:3×','#EA4335')+'</div>'+
+    '<div class="hd-grid4">'+hkpi('Investido','R$1.840','este mês','#0866FF')+hkpi('Alcance','48.200','pessoas','#30A46C')+hkpi('CPL','R$4,20','↓ -22%','#EDA33B')+hkpi('ROAS','3,8×','↑ meta:3×','#E0543C')+'</div>'+
     hcard('<div class="hd-card-title">Alcance diário — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([5200,7800,6400,9100,8200,10400,7000],['#0866FF'])+'</div>',''); animateMain(el); },
   posts:       function(el){ el.innerHTML=stitle('Posts IA','Esta semana')+
-    '<div class="hd-grid4">'+hkpi('Gerados','12','✓ meta','#34A853')+hkpi('Agendados','8','próx. 7d','#4285F4')+hkpi('Publicados','4','hoje','#FBBC04')+hkpi('Melhor','42k','views','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Calendário desta semana</div>'+hrow('Instagram Reels','Publicado',100,'#34A853')+hrow('Carrossel dicas','Agendado Ter',80,'#FBBC04')+hrow('TikTok tendência','Agendado Qua',60,'#4285F4'),''); animateMain(el); },
+    '<div class="hd-grid4">'+hkpi('Gerados','12','✓ meta','#30A46C')+hkpi('Agendados','8','próx. 7d','#3D63DB')+hkpi('Publicados','4','hoje','#EDA33B')+hkpi('Melhor','42k','views','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Calendário desta semana</div>'+hrow('Instagram Reels','Publicado',100,'#30A46C')+hrow('Carrossel dicas','Agendado Ter',80,'#EDA33B')+hrow('TikTok tendência','Agendado Qua',60,'#3D63DB'),''); animateMain(el); },
   atendimento: renderAtendimento,
   financeiro:  function(el){ renderFinanceiro(el); },
   // vendas profile
@@ -1362,8 +1362,8 @@ var RENDERERS = {
   'conteudo-calendario':renderContentCalendario,
   'conteudo-analytics': renderContentAnalytics,
   'conteudo-site':      function(el){ el.innerHTML=stitle('Meu Site','Blog e links')+
-    '<div class="hd-grid4">'+hkpi('Pageviews','8.400','↑ +28%','#34A853')+hkpi('Link bio','2.100','cliques','#4285F4')+hkpi('Tempo médio','1m48s','#FBBC04')+hkpi('Bounce','62%','↓ -8pp','#EA4335')+'</div>'+
-    hcard('<div class="hd-card-title">Posts mais visitados</div>'+hrow('Como crescer no IG','3.200',100,'#34A853')+hrow('Rotina de criador','2.100',66,'#4285F4')+hrow('Ferramentas de IA','1.800',56,'#FBBC04'),''); animateMain(el); },
+    '<div class="hd-grid4">'+hkpi('Pageviews','8.400','↑ +28%','#30A46C')+hkpi('Link bio','2.100','cliques','#3D63DB')+hkpi('Tempo médio','1m48s','#EDA33B')+hkpi('Bounce','62%','↓ -8pp','#E0543C')+'</div>'+
+    hcard('<div class="hd-card-title">Posts mais visitados</div>'+hrow('Como crescer no IG','3.200',100,'#30A46C')+hrow('Rotina de criador','2.100',66,'#3D63DB')+hrow('Ferramentas de IA','1.800',56,'#EDA33B'),''); animateMain(el); },
   'conteudo-relatorios':function(el){ renderRelatorios(el,'Carol Cria'); },
   // servicos profile
   'servicos-dashboard': renderServDashboard,
@@ -1389,31 +1389,31 @@ var RENDERERS = {
   // hotelaria profile — inline since helpers are in scope
   'hotelaria-dashboard':  function(el){
     el.innerHTML=stitle('Pousadas Hub','Março 2026')+
-      '<div class="hd-grid4">'+hkpi('Ocupação','78%','↑ +12%','#34A853')+hkpi('Receita/dia','R$4.820','↑ +18%','#4285F4')+hkpi('Diária média','R$310','↑ +8%','#FBBC04')+hkpi('Avaliação','4.9★','92 avaliações','#EA4335')+'</div>'+
-      '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Ocupação — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([72,85,91,68,88,94,78],['#34A853'])+'</div>')+
-      hcard('<div class="hd-card-title">Origem das reservas</div>'+hrow('Booking.com','42%',42,'#003B95')+hrow('Airbnb','28%',28,'#FF5A5F')+hrow('Direto','22%',22,'#34A853')+hrow('WhatsApp','8%',8,'#25D366'))+'</div>';
+      '<div class="hd-grid4">'+hkpi('Ocupação','78%','↑ +12%','#30A46C')+hkpi('Receita/dia','R$4.820','↑ +18%','#3D63DB')+hkpi('Diária média','R$310','↑ +8%','#EDA33B')+hkpi('Avaliação','4.9★','92 avaliações','#E0543C')+'</div>'+
+      '<div class="hd-grid2">'+hcard('<div class="hd-card-title">Ocupação — 7 dias</div><div class="hd-bars" style="height:72px">'+hbars([72,85,91,68,88,94,78],['#30A46C'])+'</div>')+
+      hcard('<div class="hd-card-title">Origem das reservas</div>'+hrow('Booking.com','42%',42,'#003B95')+hrow('Airbnb','28%',28,'#FF5A5F')+hrow('Direto','22%',22,'#30A46C')+hrow('WhatsApp','8%',8,'#25D366'))+'</div>';
     animateMain(el);
   },
   'hotelaria-quartos': function(el){
     el.innerHTML=stitle('Mapa de Quartos','Hoje')+
-      '<div class="hd-grid4">'+hkpi('Total quartos','24','','#FBBC04')+hkpi('Ocupados','18','75%','#34A853')+hkpi('Disponíveis','4','livres','#4285F4')+hkpi('Limpeza','2','em andamento','#EA4335')+'</div>'+
+      '<div class="hd-grid4">'+hkpi('Total quartos','24','','#EDA33B')+hkpi('Ocupados','18','75%','#30A46C')+hkpi('Disponíveis','4','livres','#3D63DB')+hkpi('Limpeza','2','em andamento','#E0543C')+'</div>'+
       hcard('<div class="hd-card-title">Status por quarto</div>'+
         '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:8px">'+
-        [['101','#34A853'],['102','#34A853'],['103','#4285F4'],['104','#34A853'],['105','#34A853'],['106','#FBBC04'],
-         ['201','#34A853'],['202','#4285F4'],['203','#34A853'],['204','#34A853'],['205','#FBBC04'],['206','#34A853'],
-         ['301','#34A853'],['302','#34A853'],['303','#4285F4'],['304','#34A853'],['305','#34A853'],['306','#4285F4']].map(function(r){
-          var labels={'#34A853':'ocup','#4285F4':'disp','#FBBC04':'limp'};
+        [['101','#30A46C'],['102','#30A46C'],['103','#3D63DB'],['104','#30A46C'],['105','#30A46C'],['106','#EDA33B'],
+         ['201','#30A46C'],['202','#3D63DB'],['203','#30A46C'],['204','#30A46C'],['205','#EDA33B'],['206','#30A46C'],
+         ['301','#30A46C'],['302','#30A46C'],['303','#3D63DB'],['304','#30A46C'],['305','#30A46C'],['306','#3D63DB']].map(function(r){
+          var labels={'#30A46C':'ocup','#3D63DB':'disp','#EDA33B':'limp'};
           return '<div style="background:'+r[1]+'22;border:1px solid '+r[1]+'44;border-radius:6px;padding:6px 4px;text-align:center"><div style="font-family:var(--font);font-size:10px;font-weight:700;color:'+r[1]+'">'+r[0]+'</div><div style="font-family:var(--font);font-size:8px;color:rgba(255,255,255,.3)">'+labels[r[1]]+'</div></div>';
         }).join('')+'</div>','');
     animateMain(el);
   },
   'hotelaria-reservas': function(el){
     el.innerHTML=stitle('Reservas','Próximos 7 dias')+
-      '<div class="hd-grid4">'+hkpi('Check-ins hoje','5','↑','#34A853')+hkpi('Check-outs','3','hoje','#FBBC04')+hkpi('Pendentes','2','confirmar','#EA4335')+hkpi('Cancel.','4%','↓ baixo','#4285F4')+'</div>'+
+      '<div class="hd-grid4">'+hkpi('Check-ins hoje','5','↑','#30A46C')+hkpi('Check-outs','3','hoje','#EDA33B')+hkpi('Pendentes','2','confirmar','#E0543C')+hkpi('Cancel.','4%','↓ baixo','#3D63DB')+'</div>'+
       hcard('<div class="hd-card-title">Próximas reservas</div>'+
-        '<div class="hd-trans"><span class="hd-trans-name">Família Santos — Apto 203</span><span class="hd-trans-date">Hoje 14h</span><span class="hd-trans-val" style="color:#34A853">Check-in</span></div>'+
-        '<div class="hd-trans"><span class="hd-trans-name">Rodrigo P. — Suite 301</span><span class="hd-trans-date">Hoje 15h</span><span class="hd-trans-val" style="color:#34A853">Check-in</span></div>'+
-        '<div class="hd-trans"><span class="hd-trans-name">Grupo Viagem — 3 qts</span><span class="hd-trans-date">Dom 16h</span><span class="hd-trans-val" style="color:#4285F4">+ R$2.480</span></div>','');
+        '<div class="hd-trans"><span class="hd-trans-name">Família Santos — Apto 203</span><span class="hd-trans-date">Hoje 14h</span><span class="hd-trans-val" style="color:#30A46C">Check-in</span></div>'+
+        '<div class="hd-trans"><span class="hd-trans-name">Rodrigo P. — Suite 301</span><span class="hd-trans-date">Hoje 15h</span><span class="hd-trans-val" style="color:#30A46C">Check-in</span></div>'+
+        '<div class="hd-trans"><span class="hd-trans-name">Grupo Viagem — 3 qts</span><span class="hd-trans-date">Dom 16h</span><span class="hd-trans-val" style="color:#3D63DB">+ R$2.480</span></div>','');
     animateMain(el);
   },
   'hotelaria-atendimento': renderAtendimento,
@@ -1431,7 +1431,7 @@ var RENDERERS = {
     var channelStats = [
       {ch:'Airbnb',       rev:'R$12.400', res:18, pct:38, color:'#FF5A5F'},
       {ch:'Booking',      rev:'R$9.800',  res:14, pct:29, color:'#003B95'},
-      {ch:'Site próprio', rev:'R$8.200',  res:12, pct:25, color:'#34A853'},
+      {ch:'Site próprio', rev:'R$8.200',  res:12, pct:25, color:'#30A46C'},
       {ch:'WhatsApp',     rev:'R$3.600',  res:6,  pct:8,  color:'#25D366'},
     ];
     var calDays = [
@@ -1442,24 +1442,24 @@ var RENDERERS = {
       {d:21,s:'free'},{d:22,s:'free'},{d:23,s:'ocp'},{d:24,s:'ocp'},{d:25,s:'ocp'},
       {d:26,s:'free'},{d:27,s:'ocp'},{d:28,s:'ocp'},{d:29,s:'free'},{d:30,s:'free'},
     ];
-    var STATUS = {ocp:{bg:'#4285F4',tc:'#fff'},free:{bg:'#e8f0fe',tc:'var(--blue)'},blk:{bg:'#f1f3f4',tc:'#9aa0a6'}};
+    var STATUS = {ocp:{bg:'#3D63DB',tc:'#fff'},free:{bg:'#e9eefb',tc:'var(--blue)'},blk:{bg:'#f3f2ed',tc:'#a4a7ab'}};
     var chMeta = {
       airbnb:  {color:'#FF5A5F', name:'Airbnb'},
       booking: {color:'#003B95', name:'Booking.com'},
-      site:    {color:'#34A853', name:'Site próprio'},
+      site:    {color:'#30A46C', name:'Site próprio'},
     };
 
     function build(){
       el.innerHTML='';
-      el.style.cssText='background:#f4f6f9;padding:16px 18px;overflow-y:auto;height:100%;box-sizing:border-box;scrollbar-width:thin';
+      el.style.cssText='background:#f3f2ed;padding:16px 18px;overflow-y:auto;height:100%;box-sizing:border-box;scrollbar-width:thin';
 
       // Header
       el.innerHTML+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-        +'<div><div style="font-family:var(--font);font-size:14px;font-weight:700;color:#1a1a1a">OmniChannel</div>'
-        +'<div style="font-family:var(--font);font-size:11px;color:#9aa0a6">Gestão centralizada de canais de distribuição</div></div>'
+        +'<div><div style="font-family:var(--font);font-size:14px;font-weight:700;color:#141414">OmniChannel</div>'
+        +'<div style="font-family:var(--font);font-size:11px;color:#a4a7ab">Gestão centralizada de canais de distribuição</div></div>'
         +'<div style="display:flex;align-items:center;gap:6px">'
-        +'<div style="width:7px;height:7px;border-radius:50%;background:#34A853;animation:blink 1.6s ease-in-out infinite"></div>'
-        +'<span style="font-family:var(--font);font-size:10px;font-weight:600;color:#34A853">Sincronizado</span></div></div>';
+        +'<div style="width:7px;height:7px;border-radius:50%;background:#30A46C;animation:blink 1.6s ease-in-out infinite"></div>'
+        +'<span style="font-family:var(--font);font-size:10px;font-weight:600;color:#30A46C">Sincronizado</span></div></div>';
 
       // Channel cards
       var grid=document.createElement('div');
@@ -1467,11 +1467,11 @@ var RENDERERS = {
       Object.keys(listings).forEach(function(key){
         var lst=listings[key], cm=chMeta[key];
         var card=document.createElement('div');
-        card.style.cssText='background:#fff;border:1.5px solid #e3e6ea;border-radius:12px;padding:13px 14px;position:relative';
+        card.style.cssText='background:#fff;border:1.5px solid #ecebe6;border-radius:12px;padding:13px 14px;position:relative';
         // Toggle
         var tog=document.createElement('label');
         tog.style.cssText='position:absolute;top:12px;right:12px;cursor:pointer';
-        var bg=lst.active?'var(--green)':'#d0d5dd';
+        var bg=lst.active?'var(--green)':'#ecebe6';
         var knobPos=lst.active?'right:2px':'left:2px';
         tog.innerHTML='<div style="width:34px;height:18px;background:'+bg+';border-radius:100px;position:relative">'
           +'<div style="width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:2px;'+knobPos+'"></div></div>';
@@ -1482,25 +1482,25 @@ var RENDERERS = {
         content.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
           +'<div style="width:28px;height:28px;border-radius:7px;background:'+cm.color+'20;display:flex;align-items:center;justify-content:center">'
           +'<div style="width:12px;height:12px;border-radius:50%;background:'+cm.color+'"></div></div>'
-          +'<div><div style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a">'+cm.name+'</div>'
-          +'<div style="font-family:var(--font);font-size:9px;color:#9aa0a6">'+lst.sync+'</div></div></div>'
+          +'<div><div style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414">'+cm.name+'</div>'
+          +'<div style="font-family:var(--font);font-size:9px;color:#a4a7ab">'+lst.sync+'</div></div></div>'
           +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">'
-          +'<div style="background:#f8f9fa;border-radius:7px;padding:7px 9px">'
-          +'<div style="font-family:var(--font);font-size:9px;color:#9aa0a6;margin-bottom:2px">DIÁRIA</div>'
-          +'<div style="font-family:var(--font);font-size:13px;font-weight:700;color:#1a1a1a">R$'+lst.price+'</div></div>'
-          +'<div style="background:#f8f9fa;border-radius:7px;padding:7px 9px">'
-          +'<div style="font-family:var(--font);font-size:9px;color:#9aa0a6;margin-bottom:2px">MIN. NOITES</div>'
-          +'<div style="font-family:var(--font);font-size:13px;font-weight:700;color:#1a1a1a">'+lst.minNights+'</div></div></div>'
+          +'<div style="background:#fafaf7;border-radius:7px;padding:7px 9px">'
+          +'<div style="font-family:var(--font);font-size:9px;color:#a4a7ab;margin-bottom:2px">DIÁRIA</div>'
+          +'<div style="font-family:var(--font);font-size:13px;font-weight:700;color:#141414">R$'+lst.price+'</div></div>'
+          +'<div style="background:#fafaf7;border-radius:7px;padding:7px 9px">'
+          +'<div style="font-family:var(--font);font-size:9px;color:#a4a7ab;margin-bottom:2px">MIN. NOITES</div>'
+          +'<div style="font-family:var(--font);font-size:13px;font-weight:700;color:#141414">'+lst.minNights+'</div></div></div>'
           +(lst.rating
-            ? '<div style="margin-top:8px;display:flex;align-items:center;gap:6px"><span style="font-family:var(--font);font-size:10px;font-weight:700;color:#FBBC04">★ '+lst.rating+'</span><span style="font-family:var(--font);font-size:10px;color:#9aa0a6">'+lst.reviews+' aval.</span></div>'
-            : '<div style="margin-top:8px"><span style="font-family:var(--font);font-size:10px;font-weight:600;background:#e8f0fe;color:var(--blue);padding:2px 8px;border-radius:100px">Reserva direta</span></div>');
+            ? '<div style="margin-top:8px;display:flex;align-items:center;gap:6px"><span style="font-family:var(--font);font-size:10px;font-weight:700;color:#EDA33B">★ '+lst.rating+'</span><span style="font-family:var(--font);font-size:10px;color:#a4a7ab">'+lst.reviews+' aval.</span></div>'
+            : '<div style="margin-top:8px"><span style="font-family:var(--font);font-size:10px;font-weight:600;background:#e9eefb;color:var(--blue);padding:2px 8px;border-radius:100px">Reserva direta</span></div>');
         card.appendChild(content);
         // Price editor
         var pe=document.createElement('div');
         pe.style.cssText='margin-top:10px;display:flex;gap:6px';
         var pi=document.createElement('input');
         pi.type='number'; pi.value=lst.price;
-        pi.style.cssText='flex:1;font-family:var(--font);font-size:11px;padding:5px 9px;border-radius:7px;border:1.5px solid #e3e6ea;background:#f8f9fa;color:#1a1a1a;outline:none';
+        pi.style.cssText='flex:1;font-family:var(--font);font-size:11px;padding:5px 9px;border-radius:7px;border:1.5px solid #ecebe6;background:#fafaf7;color:#141414;outline:none';
         var sb=document.createElement('button');
         sb.textContent='Salvar';
         sb.style.cssText='font-family:var(--font);font-size:10px;font-weight:600;padding:5px 10px;border-radius:7px;background:var(--blue);border:none;color:#fff;cursor:pointer';
@@ -1516,16 +1516,16 @@ var RENDERERS = {
 
       // Calendar
       var calCard=document.createElement('div');
-      calCard.style.cssText='background:#fff;border:1px solid #e3e6ea;border-radius:12px;padding:13px 14px';
+      calCard.style.cssText='background:#fff;border:1px solid #ecebe6;border-radius:12px;padding:13px 14px';
       var calHtml='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
-        +'<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a">Calendário — Abril</span>'
+        +'<span style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414">Calendário — Abril</span>'
         +'<div style="display:flex;gap:8px">'
-        +'<span style="font-family:var(--font);font-size:9px;color:#5f6368;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#4285F4;display:inline-block"></span>Reservado</span>'
-        +'<span style="font-family:var(--font);font-size:9px;color:#5f6368;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#e8f0fe;display:inline-block"></span>Livre</span>'
-        +'<span style="font-family:var(--font);font-size:9px;color:#5f6368;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#f1f3f4;display:inline-block"></span>Bloqueado</span>'
+        +'<span style="font-family:var(--font);font-size:9px;color:#6b6f76;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#3D63DB;display:inline-block"></span>Reservado</span>'
+        +'<span style="font-family:var(--font);font-size:9px;color:#6b6f76;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#e9eefb;display:inline-block"></span>Livre</span>'
+        +'<span style="font-family:var(--font);font-size:9px;color:#6b6f76;display:flex;align-items:center;gap:3px"><span style="width:8px;height:8px;border-radius:2px;background:#f3f2ed;display:inline-block"></span>Bloqueado</span>'
         +'</div></div>'
         +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">';
-      ['D','S','T','Q','Q','S','S'].forEach(function(d){calHtml+='<div style="font-family:var(--font);font-size:8px;color:#9aa0a6;text-align:center;padding-bottom:3px">'+d+'</div>';});
+      ['D','S','T','Q','Q','S','S'].forEach(function(d){calHtml+='<div style="font-family:var(--font);font-size:8px;color:#a4a7ab;text-align:center;padding-bottom:3px">'+d+'</div>';});
       calDays.forEach(function(day){
         var s=STATUS[day.s];
         calHtml+='<div style="background:'+s.bg+';border-radius:4px;padding:4px 0;text-align:center;font-family:var(--font);font-size:9px;font-weight:600;color:'+s.tc+'">'+day.d+'</div>';
@@ -1536,15 +1536,15 @@ var RENDERERS = {
 
       // Revenue split
       var revCard=document.createElement('div');
-      revCard.style.cssText='background:#fff;border:1px solid #e3e6ea;border-radius:12px;padding:13px 14px';
-      var revHtml='<div style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:10px">Receita por canal — Março</div>';
+      revCard.style.cssText='background:#fff;border:1px solid #ecebe6;border-radius:12px;padding:13px 14px';
+      var revHtml='<div style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414;margin-bottom:10px">Receita por canal — Março</div>';
       channelStats.forEach(function(c){
         revHtml+='<div style="margin-bottom:9px">'
           +'<div style="display:flex;justify-content:space-between;margin-bottom:3px">'
-          +'<span style="font-family:var(--font);font-size:10px;font-weight:600;color:#1a1a1a">'+c.ch+'</span>'
-          +'<div><span style="font-family:var(--font);font-size:10px;color:#9aa0a6">'+c.res+' reservas · </span>'
-          +'<span style="font-family:var(--font);font-size:10px;font-weight:700;color:#1a1a1a">'+c.rev+'</span></div></div>'
-          +'<div style="background:#f1f3f4;border-radius:3px;height:5px;overflow:hidden">'
+          +'<span style="font-family:var(--font);font-size:10px;font-weight:600;color:#141414">'+c.ch+'</span>'
+          +'<div><span style="font-family:var(--font);font-size:10px;color:#a4a7ab">'+c.res+' reservas · </span>'
+          +'<span style="font-family:var(--font);font-size:10px;font-weight:700;color:#141414">'+c.rev+'</span></div></div>'
+          +'<div style="background:#f3f2ed;border-radius:3px;height:5px;overflow:hidden">'
           +'<div style="background:'+c.color+';height:100%;width:'+c.pct+'%;border-radius:3px"></div></div></div>';
       });
       revCard.innerHTML=revHtml;
@@ -1553,12 +1553,12 @@ var RENDERERS = {
 
       // Alerts
       var alertsCard=document.createElement('div');
-      alertsCard.style.cssText='background:#fff;border:1px solid #e3e6ea;border-radius:12px;padding:13px 14px';
-      alertsCard.innerHTML='<div style="font-family:var(--font);font-size:11px;font-weight:700;color:#1a1a1a;margin-bottom:10px">Alertas de sincronização</div>'
+      alertsCard.style.cssText='background:#fff;border:1px solid #ecebe6;border-radius:12px;padding:13px 14px';
+      alertsCard.innerHTML='<div style="font-family:var(--font);font-size:11px;font-weight:700;color:#141414;margin-bottom:10px">Alertas de sincronização</div>'
         +'<div style="display:flex;flex-direction:column;gap:7px">'
-        +'<div style="background:rgba(52,168,83,.08);border:1px solid rgba(52,168,83,.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px"><span style="color:#1e7e34;font-size:13px">✓</span><span style="font-family:var(--font);font-size:11px;color:#1e7e34">Disponibilidade sincronizada em todos os canais</span></div>'
-        +'<div style="background:rgba(251,188,4,.08);border:1px solid rgba(251,188,4,.25);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px"><span style="color:#92650a;font-size:13px">⚡</span><span style="font-family:var(--font);font-size:11px;color:#92650a">Preço do Booking 6% abaixo da média — considere ajustar</span></div>'
-        +'<div style="background:rgba(66,133,244,.08);border:1px solid rgba(66,133,244,.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px"><span style="color:#1a5ccf;font-size:13px">ℹ</span><span style="font-family:var(--font);font-size:11px;color:#1a5ccf">5 dias livres em 15–19 abr — ative promoção de último minuto?</span></div>'
+        +'<div style="background:rgba(48,164,108,.08);border:1px solid rgba(48,164,108,.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px"><span style="color:#2a8459;font-size:13px">✓</span><span style="font-family:var(--font);font-size:11px;color:#2a8459">Disponibilidade sincronizada em todos os canais</span></div>'
+        +'<div style="background:rgba(237,163,59,.08);border:1px solid rgba(237,163,59,.25);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px"><span style="color:#805c28;font-size:13px">⚡</span><span style="font-family:var(--font);font-size:11px;color:#805c28">Preço do Booking 6% abaixo da média — considere ajustar</span></div>'
+        +'<div style="background:rgba(61,99,219,.08);border:1px solid rgba(61,99,219,.2);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px"><span style="color:#3452af;font-size:13px">ℹ</span><span style="font-family:var(--font);font-size:11px;color:#3452af">5 dias livres em 15–19 abr — ative promoção de último minuto?</span></div>'
         +'</div>';
       el.appendChild(alertsCard);
     }
@@ -1586,7 +1586,7 @@ function buildNav(profile){
   // clear ALL and rebuild from scratch (prevents slabel accumulation)
   el.innerHTML = '';
   var logoDiv = document.createElement('div'); logoDiv.className='hub-nav-logo';
-  logoDiv.innerHTML='<div class="hub-nav-dots"><div class="hub-nav-dot" style="background:#4285F4"></div><div class="hub-nav-dot" style="background:#EA4335"></div><div class="hub-nav-dot" style="background:#FBBC04"></div><div class="hub-nav-dot" style="background:#34A853"></div></div><div class="hub-nav-name">nó hub</div>';
+  logoDiv.innerHTML='<div class="hub-nav-dots"><div class="hub-nav-dot" style="background:#3D63DB"></div><div class="hub-nav-dot" style="background:#E0543C"></div><div class="hub-nav-dot" style="background:#EDA33B"></div><div class="hub-nav-dot" style="background:#30A46C"></div></div><div class="hub-nav-name">nó hub</div>';
   el.appendChild(logoDiv);
   var prog=document.createElement('div'); prog.className='hub-progress-strip';
   var pb=document.createElement('div'); pb.className='hub-progress-bar'; pb.id='hubProgressBar2';
@@ -1714,7 +1714,10 @@ function buildProfileTabs(){
   var container=document.getElementById('solTabs2');
   if(!container) return;
   container.innerHTML='';
-  var colorCls={all:'',vendas:'',conteudo:'t-g',servicos:'t-y',gestao:'t-r',digital:'t-p',hotelaria:'t-g'};
+  /* cor por vertical conforme BRAND.md §4/§7: ecommerce/vendas e conteudo =
+     azul (info · conteudo), saude = verde, hotelaria = vermelho, IA & sistemas
+     e a marca-mae = ambar. Sem 5a cor. */
+  var colorCls={all:'t-y',vendas:'',conteudo:'',servicos:'t-g',gestao:'t-y',digital:'',hotelaria:'t-r'};
   var icons={
     all:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
     vendas:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="width:13px;height:13px"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
@@ -1768,25 +1771,25 @@ function patch(){
 RENDERERS['site'] = function(el){
   el.innerHTML = stitle('Meu Site','Performance ao vivo')+
     '<div class="hd-grid4">'+
-      hkpi('Visitantes hoje','247','↑ vs ontem','#4285F4')+
-      hkpi('Tempo médio','2m34s','bom','#34A853')+
-      hkpi('Rejeição','38%','↓ melhorou','#FBBC04')+
-      hkpi('Conversões','14','↑ +6 hoje','#EA4335')+
+      hkpi('Visitantes hoje','247','↑ vs ontem','#3D63DB')+
+      hkpi('Tempo médio','2m34s','bom','#30A46C')+
+      hkpi('Rejeição','38%','↓ melhorou','#EDA33B')+
+      hkpi('Conversões','14','↑ +6 hoje','#E0543C')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Tráfego por origem</div>'+
-        hrow('Orgânico (Google)','142 visitas',58,'#34A853')+
-        hrow('Direto','61 visitas',25,'#4285F4')+
+        hrow('Orgânico (Google)','142 visitas',58,'#30A46C')+
+        hrow('Direto','61 visitas',25,'#3D63DB')+
         hrow('Social (Meta)','29 visitas',12,'#0866FF')+
-        hrow('E-mail','15 visitas',6,'#FBBC04'))+
+        hrow('E-mail','15 visitas',6,'#EDA33B'))+
       hcard('<div class="hd-card-title">Páginas mais acessadas</div>'+
-        hrow('/ Home','98 views',100,'#4285F4')+
-        hrow('/servicos','64 views',65,'#34A853')+
-        hrow('/contato','47 views',48,'#FBBC04')+
-        hrow('/sobre','38 views',39,'#EA4335'))+
+        hrow('/ Home','98 views',100,'#3D63DB')+
+        hrow('/servicos','64 views',65,'#30A46C')+
+        hrow('/contato','47 views',48,'#EDA33B')+
+        hrow('/sobre','38 views',39,'#E0543C'))+
     '</div>'+
     hcard('<div class="hd-card-title">Histórico de visitas — 14 dias</div>'+
-      '<div class="hd-spark">'+sparkline([120,145,132,168,180,152,198,210,188,224,195,238,220,247],'#4285F4')+'</div>','');
+      '<div class="hd-spark">'+sparkline([120,145,132,168,180,152,198,210,188,224,195,238,220,247],'#3D63DB')+'</div>','');
   animateMain(el);
 };
 
@@ -1794,25 +1797,25 @@ RENDERERS['site'] = function(el){
 RENDERERS['vendas-loja'] = function(el){
   el.innerHTML = stitle('Minha Loja','Catálogo & Estoque')+
     '<div class="hd-grid4">'+
-      hkpi('Produtos ativos','87','↑ +3 hoje','#4285F4')+
-      hkpi('Estoque crítico','5','⚠ repor','#EA4335')+
-      hkpi('Mais vendido','Kit Rosa','#34A853')+
-      hkpi('Avaliação','4.8★','128 avaliações','#FBBC04')+
+      hkpi('Produtos ativos','87','↑ +3 hoje','#3D63DB')+
+      hkpi('Estoque crítico','5','⚠ repor','#E0543C')+
+      hkpi('Mais vendido','Kit Rosa','#30A46C')+
+      hkpi('Avaliação','4.8★','128 avaliações','#EDA33B')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Vendas por categoria</div>'+
-        hrow('Kits presentes','44%',44,'#4285F4')+
-        hrow('Perfumes','28%',28,'#34A853')+
-        hrow('Velas','18%',18,'#FBBC04')+
-        hrow('Outros','10%',10,'#EA4335'))+
+        hrow('Kits presentes','44%',44,'#3D63DB')+
+        hrow('Perfumes','28%',28,'#30A46C')+
+        hrow('Velas','18%',18,'#EDA33B')+
+        hrow('Outros','10%',10,'#E0543C'))+
       hcard('<div class="hd-card-title">Estoque por produto</div>'+
-        hrow('Kit Premium Rosa','3 un.',30,'#EA4335')+
-        hrow('Vela Âmbar 200g','7 un.',55,'#FBBC04')+
-        hrow('Óleo Essencial','12 un.',85,'#34A853')+
-        hrow('Body Mist Lavanda','18 un.',100,'#34A853'))+
+        hrow('Kit Premium Rosa','3 un.',30,'#E0543C')+
+        hrow('Vela Âmbar 200g','7 un.',55,'#EDA33B')+
+        hrow('Óleo Essencial','12 un.',85,'#30A46C')+
+        hrow('Body Mist Lavanda','18 un.',100,'#30A46C'))+
     '</div>'+
     hcard('<div class="hd-card-title">Conversão por fonte — 7 dias</div>'+
-      '<div class="hd-bars" style="height:64px">'+hbars([4.2,3.8,5.1,4.7,6.2,5.8,4.9],['#4285F4'])+'</div>','');
+      '<div class="hd-bars" style="height:64px">'+hbars([4.2,3.8,5.1,4.7,6.2,5.8,4.9],['#3D63DB'])+'</div>','');
   animateMain(el);
 };
 
@@ -1820,19 +1823,19 @@ RENDERERS['vendas-loja'] = function(el){
 RENDERERS['gestao-crm'] = function(el){
   el.innerHTML = stitle('CRM','Funil + Conversas')+
     '<div class="hd-grid4">'+
-      hkpi('Leads','248','no funil','#4285F4')+
-      hkpi('Qualificados','84','34% conv.','#34A853')+
-      hkpi('Propostas','31','em negociação','#FBBC04')+
-      hkpi('Fechados/mês','18','↑ +4','#EA4335')+
+      hkpi('Leads','248','no funil','#3D63DB')+
+      hkpi('Qualificados','84','34% conv.','#30A46C')+
+      hkpi('Propostas','31','em negociação','#EDA33B')+
+      hkpi('Fechados/mês','18','↑ +4','#E0543C')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Funil de vendas</div>'+
-        hrow('Lead','248',100,'#4285F4')+
-        hrow('Qualificado','84',34,'#34A853')+
-        hrow('Proposta','31',13,'#FBBC04')+
-        hrow('Fechado','18',7,'#EA4335'))+
+        hrow('Lead','248',100,'#3D63DB')+
+        hrow('Qualificado','84',34,'#30A46C')+
+        hrow('Proposta','31',13,'#EDA33B')+
+        hrow('Fechado','18',7,'#E0543C'))+
       '<div class="hd-chat-win" style="min-height:180px">'+
-        '<div class="hd-chat-win-hdr"><div class="hub-avatar" style="width:26px;height:26px;font-size:11px;border-radius:50%;background:linear-gradient(135deg,#4285F4,#34A853);display:grid;place-items:center;color:white">MR</div><div style="margin-left:8px"><div style="font-size:12px;font-weight:700;color:var(--white)">Marcos Ramos</div><div style="font-size:10px;color:#34A853">● Hot lead</div></div></div>'+
+        '<div class="hd-chat-win-hdr"><div class="hub-avatar" style="width:26px;height:26px;font-size:11px;border-radius:50%;background:linear-gradient(135deg,#3D63DB,#30A46C);display:grid;place-items:center;color:white">MR</div><div style="margin-left:8px"><div style="font-size:12px;font-weight:700;color:var(--white)">Marcos Ramos</div><div style="font-size:10px;color:#30A46C">● Hot lead</div></div></div>'+
         '<div class="hd-chat-msgs" style="max-height:130px">'+
           '<div class="hd-msg hd-msg-left"><div class="hd-msg-bubble">Oi! Vi o anúncio, vocês fazem sistema para clínica?</div></div>'+
           '<div class="hd-msg hd-msg-right"><div class="hd-msg-bubble">Sim! Temos prontuário digital, agenda e pagamento integrado. Quer uma demo?</div></div>'+
@@ -1849,22 +1852,22 @@ RENDERERS['gestao-crm'] = function(el){
 RENDERERS['gestao-campanhas'] = function(el){
   el.innerHTML = stitle('Campanhas','Google + Meta')+
     '<div class="hd-grid4">'+
-      hkpi('Investido','R$8.400','mês','#4285F4')+
-      hkpi('Leads','248','↑ +38%','#34A853')+
-      hkpi('CPL','R$33,87','↓ -12%','#FBBC04')+
-      hkpi('ROAS','3,2×','↑ meta:3×','#EA4335')+
+      hkpi('Investido','R$8.400','mês','#3D63DB')+
+      hkpi('Leads','248','↑ +38%','#30A46C')+
+      hkpi('CPL','R$33,87','↓ -12%','#EDA33B')+
+      hkpi('ROAS','3,2×','↑ meta:3×','#E0543C')+
     '</div>'+
     hcard('<div class="hd-card-title">Performance diária — 14 dias</div>'+
-      '<div class="hd-spark">'+sparkline([18,24,21,32,28,38,29,34,42,38,46,41,52,48],'#4285F4')+'</div>','')+
+      '<div class="hd-spark">'+sparkline([18,24,21,32,28,38,29,34,42,38,46,41,52,48],'#3D63DB')+'</div>','')+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Google Ads — por campanha</div>'+
-        hrow('Pesquisa - clínica SP','CPC R$2,40',88,'#4285F4')+
-        hrow('Display - remarketing','CPC R$0,80',45,'#34A853')+
-        hrow('YouTube - branding','CPV R$0,12',62,'#FBBC04'))+
+        hrow('Pesquisa - clínica SP','CPC R$2,40',88,'#3D63DB')+
+        hrow('Display - remarketing','CPC R$0,80',45,'#30A46C')+
+        hrow('YouTube - branding','CPV R$0,12',62,'#EDA33B'))+
       hcard('<div class="hd-card-title">Meta Ads — criativos</div>'+
         hrow('Vídeo depoimento','CTR 3,8%',100,'#0866FF')+
-        hrow('Carrossel benefícios','CTR 2,4%',63,'#34A853')+
-        hrow('Imagem simples','CTR 1,1%',29,'#FBBC04'))+
+        hrow('Carrossel benefícios','CTR 2,4%',63,'#30A46C')+
+        hrow('Imagem simples','CTR 1,1%',29,'#EDA33B'))+
     '</div>';
   animateMain(el);
 };
@@ -1885,20 +1888,20 @@ RENDERERS['digital-cursos'] = function(el){
   }
   el.innerHTML = stitle('Cursos','Plataforma própria')+
     '<div class="hd-grid4">'+
-      hkpi('Cursos ativos','4','↑ +1 novo','#7c3aed')+
-      hkpi('Total aulas','186','horas de conteúdo','#4285F4')+
-      hkpi('Certificados','312','emitidos','#34A853')+
-      hkpi('Avaliação','4.9★','⭐ destaque','#FBBC04')+
+      hkpi('Cursos ativos','4','↑ +1 novo','#3d63db')+
+      hkpi('Total aulas','186','horas de conteúdo','#3D63DB')+
+      hkpi('Certificados','312','emitidos','#30A46C')+
+      hkpi('Avaliação','4.9★','⭐ destaque','#EDA33B')+
     '</div>'+
     hcard('<div class="hd-card-title">Biblioteca de cursos</div>'+
-      courseFile('Marketing Digital do Zero ao Avançado','42',78,'#7c3aed')+
-      courseFile('Tráfego Pago — Google & Meta Ads','31',64,'#4285F4')+
-      courseFile('Copywriting que Vende','24',81,'#34A853')+
+      courseFile('Marketing Digital do Zero ao Avançado','42',78,'#3d63db')+
+      courseFile('Tráfego Pago — Google & Meta Ads','31',64,'#3D63DB')+
+      courseFile('Copywriting que Vende','24',81,'#30A46C')+
       courseFile('Instagram Profissional para Negócios','18',52,'#E1306C'),'')+
     hcard('<div class="hd-card-title">Última aula adicionada</div>'+
       '<div style="display:flex;align-items:center;gap:10px;padding:6px 0">'+
-        '<div style="width:40px;height:28px;background:rgba(234,67,53,.15);border-radius:6px;display:grid;place-items:center;flex-shrink:0">'+
-          '<svg viewBox="0 0 24 24" fill="none" stroke="#EA4335" stroke-width="2" width="14" height="14"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>'+
+        '<div style="width:40px;height:28px;background:rgba(224,84,60,.15);border-radius:6px;display:grid;place-items:center;flex-shrink:0">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="#E0543C" stroke-width="2" width="14" height="14"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>'+
         '</div>'+
         '<div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8)">Aula 43 — Funis de Alta Conversão</div><div style="font-size:10px;color:rgba(255,255,255,.3)">Adicionada hoje · 28 min · Marketing Digital</div></div>'+
       '</div>','');
@@ -1920,19 +1923,19 @@ RENDERERS['digital-comunidade'] = function(el){
   }
   el.innerHTML = stitle('Comunidade','Feed')+
     '<div class="hd-grid4">'+
-      hkpi('Membros','1.248','ativos','#7c3aed')+
-      hkpi('Posts/semana','34','↑ +12%','#4285F4')+
-      hkpi('Comentários','218','esta semana','#34A853')+
-      hkpi('Lives','2','agendadas','#FBBC04')+
+      hkpi('Membros','1.248','ativos','#3d63db')+
+      hkpi('Posts/semana','34','↑ +12%','#3D63DB')+
+      hkpi('Comentários','218','esta semana','#30A46C')+
+      hkpi('Lives','2','agendadas','#EDA33B')+
     '</div>'+
     hcard('<div class="hd-card-title">Discussões recentes</div>'+
-      post('Fernanda Lima','FL','#7c3aed','Como otimizar copy para anúncios frios? Minha CTR tá em 1,2% e queria melhorar...','2h atrás','48')+
-      post('Rafael Torres','RT','#4285F4','Resultados do desafio semana 3 🎉 Saí de 0 para 4 mil seguidores em 30 dias!','5h atrás','32')+
-      post('Ana Beatriz','AB','#34A853','Alguém já usou o módulo de automação do WhatsApp pra clínica? Como configurou?','Ontem','19'),'')+
+      post('Fernanda Lima','FL','#3d63db','Como otimizar copy para anúncios frios? Minha CTR tá em 1,2% e queria melhorar...','2h atrás','48')+
+      post('Rafael Torres','RT','#3D63DB','Resultados do desafio semana 3 🎉 Saí de 0 para 4 mil seguidores em 30 dias!','5h atrás','32')+
+      post('Ana Beatriz','AB','#30A46C','Alguém já usou o módulo de automação do WhatsApp pra clínica? Como configurou?','Ontem','19'),'')+
     hcard('<div class="hd-card-title">Próxima live</div>'+
       '<div style="display:flex;align-items:center;gap:10px;padding:8px 0">'+
-        '<div style="width:36px;height:36px;border-radius:10px;background:rgba(124,58,237,.2);display:grid;place-items:center;flex-shrink:0">'+
-          '<svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" width="18" height="18"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>'+
+        '<div style="width:36px;height:36px;border-radius:10px;background:rgba(61,99,219,.2);display:grid;place-items:center;flex-shrink:0">'+
+          '<svg viewBox="0 0 24 24" fill="none" stroke="#3d63db" stroke-width="2" width="18" height="18"><polygon points="23 7 16 12 23 17 23 7"/><rect width="15" height="14" x="1" y="5" rx="2"/></svg>'+
         '</div>'+
         '<div><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.8)">Live: Tráfego Pago para Infoprodutos</div><div style="font-size:10px;color:rgba(255,255,255,.3)">Sábado 10:00 · Sala aberta para membros Pro</div></div>'+
       '</div>','');
@@ -1954,10 +1957,10 @@ RENDERERS['conteudo-calendario'] = function(el){
   }
   el.innerHTML = stitle('Calendário','Semana 23–29 Abr')+
     '<div class="hd-grid4">'+
-      hkpi('Posts planejados','12','esta semana','#34A853')+
-      hkpi('Em produção','4','pelo Claude AI','#4285F4')+
-      hkpi('Agendados','7','próx. 7 dias','#FBBC04')+
-      hkpi('Publicados hoje','2','✓','#EA4335')+
+      hkpi('Posts planejados','12','esta semana','#30A46C')+
+      hkpi('Em produção','4','pelo Claude AI','#3D63DB')+
+      hkpi('Agendados','7','próx. 7 dias','#EDA33B')+
+      hkpi('Publicados hoje','2','✓','#E0543C')+
     '</div>'+
     hcard('<div class="hd-card-title">Grade semanal</div>'+
       '<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:8px">'+
@@ -1992,18 +1995,18 @@ RENDERERS['servicos-agenda'] = function(el){
   }
   el.innerHTML = stitle('Agenda','Hoje — 23 Abr')+
     '<div class="hd-grid4">'+
-      hkpi('Confirmadas','8','✓ todas','#34A853')+
-      hkpi('Pendentes','2','aguardam','#FBBC04')+
-      hkpi('Livres','3','disponíveis','#4285F4')+
-      hkpi('Faltas prev.','0','✓ 0 hoje','#EA4335')+
+      hkpi('Confirmadas','8','✓ todas','#30A46C')+
+      hkpi('Pendentes','2','aguardam','#EDA33B')+
+      hkpi('Livres','3','disponíveis','#3D63DB')+
+      hkpi('Faltas prev.','0','✓ 0 hoje','#E0543C')+
     '</div>'+
     hcard('<div class="hd-card-title">Consultas de hoje</div>'+
-      appt('08:30','Ana Martins','Retorno — Cardiologia','Confirmada','#34A853')+
-      appt('09:30','Carlos Rocha','1ª consulta — Geral','Confirmada','#34A853')+
-      appt('10:30','— Horário livre —','Disponível para encaixe','Livre','#4285F4')+
-      appt('11:00','Lucia Ferreira','Pós-operatório','Confirmada','#34A853')+
-      appt('14:00','Pedro Alves','Check-up anual','Pendente','#FBBC04')+
-      appt('15:30','Maria Costa','Retorno — Derma','Confirmada','#34A853'),'')+
+      appt('08:30','Ana Martins','Retorno — Cardiologia','Confirmada','#30A46C')+
+      appt('09:30','Carlos Rocha','1ª consulta — Geral','Confirmada','#30A46C')+
+      appt('10:30','— Horário livre —','Disponível para encaixe','Livre','#3D63DB')+
+      appt('11:00','Lucia Ferreira','Pós-operatório','Confirmada','#30A46C')+
+      appt('14:00','Pedro Alves','Check-up anual','Pendente','#EDA33B')+
+      appt('15:30','Maria Costa','Retorno — Derma','Confirmada','#30A46C'),'')+
     hcard('<div class="hd-card-title">Lembretes enviados hoje</div>'+
       '<div class="hd-trans"><span class="hd-trans-name">✓ WhatsApp → Ana Martins</span><span class="hd-trans-date">07:00</span><span class="hd-trans-val" style="color:#25D366">Entregue</span></div>'+
       '<div class="hd-trans"><span class="hd-trans-name">✓ WhatsApp → Carlos Rocha</span><span class="hd-trans-date">07:00</span><span class="hd-trans-val" style="color:#25D366">Entregue</span></div>','');
@@ -2014,22 +2017,22 @@ RENDERERS['servicos-agenda'] = function(el){
 RENDERERS['vendas-dashboard'] = function(el){
   el.innerHTML = stitle('Ana Loja','Março 2026')+
     '<div class="hd-grid4">'+
-      hkpi('Faturamento','R$28.400','↑ +24%','#4285F4')+
-      hkpi('Pedidos','312','↑ +18%','#34A853')+
-      hkpi('Ticket médio','R$91','↑ +5%','#FBBC04')+
-      hkpi('Carrinho aband.','14%','↓ -6%','#EA4335')+
+      hkpi('Faturamento','R$28.400','↑ +24%','#3D63DB')+
+      hkpi('Pedidos','312','↑ +18%','#30A46C')+
+      hkpi('Ticket médio','R$91','↑ +5%','#EDA33B')+
+      hkpi('Carrinho aband.','14%','↓ -6%','#E0543C')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Faturamento — 7 dias</div>'+
-        '<div class="hd-bars" style="height:72px">'+hbars([3200,4100,2900,5200,4800,6100,3900],['#4285F4'])+'</div>')+
+        '<div class="hd-bars" style="height:72px">'+hbars([3200,4100,2900,5200,4800,6100,3900],['#3D63DB'])+'</div>')+
       hcard('<div class="hd-card-title">Origem dos pedidos</div>'+
         '<div style="display:flex;align-items:center;gap:16px">'+
-          donut(48,'#34A853',72)+
+          donut(48,'#30A46C',72)+
           '<div style="flex:1">'+
-            hrow('Orgânico','48%',48,'#34A853')+
+            hrow('Orgânico','48%',48,'#30A46C')+
             hrow('Meta Ads','31%',31,'#0866FF')+
             hrow('WhatsApp','14%',14,'#25D366')+
-            hrow('Direto','7%',7,'#FBBC04')+
+            hrow('Direto','7%',7,'#EDA33B')+
           '</div>'+
         '</div>')+
     '</div>';
@@ -2040,30 +2043,30 @@ RENDERERS['vendas-dashboard'] = function(el){
 RENDERERS['servicos-dashboard'] = function(el){
   el.innerHTML = stitle('Dr. Pedro','Março 2026')+
     '<div class="hd-grid4">'+
-      hkpi('Consultas/mês','142','↑ +12%','#EA4335')+
-      hkpi('Taxa faltas','4,2%','↓ -62%','#34A853')+
-      hkpi('Receita','R$31.200','↑ +18%','#4285F4')+
-      hkpi('NPS','94','pacientes','#FBBC04')+
+      hkpi('Consultas/mês','142','↑ +12%','#E0543C')+
+      hkpi('Taxa faltas','4,2%','↓ -62%','#30A46C')+
+      hkpi('Receita','R$31.200','↑ +18%','#3D63DB')+
+      hkpi('NPS','94','pacientes','#EDA33B')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Consultas — 7 dias</div>'+
-        '<div class="hd-bars" style="height:72px">'+hbars([6,8,7,9,8,10,4],['#EA4335'])+'</div>')+
+        '<div class="hd-bars" style="height:72px">'+hbars([6,8,7,9,8,10,4],['#E0543C'])+'</div>')+
       hcard('<div class="hd-card-title">Satisfação dos pacientes</div>'+
         '<div style="display:flex;align-items:center;gap:16px">'+
-          donut(94,'#34A853',72)+
+          donut(94,'#30A46C',72)+
           '<div style="flex:1">'+
-            '<div style="font-size:22px;font-weight:700;color:#34A853;line-height:1">94%</div>'+
+            '<div style="font-size:22px;font-weight:700;color:#30A46C;line-height:1">94%</div>'+
             '<div style="font-size:10px;color:rgba(255,255,255,.3)">satisfação geral</div>'+
             '<div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:6px">⭐⭐⭐⭐⭐ 4.9/5.0</div>'+
           '</div>'+
         '</div>')+
     '</div>'+
     hcard('<div class="hd-card-title">Ocupação por dia — semana atual</div>'+
-      hrow('Segunda','91%',91,'#34A853')+
-      hrow('Terça','88%',88,'#34A853')+
-      hrow('Quarta','95%',95,'#34A853')+
-      hrow('Quinta','72%',72,'#FBBC04')+
-      hrow('Sexta','68%',68,'#FBBC04'),'');
+      hrow('Segunda','91%',91,'#30A46C')+
+      hrow('Terça','88%',88,'#30A46C')+
+      hrow('Quarta','95%',95,'#30A46C')+
+      hrow('Quinta','72%',72,'#EDA33B')+
+      hrow('Sexta','68%',68,'#EDA33B'),'');
   animateMain(el);
 };
 
@@ -2071,21 +2074,21 @@ RENDERERS['servicos-dashboard'] = function(el){
 RENDERERS['gestao-dashboard'] = function(el){
   el.innerHTML = stitle('Marcos CEO','Março 2026')+
     '<div class="hd-grid4">'+
-      hkpi('Receita total','R$184k','↑ +22%','#4285F4')+
-      hkpi('CAC','R$87','↓ -14%','#34A853')+
-      hkpi('LTV médio','R$2.100','↑ +18%','#FBBC04')+
-      hkpi('Churn','3,1%','↓ -0,8pp','#EA4335')+
+      hkpi('Receita total','R$184k','↑ +22%','#3D63DB')+
+      hkpi('CAC','R$87','↓ -14%','#30A46C')+
+      hkpi('LTV médio','R$2.100','↑ +18%','#EDA33B')+
+      hkpi('Churn','3,1%','↓ -0,8pp','#E0543C')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">MRR — 6 meses</div>'+
-        '<div class="hd-bars" style="height:72px">'+hbars([140,152,148,162,171,184],['#4285F4','#34A853'])+'</div>')+
+        '<div class="hd-bars" style="height:72px">'+hbars([140,152,148,162,171,184],['#3D63DB','#30A46C'])+'</div>')+
       hcard('<div class="hd-card-title">Meta do trimestre</div>'+
         '<div style="display:flex;align-items:center;gap:12px">'+
-          donut(72,'#4285F4',72)+
+          donut(72,'#3D63DB',72)+
           '<div style="flex:1">'+
-            '<div style="font-size:20px;font-weight:700;color:#4285F4;line-height:1">72%</div>'+
+            '<div style="font-size:20px;font-weight:700;color:#3D63DB;line-height:1">72%</div>'+
             '<div style="font-size:10px;color:rgba(255,255,255,.3)">da meta Q1</div>'+
-            '<div style="font-size:11px;font-weight:600;color:#34A853;margin-top:6px">R$184k / R$255k</div>'+
+            '<div style="font-size:11px;font-weight:600;color:#30A46C;margin-top:6px">R$184k / R$255k</div>'+
           '</div>'+
         '</div>')+
     '</div>';
@@ -2096,10 +2099,10 @@ RENDERERS['gestao-dashboard'] = function(el){
 RENDERERS['conteudo-dashboard'] = function(el){
   el.innerHTML = stitle('Carol Cria','Março 2026')+
     '<div class="hd-grid4">'+
-      hkpi('Posts publicados','28','este mês','#34A853')+
-      hkpi('Alcance total','148k','↑ +42%','#4285F4')+
-      hkpi('Engajamento','8,4%','↑ +1,2pp','#FBBC04')+
-      hkpi('Seguidores novos','1.840','↑ +31%','#EA4335')+
+      hkpi('Posts publicados','28','este mês','#30A46C')+
+      hkpi('Alcance total','148k','↑ +42%','#3D63DB')+
+      hkpi('Engajamento','8,4%','↑ +1,2pp','#EDA33B')+
+      hkpi('Seguidores novos','1.840','↑ +31%','#E0543C')+
     '</div>'+
     hcard('<div class="hd-card-title">Alcance por rede — 30 dias</div>'+
       '<div style="display:flex;align-items:center;gap:16px">'+
@@ -2108,11 +2111,11 @@ RENDERERS['conteudo-dashboard'] = function(el){
       '</div>','')+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Crescimento de seguidores</div>'+
-        '<div class="hd-spark">'+sparkline([12400,12680,12950,13280,13720,14100,14580,15040,15490,15920,16380,16840,17300,17840],'#34A853')+'</div>')+
+        '<div class="hd-spark">'+sparkline([12400,12680,12950,13280,13720,14100,14580,15040,15490,15920,16380,16840,17300,17840],'#30A46C')+'</div>')+
       hcard('<div class="hd-card-title">Melhor horário para postar</div>'+
         hrow('18h–20h','42% do alcance',100,'#E1306C')+
         hrow('12h–13h','28% do alcance',67,'#0866FF')+
-        hrow('08h–09h','18% do alcance',43,'#34A853'))+
+        hrow('08h–09h','18% do alcance',43,'#30A46C'))+
     '</div>';
   animateMain(el);
 };
@@ -2121,21 +2124,21 @@ RENDERERS['conteudo-dashboard'] = function(el){
 RENDERERS['digital-dashboard'] = function(el){
   el.innerHTML = stitle('Prof. Julia','Março 2026')+
     '<div class="hd-grid4">'+
-      hkpi('Alunos ativos','1.248','↑ +142','#7c3aed')+
-      hkpi('Receita MRR','R$24.800','↑ +18%','#34A853')+
-      hkpi('Taxa conclusão','74%','↑ +8pp','#4285F4')+
-      hkpi('NPS','91','excelente','#FBBC04')+
+      hkpi('Alunos ativos','1.248','↑ +142','#3d63db')+
+      hkpi('Receita MRR','R$24.800','↑ +18%','#30A46C')+
+      hkpi('Taxa conclusão','74%','↑ +8pp','#3D63DB')+
+      hkpi('NPS','91','excelente','#EDA33B')+
     '</div>'+
     '<div class="hd-grid2">'+
       hcard('<div class="hd-card-title">Novos alunos — 14 dias</div>'+
-        '<div class="hd-spark">'+sparkline([18,24,21,32,28,38,29,34,42,38,46,41,52,48],'#7c3aed')+'</div>')+
+        '<div class="hd-spark">'+sparkline([18,24,21,32,28,38,29,34,42,38,46,41,52,48],'#3d63db')+'</div>')+
       hcard('<div class="hd-card-title">Progresso dos cursos</div>'+
         '<div style="display:flex;align-items:center;gap:12px">'+
-          donut(74,'#7c3aed',72)+
+          donut(74,'#3d63db',72)+
           '<div style="flex:1">'+
-            hrow('Concluídos','312 alunos',25,'#34A853')+
-            hrow('Em curso','840 alunos',67,'#7c3aed')+
-            hrow('Inativos','96 alunos',8,'#EA4335')+
+            hrow('Concluídos','312 alunos',25,'#30A46C')+
+            hrow('Em curso','840 alunos',67,'#3d63db')+
+            hrow('Inativos','96 alunos',8,'#E0543C')+
           '</div>'+
         '</div>')+
     '</div>';

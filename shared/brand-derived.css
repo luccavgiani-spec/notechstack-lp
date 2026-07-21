@@ -1,0 +1,35 @@
+/* nó · tech stack — Tons derivados · Identidade v2
+   ────────────────────────────────────────────────────────────────
+   NÃO é fonte da verdade. A fonte da verdade é brand/tokens/tokens.css.
+   Este arquivo só deriva os estados que os sites precisam e que o kit
+   não entrega: hover/pressed (escuro), sobre-fundo-escuro (claro) e a
+   rampa de superfícies neutras.
+
+   Método: escuro = 78% cor + 22% tinta · claro = 55% cor + 45% osso.
+   Carregar SEMPRE depois de brand/tokens/tokens.css. */
+
+:root {
+  /* ── Estados por cor (ordem canônica: azul → vermelho → âmbar → verde) ── */
+  --no-azul-escuro: #3452AF;      /* hover/pressed sobre claro */
+  --no-azul-claro: #92A7E9;       /* texto/ícone sobre fundo tinta */
+
+  --no-vermelho-escuro: #B34633;
+  --no-vermelho-claro: #EC9F92;
+
+  --no-ambar-escuro: #805C28;     /* âmbar legível como texto sobre osso */
+  --no-ambar-claro: #F3CA91;
+
+  --no-verde-escuro: #2A8459;
+  --no-verde-claro: #8BCBAC;
+
+  /* ── Rampa neutra ── */
+  --no-cinza-claro: #A4A7AB;      /* texto secundário sobre fundo tinta */
+  --no-osso-alt: #F3F2ED;         /* seção alternada sobre osso */
+  --no-tinta-alt: #1F1F1D;        /* card/superfície elevada sobre tinta */
+  --no-tinta-alt2: #2A2A27;       /* segundo nível de elevação no dark */
+  --no-borda-dark: #3A3A36;       /* separador dentro de fundo tinta */
+
+  /* ── Sombras ── (o manual limita a opacity a 0.07) */
+  --no-shadow-sm: 0 4px 12px rgba(20, 20, 20, 0.05);
+  --no-shadow-lg: 0 20px 48px rgba(20, 20, 20, 0.07);
+}

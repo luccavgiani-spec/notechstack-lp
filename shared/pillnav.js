@@ -7,10 +7,10 @@ export function initPillNav(container, options) {
     items,
     activeHref,
     ease = 'power3.easeOut',
-    baseColor = '#0f0f0f',
-    pillColor = '#ffffff',
-    hoveredPillTextColor = '#ffffff',
-    pillTextColor = '#0f0f0f',
+    baseColor = '#141414',
+    pillColor = '#FAFAF7',
+    hoveredPillTextColor = '#FFFFFF',
+    pillTextColor = '#141414',
     initialLoadAnimation = true,
     onMobileMenuClick
   } = options;
@@ -105,9 +105,18 @@ export function initPillNav(container, options) {
     });
   };
 
+  // A largura das pills depende da métrica da fonte. Se a Sora terminar de
+  // carregar depois da animação de entrada, o width fixo que o GSAP deixou no
+  // container fica menor que as pills e corta os labels — por isso o
+  // clearProps abaixo, junto do relayout.
+  const relayout = () => {
+    if (navItems) gsap.set(navItems, { clearProps: 'width,overflow' });
+    layout();
+  };
+
   layout();
   window.addEventListener('resize', layout);
-  if (document.fonts?.ready) document.fonts.ready.then(layout).catch(() => {});
+  if (document.fonts?.ready) document.fonts.ready.then(relayout).catch(() => {});
 
   if (mobileMenu) gsap.set(mobileMenu, { visibility: 'hidden', opacity: 0, scaleY: 1 });
 
@@ -118,7 +127,10 @@ export function initPillNav(container, options) {
     }
     if (navItems) {
       gsap.set(navItems, { width: 0, overflow: 'hidden' });
-      gsap.to(navItems, { width: 'auto', duration: 0.6, ease });
+      gsap.to(navItems, {
+        width: 'auto', duration: 0.6, ease,
+        onComplete: () => gsap.set(navItems, { clearProps: 'width,overflow' })
+      });
     }
     const activePillIndicator = container.querySelector('.pill.is-active');
     if (activePillIndicator) {

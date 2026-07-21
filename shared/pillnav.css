@@ -47,7 +47,7 @@
   display: flex;
   align-items: center;
   height: var(--nav-h);
-  background: var(--base, #0f0f0f);
+  background: var(--base, #141414);
   border-radius: 9999px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(12px);
@@ -59,8 +59,10 @@
   width: var(--nav-h);
   height: var(--nav-h);
   border-radius: 50%;
-  background: var(--base, #0f0f0f);
-  padding: 10px;
+  background: var(--base, #141414);
+  /* o mark de brand/favicon/favicon-dark.svg já traz a margem óptica desenhada
+     e um fundo tinta que casa com --base — sem padding extra */
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -75,6 +77,9 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* o mark de favicon tem margem de segurança generosa pro tamanho de aba;
+     no badge da nav ele pede um respiro óptico menor */
+  transform: scale(1.22);
 }
 
 .pill-list {
@@ -103,12 +108,12 @@
   text-decoration: none;
   border-radius: 9999px;
   box-sizing: border-box;
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 600;
-  font-size: 16px;
+  font-family: var(--no-font-sans, 'Sora', system-ui, sans-serif);
+  font-weight: var(--no-weight-subtitulo, 600);
+  font-size: 15px;
   line-height: 0;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   cursor: pointer;
   position: relative;
@@ -120,7 +125,7 @@
   left: 50%;
   bottom: 0;
   border-radius: 50%;
-  background: var(--item-color, var(--base, #0f0f0f));
+  background: var(--item-color, var(--base, #141414));
   z-index: 1;
   display: block;
   pointer-events: none;
@@ -160,7 +165,7 @@
   transform: translateX(-50%);
   width: 14px;
   height: 14px;
-  background: var(--item-color, #34A853);
+  background: var(--item-color, #30A46C);
   border-radius: 50px;
   z-index: 4;
 }
@@ -177,7 +182,7 @@
   width: var(--nav-h);
   height: var(--nav-h);
   border-radius: 50%;
-  background: var(--base, #0f0f0f);
+  background: var(--base, #141414);
   border: none;
   display: none;
   flex-direction: column;
@@ -234,9 +239,9 @@
   color: var(--pill-text, #ffffff);
   background-color: var(--pill-bg, #ffffff);
   text-decoration: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--no-font-sans, 'Sora', system-ui, sans-serif);
   font-size: 18px;
-  font-weight: 500;
+  font-weight: var(--no-weight-subtitulo, 600);
   border-radius: 50px;
   transition: all 0.2s ease;
 }
