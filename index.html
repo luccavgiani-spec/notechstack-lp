@@ -90,23 +90,32 @@ html{scroll-behavior:smooth}
   font-family:var(--font-mono);font-size:11px;font-weight:500;
   text-transform:uppercase;letter-spacing:var(--no-tracking-label);
 }
-body{font-family:var(--font);background:var(--white);color:var(--dark);overflow-x:hidden;padding-top:96px}
-@media (max-width:768px){body{padding-top:80px}}
+/* offset do nav flutuante — a hero precisa anular isso pra o fundo
+   dela passar por baixo do nav em vez de deixar faixa branca no topo */
+:root{--nav-offset:96px}
+@media (max-width:768px){:root{--nav-offset:80px}}
+/* Superfície de estúdio — mesma família quente do osso/borda, só mais densa.
+   É o tom da hero levado pro resto da página. */
+/* Cor exata amostrada do fundo dos frames do mascote (assets/mascote/*.jpg),
+   pra ele não recortar num retângulo mais claro que a página. */
+:root{--studio:#E2D8CF}
+body{font-family:var(--font);background:var(--studio);color:var(--dark);overflow-x:hidden;padding-top:var(--nav-offset)}
 
 /* ── CURSOR ── */
 .cursor{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply}
 .cursor-ring{width:38px;height:38px;border:1.5px solid var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .22s ease;opacity:.45}
+/* Cursor customizado só faz sentido onde existe mouse. Largura não serve de
+   teste — tablet em paisagem passa de 768px e mesmo assim não tem ponteiro.
+   hover/pointer detectam o dispositivo de fato. */
+@media (hover:none),(pointer:coarse){
+  .cursor,.cursor-ring{display:none!important}
+}
 
 /* ── HERO ── */
 /* hero layout now set by hw grid CSS */
-.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(20,20,20,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(20,20,20,.05) 1px,transparent 1px);background-size:56px 56px;opacity:.6}
 
-.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.22;animation:orbFloat 9s ease-in-out infinite;will-change:opacity;contain:strict;pointer-events:none}
-.orb-1{width:520px;height:520px;background:var(--blue);top:-120px;right:-80px}
-.orb-2{width:280px;height:280px;background:var(--yellow);bottom:80px;left:-80px;animation-delay:2.5s}
-.orb-3{width:220px;height:220px;background:var(--green);top:45%;right:32%;animation-delay:4s}
-.orb-4{width:180px;height:180px;background:var(--red);bottom:22%;right:18%;animation-delay:1s}
-@keyframes orbFloat{0%,100%{opacity:.22}50%{opacity:.28}}
+
+
 .hero-content{position:relative;z-index:2}
 /* pílula no âmbar = fundo preto, texto branco (BRAND.md §6) */
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--dark);color:#fff;padding:7px 18px;border-radius:100px;font-family:var(--font);font-size:13px;font-weight:600;margin-bottom:30px;animation:fadeUp .8s ease both}
@@ -219,7 +228,7 @@ section{padding:100px 60px}
 @media(max-width:800px){.sol-grid{grid-template-columns:1fr}.sol-sidebar{border-right:none;border-bottom:1.5px solid var(--border)}.sol-panel{padding:24px 20px}.sol-delivers{grid-template-columns:1fr}}
 @media(max-width:600px){#usecases{padding:80px 20px}}
 /* PLATFORMS */
-#platforms{background:var(--white);padding:80px 0;overflow:hidden}
+#platforms{background:var(--studio);padding:80px 0;overflow:hidden}
 .plat-hdr{text-align:center;padding:0 60px;margin-bottom:48px}
 .plat-marquee-wrap{position:relative;overflow:hidden}
 .plat-marquee-wrap::before,.plat-marquee-wrap::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
@@ -285,7 +294,7 @@ svg.mm-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .cmp-item.hi .cmp-val{color:var(--green)}
 
 /* ── CTA / FORM ── */
-#cta{background:linear-gradient(135deg,var(--light),var(--white));position:relative;overflow:hidden}
+#cta{background:var(--studio);position:relative;overflow:hidden}
 #cta::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(61,99,219,.05),transparent 70%)}
 .cta-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
 .cta-left .section-title{font-size:clamp(30px,3.5vw,46px)}
@@ -741,7 +750,8 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 }
 .cmp-feat-header{
   display:grid;grid-template-columns:1fr 100px 88px;
-  padding:11px 16px;background:rgba(255,255,255,.04);
+  padding:11px 16px;
+  /* sem faixa cinza: a linha de baixo já separa o cabeçalho das linhas */
   border-bottom:1px solid rgba(255,255,255,.08);
 }
 .cmp-feat-hd{
@@ -764,17 +774,26 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 .cmp-x{color:#ec9f92;font-weight:700;margin-right:2px}
 
 @media(max-width:900px){
-  .cmp-layout{grid-template-columns:1fr}
+  /* minmax(0,1fr) em vez de 1fr: `1fr` é minmax(auto,1fr) e o mínimo `auto`
+     impede o track de encolher abaixo do min-content da coluna (345px de
+     conteúdo + 48px de padding = 393px), estourando o container de 366px.
+     Como .cmp-wrap tem overflow-x:hidden, isso aparecia como margem cortada. */
+  .cmp-layout{grid-template-columns:minmax(0,1fr)}
   .cmp-bars-col{border-right:none;border-bottom:1px solid rgba(255,255,255,.08)}
   .cmp-intro{padding:22px 20px 18px}
   .cmp-bars-col,.cmp-cards-col{padding:20px}
 }
 
+/* Este bloco tinha perdido a linha `@media(...){` de abertura, então as três
+   regras caíam no escopo global e sobrescreviam tanto o padding do desktop
+   (28/32px) quanto o do mobile (20px) — e ainda sobrava uma chave solta no
+   .pcomp-table. Reescopado para a faixa tablet, sem invadir o ≤900px. */
+@media(min-width:901px) and (max-width:1100px){
   .cmp-bars-col{border-right:none;border-bottom:1.5px solid var(--border)}
   .cmp-intro{padding:24px}
   .cmp-bars-col,.cmp-cards-col{padding:24px}
 }
-.pcomp-table{display:none}}
+.pcomp-table{display:none}
 
 
 /* ── SCROLL INDICATOR ── */
@@ -788,15 +807,15 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 /* hero now grid — defined in hero-chat CSS */
 .hero-content{position:relative;z-index:2;max-width:600px}
 
-to{opacity:1;transform:translateX(0)}}
 
-@media(max-width:1100px){#hero{grid-template-columns:1fr;padding:140px 60px 60px}}
+
+@media(max-width:1100px){#hero{padding:140px 48px 60px}}
 @media(max-width:900px){#hero{padding:140px 24px 60px}}
 
 
 
 
-to{opacity:1;transform:translateX(0)}}
+
 
 
 /* ════════════════════════════════════════════════════════════
@@ -923,7 +942,7 @@ to{opacity:1;transform:translateX(0)}}
   .cmp-wrap{margin-top:32px}
   .cmp-intro{padding:20px!important}
   .cmp-intro-title{font-size:16px!important}
-  .cmp-layout{grid-template-columns:1fr!important}
+  .cmp-layout{grid-template-columns:minmax(0,1fr)!important}
   .cmp-bars-col{border-right:none!important;border-bottom:1px solid rgba(255,255,255,.08);padding:20px!important}
   .cmp-cards-col{padding:20px!important}
   .cmp-feature-grid{font-size:11px}
@@ -988,7 +1007,7 @@ to{opacity:1;transform:translateX(0)}}
   footer{padding:60px 40px}
   .flow-tree{gap:10px}
   .flow-node{padding:16px 14px;min-width:120px!important}
-  .cmp-layout{grid-template-columns:1fr!important}
+  .cmp-layout{grid-template-columns:minmax(0,1fr)!important}
   .cmp-bars-col{border-right:none!important;border-bottom:1px solid rgba(255,255,255,.08)}
 }
 
@@ -1296,7 +1315,7 @@ to{opacity:1;transform:translateX(0)}}
 
 
 /* ── FAQ SECTION ── */
-#faq{background:var(--white);padding:100px 60px}
+#faq{background:var(--studio);padding:100px 60px}
 .faq-grid{max-width:860px;margin:0 auto;margin-top:48px}
 .faq-item{border-bottom:1.5px solid var(--border);overflow:hidden}
 .faq-item:first-child{border-top:1.5px solid var(--border)}
@@ -1315,25 +1334,226 @@ to{opacity:1;transform:translateX(0)}}
 
 
 /* ── HERO AI CHAT ── */
+/* ══════════════════════════════════════════
+   HERO — coluna única sobre vídeo de fundo
+   O conteúdo desce: label borrado → frase digitada → pills →
+   chat, que expande no lugar logo abaixo das pills.
+══════════════════════════════════════════ */
 #hero{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  align-items:center;
-  gap:80px;
+  display:flex;flex-direction:column;justify-content:center;
   min-height:100vh;
-  padding:130px 60px 80px;
+  margin-top:calc(-1 * var(--nav-offset));
+  padding:calc(150px + var(--nav-offset)) 60px 80px;
   position:relative;overflow:hidden;isolation:isolate
 }
-.hero-content{max-width:560px}
+
+/* Seções em superfície de estúdio.
+   Sobre o osso quase branco, o cinza secundário #6B6F76 dá 4.8:1; sobre o
+   estúdio cai pra 4.0:1, abaixo do AA. Por isso --mid é escurecido dentro
+   dessas seções (5.2:1) em vez de aplicar só o background. */
+.sec-studio{
+  background:var(--studio);
+  --mid:#5A5E65;
+}
+
+/* Fundo de estúdio: cinza quente chapado com queda de luz suave, como papel
+   seamless de fotografia. O ponto claro fica em 68%/42% pra bater com o
+   object-position do vídeo (70%), onde o assunto vai entrar.
+   Os cinzas são da família quente do osso/borda — mesma matiz, só mais densos. */
+.hero-backdrop{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(130% 100% at 72% 45%,
+    #E7DDD4 0%, #E2D8CF 45%, #DDD3CA 75%, #D7CDC4 100%);
+}
+/* quando o vídeo entra, ele cobre o backdrop — que segue como cor de espera */
+#hero.has-video .hero-backdrop{opacity:0;transition:opacity .8s ease}
+
+/* ── Mascote ──
+   Mobile: fica no fluxo, entre o subtítulo e as perguntas.
+   Desktop: sai do fluxo e ocupa a faixa direita da hero. */
+/* mobile: personagem centralizado, com as perguntas centralizadas abaixo */
+.hero-mascot{margin:0 auto 22px;display:flex;justify-content:center}
+#no-mascot{
+  position:relative;width:100%;max-width:250px;
+  aspect-ratio:480/544;cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+}
+@media(max-width:1199px){
+  .hero-ctas{justify-content:center;text-align:center}
+}
+#no-mascot .nm-canvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  will-change:transform;
+  /* as bordas do quadro somem no fundo em vez de recortar num retângulo */
+  -webkit-mask:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 4%, #000 84%, transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+  mask:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 4%, #000 84%, transparent);
+}
+
+/* A partir de 1200px o mascote vai pra direita. O corte é 1200 e não 1100
+   porque abaixo disso a coluna de texto (min(52vw,880px)) e o mascote
+   (min(34vw,620px)) se encostariam — e ele comeria o chat. */
+@media(min-width:1200px){
+  .hero-mascot{
+    position:absolute;right:60px;top:50%;
+    transform:translateY(-50%);
+    width:min(34vw,620px);margin:0;
+    z-index:1;   /* abaixo do conteúdo (z-index:2), nunca por cima do texto */
+  }
+  #no-mascot{max-width:none}
+}
+
+.hero-inner{
+  position:relative;z-index:2;
+  width:100%;max-width:min(52vw,880px);
+}
+
+/* Emenda entre a hero e a seção de baixo: o degradê da hero termina em
+   #C0BEB4 e a próxima seção começa em --studio, o que criava uma linha dura.
+   Esta faixa dissolve uma na outra pra leitura ficar contínua. */
+#hero::after{
+  content:'';position:absolute;left:0;right:0;bottom:0;height:180px;
+  z-index:1;pointer-events:none;
+  background:linear-gradient(to bottom, rgba(226,216,207,0) 0%, var(--studio) 100%);
+}
+
+/* grão fino por cima do fundo — o mockup tem textura de papel, não cor chapada */
+.hero-grain{
+  position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.32;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.5'/></svg>");
+}
+
+/* 1 · headline — Sora 800 caixa alta, tracking apertado (BRAND.md §5) */
+.hero-h1{
+  font-family:var(--font);
+  font-size:clamp(38px,5.4vw,74px);
+  font-weight:var(--no-weight-display);
+  line-height:.98;
+  text-transform:uppercase;
+  letter-spacing:var(--no-tracking-headline);
+  color:var(--dark);
+  margin:0 0 22px;
+}
+
+/* 2 · lead */
+.hero-lead{
+  font-family:var(--font);
+  font-size:clamp(15px,1.25vw,18px);
+  font-weight:var(--no-weight-corpo);
+  line-height:1.6;color:var(--mid);
+  max-width:100%;margin:0 0 30px;
+}
+
+/* 3 · botões — sólido tinta + contornados */
+.hero-ctas{
+  display:flex;flex-wrap:wrap;gap:10px;max-width:100%;margin-bottom:30px;
+}
+/* as sugestões de pergunta pesam menos que o CTA principal — corpo menor,
+   respiro menor, pra caberem mais por linha e não competirem com ele */
+.btn-pill-q{
+  font-size:12.5px;font-weight:var(--no-weight-corpo);
+  padding:9px 16px;border-color:rgba(20,20,20,.14);
+}
+
+/* Quebra que só existe no mobile. O <br> mora dentro de um <span> porque
+   solto num flex container ele viraria item do flex; dentro do span ele é
+   quebra de linha normal. O espaço antes dele mantém a frase correta no
+   desktop, onde o <br> some. */
+.so-mobile{display:none}
+@media(max-width:768px){
+  .so-mobile{display:inline}
+  /* sem isso o nowrap do .btn-pill corta a frase fora da tela */
+  .btn-pill{white-space:normal;text-align:center;line-height:1.4;max-width:100%}
+}
+
+/* `nó.` em pílula dentro da headline — logo oficial (palavra branca, ponto
+   azul), nunca texto recriado. O ponto quadrado do SVG é o ponto final da frase. */
+.h1-pill{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--dark);border-radius:999px;
+  /* o ponto do SVG fica embaixo à direita, bem onde o raio da pílula corta —
+     por isso o respiro é maior desse lado */
+  padding:.22em .52em .26em .42em;
+  vertical-align:baseline;
+}
+.h1-pill img{height:.58em;width:auto;display:block}
+.btn-pill{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--font);font-size:15px;font-weight:var(--no-weight-subtitulo);
+  padding:14px 26px;border-radius:999px;
+  border:1.5px solid rgba(20,20,20,.18);
+  background:transparent;color:var(--dark);
+  cursor:pointer;text-decoration:none;white-space:nowrap;
+  transition:background .2s,color .2s,border-color .2s,transform .2s;
+}
+.btn-pill:hover{background:var(--dark);color:#fff;border-color:var(--dark);transform:translateY(-1px)}
+.btn-pill-solid{background:var(--dark);color:#fff;border-color:var(--dark)}
+.btn-pill-solid:hover{background:var(--no-tinta-alt2)}
+.btn-pill .arw{font-size:1.05em;line-height:1}
+
+/* 4 · cartão de chat — claro, com avatar, status e input embutido */
 .hero-chat{
   position:relative;z-index:2;
-  animation:fadeLeft 1s ease .5s both;
-  display:flex;flex-direction:column;
-  align-items:stretch;
-  width:100%;max-width:520px;
-  justify-self:end;
+  width:100%;max-width:100%;
+  background:rgba(255,255,255,.72);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(20,20,20,.08);
+  border-radius:22px;padding:16px;
+  box-shadow:var(--no-shadow-card);
 }
-@keyframes fadeLeft{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+.cc-head{display:flex;align-items:flex-start;gap:11px}
+.cc-avatar{
+  width:38px;height:38px;border-radius:50%;flex:none;
+  background:var(--dark);object-fit:cover;
+}
+.cc-copy{flex:1;min-width:0}
+.cc-title{
+  font-family:var(--font);font-size:14.5px;
+  font-weight:var(--no-weight-subtitulo);color:var(--dark);
+}
+.cc-sub{
+  font-family:var(--font);font-size:13px;font-weight:var(--no-weight-corpo);
+  color:var(--mid);line-height:1.45;margin-top:3px;
+}
+.cc-status{
+  display:inline-flex;align-items:center;gap:6px;flex:none;
+  font-family:var(--font);font-size:12.5px;color:var(--mid);
+}
+.cc-status i{width:7px;height:7px;border-radius:50%;background:var(--no-verde);display:block}
+
+/* linha do input — pílula clara com botão circular tinta */
+.cc-inputrow{
+  display:flex;align-items:center;gap:10px;margin-top:14px;
+  background:#fff;border:1px solid rgba(20,20,20,.09);
+  border-radius:999px;padding:6px 6px 6px 18px;
+  transition:border-color .2s;
+}
+.cc-inputrow:focus-within{border-color:rgba(20,20,20,.28)}
+.cc-inputrow .hchat-input{
+  flex:1;min-width:0;border:none;outline:none;background:transparent;
+  font-family:var(--font);font-size:14.5px;font-weight:var(--no-weight-corpo);
+  color:var(--dark);padding:8px 0;
+}
+.cc-inputrow .hchat-input::placeholder{color:var(--mid);opacity:.85}
+.cc-send{
+  width:38px;height:38px;flex:none;border-radius:50%;border:none;
+  background:var(--dark);color:#fff;cursor:pointer;
+  display:grid;place-items:center;transition:background .2s,transform .2s;
+}
+.cc-send:hover{background:var(--no-tinta-alt2);transform:scale(1.06)}
+.cc-send svg{width:15px;height:15px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+/* o mockup mostra só cabeçalho + input; as sugestões de follow-up do main.js
+   ficam ocultas pra não competir com os 4 botões acima */
+.hero-chat .hchat-chips{display:none}
+
+/* controles herdados do chat antigo que o mockup não mostra.
+   Ficam no DOM porque main.js os referencia sem checar null. */
+.cc-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ── greeting ── */
 .hchat-label{
@@ -1464,32 +1684,30 @@ to{opacity:1;transform:translateX(0)}}
 }
 .hchat-msgs{
   overflow-y:auto;
-  padding:4px 0 12px;
+  padding:2px 2px 4px;
   display:flex;flex-direction:column;gap:8px;
-  max-height:340px;
+  max-height:320px;
   scrollbar-width:thin;
-  scrollbar-color:rgba(255,255,255,.15) transparent;
+  scrollbar-color:rgba(20,20,20,.18) transparent;
 }
-.hchat-msgs::-webkit-scrollbar{width:3px}
-.hchat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px}
+.hchat-msgs::-webkit-scrollbar{width:4px}
+.hchat-msgs::-webkit-scrollbar-thumb{background:rgba(20,20,20,.16);border-radius:2px}
 .hchat-msg{display:flex;flex-direction:column;max-width:86%}
 .hchat-msg.user{align-self:flex-end}
 .hchat-msg.ai{align-self:flex-start}
 .hchat-bubble{
-  padding:9px 14px;border-radius:16px;
-  font-family:var(--font);font-size:13px;line-height:1.65;
+  padding:10px 14px;border-radius:16px;
+  font-family:var(--font);font-size:13.5px;line-height:1.6;
 }
+/* usuário: tinta sólida. IA: branco com borda — a conversa fica legível
+   sobre o cartão claro sem precisar de fundo escuro atrás. */
 .hchat-msg.user .hchat-bubble{
-  background:var(--blue);
-  border:1px solid var(--blue);
-  color:#ffffff;
-  border-bottom-right-radius:4px;
+  background:var(--dark);border:1px solid var(--dark);
+  color:#fff;border-bottom-right-radius:5px;
 }
 .hchat-msg.ai .hchat-bubble{
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.1);
-  color:rgba(255,255,255,.92);
-  border-bottom-left-radius:4px;
+  background:#fff;border:1px solid rgba(20,20,20,.09);
+  color:var(--dark);border-bottom-left-radius:5px;
 }
 .hchat-typing{
   display:flex;align-items:center;gap:4px;
@@ -1528,8 +1746,8 @@ to{opacity:1;transform:translateX(0)}}
 }
 .hchat-file-rm svg{width:8px;height:8px;stroke:white;stroke-width:2.5;fill:none}
 
-@media(max-width:1200px){#hero{gap:40px}}
-@media(max-width:1100px){#hero{grid-template-columns:1fr}.hero-chat{display:none}}
+
+
 @media(max-width:900px){#hero{padding:120px 20px 60px}}
 
 
@@ -1754,12 +1972,12 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;backgrou
 }
 
 /* ── Chat bubbles ── */
-.hchat-msg.ai .hchat-bubble{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.92);border-bottom-left-radius:4px}
-.hchat-msg.user .hchat-bubble{background:var(--blue);border:1px solid var(--blue);color:#ffffff;border-bottom-right-radius:4px}
+.hchat-msg.ai .hchat-bubble{background:#fff;border:1px solid rgba(20,20,20,.09);color:var(--dark);border-bottom-left-radius:5px}
+.hchat-msg.user .hchat-bubble{background:var(--dark);border:1px solid var(--dark);color:#fff;border-bottom-right-radius:5px}
 .hchat-msgs{background:transparent}
 
 /* ── Hero mobile: chat abaixo + conteúdo centralizado ── */
-@media(max-width:1100px){#hero{grid-template-columns:1fr;padding:130px 60px 60px}.hero-chat{display:flex;max-width:100%;justify-self:stretch}}
+@media(max-width:1100px){#hero{padding:130px 48px 60px}.hero-inner,.hero-chat{max-width:100%}}
 @media(max-width:768px){
   #hero{padding:100px 20px 48px;gap:24px}
   .hero-content{text-align:center;max-width:100%}
@@ -1788,33 +2006,18 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;backgrou
 #usecases{min-height:500px}
 
 
-/* ── Chat: messages integradas ao dark box ── */
-/* Quando msgs aparecem, o box não tem separação visual */
-.hchat-msgs-wrap.visible + .hchat-box {
-  border-radius:0 0 20px 20px;
-  border-top:none;
+/* ── Chat dentro do cartão claro ──
+   O painel #1a1d27 daqui era pra fundir com a caixa preta antiga, que saiu
+   no redesign da hero. Agora as mensagens vivem sobre o cartão claro. */
+.hchat-msgs-wrap.visible{
+  background:transparent;border:none;padding:0;margin:12px 0 0;
+  box-shadow:none;border-radius:0;
 }
-.hchat-msgs-wrap.visible {
-  background:#1a1d27;
-  border:1.5px solid rgba(255,255,255,.08);
-  border-bottom:none;
-  border-radius:20px 20px 0 0;
-  padding:14px 14px 0;
-  box-shadow:0 16px 48px rgba(0,0,0,.24),0 4px 12px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.05);
-  margin-bottom:-2px; /* overlap with box below */
-}
-/* Typing indicator dentro do dark box */
 .hchat-typing{
-  background:rgba(255,255,255,.07) !important;
-  border:1px solid rgba(255,255,255,.09) !important;
+  background:rgba(20,20,20,.05) !important;
+  border:1px solid rgba(20,20,20,.08) !important;
 }
-.hchat-typing span{
-  background:rgba(255,255,255,.45) !important;
-}
-/* Focus state no container completo */
-.hchat-msgs-wrap.visible + .hchat-box:focus-within {
-  border-color:rgba(61,99,219,.4);
-}
+.hchat-typing span{background:rgba(20,20,20,.4) !important}
 
 
 /* ── Logos: garantir visibilidade em fundos escuros ── */
@@ -1850,65 +2053,70 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-grid"></div>
-  <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div><div class="orb orb-4"></div>
-  <div class="hero-content">
-    <div class="hero-badge"><span class="logo-no" style="font-size:20px">nó</span> tech stack IA</div>
-    <h1 class="hero-title">
-      <span class="t-dark">Tecnologia que</span><br>
-      <span class="t-blue">arquiteta</span><span class="t-dark">,</span> <span class="t-green">integra</span>
-      <span class="t-dark">e </span><span class="t-red">opera</span><span class="t-dark">.</span>
-    </h1>
-    <p class="hero-sub">Você não precisa saber qual ferramenta usar, como conectar ou transformar IA em resultado. A gente faz tudo — e entrega funcionando.</p>
-    <p class="hero-sub" style="margin-top:18px"><strong>Marketing. Sistemas. Tudo no mesmo nó.</strong></p>
-    <div class="hero-actions">
-      <a href="#cta" class="btn-primary" onclick="goTo('cta');return false">Montar meu tech-stack →</a>
-      <a href="#how" class="btn-secondary" onclick="goTo('how');return false">Ver como funciona</a>
+  <!-- Fundo em vídeo, avançado/retrocedido pelo movimento horizontal do mouse.
+       Sem autoplay de propósito: quem controla o tempo é o cursor.
+       Enquanto o arquivo não existir, o gradiente + orbs abaixo seguem valendo. -->
+  <div class="hero-backdrop"></div>
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="hero-mascot" id="heroMascot">
+    <div id="no-mascot" role="img" aria-label="Mascote nó tech stack — observa o cursor; clique para mudar o modo">
+      <canvas class="nm-canvas"></canvas>
     </div>
   </div>
-  <div class="hero-chat">
-    <div class="hchat-title">Quer tirar alguma dúvida?<br>Pergunte para a IA da&nbsp;<span class="logo-no" style="font-size:1.15em">nó</span></div>
-    <!-- messages -->
-    <div class="hchat-msgs-wrap" id="hchatMsgsWrap">
-      <div class="hchat-msgs" id="hchatMsgs"></div>
-    </div>
-    <!-- main prompt box -->
-    <div class="hchat-box" id="hchatBox">
-      <!-- file previews -->
-      <div class="hchat-files" id="hchatFiles" style="display:none"></div>
-      <!-- textarea -->
-      <input class="hchat-input" id="hchatInput" type="text" autocomplete="off">
-      <!-- footer row -->
-      <div class="hchat-box-footer">
-        <div class="hchat-actions">
-          <!-- attach -->
-          <button class="hchat-act" id="hchatAttach" title="Anexar imagem">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-          </button>
-          <input type="file" id="hchatFileIn" accept="image/*" style="display:none">
-          <div class="hchat-act-divider"></div>
-          <!-- search -->
-          <button class="hchat-act" id="hchatSearch" title="Pesquisar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-            <span class="hchat-act-label" style="display:none">Pesquisar</span>
-          </button>
-          <div class="hchat-act-divider"></div>
-          <!-- think -->
-          <button class="hchat-act" id="hchatThink" title="Analisar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg>
-            <span class="hchat-act-label" style="display:none">Analisar</span>
-          </button>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px">
 
-          <button class="hchat-send" id="hchatSend">
-            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
+  <div class="hero-inner">
+    <h1 class="hero-h1">Sua operação,<br>em um só <span class="h1-pill"><img src="/brand/logo/png/no-branca-ponto-azul-2048w.png" alt="nó." width="2048" height="1209"></span></h1>
+
+    <p class="hero-lead">Site, automações, integrações com IA e tráfego pago.
+    A gente arquiteta, implementa e mantém funcionando — você só opera.</p>
+
+    <!-- Mascote vivo. No mobile fica aqui no fluxo, entre o subtítulo e as
+         perguntas; no desktop o CSS o tira do fluxo e joga na faixa direita. -->
+    <!-- Âncora do mascote no mobile: ele vive aqui, entre o subtítulo e as
+         perguntas. No desktop o JS o move pra dentro do #hero, pra poder
+         ancorar na direita da seção em vez da coluna de texto. -->
+    <div id="mascotSlot"></div>
+
+    <div class="hero-ctas">
+      <a href="#cta" class="btn-pill btn-pill-solid" onclick="goTo('cta');return false">Fale com a gente <span class="arw" aria-hidden="true">↗</span></a>
+      <button type="button" class="btn-pill btn-pill-q" data-ask="Serve para o meu negócio? Quero entender se a nó atende o meu caso.">Serve para o meu negócio?</button>
+      <button type="button" class="btn-pill btn-pill-q" data-ask="Ainda não tenho um negócio, mas tenho uma ideia. Como a nó pode me ajudar a tirar do papel?"><span>Ainda não tenho um negócio, <br class="so-mobile">mas tenho uma ideia...</span></button>
+      <button type="button" class="btn-pill btn-pill-q" data-ask="Vocês utilizam quais modelos de IA? Como a IA entra nos projetos que vocês entregam?">Vocês utilizam quais modelos de IA?</button>
+    </div>
+
+    <!-- cartão de chat -->
+    <div class="hero-chat">
+      <div class="cc-head">
+        <img class="cc-avatar" src="/brand/favicon/favicon-dark.svg" alt="nó" width="38" height="38">
+        <div class="cc-copy">
+          <div class="cc-title">Olá! Como podemos ajudar?</div>
+          <div class="cc-sub">Respondo rápido para falar sobre seu projeto ou tirar dúvidas.</div>
         </div>
+        <span class="cc-status"><i aria-hidden="true"></i>Online</span>
+      </div>
+
+      <div class="hchat-msgs-wrap" id="hchatMsgsWrap">
+        <div class="hchat-msgs" id="hchatMsgs"></div>
+      </div>
+
+      <div class="cc-inputrow">
+        <input class="hchat-input" id="hchatInput" type="text" autocomplete="off" placeholder="Escreva sua mensagem...">
+        <button class="cc-send" id="hchatSend" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </button>
+      </div>
+
+      <div class="hchat-chips" id="hchatChips"></div>
+
+      <!-- controles que o mockup não mostra; main.js os referencia sem checar null -->
+      <div class="cc-hidden" aria-hidden="true">
+        <div class="hchat-files" id="hchatFiles"></div>
+        <button class="hchat-act" id="hchatAttach" tabindex="-1"></button>
+        <input type="file" id="hchatFileIn" accept="image/*" tabindex="-1">
+        <button class="hchat-act" id="hchatSearch" tabindex="-1"><span class="hchat-act-label"></span></button>
+        <button class="hchat-act" id="hchatThink" tabindex="-1"><span class="hchat-act-label"></span></button>
       </div>
     </div>
-    <!-- suggestion chips -->
-    <div class="hchat-chips" id="hchatChips"></div>
   </div>
 </section>
 
@@ -1921,7 +2129,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <!-- HOW IT WORKS -->
-<section id="how">
+<!-- OCULTA: home enxuta, o caminho principal é conversar com a IA.
+     Pra religar, basta remover o atributo hidden. -->
+<section id="how" hidden>
   <div class="how-header reveal">
     <div class="section-label label-blue">Como funciona</div>
     <h2 class="section-title">Da ideia à operação em 4 etapas</h2>
@@ -2066,7 +2276,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- USE CASES — BENTO -->
-<section id="usecases">
+<!-- OCULTA: home enxuta, o caminho principal é conversar com a IA.
+     Pra religar, basta remover o atributo hidden. -->
+<section id="usecases" hidden>
   <div class="section-label reveal label-blue">Soluções</div>
   <h2 class="section-title reveal">Veja o painel de<br>quem já usa a <span class="logo-no" style="font-size:1.05em">nó</span></h2>
   <p class="section-sub reveal">Cada segmento possui suas particularidades. Escolha o tipo de negócio e veja algumas possibilidades para a sua própria Hub.</p>
@@ -2117,7 +2329,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- MODULES -->
-<section id="modulos">
+<!-- OCULTA: home enxuta, o caminho principal é conversar com a IA.
+     Pra religar, basta remover o atributo hidden. -->
+<section id="modulos" hidden>
   <div class="section-label reveal" style="color:rgba(255,255,255,.4)">Ecossistema</div>
   <h2 class="section-title reveal">Nosso ecossistema de SaaS</h2>
   <p class="section-sub reveal">Módulos que potencializam a sua Hub — ou que você assina individualmente.</p>
@@ -2125,7 +2339,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- PLATFORMS -->
-<section id="platforms" style="padding:80px 0">
+<section id="platforms" class="sec-studio" style="padding:80px 0">
   <div class="plat-hdr reveal">
     <div class="section-label label-blue" style="justify-content:center">Ferramentas</div>
     <h2 class="section-title" style="text-align:center">Stack que dominamos</h2>
@@ -2139,7 +2353,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section id="pricing">
   <div class="section-label reveal" style="color:rgba(255,255,255,.38)">Investimento</div>
   <h2 class="section-title reveal">Preço justo. Resultado real.</h2>
-  <p class="section-sub reveal">Um único investimento na implementação com a <span class="logo-no" style="font-size:1.05em">nó</span>. Depois, só o custo das plataformas.</p>
+  <p class="section-sub reveal">Um único investimento na implementação com a <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Depois, só o custo das plataformas.</p>
   <div class="pricing-grid">
     <div class="pricing-card reveal">
       <div class="pricing-title">Implementação</div>
@@ -2266,7 +2480,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- FAQ -->
-<section id="faq">
+<section id="faq" class="sec-studio">
   <div class="section-label reveal label-blue">Dúvidas Frequentes</div>
   <h2 class="section-title reveal">Tudo que você precisa<br>saber sobre a <span class="logo-no" style="font-size:1.05em">nó</span></h2>
   <p class="section-sub reveal">Respondemos as principais perguntas de quem está considerando trabalhar com a gente.</p>
@@ -2274,7 +2488,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </section>
 
 <!-- CTA FORM -->
-<section id="cta">
+<section id="cta" class="sec-studio">
   <div class="cta-grid">
     <div class="cta-left">
       <div class="section-label label-blue reveal">Começar agora</div>
@@ -2346,17 +2560,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="ft-logo"><img src="/brand/logo/svg/no-branca-ponto-ambar.svg" alt="nó" width="64" height="38" style="height:38px;width:auto;object-fit:contain"></div>
     <div class="ft-txt" style="margin-top:7px">IA que arquiteta, integra e opera.</div>
   </div>
-  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
-    <!-- rodapé da marca: 4 pontos + nó · @notechstack (BRAND.md §7) -->
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="mono-label" style="color:rgba(255,255,255,.55)">nó · @notechstack</span>
-    </div>
-    <div class="ft-txt">© 2026 <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Todos os direitos reservados.</div>
-  </div>
+  <div class="ft-txt">© 2026 <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Todos os direitos reservados.</div>
 </footer>
 
 <script type="module">
+  /* ─── HERO: botões que semeiam o chat + vídeo controlado pelo mouse ─── */
+  (function(){
+    /* Os três botões contornados não têm página de destino (não existe
+       portfólio no site). Em vez de link morto, cada um abre o chat já com a
+       pergunta correspondente — que é o caminho principal desta home. */
+    document.querySelectorAll('.btn-pill[data-ask]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var input = document.getElementById('hchatInput');
+        var send  = document.getElementById('hchatSend');
+        if(!input || !send) return;
+        input.value = b.getAttribute('data-ask');
+        send.click();
+        input.focus();
+      });
+    });
+
+    /* Vídeo de fundo: o mouse é a linha do tempo.
+       delta horizontal → offset de tempo; o onSeeked reenfileira o próximo
+       seek só se o alvo mudou, senão o browser afoga em seeks. */
+    var v = document.getElementById('heroVideo');
+    var hero = document.getElementById('hero');
+    if(v){
+      var SENSITIVITY = 0.8, prevX = null, target = 0, seeking = false;
+      var media = document.getElementById('heroMedia');
+      v.addEventListener('loadeddata', function(){
+        hero.classList.add('has-video');
+        if(media) media.classList.add('ready');
+      });
+      /* sem arquivo ainda → o bloco inteiro sai do layout, sem buraco */
+      v.addEventListener('error', function(){ if(media) media.remove(); });
+
+      window.addEventListener('mousemove', function(e){
+        if(prevX === null){ prevX = e.clientX; return; }
+        var delta = e.clientX - prevX; prevX = e.clientX;
+        if(!v.duration || !isFinite(v.duration)) return;
+        target += (delta / window.innerWidth) * SENSITIVITY * v.duration;
+        target = Math.max(0, Math.min(v.duration, target));
+        if(!seeking){ seeking = true; v.currentTime = target; }
+      }, {passive:true});
+
+      v.addEventListener('seeked', function(){
+        if(Math.abs(v.currentTime - target) > 0.01) v.currentTime = target;
+        else seeking = false;
+      });
+    }
+  })();
+
+  import '/shared/mascote.js';
   import { initPillNav } from '/shared/pillnav.js';
   import { pillNavConfig } from '/shared/pillnav-config.js';
 

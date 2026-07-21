@@ -1,1 +1,7 @@
 ﻿.vault-context/
+
+# Matéria-prima do mascote — o site consome assets/mascote/ (frames extraídos)
+# e shared/mascote.js. Os MP4 originais e o HTML com os frames em base64 são
+# só a fonte da extração; ficam fora do git pra não pesar 30 MB no histórico.
+brand/mascote/*.mp4
+brand/mascote/no-mascote-vivo.html

@@ -1,11 +1,29 @@
+/* Logo ancorada à esquerda, pills à direita — o miolo fica livre pro
+   assunto da hero respirar. */
 .pill-nav-container {
   position: fixed;
   top: 24px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  padding: 0 40px;
   z-index: 1000;
   transition: filter .3s ease;
 }
+/* Três faixas: logo à esquerda, pills centralizadas de verdade, botão mobile
+   à direita. As colunas 1fr dos lados é que garantem o centro óptico — com
+   space-between as pills ficariam empurradas pela largura da logo. */
+.pill-nav-container .pill-nav {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+/* As colunas são fixadas na mão de propósito: no mobile as pills ficam
+   display:none e saem do fluxo do grid, e com posicionamento automático o
+   hambúrguer subiria pra coluna do meio em vez de ficar na direita. */
+.pill-nav-container .pill-logo { grid-column: 1; justify-self: start; }
+.pill-nav-container .pill-nav-items { grid-column: 2; justify-self: center; }
+.pill-nav-container .mobile-menu-button { grid-column: 3; justify-self: end; }
 
 .pill-nav-container.scrolled .pill-nav-items,
 .pill-nav-container.scrolled .pill-logo,
@@ -14,17 +32,12 @@
 }
 
 @media (max-width: 768px) {
-  .pill-nav-container {
-    width: 100%;
-    left: 0;
-    transform: none;
-    top: 16px;
-  }
+  .pill-nav-container { padding: 0 16px; top: 16px; }
 }
 
 .pill-nav {
   --nav-h: 56px;
-  --logo: 48px;
+  --logo: 76px;
   --pill-pad-x: 28px;
   --pill-gap: 4px;
   width: max-content;
@@ -34,12 +47,17 @@
 }
 
 @media (max-width: 768px) {
-  .pill-nav {
-    width: 100%;
-    justify-content: space-between;
-    padding: 0 16px;
-    background: transparent;
+  /* No mobile a logo encolhe e o hambúrguer vai pro canto superior direito.
+     As pills somem (.desktop-only), então a coluna do meio colapsa e o grid
+     vira só logo | hambúrguer. */
+  .pill-nav { background: transparent; }
+  .pill-nav-container .pill-nav { --logo: 44px; }
+  .pill-nav-container .mobile-menu-button {
+    width: 44px;
+    height: 44px;
+    justify-self: end;
   }
+  .pill-nav-container .hamburger-line { width: 17px; }
 }
 
 .pill-nav-items {
@@ -56,8 +74,8 @@
 }
 
 .pill-logo {
-  width: var(--nav-h);
-  height: var(--nav-h);
+  width: var(--logo);
+  height: var(--logo);
   border-radius: 50%;
   background: var(--base, #141414);
   /* o mark de brand/favicon/favicon-dark.svg já traz a margem óptica desenhada

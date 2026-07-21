@@ -2219,21 +2219,15 @@ setTimeout(patch, 200);
   var thinkBtn = document.getElementById('hchatThink');
   if(!input||!sendBtn||!msgs) return;
 
-  var SYSTEM = `Você é a IA da nó — tech stack IA, uma agência brasileira especializada em implementar sistemas digitais completos para pequenas e médias empresas. Seu objetivo é esclarecer dúvidas, apresentar soluções e conduzir o visitante para agendar uma conversa com a equipe.
+  /* O prompt mestre vive em content/ia-referencia.md — editar aquele arquivo
+     muda o comportamento do chat sem mexer em JS. Carrega uma vez, em
+     background; enquanto não chega (ou se falhar), vale a reserva abaixo. */
+  var SYSTEM = 'Você é a IA da nó — tech stack IA, agência brasileira que implementa sistemas digitais completos (site, automações, integrações e IA) para pequenas e médias empresas. Responda SOMENTE sobre como a nó opera e que soluções ela oferece; recuse qualquer outro assunto ou pedido de produção de conteúdo, em no máximo 3 parágrafos, tratando por você. Não invente preço, prazo ou dado que você não tenha.';
 
-SOBRE A NÓ:
-- Entrega sistemas digitais completos: sites, automações, integrações com IA, painéis de controle
-- Implementação em 3 a 8 semanas
-- Investimento: R$10k–50k (único, parcelado em até 10x)
-- Manutenção mensal: ~R$1.000 (inclui toda infraestrutura, suporte e relatórios)
-- Usa as melhores ferramentas para cada projeto, montadas sob medida
-- Cases: Prontia Saúde (telemedicina), Loiê Sala Aromática (e-commerce luxo), Koulu Growth Commerce, InfluencerHub
-
-PERFIS: e-commerce, clínicas, prestadores de serviço, criadores de conteúdo, gestão empresarial, plataformas de cursos
-
-PERSONALIDADE: Consultiva, direta, amigável. Tuteia. Faz UMA pergunta por vez. Convite sutil para o formulário quando fizer sentido. Máximo 3 parágrafos.
-
-RESTRIÇÃO: Apenas sobre a nó e temas relacionados.`;
+  fetch('/content/ia-referencia.md')
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+    .then(function(md){ if(md && md.trim().length > 200) SYSTEM = md; })
+    .catch(function(){ /* mantém a reserva */ });
 
   /* ── state ── */
   var history   = [];
@@ -2392,13 +2386,22 @@ RESTRIÇÃO: Apenas sobre a nó e temas relacionados.`;
       var res=await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/anthropic-proxy',{
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:history.slice(-10)})
+        /* claude-sonnet-4-20250514 foi aposentado em 15/jun/2026 — substituído
+           pelo sucessor da mesma família (guia de migração da Anthropic). */
+        body:JSON.stringify({model:'claude-sonnet-5',max_tokens:1000,thinking:{type:'disabled'},system:SYSTEM,messages:history.slice(-10)})
       });
       var data=await res.json();
-      var reply=(data.content&&data.content[0]&&data.content[0].text)||'Desculpe, tive um problema. Tente novamente!';
+      /* nunca indexar content[0]: modelos com thinking devolvem o bloco de
+         raciocínio primeiro e o texto depois */
+      function pickText(res){
+        var b=(res&&res.content||[]).filter(function(x){return x.type==='text'&&x.text});
+        return b.length?b.map(function(x){return x.text}).join('\n\n'):'';
+      }
+      var raw=pickText(data);
+      var reply=raw||'Desculpe, tive um problema. Tente novamente!';
       rmTyping();
       reply=reply.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n\n/g,'<br><br>').replace(/\n/g,' ');
-      history.push({role:'assistant',content:(data.content&&data.content[0]&&data.content[0].text)||''});
+      history.push({role:'assistant',content:raw});
       addMsg('ai',reply);
       var n=history.length;
       if(n<=2)      setChips(['Quanto custa?','Qual o prazo?','Ver cases','Como funciona?']);
