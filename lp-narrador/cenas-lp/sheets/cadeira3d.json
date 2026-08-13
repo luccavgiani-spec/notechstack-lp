@@ -1,0 +1,29 @@
+{
+ "frames": 24,
+ "cols": 6,
+ "rows": 4,
+ "refAspect": 0.6783505154639176,
+ "sheets": {
+  "@2x": {
+   "file": "cadeira3d@2x.webp",
+   "frameW": 329,
+   "frameH": 485,
+   "sheetW": 1974,
+   "sheetH": 1940
+  },
+  "@1x": {
+   "file": "cadeira3d@1x.webp",
+   "frameW": 165,
+   "frameH": 243,
+   "sheetW": 990,
+   "sheetH": 972
+  },
+  "@0.5x": {
+   "file": "cadeira3d@0.5x.webp",
+   "frameW": 82,
+   "frameH": 121,
+   "sheetW": 492,
+   "sheetH": 484
+  }
+ }
+}
