@@ -2653,6 +2653,19 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
    do estado da porta do diagnóstico (a regra que a desligava com
    html.diag-aberto saiu junto). */
 #platforms{ position:relative; overflow:hidden }
+/* ── FIO CLARO NAS DUAS EMENDAS ──
+   As duas bordas das ferramentas caem em pixel FRACIONÁRIO (medido: 5695.734
+   e 6218.516). Quando isso acontece, a última linha de cada seção é composta
+   com o que está ATRÁS dela — e atrás é o body, que é bege (#E2D8CF). Nas
+   duas emendas o que encosta é preto com preto (o gradiente das ferramentas
+   fecha em preto dos dois lados, e os vizinhos são o #fluxo e o #ctafinal),
+   então o bege do body aparece no meio como um fio claro.
+   O -1px de sangria que os pseudo-elementos já tinham não resolve: o
+   overflow:hidden da seção corta justamente essa sangria.
+   Um pixel de sobreposição fecha a fresta. Os dois são position:relative, e
+   irmão posterior pinta por cima, então cada um cobre a borda do anterior. */
+#platforms{ margin-top:-1px }
+#ctafinal{ margin-top:-1px }
 /* Rampa QUENTE, não neutra: preto → bege em linha reta passa por um cinza
    morto no meio. Passando pelos marrons da marca (a mesma família do estúdio
    do "Senta aí"), a emenda vira anoitecer em vez de sujeira. */
