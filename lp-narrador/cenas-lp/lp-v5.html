@@ -3187,8 +3187,8 @@ html.diag-aberto #platforms::before{ display:none }
 </div>
 <script type="module">
   /* ─── HERO: vídeo de fundo controlado pelo mouse ───
-     (os botões-pergunta agora pré-armam a opção no monitor via armOption —
-     o chat da hero que eles alimentavam não existe mais nesta página) */
+     (a hero tem um CTA só, o #heroCtaBtn, e ele leva ao #ctafinal. Os
+     botões-pergunta saíram junto com o chat que alimentavam) */
   (function(){
     /* Vídeo de fundo: o mouse é a linha do tempo.
        delta horizontal → offset de tempo; o onSeeked reenfileira o próximo
@@ -3695,8 +3695,10 @@ function frame(now){
    O #pouso nasce display:none. Isto aqui destranca, remede o monitor (a
    calibragem da tela do CRT é medida em pixels, e medir escondido dá zero) e
    só então rola pra lá. Idempotente: chamar de novo só rola.
-   Chamam esta função: o botão "Começar projeto", o deep-link #pouso, o
-   armOption/pousoForceNode do monitor e o "Ir para esta seção" do painel. */
+   São DUAS as entradas do diagnóstico, e as duas passam por aqui: o botão
+   "Começar projeto" do #ctafinal e o deep-link #pouso. Fora do fluxo do
+   visitante, também chamam o pousoForceNode do painel de debug e o "Ir para
+   esta seção". */
 /* Rolagem com curva própria. O html tem scroll-behavior:smooth, que é uma
    curva do browser: não dá pra sincronizar com a entrada do palco, e os dois
    ainda brigariam pelo mesmo eixo. Aqui a curva é a mesma dos transitions do
@@ -4704,7 +4706,10 @@ requestAnimationFrame(frame);
 
   /* ---------- estado ---------- */
   let stillOnly = R2;      // fallback: still direto, sem fase de vídeo
-  let armed = 0;           // atalho da hero pré-armou a opção N (0 = nada)
+  /* liga o terminal sem esperar a fase de vídeo. Só o pousoForceNode do
+     painel de debug levanta isto hoje — no fluxo do visitante ele fica em 0
+     e o monitor acende pela rolagem. */
+  let armed = 0;
   let chosen = 0;          // opção selecionada no monitor
   let lastLayer = '';      // 'A' | 'B' | 'S'
 
@@ -6925,20 +6930,15 @@ requestAnimationFrame(frame);
     window.leadPath = seedPath.map(p => p.short || p.label).join(' → ');
   }
 
-  /* atalho da hero: pré-arma a opção RAIZ e leva direto ao monitor com o
-     roteiro completo (o typing pula a apresentação — quem chega por atalho
-     já respondeu a pergunta no clique) */
-  window.armOption = function(n){
-    armed = n;
-    if (window.abrirDiagnostico) abrirDiagnostico({semRolar:true});
-    const range = pouso.offsetHeight - innerHeight;
-    /* 'instant' de verdade: 'auto' herda o scroll-behavior:smooth do html */
-    window.scrollTo({ top: pouso.offsetTop + range * 0.99, behavior:'instant' });
-    requestAnimationFrame(() => {
-      instantBase();          // pula a apresentação: quem clicou já respondeu
-      chooseOption('root', n - 1);
-    });
-  };
+  /* Havia aqui um armOption(n) — atalho que pré-armava uma opção da raiz e
+     pulava direto pro monitor. Ele nasceu pros botões-pergunta da hero, que
+     saíram da página junto com o chat que alimentavam; ficou meses definido
+     em window sem um único call site, prometendo nos comentários uma terceira
+     entrada que não existia. Removido em 14/08. As entradas do diagnóstico
+     são duas: o CTA do #ctafinal e o deep-link #pouso.
+     Se um dia a hero voltar a fazer a pergunta, o que ele fazia era:
+     armed = n → abrirDiagnostico({semRolar:true}) → scrollTo do fim do #pouso
+     → instantBase() → chooseOption('root', n-1). */
 
   /* o sub() do main.js compartilhado montava o payload a partir do DOM do
      formulário de 5 passos do #cta, que não existe mais. Quem envia o lead

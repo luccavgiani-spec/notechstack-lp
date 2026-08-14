@@ -25,7 +25,7 @@ flowchart TD
     classDef fim fill:#dbfaad,stroke:#608520
     classDef fuga fill:#ffd8f4,stroke:#af3fb9
 
-    E1(["ENTRADAS · 4 portas pro mesmo monitor<br>hero · CTA final · atalho armOption · deep-link #pouso"]):::entrada
+    E1(["ENTRADAS · 2 portas pro mesmo monitor<br>CTA 'Começar projeto' do #ctafinal · deep-link #pouso<br>(o CTA da hero rola até o #ctafinal, não abre o diagnóstico)"]):::entrada
     E2["abrirDiagnostico → queda → pouso → zoom no monitor"]:::entrada
     NAV["NAVBAR · ← voltar · TRILHA ao vivo · ⌂ início · próximo →"]:::entrada
 
