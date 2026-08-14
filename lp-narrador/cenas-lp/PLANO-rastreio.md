@@ -464,7 +464,7 @@ curl -s "$FN/painel-dados?v=funil" -H "x-painel-token: SEU_TOKEN"
 
 | Bloco | Estado | Quando | Notas |
 |---|---|---|---|
-| A — container GTM | ⬜ **é o que falta** | | precisa da conta Google logada; ver "o último passo" abaixo |
+| A — container GTM | 🟡 **montado, NÃO publicado** | 14/08/2026 | 26 itens no workspace; publicar só depois do deploy do PR |
 | B — lp-v5.html | ✅ **aplicado e testado** | 14/08/2026 | funil de 16 eventos percorrido ponta a ponta no browser |
 | C — server-side | ✅ **no ar** | 14/08/2026 | secrets setados; CAPI devolveu `events_received: 1` |
 | D — painel | ✅ **completo** | 14/08/2026 | `painel-leads.html`, três telas |
@@ -487,7 +487,43 @@ e `virou_lead`, o lead com **coluna própria** para site, descrição, folha, ni
 caminho e modo — e **`capi_status: ok_1`**, ou seja, o Meta recebeu o `Lead`
 server-side com e-mail e telefone hasheados. Dados de teste apagados depois.
 
-### O último passo: o container GTM
+### O container, montado em 14/08/2026 — e por que NÃO foi publicado
+
+Conta confirmada antes de tocar em qualquer coisa: **Nó Tech Stack ·
+notechstack@gmail.com** (`authuser=1`), com **sete contas Google logadas** no Chrome.
+Criar sob a identidade errada é caro de desfazer — vale sempre parar e conferir.
+
+Montado por **importação de JSON** em vez de ~150 cliques: 15 variáveis, 5 acionadores e
+6 tags, com `Combinar` (nunca `Substituir`, que apagaria GA4 e Ads). O diff da primeira
+importação veio **0 modificadas · 26 adicionadas · 0 excluídas** — as tags que já existiam
+ficaram intactas.
+
+**Dois bugs pegos antes de ir pro ar:**
+
+1. **Aspas em Custom HTML.** O GTM substitui `{{variável}}` pelo valor **cru, sem aspas**.
+   `{eventID:'pv-'+{{js.sid}}}` viraria `'pv-'+66570817-5122-...` — erro de sintaxe que
+   mataria as quatro tags Meta em silêncio. As aspas vão **dentro** da string:
+   `{eventID:'pv-{{js.sid}}'}`.
+2. **A categoria temática no GA4.** A `/privacidade` promete, por escrito, que categoria
+   capaz de revelar dado sensível não vai para plataforma de anúncio — quatro das dezenove
+   folhas são saúde. As tags Meta já nasceram limpas (só `value` e `currency`), mas as de
+   GA4 levavam `folha`, `nicho` e `caminho` — e **o GA4 alimenta o Google Ads pelo mesmo
+   container**. Removidos.
+
+   Mascarar só as folhas de saúde foi descartado: a ausência vira a marca. Sessão sem
+   `folha` seria, por eliminação, sessão de saúde. A análise por folha mora no painel de
+   percurso (first-party, view `folha_desempenho`), que responde isso melhor do que o GA4
+   responderia — então não se perde nada.
+
+**O que ficou no GA4:** `lead_sid`, `etapa`, `modo`, `passo`, `origem`, `capitulo`, `cta`
+e, no `generate_lead`, `value`, `currency`, `method`, `prazo`, `gravado`. Nada temático.
+
+> ⛔ **Está tudo no workspace, sem publicar, e é assim que tem que ficar até o deploy.**
+> Publicar a tag do pixel enquanto a produção ainda tem o bloco escrito à mão no
+> `roteador/index.html` faz o Roteador contar PageView e Lead **em dobro**. A sequência é:
+> **merge do PR → deploy → publicar o container**, nessa ordem e na mesma sessão.
+
+### Depois de publicar, o que ainda falta no GA4
 
 É a única parte que **não cabe num PR** — tag de container não é arquivo de repo.
 O código já empurra tudo para o `dataLayer`; falta o container escutar. Enquanto o
