@@ -4439,6 +4439,14 @@ const janelaLegal = (() => {
   }
 
   function abrir(url, titulo, origem){
+    /* RASTREIO · quem LÊ os termos antes de enviar tem intenção diferente de
+       quem só marca a caixa — e é um dos poucos sinais de leitura real que a
+       página produz. Sem `etapa`: abrir um documento legal não é avanço no
+       funil, e contar como avanço inflaria a etapa de quem só foi conferir. */
+    if (window.track) track('doc_legal', {
+      documento: (url || '').replace(/^\//, '') || 'desconhecido',
+      de: origem && origem.closest && origem.closest('#crtForm') ? 'formulario' : 'rodape'
+    });
     voltarPara = origem || null;
     tit.textContent = titulo;
     abrirEm.href = url;
