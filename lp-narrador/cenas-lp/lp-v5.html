@@ -2727,6 +2727,76 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 #ctafinal .pill-cta:hover{ background:#EDEAE4 }
 /* (a dica embaixo do botão saiu na revisão de texto de 14/08) */
 
+/* ═══ JANELA DOS DOCUMENTOS LEGAIS ═══
+   Documento, não terminal: o texto é longo e âmbar-sobre-preto em mono seria
+   hostil de ler. A janela usa o papel claro das páginas reais — quem abriu
+   quer LER, não continuar dentro da encenação. */
+#lgModal{ position:fixed; inset:0; z-index:220 }
+#lgModal[hidden]{ display:none }
+.lgm-veu{
+  position:absolute; inset:0; background:rgba(10,8,6,.72);
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  opacity:0; transition:opacity .25s ease;
+}
+.lgm-caixa{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-46%);
+  width:min(680px, calc(100vw - 32px)); height:min(82vh, 760px);
+  display:flex; flex-direction:column; overflow:hidden;
+  background:var(--no-osso,#FAFAF7); border-radius:16px;
+  box-shadow:0 30px 90px rgba(0,0,0,.45);
+  opacity:0; transition:opacity .28s ease, transform .34s cubic-bezier(.16,1,.3,1);
+}
+#lgModal.on .lgm-veu{ opacity:1 }
+#lgModal.on .lgm-caixa{ opacity:1; transform:translate(-50%,-50%) }
+
+.lgm-topo{
+  display:flex; align-items:center; gap:12px; flex:none;
+  padding:14px 14px 14px 20px; border-bottom:1px solid var(--no-borda,#E4E0D8);
+  background:#fff;
+}
+.lgm-tit{
+  flex:1; min-width:0; font-family:var(--font-mono); font-size:11px;
+  letter-spacing:.16em; text-transform:uppercase; color:var(--no-cinza,#6B6F76);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgm-abrir{
+  flex:none; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em;
+  color:var(--no-cinza,#6B6F76); text-decoration:none;
+  border-bottom:1px solid rgba(20,20,20,.16); padding-bottom:1px;
+}
+.lgm-abrir:hover{ color:var(--dark,#141414); border-bottom-color:var(--no-ambar,#e8a33d) }
+.lgm-x{
+  flex:none; width:34px; height:34px; border-radius:50%; cursor:pointer;
+  border:1px solid var(--no-borda,#E4E0D8); background:transparent;
+  color:var(--no-cinza,#6B6F76); font-size:13px; line-height:1;
+  display:grid; place-items:center; transition:background .2s, color .2s;
+}
+.lgm-x:hover{ background:var(--dark,#141414); color:#fff; border-color:var(--dark,#141414) }
+
+.lgm-corpo{ flex:1; min-height:0; position:relative; background:var(--no-osso,#FAFAF7) }
+.lgm-corpo iframe{
+  width:100%; height:100%; border:0; display:block;
+  /* o iframe rola sozinho: o scroll da LP é dirigido pela história e não pode
+     ser sequestrado por um documento de dez seções */
+}
+.lgm-carregando{
+  position:absolute; inset:0; display:grid; place-items:center;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--no-cinza,#6B6F76);
+  background:var(--no-osso,#FAFAF7); transition:opacity .3s ease;
+}
+.lgm-carregando.foi{ opacity:0; pointer-events:none }
+
+/* com a janela aberta a página de trás não rola: rolar o fundo enquanto se lê
+   um documento move a história do #pouso às cegas */
+html.lgm-on, html.lgm-on body{ overflow:hidden }
+
+@media(max-width:640px){
+  .lgm-caixa{ width:calc(100vw - 20px); height:88vh; border-radius:14px }
+  .lgm-topo{ padding:12px 12px 12px 16px }
+  .lgm-abrir{ display:none }   /* no celular o alvo é o X, não um link de 10px */
+}
+
 /* ═══ PORTAL — travessia do CTA pro "Senta aí" ═══
    Preto sobre preto de propósito: o #ctafinal já é --lp-preto, então o véu
    não "aparece", ele FECHA. O que a pessoa vê é o texto do CTA se apagando e
@@ -3481,6 +3551,35 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
   <div class="pt-inner">
     <div class="pt-rot">Loading...</div>
     <div class="pt-num"><span class="pt-pct">0%</span></div>
+  </div>
+</div>
+
+<!-- ══ JANELA DOS DOCUMENTOS LEGAIS ══
+     Clicar em "termos de uso" ou "compartilhamento dos meus dados" DENTRO do
+     CRT não pode navegar pra outra página: a pessoa está no meio do
+     formulário, e sair levaria embora tudo que ela já digitou. Aqui o
+     documento abre por cima, numa janela, e o formulário continua intacto
+     atrás.
+     É um <iframe> e não HTML injetado porque a shared/legal.css define
+     `body{}` — carregá-la junto com a LP arrasaria o layout. O iframe isola
+     o estilo por completo e ainda garante que a janela mostre exatamente a
+     mesma página que está publicada, sem cópia pra sair de sincronia.
+     O src só é preenchido no primeiro clique: ninguém paga o download de dois
+     documentos jurídicos por visita.
+     Os links do RODAPÉ seguem navegando normalmente — lá não há nada pra
+     perder. ══ -->
+<div id="lgModal" hidden>
+  <div class="lgm-veu" data-lgm-fecha></div>
+  <div class="lgm-caixa" role="dialog" aria-modal="true" aria-labelledby="lgmTit">
+    <div class="lgm-topo">
+      <span class="lgm-tit" id="lgmTit">Termos de uso</span>
+      <a class="lgm-abrir" id="lgmAbrir" href="/termos" target="_blank" rel="noopener">abrir em nova aba ↗</a>
+      <button type="button" class="lgm-x" data-lgm-fecha aria-label="Fechar">✕</button>
+    </div>
+    <div class="lgm-corpo">
+      <iframe id="lgmFrame" title="Documento" src="about:blank"></iframe>
+      <div class="lgm-carregando" id="lgmLoad">carregando…</div>
+    </div>
   </div>
 </div>
 
@@ -4285,6 +4384,83 @@ function rolarAte(alvo, ms){
     })(t0);
   });
 }
+
+/* ── JANELA DOS DOCUMENTOS LEGAIS ──
+   Só intercepta clique vindo de DENTRO do formulário do CRT. No rodapé os
+   mesmos links navegam normalmente: lá não há formulário preenchido pra
+   perder, e mandar a pessoa pra uma janelinha quando a página inteira serve
+   seria pior. */
+const janelaLegal = (() => {
+  const el = document.getElementById('lgModal');
+  if (!el) return { abrir(){ return false; } };
+  const frame = el.querySelector('#lgmFrame');
+  const tit   = el.querySelector('#lgmTit');
+  const abrirEm = el.querySelector('#lgmAbrir');
+  const load  = el.querySelector('#lgmLoad');
+  const raiz  = document.documentElement;
+  let voltarPara = null;      // pra devolver o foco a quem abriu
+  let carregado = {};         // url -> true, pra não rebaixar em toda abertura
+
+  function fechar(){
+    if (el.hidden) return;
+    el.classList.remove('on');
+    raiz.classList.remove('lgm-on');
+    setTimeout(() => {
+      el.hidden = true;
+      /* o iframe NÃO é zerado: manter o documento carregado faz a segunda
+         abertura ser instantânea, e ele não custa nada parado */
+      if (voltarPara && voltarPara.isConnected) voltarPara.focus();
+      voltarPara = null;
+    }, 280);
+  }
+
+  function abrir(url, titulo, origem){
+    voltarPara = origem || null;
+    tit.textContent = titulo;
+    abrirEm.href = url;
+    const src = url + (url.includes('?') ? '&' : '?') + 'embed=1';
+    if (frame.getAttribute('src') !== src){
+      load.classList.remove('foi');
+      frame.setAttribute('src', src);
+      if (carregado[src]) load.classList.add('foi');
+    } else {
+      load.classList.add('foi');
+    }
+    el.hidden = false;
+    raiz.classList.add('lgm-on');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.classList.add('on');
+      el.querySelector('.lgm-x').focus();
+    }));
+    return true;
+  }
+
+  frame.addEventListener('load', () => {
+    const s = frame.getAttribute('src');
+    if (s && s !== 'about:blank'){ carregado[s] = true; load.classList.add('foi'); }
+  });
+
+  el.addEventListener('click', e => { if (e.target.closest('[data-lgm-fecha]')) fechar(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !el.hidden) fechar(); });
+
+  /* a interceptação: delegada no formulário do CRT, então vale pros links do
+     aceite mesmo que a etapa 3 seja remontada */
+  const form = document.getElementById('crtForm');
+  if (form) form.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="/"]');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (href !== '/termos' && href !== '/privacidade') return;
+    e.preventDefault();
+    /* o clique morre aqui: sem isto ele sobe até o <label> do consentimento e
+       marcaria a caixa como efeito colateral de abrir o documento */
+    e.stopPropagation();
+    abrir(href, href === '/termos' ? 'Termos de uso' : 'Privacidade e cookies', a);
+  });
+
+  return { abrir, fechar };
+})();
+window.janelaLegal = janelaLegal;
 
 /* ── PORTAL: a travessia do CTA pro "Senta aí" ──
    A porta deixou de EXPANDIR a página pra baixo. Agora o preto do #ctafinal
