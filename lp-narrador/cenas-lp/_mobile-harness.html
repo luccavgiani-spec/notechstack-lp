@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>harness mobile — lp-v5</title>
+<style>
+  /* Harness de viewport mobile. O resize_window da automação não funciona aqui,
+     então a única forma confiável de ver o layout de celular é um iframe
+     same-origin com as medidas exatas do aparelho. Esperar 3–5s antes de
+     medir: a lp-v5 só posiciona a hero depois que o vídeo de fundo carrega. */
+  body{margin:0;background:#2a2a2a;font:13px/1.4 system-ui;color:#ddd;
+       display:flex;gap:20px;padding:16px;align-items:flex-start;flex-wrap:wrap}
+  .box{display:flex;flex-direction:column;gap:6px}
+  .rot{font-family:ui-monospace,monospace;font-size:11px;color:#9a9a9a}
+  iframe{border:0;background:#fff;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+</style>
+</head>
+<body>
+  <div class="box">
+    <span class="rot">iPhone SE · 375×667</span>
+    <iframe id="f1" src="/lp-narrador/cenas-lp/lp-v5.html" width="375" height="667"></iframe>
+  </div>
+  <div class="box">
+    <span class="rot">iPhone 14 · 390×844</span>
+    <iframe id="f2" src="/lp-narrador/cenas-lp/lp-v5.html" width="390" height="844"></iframe>
+  </div>
+  <div class="box">
+    <span class="rot">Pixel 7 · 412×915</span>
+    <iframe id="f3" src="/lp-narrador/cenas-lp/lp-v5.html" width="412" height="915"></iframe>
+  </div>
+</body>
+</html>
