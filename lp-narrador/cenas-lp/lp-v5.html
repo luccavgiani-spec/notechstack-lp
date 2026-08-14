@@ -3093,9 +3093,9 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
          (palíndromo: o clipe roda pra frente e volta, emenda exata).
          O fundo do palco reproduz a parede e o chão DESTE vídeo, então ele
          não é uma imagem colada num canto: é a continuação do mesmo espaço. -->
-    <video class="hero-video" poster="assets/video/hero-parede.jpg"
+    <video class="hero-video" poster="/lp-narrador/cenas-lp/assets/video/hero-parede.jpg"
            autoplay loop muted playsinline preload="auto" aria-hidden="true">
-      <source src="assets/video/hero-parede.mp4" type="video/mp4">
+      <source src="/lp-narrador/cenas-lp/assets/video/hero-parede.mp4" type="video/mp4">
     </video>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="hero-grain" aria-hidden="true"></div>
@@ -3864,7 +3864,7 @@ function applyBgColors(){
 }
 applyBgColors();
 
-const SHEETS = 'sheets/';
+const SHEETS = '/lp-narrador/cenas-lp/sheets/';
 
 const R = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = s => document.querySelector(s);
@@ -5545,10 +5545,10 @@ requestAnimationFrame(frame);
      zoom (não chutadas); em modo debug elas saem no console. ---------- */
   const VIDEO_SETS = {
     portrait: {
-      caindo: 'assets/caindo_portrait.mp4',
-      zoom:   'assets/zoom_portrait.mp4',
-      still:  'assets/monitor_portrait.png',
-      stillTyping: 'assets/monitor_typing.png',
+      caindo: '/lp-narrador/cenas-lp/assets/caindo_portrait.mp4',
+      zoom:   '/lp-narrador/cenas-lp/assets/zoom_portrait.mp4',
+      still:  '/lp-narrador/cenas-lp/assets/monitor_portrait.png',
+      stillTyping: '/lp-narrador/cenas-lp/assets/monitor_typing.png',
       vw: 1080, vh: 1916,
       eyesOnAtEnd: true,   // termina com os olhos acesos → power-down sintético
       screen: { x: 1.9, y: 22.9, w: 91.8, h: 38.4 },
@@ -5559,10 +5559,10 @@ requestAnimationFrame(frame);
       txt: { x: 4, y: 14, w: 92 }
     },
     landscape: {
-      caindo: 'assets/caindo_landscape.mp4',
-      zoom:   'assets/zoom_landscape.mp4',
-      still:  'assets/monitor_landscape.png',
-      stillTyping: 'assets/monitor_landscape.png', // já chega apagada
+      caindo: '/lp-narrador/cenas-lp/assets/caindo_landscape.mp4',
+      zoom:   '/lp-narrador/cenas-lp/assets/zoom_landscape.mp4',
+      still:  '/lp-narrador/cenas-lp/assets/monitor_landscape.png',
+      stillTyping: '/lp-narrador/cenas-lp/assets/monitor_landscape.png', // já chega apagada
       vw: 1916, vh: 1080,
       eyesOnAtEnd: false,  // os olhos apagam no meio do push-in do próprio vídeo
       /* calibragem aprovada 13/08 (a medida por luminância era

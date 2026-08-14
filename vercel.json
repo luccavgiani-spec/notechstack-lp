@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "/lp-narrador/cenas-lp/lp-v5.html" }
+  ]
+}
