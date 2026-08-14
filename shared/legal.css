@@ -83,6 +83,16 @@ th{
 tr:last-child td{ border-bottom:0 }
 td code{ white-space:nowrap }
 
+/* identificação legal: a marca lidera o texto, a razão social é a letra miúda
+   que a lei pede. Quando o nome fantasia for instaurado, é este parágrafo — e
+   só ele — que muda nas duas páginas. */
+.lg-id{
+  font-size:14px; color:var(--lg-cinza); line-height:1.6;
+  padding:12px 16px; border:1px solid var(--lg-borda); border-radius:10px;
+  background:rgba(20,20,20,.02); max-width:none;
+}
+.lg-id strong{ color:var(--lg-tinta); font-weight:var(--no-weight-subtitulo) }
+
 /* caixa de destaque para o que o leitor precisa mesmo ver */
 .lg-nota{
   border-left:3px solid var(--lg-acento); background:rgba(20,20,20,.03);
