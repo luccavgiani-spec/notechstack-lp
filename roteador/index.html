@@ -27,23 +27,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
 <!-- End Google Tag Manager -->
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1753619075655271');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1753619075655271&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<!-- O Meta Pixel saiu daqui em 14/08/2026 e virou tag do container GTM-NK87FH8W,
+     junto com o PageView e o Lead. Motivo: escrito à mão no HTML, ele existia
+     só nesta página — a home e a lp-v5 ficavam invisíveis pra Meta — e não dava
+     pra deduplicar contra o Conversions API sem republicar o site a cada ajuste.
+
+     ⚠️ ESTE ARQUIVO E O CONTAINER ANDAM JUNTOS. Enquanto a tag do pixel não
+     estiver PUBLICADA no GTM, esta página fica sem Meta. E se o bloco voltar
+     pra cá com a tag no ar, o Roteador conta PageView e Lead EM DOBRO: público
+     de retargeting inflado e custo por lead reportado pela metade.
+     A ordem correta é sempre: deploy do site primeiro, publicação do container
+     logo depois. Ver lp-narrador/cenas-lp/PLANO-rastreio.md, bloco A5. -->
 <style>
 /* ─── Roteador · identidade v2 ───
    Base da marca: brand/tokens/tokens.css. Os apelidos abaixo só consomem
@@ -1505,9 +1499,19 @@ if(SHOW_WHITELABEL) document.getElementById('whitelabel').hidden = false;
           aiAnalysis:f.msg.value.trim()
         })
       });
-      if(window.fbq)fbq('track','Lead');
+      /* o fbq('track','Lead') saiu daqui em 14/08/2026: quem dispara o Lead da
+         Meta agora é a tag do container, ouvindo o `lead_submit` abaixo. Se
+         voltar, o Lead conta duas vezes. */
       window.dataLayer=window.dataLayer||[];
-      window.dataLayer.push({event:'lead_submit'});
+      window.dataLayer.push({
+        event:'lead_submit',
+        /* o container espera estes parâmetros; a lp-v5 manda todos, e aqui vão
+           os que fazem sentido pro Roteador. Sem `modo` o generate_lead do GA4
+           chegaria com o campo vazio e ninguém saberia de onde veio. */
+        modo:'roteador',
+        valor:1,
+        lead_sid:(function(){try{return sessionStorage.getItem('no_sid')||''}catch(e){return ''}})()
+      });
     }catch(err){console.warn('Email send failed:',err);}
     btn.disabled=false;
     btn.textContent='Recebido ✓ — falamos ainda hoje';
