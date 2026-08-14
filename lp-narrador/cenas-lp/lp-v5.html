@@ -2735,6 +2735,29 @@ html.diag-aberto #platforms::before{ display:none }
   .fx-kpi{ gap:16px } .fx-kpi-num{ font-size:32px }
   .fx-two{ gap:26px }
   .fx-msg-in,.fx-msg-out{ max-width:92% }
+
+  /* CONVERSA DOS AGENTES — A JANELA VOLTA A SER JANELA (14/08).
+     Em 14/08 a altura fixa foi removida pra que nenhum balão saísse de quadro,
+     e o cartão passou a ter a altura da conversa inteira. No desktop isso
+     coube; em 390x844 virou um cartão de 831px — a seção toda foi pra 1772px,
+     mais de dois telefones. E como a cadência leva ~18s pra encher (1800ms
+     por pedido, 1500 pelo chip do agente, 2600 pela resposta), o que se vê ao
+     chegar é um retângulo preto quase vazio: lê-se como página carregando,
+     não como conversa.
+     Com a janela de volta, o primeiro balão já ocupa parte visível do quadro e
+     a thread rola sozinha — o rolar() do script existe exatamente pra isso e
+     estava órfão desde que a altura saiu.
+     O medo de 14/08 (perder as primeiras trocas) não se aplica mais: o
+     IntersectionObserver REINICIA a conversa do primeiro balão toda vez que a
+     seção entra em quadro, então ninguém pega o meio. */
+  .fx-chat{
+    height:300px; overflow:hidden;
+    -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 26px);
+            mask-image:linear-gradient(to bottom, transparent 0, #000 26px);
+  }
+  .fx-thread{ gap:8px }
+  .fx-msg-in,.fx-msg-out{ font-size:12.5px; line-height:1.45; padding:8px 12px }
+  .fx-tool{ font-size:10px; padding:4px 10px }
 }
 
 @media (prefers-reduced-motion: reduce){
