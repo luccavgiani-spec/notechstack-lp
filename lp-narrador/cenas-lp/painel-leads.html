@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>nó · percurso dos leads</title>
+<link rel="stylesheet" href="/brand/fonts/fonts.css">
+<link rel="stylesheet" href="/brand/tokens/tokens.css">
+<style>
+/* Painel local de acompanhamento — bloco D6 do PLANO-rastreio.md.
+   Sem build, sem framework: abre do disco (com o servidor local na raiz do
+   repo, por causa dos paths absolutos de /brand).
+
+   A chave de serviço NUNCA entra aqui. Este arquivo só sabe falar com a edge
+   function `painel-dados`, que carrega a chave do lado do servidor e exige o
+   token abaixo. O token fica em localStorage, não no código. */
+:root{
+  --ground:#FAFAF7; --card:#fff; --card2:#F4F2EA;
+  --ink:var(--no-tinta); --ink2:#5B6068; --ink3:#8B9098;
+  --line:#E7E4DC; --line2:#D3CFC4;
+  --ambar:var(--no-ambar); --azul:var(--no-azul);
+  --verde:var(--no-verde); --vermelho:var(--no-vermelho);
+  --sans:var(--no-font-sans); --mono:var(--no-font-mono);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+  font-weight:300;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 80px}
+
+header{padding:34px 0 22px;border-bottom:1px solid var(--line);
+  display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap}
+h1{font-size:26px;font-weight:800;letter-spacing:-.03em;margin:0}
+.sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ambar);margin:0 0 6px;font-weight:500}
+.head-r{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+button,select,input{font-family:inherit;font-size:14px}
+.btn{background:var(--card);border:1px solid var(--line2);border-radius:2px;
+  padding:7px 14px;cursor:pointer;color:var(--ink);font-weight:500;transition:.15s}
+.btn:hover{border-color:var(--ambar)}
+.btn:focus-visible,input:focus-visible{outline:2px solid var(--ambar);outline-offset:2px}
+.btn.on{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+
+nav.abas{display:flex;gap:4px;margin:22px 0 26px;border-bottom:1px solid var(--line)}
+nav.abas button{background:none;border:0;border-bottom:2px solid transparent;
+  padding:10px 16px;cursor:pointer;color:var(--ink2);font-weight:500;font-size:15px}
+nav.abas button.on{color:var(--ink);border-bottom-color:var(--ambar)}
+
+/* ---- gate do token ---- */
+#gate{max-width:440px;margin:80px auto;background:var(--card);
+  border:1px solid var(--line);border-radius:2px;padding:28px}
+#gate h2{font-size:18px;margin:0 0 6px;font-weight:600}
+#gate p{color:var(--ink2);font-size:14px;margin:0 0 18px}
+#gate input{width:100%;padding:10px 12px;border:1px solid var(--line2);
+  border-radius:2px;background:var(--ground);font-family:var(--mono);margin-bottom:12px}
+
+/* ---- funil ---- */
+.funil{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:24px}
+.etapa{display:grid;grid-template-columns:180px 1fr 92px;gap:16px;align-items:center;
+  padding:9px 0}
+.etapa .rot{font-size:14px;color:var(--ink2)}
+.etapa .rot b{display:block;color:var(--ink);font-weight:600}
+.barra{height:26px;background:var(--card2);border-radius:2px;overflow:hidden;position:relative}
+.barra span{display:block;height:100%;background:var(--ambar);
+  transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.etapa:first-child .barra span{background:var(--ink)}
+.etapa:last-child .barra span{background:var(--verde)}
+.etapa .n{font-family:var(--mono);font-size:17px;font-weight:500;text-align:right;
+  font-variant-numeric:tabular-nums}
+/* a queda ENTRE as etapas é o número que importa — não a altura de uma barra */
+.queda{grid-column:2;font-family:var(--mono);font-size:11px;color:var(--ink3);
+  padding:0 0 6px 2px;display:flex;align-items:center;gap:6px}
+.queda .perda{color:var(--vermelho)}
+
+/* ---- tabelas ---- */
+.scroller{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:2px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:760px}
+th,td{text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink3);font-weight:500;background:var(--card2)}
+tbody tr:last-child td{border-bottom:0}
+tbody tr.clicavel{cursor:pointer}
+tbody tr.clicavel:hover{background:var(--card2)}
+td.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;
+  text-transform:uppercase;padding:2px 7px;border-radius:2px;border:1px solid;white-space:nowrap}
+.p-lead{color:var(--verde);background:#E5F4EC;border-color:#9FD9BC}
+.p-perdeu{color:var(--ink3);background:var(--card2);border-color:var(--line2)}
+.p-ecom{color:var(--azul);background:#E9EEFB;border-color:#B9C8F0}
+.p-saude{color:var(--verde);background:#E5F4EC;border-color:#9FD9BC}
+.p-com{color:var(--vermelho);background:#FBEAE5;border-color:#F0BCAE}
+.p-apps{color:#9A6B12;background:#FCF3E0;border-color:#EBD3A0}
+.p-neutro{color:var(--ink3);background:var(--card2);border-color:var(--line2)}
+
+/* medidor de etapa: a forma diz o estágio sem precisar ler o número */
+.med{display:inline-flex;gap:2px;vertical-align:middle}
+.med i{width:7px;height:14px;background:var(--line2);border-radius:1px;display:block}
+.med i.on{background:var(--ambar)}
+.med i.fim{background:var(--verde)}
+
+/* ---- linha do tempo ---- */
+#tl{position:fixed;inset:0;background:rgba(20,20,20,.42);display:none;z-index:50}
+#tl.on{display:block}
+#tl .painel{position:absolute;right:0;top:0;bottom:0;width:min(560px,100%);
+  background:var(--card);border-left:1px solid var(--line2);overflow-y:auto;padding:26px}
+#tl h3{margin:0 0 4px;font-size:18px;font-weight:600}
+#tl .meta{font-family:var(--mono);font-size:11.5px;color:var(--ink3);margin:0 0 22px}
+.ev{display:grid;grid-template-columns:64px 1fr;gap:14px;padding:9px 0;
+  border-left:2px solid var(--line);padding-left:18px;margin-left:6px;position:relative}
+.ev::before{content:'';position:absolute;left:-5px;top:15px;width:8px;height:8px;
+  border-radius:50%;background:var(--line2)}
+.ev.marco::before{background:var(--ambar)}
+.ev.fim::before{background:var(--verde)}
+.ev .t{font-family:var(--mono);font-size:11px;color:var(--ink3);padding-top:2px;
+  font-variant-numeric:tabular-nums}
+.ev .nome{font-family:var(--mono);font-size:13px;font-weight:500}
+.ev .det{font-size:12.5px;color:var(--ink2);margin-top:2px}
+.fechar{position:absolute;right:20px;top:20px;background:none;border:0;font-size:22px;
+  cursor:pointer;color:var(--ink3);line-height:1}
+
+.vazio{padding:48px 24px;text-align:center;color:var(--ink3);
+  background:var(--card);border:1px solid var(--line);border-radius:2px}
+.erro{background:#FBEAE5;border:1px solid #F0BCAE;color:#8F2E1C;padding:12px 16px;
+  border-radius:2px;margin-bottom:16px;font-size:14px}
+.oculto{display:none}
+@media (max-width:760px){
+  .etapa{grid-template-columns:110px 1fr 64px;gap:10px}
+  .etapa .rot b{font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ gate ══ -->
+<div id="gate">
+  <h2>Percurso dos leads</h2>
+  <p>Cole o <code>PAINEL_TOKEN</code>. Ele fica só neste navegador — a chave do
+     banco nunca passa por aqui.</p>
+  <input id="tok" type="password" placeholder="token" autocomplete="off">
+  <button class="btn on" id="entrar" style="width:100%">Entrar</button>
+  <p id="gateErr" style="color:#8F2E1C;margin:12px 0 0" class="oculto"></p>
+</div>
+
+<!-- ══ painel ══ -->
+<div class="wrap oculto" id="app">
+  <header>
+    <div>
+      <p class="sub">nó · tech stack</p>
+      <h1>Percurso dos leads</h1>
+    </div>
+    <div class="head-r">
+      <select class="btn" id="periodo">
+        <option value="7">7 dias</option>
+        <option value="30" selected>30 dias</option>
+        <option value="90">90 dias</option>
+        <option value="365">tudo</option>
+      </select>
+      <button class="btn" id="recarregar">Atualizar</button>
+      <button class="btn" id="sair">Sair</button>
+    </div>
+  </header>
+
+  <nav class="abas">
+    <button data-aba="funil" class="on">Funil</button>
+    <button data-aba="leads">Leads</button>
+    <button data-aba="arvore">Árvore</button>
+  </nav>
+
+  <div id="erro" class="erro oculto"></div>
+  <div id="conteudo"></div>
+</div>
+
+<div id="tl"><div class="painel">
+  <button class="fechar" id="tlFechar" title="Fechar">×</button>
+  <div id="tlCorpo"></div>
+</div></div>
+
+<script>
+const FN = 'https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/painel-dados';
+
+/* as seis etapas, na ordem do funil. `chave` é o etapa_max mínimo. */
+const ETAPAS = [
+  { chave:'sessoes',           rot:'Chegou',              det:'abriu a página' },
+  { chave:'abriu_o_monitor',   rot:'Destravou o monitor', det:'clicou no CTA' },
+  { chave:'conversou',         rot:'Conversou',           det:'escolheu na árvore' },
+  { chave:'entrou_no_form',    rot:'Entrou no formulário',det:'passou da ponte' },
+  { chave:'chegou_no_contato', rot:'Chegou no contato',   det:'tela de nome e e-mail' },
+  { chave:'leads',             rot:'Virou lead',          det:'enviou' }
+];
+
+const NICHOS = { ecom:'p-ecom', saude:'p-saude', com:'p-com', apps:'p-apps' };
+
+/* eventos que valem como marco na linha do tempo — o resto é ruído de percurso */
+const MARCOS = ['diag_abrir','diag_folha','form_abrir','form_contato','lead_submit'];
+
+let token = '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+async function busca(q){
+  const r = await fetch(FN + '?' + q, { headers: { 'x-painel-token': token } });
+  if (r.status === 401) throw new Error('Token recusado.');
+  if (!r.ok) throw new Error('Falha ao consultar (HTTP ' + r.status + ').');
+  return r.json();
+}
+
+/* ---------- entrada ---------- */
+$('#entrar').addEventListener('click', entrar);
+$('#tok').addEventListener('keydown', e => { if (e.key === 'Enter') entrar(); });
+
+async function entrar(){
+  const t = $('#tok').value.trim();
+  if (!t) return;
+  token = t;
+  try {
+    await busca('v=funil&dias=1');          // ping barato só pra validar o token
+    localStorage.setItem('no_painel_token', t);
+    $('#gate').classList.add('oculto');
+    $('#app').classList.remove('oculto');
+    render();
+  } catch(e){
+    $('#gateErr').textContent = e.message;
+    $('#gateErr').classList.remove('oculto');
+  }
+}
+
+$('#sair').addEventListener('click', () => {
+  localStorage.removeItem('no_painel_token');
+  location.reload();
+});
+
+/* ---------- abas ---------- */
+let aba = 'funil';
+document.querySelectorAll('nav.abas button').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('nav.abas button').forEach(x => x.classList.toggle('on', x === b));
+    aba = b.dataset.aba;
+    render();
+  });
+});
+$('#recarregar').addEventListener('click', render);
+$('#periodo').addEventListener('change', render);
+
+async function render(){
+  $('#erro').classList.add('oculto');
+  $('#conteudo').innerHTML = '<div class="vazio">carregando…</div>';
+  try {
+    if (aba === 'funil')  return pintaFunil(await busca('v=funil&dias=' + $('#periodo').value));
+    if (aba === 'leads')  return pintaLeads(await busca('v=leads&limite=200'));
+    if (aba === 'arvore') return pintaArvore(await busca('v=folhas'));
+  } catch(e){
+    $('#conteudo').innerHTML = '';
+    $('#erro').textContent = e.message;
+    $('#erro').classList.remove('oculto');
+  }
+}
+
+/* ---------- funil ---------- */
+function pintaFunil(linhas){
+  if (!linhas.length) return vazio('Nenhuma sessão no período. O funil começa a encher quando a lp-v5 estiver no ar.');
+  /* soma o período inteiro: a leitura do funil é sobre a forma da queda, e um
+     dia isolado quase nunca tem volume pra isso significar alguma coisa */
+  const t = {};
+  ETAPAS.forEach(e => t[e.chave] = linhas.reduce((s,l) => s + (+l[e.chave] || 0), 0));
+  const topo = t[ETAPAS[0].chave] || 1;
+
+  let h = '<div class="funil">';
+  ETAPAS.forEach((e, i) => {
+    const n = t[e.chave] || 0;
+    const pct = Math.round(n / topo * 100);
+    if (i > 0){
+      const ant = t[ETAPAS[i-1].chave] || 0;
+      const passou = ant ? Math.round(n / ant * 100) : 0;
+      const perdeu = ant - n;
+      h += '<div class="etapa" style="padding:0"><div></div><div class="queda">'
+         + '<span>↓ ' + passou + '% seguiram</span>'
+         + (perdeu > 0 ? '<span class="perda">· ' + perdeu + ' pararam aqui</span>' : '')
+         + '</div><div></div></div>';
+    }
+    h += '<div class="etapa">'
+       + '<div class="rot"><b>' + e.rot + '</b>' + e.det + '</div>'
+       + '<div class="barra"><span style="width:' + pct + '%"></span></div>'
+       + '<div class="n">' + n + '</div></div>';
+  });
+  h += '</div>';
+
+  const conv = topo ? (t.leads / topo * 100).toFixed(1) : '0';
+  h += '<p style="color:var(--ink2);font-size:14px;margin-top:16px">'
+     + '<b>' + conv + '%</b> das sessões viraram lead no período — '
+     + t.leads + ' de ' + topo + '.</p>';
+  $('#conteudo').innerHTML = h;
+}
+
+/* ---------- leads ---------- */
+function pintaLeads(linhas){
+  if (!linhas.length) return vazio('Nenhuma sessão registrada ainda.');
+  let h = '<div class="scroller"><table><thead><tr>'
+    + '<th>Quando</th><th>Contato</th><th>Etapa</th><th>Caminho</th>'
+    + '<th>Nicho</th><th>Origem</th><th>Estado</th>'
+    + '</tr></thead><tbody>';
+  linhas.forEach(l => {
+    const c = l.leads || null;
+    const d = new Date(l.criada_em);
+    h += '<tr class="clicavel" data-sid="' + esc(l.sid) + '">'
+      + '<td class="mono">' + d.toLocaleDateString('pt-BR') + '<br>'
+        + '<span style="color:var(--ink3)">' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) + '</span></td>'
+      + '<td>' + (c ? '<b>' + esc(c.nome) + '</b><br><span style="color:var(--ink2);font-size:12px">' + esc(c.email) + '</span>' : '<span style="color:var(--ink3)">—</span>') + '</td>'
+      + '<td>' + medidor(l.etapa_max) + '</td>'
+      + '<td class="mono" style="font-size:12px">' + esc(l.caminho || '—') + '</td>'
+      + '<td>' + (l.nicho ? '<span class="pill ' + (NICHOS[l.nicho] || 'p-neutro') + '">' + esc(l.nicho) + '</span>' : '') + '</td>'
+      + '<td style="font-size:12px;color:var(--ink2)">' + esc(l.utm_campaign || l.utm_source || l.referrer || '(direto)') + '</td>'
+      + '<td>' + (l.virou_lead ? '<span class="pill p-lead">lead</span>' : '<span class="pill p-perdeu">parou</span>') + '</td>'
+      + '</tr>';
+  });
+  h += '</tbody></table></div>'
+    + '<p style="color:var(--ink3);font-size:13px;margin-top:10px">Clique numa linha para ver a jornada completa.</p>';
+  $('#conteudo').innerHTML = h;
+  document.querySelectorAll('tr.clicavel').forEach(tr =>
+    tr.addEventListener('click', () => linhaDoTempo(tr.dataset.sid)));
+}
+
+function medidor(n){
+  let h = '<span class="med" title="etapa ' + n + ' de 5">';
+  for (let i = 1; i <= 5; i++)
+    h += '<i class="' + (i <= n ? (n === 5 ? 'fim' : 'on') : '') + '"></i>';
+  return h + '</span>';
+}
+
+/* ---------- árvore ---------- */
+function pintaArvore(linhas){
+  if (!linhas.length) return vazio('Nenhuma folha alcançada ainda.');
+  let h = '<div class="scroller"><table><thead><tr>'
+    + '<th>Folha</th><th>Nicho</th><th class="num">Chegaram</th>'
+    + '<th class="num">Abriram o form</th><th class="num">Leads</th><th class="num">Conversão</th>'
+    + '</tr></thead><tbody>';
+  linhas.forEach(l => {
+    h += '<tr>'
+      + '<td class="mono">' + esc(l.folha) + '</td>'
+      + '<td>' + (l.nicho ? '<span class="pill ' + (NICHOS[l.nicho] || 'p-neutro') + '">' + esc(l.nicho) + '</span>' : '') + '</td>'
+      + '<td class="num">' + l.chegaram + '</td>'
+      + '<td class="num">' + l.abriram_form + '</td>'
+      + '<td class="num"><b>' + l.leads + '</b></td>'
+      + '<td class="num">' + (l.taxa_pct == null ? '—' : l.taxa_pct + '%') + '</td>'
+      + '</tr>';
+  });
+  h += '</tbody></table></div>'
+    + '<p style="color:var(--ink3);font-size:13px;margin-top:10px">'
+    + 'Folha com muita chegada e pouca conversão é texto de fechamento que não está bastando — '
+    + 'não necessariamente um ramo que sobra.</p>';
+  $('#conteudo').innerHTML = h;
+}
+
+/* ---------- linha do tempo de um lead ---------- */
+async function linhaDoTempo(sid){
+  $('#tl').classList.add('on');
+  $('#tlCorpo').innerHTML = '<p style="color:var(--ink3)">carregando…</p>';
+  try {
+    const evs = await busca('v=percurso&sid=' + encodeURIComponent(sid));
+    if (!evs.length){ $('#tlCorpo').innerHTML = '<p style="color:var(--ink3)">Sem eventos gravados para esta sessão.</p>'; return; }
+    const t0 = new Date(evs[0].ts).getTime();
+    let h = '<h3>Jornada</h3><p class="meta">' + esc(sid) + '</p>';
+    evs.forEach(e => {
+      const dt = (new Date(e.ts).getTime() - t0) / 1000;
+      const cls = e.evento === 'lead_submit' ? 'fim' : (MARCOS.includes(e.evento) ? 'marco' : '');
+      h += '<div class="ev ' + cls + '">'
+        + '<div class="t">+' + (dt < 60 ? dt.toFixed(0) + 's' : (dt/60).toFixed(1) + 'min') + '</div>'
+        + '<div><div class="nome">' + esc(e.evento) + '</div>'
+        + '<div class="det">' + esc(detalhe(e)) + '</div></div></div>';
+    });
+    $('#tlCorpo').innerHTML = h;
+  } catch(e){
+    $('#tlCorpo').innerHTML = '<p style="color:#8F2E1C">' + esc(e.message) + '</p>';
+  }
+}
+
+/* o que interessa ler de cada evento — não o objeto inteiro */
+function detalhe(e){
+  const p = e.params || {};
+  if (e.evento === 'diag_escolha')   return p.opcao ? '“' + p.opcao + '” (nível ' + p.nivel + ')' : '';
+  if (e.evento === 'diag_folha')     return p.folha + ' · parede ' + (p.parede || '—');
+  if (e.evento === 'diag_portal')    return p.ms + 'ms' + (p.estourou ? ' · estourou o teto (conexão ruim)' : '');
+  if (e.evento === 'form_passo')     return 'passo ' + p.passo + (p.prazo ? ' · ' + p.prazo : '');
+  if (e.evento === 'form_abrir')     return 'modo ' + p.modo;
+  if (e.evento === 'form_abandono')  return 'saiu no passo ' + p.passo;
+  if (e.evento === 'lead_submit')    return (p.gravado ? 'gravado' : 'FALHOU AO GRAVAR')
+                                          + ' · valor ' + p.valor + ' · ' + (p.prazo || '');
+  if (e.evento === 'cta_click')      return p.cta + (p.capitulo ? ' · ' + p.capitulo : '');
+  if (e.evento === 'capitulo_visto') return p.capitulo;
+  if (e.evento === 'diag_abrir')     return 'entrada: ' + p.origem;
+  return '';
+}
+
+$('#tlFechar').addEventListener('click', () => $('#tl').classList.remove('on'));
+$('#tl').addEventListener('click', e => { if (e.target.id === 'tl') $('#tl').classList.remove('on'); });
+addEventListener('keydown', e => { if (e.key === 'Escape') $('#tl').classList.remove('on'); });
+
+function vazio(msg){ $('#conteudo').innerHTML = '<div class="vazio">' + esc(msg) + '</div>'; }
+
+/* sessão anterior */
+(function(){
+  const t = localStorage.getItem('no_painel_token');
+  if (t){ $('#tok').value = t; entrar(); }
+})();
+</script>
+</body>
+</html>
