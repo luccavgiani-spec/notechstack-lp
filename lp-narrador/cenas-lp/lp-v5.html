@@ -2025,13 +2025,26 @@ html.wall-edit #wallStage::after{
 .cn-btn:hover:not([disabled]),.cn-btn:focus-visible{
   background:var(--cnA); color:#1a1109; text-shadow:none;
 }
-.cn-btn[disabled]{ opacity:.28; cursor:default }
+/* .45 e não .28 (14/08). O desabilitado precisa parecer indisponível, não
+   quebrado — e a .28 vinha de um desktop, onde o botão é maior e o contraste
+   do fósforo âmbar segura. No retrato o mesmo botão tem 26px de altura e fonte
+   .86em: a .28 apagava ele a ponto de "⌂ início" e "próximo →" sumirem da tela
+   e a navbar parecer ter um botão só. */
+.cn-btn[disabled]{ opacity:.45; cursor:default }
 /* o meio da navbar é só espaçador: nem contador de etapas, nem trilha.
    As duas tentativas ocuparam esse lugar e as duas saíram — ver o comentário
    no HTML do #crtNav. */
 .cn-gap{ flex:1; min-width:0 }
 [data-var="portrait"] #crtNav{ gap:6px }
-[data-var="portrait"] .cn-btn{ min-height:26px; padding:3px 9px; font-size:.86em; border-radius:7px }
+/* No retrato o botão encolhe pra caber três numa barra estreita — e encolhendo
+   ele perdia presença justamente onde a tela é menor. Fundo e borda sobem pra
+   ficar no mesmo peso visual dos botões de escolha (.crt-opt), que são a
+   referência de "isto aqui é clicável" dentro do monitor. */
+[data-var="portrait"] .cn-btn{
+  min-height:26px; padding:3px 9px; font-size:.86em; border-radius:7px;
+  background:color-mix(in srgb, var(--cnA) 15%, transparent);
+  border-color:color-mix(in srgb, var(--cnA) 78%, transparent);
+}
 
 /* ── rodapé de teclas ── */
 #crtKeys{
