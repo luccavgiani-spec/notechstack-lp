@@ -1870,6 +1870,28 @@ html.wall-edit #wallStage::after{
 [data-var="portrait"] #crtKeys{ display:none }
 [data-var="portrait"] #crtText,
 [data-var="portrait"] #crtForm{ bottom:4% }
+
+/* ── AS OPÇÕES COMIAM A TELA INTEIRA (14/08) ──
+   Medido num iPhone 14: o vidro útil do #crtText tem 266px de altura em
+   retrato. Com o alvo de dedo (@media pointer:coarse: min-height 44 + padding
+   9 + margem 5), o menu da RAIZ — quatro rótulos longos, dois deles em duas
+   linhas — ocupava 259px. Sobravam 7px pra conversa inteira: a pergunta "e
+   por onde você começaria?" era empurrada pra fora pelo justify-content:
+   flex-end e o visitante via quatro botões nus, sem saber o que respondia.
+   Nada é cortado por bug — o terminal está fazendo o que foi mandado; é o
+   orçamento de altura que não fecha.
+   Aqui o menu devolve altura SEM abrir mão do alvo de toque: o min-height de
+   44px continua (é o mínimo da WCAG pro dedo), o que encolhe é só o respiro
+   em volta e a entrelinha. A dica sai porque no celular ela repete o que os
+   botões já dizem, e custa uma linha que faz falta.
+   Reservado para a conversa depois disto: ~60px, três linhas — a pergunta
+   cabe com folga. */
+[data-var="portrait"] .crt-opt{
+  padding:6px 12px; margin:3px 0; line-height:1.22;
+}
+[data-var="portrait"] .crt-hint{ display:none }
+/* a navbar do CRT encostava no texto; 4px de folga vêm de graça */
+[data-var="portrait"] #crtNav{ gap:6px; margin-bottom:0 }
 @media (pointer:coarse){
   #crtKeys{ display:none }
   #crtText,#crtForm{ bottom:4% }
@@ -2758,6 +2780,13 @@ html.diag-aberto #platforms::before{ display:none }
   .fx-thread{ gap:8px }
   .fx-msg-in,.fx-msg-out{ font-size:12.5px; line-height:1.45; padding:8px 12px }
   .fx-tool{ font-size:10px; padding:4px 10px }
+
+  /* PROFUNDÍMETRO FORA DO CELULAR (14/08). Ele é position:fixed no meio da
+     borda direita: no desktop sobra corredor pra ele, no celular ele cai em
+     cima do conteúdo — apareceu por cima do cartão dos agentes e da parede do
+     #pouso. Numa tela de 390px não há margem pra um elemento decorativo
+     flutuando, então ele fica só onde tem espaço. */
+  .depth{ display:none }
 }
 
 @media (prefers-reduced-motion: reduce){
