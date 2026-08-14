@@ -1,0 +1,102 @@
+/* ─── páginas legais (/termos e /privacidade) ───
+   Documento, não landing page: coluna estreita, hierarquia clara, zero
+   animação. Consome os tokens de brand/tokens/tokens.css — nenhum hex de
+   marca é redeclarado aqui. */
+
+:root{
+  --lg-fundo:  var(--no-osso);
+  --lg-tinta:  var(--no-tinta);
+  --lg-cinza:  var(--no-cinza);
+  --lg-borda:  var(--no-borda);
+  --lg-acento: var(--no-ambar);
+}
+
+*{ box-sizing:border-box }
+html{ scroll-behavior:smooth }
+body{
+  margin:0; background:var(--lg-fundo); color:var(--lg-tinta);
+  font-family:var(--no-font-sans); font-weight:var(--no-weight-corpo);
+  font-size:16px; line-height:1.72;
+  -webkit-font-smoothing:antialiased;
+}
+
+.lg-wrap{ max-width:760px; margin:0 auto; padding:0 24px 120px }
+
+/* topo: volta pra home + marca */
+.lg-topo{
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:28px 0 0; flex-wrap:wrap;
+}
+.lg-topo img{ height:30px; width:auto; display:block }
+.lg-voltar{
+  font-family:var(--no-font-mono); font-size:12px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--lg-cinza); text-decoration:none;
+  border-bottom:1px solid transparent; padding-bottom:2px;
+}
+.lg-voltar:hover{ color:var(--lg-tinta); border-bottom-color:var(--lg-acento) }
+
+.lg-rot{
+  display:inline-flex; align-items:center; gap:8px; margin-top:64px;
+  font-family:var(--no-font-mono); font-size:11px; font-weight:500;
+  letter-spacing:var(--no-tracking-label); text-transform:uppercase;
+  color:var(--lg-acento);
+}
+.lg-rot::before{ content:''; width:22px; height:2px; border-radius:2px; background:var(--lg-acento) }
+
+h1{
+  font-size:clamp(30px,5vw,44px); font-weight:var(--no-weight-titulo);
+  line-height:1.12; letter-spacing:var(--no-tracking-headline);
+  text-transform:uppercase; margin:14px 0 10px;
+}
+.lg-data{
+  font-family:var(--no-font-mono); font-size:12px; color:var(--lg-cinza);
+  margin:0 0 8px;
+}
+.lg-abre{ font-size:17px; color:var(--lg-cinza); margin:0 0 8px; max-width:62ch }
+
+h2{
+  font-size:20px; font-weight:var(--no-weight-subtitulo); line-height:1.3;
+  margin:52px 0 12px; padding-top:22px; border-top:1px solid var(--lg-borda);
+}
+h3{ font-size:16px; font-weight:var(--no-weight-subtitulo); margin:28px 0 8px }
+p{ margin:0 0 14px; max-width:68ch }
+ul{ margin:0 0 16px; padding-left:20px; max-width:68ch }
+li{ margin-bottom:9px }
+strong{ font-weight:var(--no-weight-subtitulo) }
+a{ color:var(--lg-tinta); text-decoration:underline; text-underline-offset:2px;
+   text-decoration-color:var(--lg-acento) }
+a:hover{ color:var(--lg-acento) }
+code{
+  font-family:var(--no-font-mono); font-size:.88em;
+  background:rgba(20,20,20,.05); padding:1px 5px; border-radius:4px;
+}
+
+/* tabela de cookies/dados: rola sozinha em tela estreita, sem empurrar a página */
+.lg-tab-wrap{ overflow-x:auto; margin:0 0 18px; border:1px solid var(--lg-borda); border-radius:12px }
+table{ border-collapse:collapse; width:100%; min-width:520px; font-size:14px }
+th,td{ text-align:left; padding:11px 14px; border-bottom:1px solid var(--lg-borda); vertical-align:top }
+th{
+  font-family:var(--no-font-mono); font-size:11px; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--lg-cinza); font-weight:500;
+  background:rgba(20,20,20,.03);
+}
+tr:last-child td{ border-bottom:0 }
+td code{ white-space:nowrap }
+
+/* caixa de destaque para o que o leitor precisa mesmo ver */
+.lg-nota{
+  border-left:3px solid var(--lg-acento); background:rgba(20,20,20,.03);
+  padding:16px 18px; border-radius:0 10px 10px 0; margin:0 0 18px;
+}
+.lg-nota p:last-child{ margin-bottom:0 }
+
+.lg-fim{
+  margin-top:64px; padding-top:22px; border-top:1px solid var(--lg-borda);
+  font-size:14px; color:var(--lg-cinza);
+}
+
+@media(max-width:640px){
+  body{ font-size:15.5px }
+  .lg-wrap{ padding:0 20px 90px }
+  h2{ margin-top:42px }
+}
