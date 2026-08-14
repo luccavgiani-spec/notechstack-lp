@@ -416,6 +416,19 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 .ft-link{color:rgba(255,255,255,.5);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18)}
 .ft-link:hover{color:#fff;border-bottom-color:var(--no-ambar,#e8a33d)}
 
+/* ── alinhamento dos dois blocos do rodapé ──
+   Cada bloco alinha pela própria borda EXTERNA: a marca pela esquerda, o
+   legal pela direita. Antes o bloco da direita era texto solto encostado na
+   borda direita mas alinhado à esquerda — as duas linhas ficavam com sobra
+   desigual e lia como desalinho, não como escolha.
+   O `align-items:center` do footer cuida do eixo vertical; aqui é só o
+   horizontal de cada coluna. O gap substitui o margin-top que estava inline
+   no slogan e tinha sido calibrado para a logo antiga (38px, contra os 27
+   do lockup). */
+.ft-brand{ display:flex; flex-direction:column; align-items:flex-start; gap:9px }
+.ft-legal{ display:flex; flex-direction:column; align-items:flex-end; gap:7px; text-align:right }
+.ft-legal-links{ display:flex; align-items:center; gap:2px; flex-wrap:wrap; justify-content:flex-end }
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   #hero{padding:110px 20px 56px}.floating-pills{display:none}
@@ -425,7 +438,12 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
   .cases-grid{grid-template-columns:1fr}.case-wide{grid-column:span 1}
   .case-wide .case-metrics{grid-template-columns:1fr 1fr}.cta-grid{grid-template-columns:1fr;gap:36px}
   .mm-wrap{height:720px}
-  footer{flex-direction:column;gap:12px;text-align:center;padding:36px 20px}
+  footer{flex-direction:column;gap:18px;text-align:center;padding:36px 20px}
+  /* empilhado, os dois blocos centram junto — deixar um alinhado à esquerda e
+     outro à direita numa coluna só é o desalinho clássico de rodapé */
+  .ft-brand{ align-items:center }
+  .ft-legal{ align-items:center; text-align:center }
+  .ft-legal-links{ justify-content:center }
   .cost-compare{flex-direction:column;text-align:center}
 }
 
@@ -3585,19 +3603,25 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
 
 <!-- FOOTER -->
 <footer>
-  <div>
-    <div class="ft-logo"><img src="/brand/logo/svg/no-branca-ponto-ambar.svg" alt="nó" width="64" height="38" style="height:38px;width:auto;object-fit:contain"></div>
-    <div class="ft-txt" style="margin-top:7px">IA que arquiteta, integra e opera.</div>
+  <div class="ft-brand">
+    <!-- lockup completo (nó tech stack), não só a marca. É 7060x964 = 7.3:1,
+         muito mais largo que a logo isolada que estava aqui: por isso a altura
+         é fluida e a largura vem do aspect-ratio, senão estoura os 370px de um
+         celular. -->
+    <div class="ft-logo"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="7060" height="964" style="height:clamp(19px,4.6vw,27px);width:auto;object-fit:contain;display:block"></div>
+    <div class="ft-txt">IA que arquiteta, integra e opera.</div>
   </div>
   <!-- Os dois links também vivem no aceite do formulário. Aqui eles existem
        porque uma política de privacidade alcançável só de dentro de um
        formulário é, na prática, uma política escondida: quem ainda não decidiu
        se vai deixar contato é justamente quem precisa lê-la antes. -->
-  <div class="ft-txt">
-    <a href="/termos" class="ft-link">Termos de uso</a>
-    <span aria-hidden="true"> · </span>
-    <a href="/privacidade" class="ft-link">Privacidade e cookies</a>
-    <br>© 2026 <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Todos os direitos reservados.
+  <div class="ft-legal ft-txt">
+    <div class="ft-legal-links">
+      <a href="/termos" class="ft-link">Termos de uso</a>
+      <span aria-hidden="true"> · </span>
+      <a href="/privacidade" class="ft-link">Privacidade e cookies</a>
+    </div>
+    <div>© 2026 <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Todos os direitos reservados.</div>
   </div>
 </footer>
 <!-- mascote de sprite (fixo, sobrepõe a página inteira) -->

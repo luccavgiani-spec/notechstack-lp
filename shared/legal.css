@@ -100,3 +100,19 @@ td code{ white-space:nowrap }
   .lg-wrap{ padding:0 20px 90px }
   h2{ margin-top:42px }
 }
+
+/* ─── modo embutido (?embed=1) ───
+   A mesma página servida dentro do modal do CRT. Some tudo que é navegação:
+   o "voltar ao site" dentro de um modal levaria o iframe pra home e deixaria
+   a pessoa presa numa janelinha com a home dentro. O título da página também
+   sai, porque o cabeçalho do modal já o exibe.
+   Iframe e não HTML injetado de propósito: esta folha define `body{}`, e
+   carregá-la junto com a LP arrasaria o layout dela. */
+html.lg-embed .lg-topo,
+html.lg-embed h1,
+html.lg-embed .lg-abre{ display:none }
+html.lg-embed .lg-wrap{ padding:0 22px 40px; max-width:none }
+html.lg-embed .lg-rot{ margin-top:22px }
+html.lg-embed body{ background:transparent; font-size:15px }
+html.lg-embed h2{ margin-top:34px }
+html.lg-embed .lg-fim{ margin-top:40px }

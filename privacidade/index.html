@@ -11,6 +11,10 @@
 <link rel="stylesheet" href="/brand/fonts/fonts.css">
 <link rel="stylesheet" href="/brand/tokens/tokens.css">
 <link rel="stylesheet" href="/shared/legal.css">
+<!-- ?embed=1 → a mesma página servida dentro do modal do CRT. No <head> e não
+     no fim do body pra classe existir antes do primeiro paint, senão o
+     cabeçalho pisca antes de sumir. -->
+<script>if(location.search.includes('embed'))document.documentElement.classList.add('lg-embed')</script>
 </head>
 <body>
 <div class="lg-wrap">
