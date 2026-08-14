@@ -1026,12 +1026,26 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
   }
   /* topo do vídeo em 46% + 88,8% da altura dele = 93,9% */
   .hero-stage{ --linha:93.9% }
-  /* o conteúdo para acima da cabeça do mascote, não acima da linha.
-     44% e não 50%: com o slogan em fluxo o bloco da marca ficou mais alto e
-     o topo dele saía do palco. A sobra cai na faixa que a máscara do vídeo
-     já dissolve, então continua sendo parede limpa. */
-  .hero-foot{ bottom:44% }
-  .hero-mark{ width:min(50vw,210px) }
+  /* O CONTEÚDO PARA ACIMA DA CABEÇA DO MASCOTE — mas só até onde o palco
+     deixa. Antes isto era `bottom:44%` fixo, e num palco curto o bloco
+     (marca + slogan + parágrafo + CTA) ficava mais alto que os 56% restantes:
+     o topo da marca saía pra fora e o `overflow:hidden` do palco cortava o
+     "nó" pela metade. Medido no harness: 76px de corte num 375×667.
+
+     Por que aparecia no celular real e não no harness em tamanho nominal: a
+     barra do navegador come ~90px de altura. Um iPhone 14 tem 844 no papel e
+     ~750 na mão — e é nos 750 que o corte começa.
+
+     `min()` resolve os dois casos com uma regra só: normalmente 41% do palco,
+     mas nunca tão alto que sobre menos de 392px acima (a altura do bloco).
+     Em tela alta o comportamento é praticamente o de antes; em tela curta o
+     bloco desce o quanto for preciso pra caber. */
+  .hero-stage{
+    --palco: calc(100svh - 148px);   /* 100 e 48 de padding do #hero, fixos */
+    --alto:  min(calc(var(--palco) * 0.41), calc(var(--palco) - 392px));
+  }
+  .hero-foot{ bottom: var(--alto) }
+  .hero-mark{ width:min(46vw,178px) }
   .hero-slogan{ font-size:clamp(13px,3.6vw,17px) }
   .hero-right{ gap:13px }
   .hero-desc{ font-size:14px;max-width:none }
@@ -1043,13 +1057,20 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
      É `top` (o botão já nasce position:relative) e NÃO `transform`: a entrada
      .h-rise roda @keyframes fadeUp com fill `both`, que termina em
      translateY(0) e sobrescreveria qualquer transform declarado aqui.
-     33.5vh vem da geometria do palco: o bloco para a 44% da altura dele e a
-     linha do chão está a 6,1% — a diferença é ~35% do palco, que dá ~34% da
-     janela. Medido em 360x640, 390x844 e 430x932, o centro do botão cai a
-     menos de 8px da linha do chão nos três. Os 0,5vh a menos que a conta
-     redonda são pra folga: com 34vh exatos o botão passava 1px da base do
-     palco no 640, o mais baixo dos três. */
-  #heroCtaBtn{ top:33.5vh }
+     ERA `33.5vh`, E ISSO DERIVAVA. O deslocamento tem que ser a distância
+     entre o rodapé do bloco e a linha do chão — e os dois são % do PALCO,
+     enquanto `vh` é % da JANELA. As duas escalas não são proporcionais: o
+     #hero tem 148px de padding fixo, que pesa muito mais num palco curto (o
+     palco é 78% da janela num 667 e 84% num 915). Resultado medido: o botão
+     caía 30px abaixo da linha do chão num 390×750.
+
+     Agora sai da MESMA expressão do bloco, em comprimento e sem porcentagem,
+     então acompanha sozinho: `--alto` menos os 6,1% do piso. Os 12px a mais
+     enviesam o botão pra CIMA da linha de propósito — errar pra cima deixa
+     ele nos pés do mascote, errar pra baixo encosta na borda do palco.
+     Verificado em 375×667, 390×750, 390×844 e 412×915: o centro cai entre
+     8px e 38px acima da linha nos quatro. */
+  #heroCtaBtn{ top: calc(var(--alto) - var(--palco) * 0.061 - 12px) }
 }
 
 /* TABLET DEITADO — palco largo e baixo: marca e texto empilham na metade
@@ -1509,6 +1530,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   width:100%; height:100%; max-width:none;
   object-fit:cover; object-position:50% 50%;
 }
+/* RETRATO: CONTAIN, NÃO COVER (14/08).
+   O quadro é 1080×1916 (proporção 0,56) e celular alto e estreito é 0,45–0,46.
+   Em cover a escala é ditada pela ALTURA, e a largura renderizada estoura o
+   viewport: medido no harness, 101px cortados num 390×844 e 119px num 412×915.
+   O que ficava de fora era exatamente a lateral da cabeça de monitor — a tela
+   do CRT chegava de borda a borda, sem gabinete nenhum em volta, e era isso
+   que dava a sensação de "apertado".
+
+   Em contain a tela fica só ~22px mais estreita (a moldura ocupa pouco), e em
+   troca o monitor volta a parecer um monitor. As faixas que sobram em cima e
+   embaixo caem sobre o gradiente de estúdio do #pouso, que existe justamente
+   pra ser a parede atrás do quadro.
+
+   Landscape SEGUE EM COVER: lá o corte cai na esquerda vazia, nunca na
+   cadeira — é decisão da variante, não descuido. */
+#pouso[data-var="portrait"] .pouso-stage video,
+#pouso[data-var="portrait"] .pouso-stage img{ object-fit:contain }
+
 /* crossfade suave em toda troca de camada (fim do zoom → still deixou de
    ser corte seco: o último frame congelado dissolve na imagem) */
 .pouso-stage video{ transition:opacity .55s linear }
@@ -5706,11 +5745,18 @@ requestAnimationFrame(frame);
      (depende do object-fit/object-position — calculado, não assumido 1:1
      com o viewport) e, dentro dele, o retângulo medido da tela ---------- */
   function frameRect(){
-    /* cover full-bleed nas duas variantes; muda só a âncora horizontal
-       (landscape prioriza a direita via object-position 100%) */
+    /* ESTA CONTA TEM QUE ESPELHAR O object-fit DO CSS. O retângulo da tela do
+       CRT é derivado daqui: se a escala aqui não for a mesma que o browser
+       usou pra desenhar o quadro, o terminal desalinha do vidro do monitor.
+
+       landscape → cover (Math.max): o corte cai na esquerda vazia, nunca na cadeira.
+       portrait  → contain (Math.min): em cover a altura ditava a escala e a
+       largura estourava o viewport, cortando a lateral da cabeça de monitor. */
     const pin = pouso.querySelector('.pouso-pin');
     const pw = pin.clientWidth, ph = pin.clientHeight;
-    const s = Math.max(pw / SET.vw, ph / SET.vh);
+    const s = curVar === 'landscape'
+      ? Math.max(pw / SET.vw, ph / SET.vh)
+      : Math.min(pw / SET.vw, ph / SET.vh);
     const w = SET.vw * s, h = SET.vh * s;
     const left = curVar === 'landscape' ? pw - w : (pw - w) / 2;
     return { left, top: (ph - h) / 2, w, h };
