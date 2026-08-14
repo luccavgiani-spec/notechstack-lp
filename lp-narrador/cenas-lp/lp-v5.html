@@ -2164,6 +2164,14 @@ html.wall-edit #wallStage::after{
   will-change:transform,filter; transform:translate3d(-999px,-999px,0);
 }
 #sprite{ width:100%; height:100%; background-repeat:no-repeat; image-rendering:auto }
+/* enquanto o dedo segura o mascote (ver o módulo `brinca` no script): nada de
+   seleção de texto nem de realce azul de toque acidental. O #mascot segue com
+   pointer-events:none de propósito — o alvo é testado na mão, pra não abrir um
+   buraco de 150x200px onde a rolagem morre quando ninguém quer brincar. */
+html.brincando, html.brincando *{
+  user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
+}
+html.brincando{ cursor:grabbing }
 #lines{ position:fixed; inset:0; z-index:55; pointer-events:none; opacity:0; transition:opacity .5s }
 #sizer{ position:absolute; left:-9999px; top:0; width:0; height:var(--mh); pointer-events:none }
 
@@ -3707,6 +3715,179 @@ function measure(){
   mh = (sz && isFinite(sz) && sz > 20) ? sz : Math.min(320, Math.max(150, H * 0.28));
   sitH = Math.max(90, Math.min(640, mh * CFG.sizeK * kTamMobile()));
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   BRINCAR COM O MASCOTE (14/08) — só no celular
+   Segurar o dedo nele tira o controle do scroll e devolve pro dedo; soltar
+   arremessa com a velocidade do gesto, e ele quica nas paredes até perder a
+   energia e voltar pra queda.
+
+   POR QUE ASSIM:
+   · O hit-test é MANUAL (uma caixa guardada no desenho), e não
+     pointer-events no #mascot. Ligar pointer-events num elemento
+     position:fixed de 150x200px no meio da tela significa um buraco onde a
+     rolagem morre mesmo quando ninguém quer brincar. Testando na mão, só
+     roubamos o gesto quando o dedo cai DENTRO dele.
+   · O bloqueio da rolagem é um touchmove com {passive:false}: preventDefault
+     em pointerdown não segura scroll no Chrome de Android.
+   · Ao soltar, ele não teleporta de volta pra posição da queda — perde
+     energia, encosta no chão e só então volta interpolando. Snap depois de
+     um arremesso lê como bug.
+   ══════════════════════════════════════════════════════════════════════ */
+const brinca = (() => {
+  /* GRAVIDADE ZERO (14/08, a pedido). A primeira versão tinha gravidade,
+     quique no chão e atrito: ele era ARREMESSADO, batia, caía e parava. O que
+     se queria é outra coisa — ele FLUTUA. Então não há "baixo": as quatro
+     bordas são iguais, o arrasto é o de quem desliza no vácuo (quase nenhum) e
+     o giro acompanha, lento. Ele fica à deriva por vários segundos depois do
+     empurrão, que é o ponto da brincadeira. */
+  const AR     = 0.5;    // arrasto (decaimento exponencial por segundo)
+  /* Quique BAIXO de propósito (ajuste 14/08). Com 0.82 ele devolvia quase toda
+     a velocidade e o resultado era pinball: batia de parede em parede e a
+     brincadeira virava barulho. Com 0.28 a borda absorve a maior parte — ele
+     encosta, perde o embalo e sai de lá devagar. Parede de veludo, não de
+     borracha. */
+  const QUICA  = 0.28;
+  const PARADO = 16;     // velocidade abaixo da qual consideramos à deriva parado
+  const ESPERA = 1.4;    // segundos parado antes de devolver pra queda
+  const MARGEM = 10;
+
+  let modo = 'queda';           // queda | preso | solto | voltando
+  let x = 0, y = 0, ang = 0;    // posição do QUADRIL (mesmo espaço de curX/curY)
+  let vx = 0, vy = 0, va = 0;
+  let quieto = 0, volta = 0;
+  let caixa = null;             // {left, top, w, h} do último quadro desenhado
+  let pid = null, ox = 0, oy = 0;
+  let amostras = [];            // [t, x, y] pra estimar a velocidade do gesto
+
+  const podeBrincar = () => ehMobile() && !R && caixa;
+
+  function registraCaixa(left, top, w, h){ caixa = {left, top, w, h}; }
+  function some(){ if (modo !== 'queda'){ modo = 'queda'; pid = null; } caixa = null; }
+
+  function dentro(px, py){
+    if (!caixa) return false;
+    /* folga de 12px: o sprite tem transparência nas bordas e mirar num boneco
+       girando com o dedo já é difícil o bastante */
+    return px >= caixa.left - 12 && px <= caixa.left + caixa.w + 12 &&
+           py >= caixa.top  - 12 && py <= caixa.top  + caixa.h + 12;
+  }
+
+  function pega(px, py, id){
+    modo = 'preso'; pid = id;
+    ox = px - x; oy = py - y;
+    vx = vy = va = 0; quieto = 0;
+    amostras = [[performance.now(), px, py]];
+    document.documentElement.classList.add('brincando');
+  }
+
+  function move(px, py){
+    if (modo !== 'preso') return;
+    x = px - ox; y = py - oy;
+    const t = performance.now();
+    amostras.push([t, px, py]);
+    /* só os últimos 90ms interessam: velocidade de arremesso é o FIM do
+       gesto, não a média dele — quem arrasta devagar e dá um peteleco no
+       final espera que valha o peteleco */
+    while (amostras.length > 2 && t - amostras[0][0] > 90) amostras.shift();
+  }
+
+  function solta(){
+    if (modo !== 'preso') return;
+    const a = amostras[0], b = amostras[amostras.length - 1];
+    const dt = Math.max(0.016, (b[0] - a[0]) / 1000);
+    vx = (b[1] - a[1]) / dt;
+    vy = (b[2] - a[2]) / dt;
+    /* teto de velocidade: sem gravidade e com pouco arrasto, um flick violento
+       vira um projétil ricocheteando — que não é flutuar. O teto mantém o
+       gesto no terreno do "empurrão no espaço". */
+    const v = Math.hypot(vx, vy), TETO = 900;
+    if (v > TETO){ vx *= TETO / v; vy *= TETO / v; }
+    va = vx * 0.09;                 // gira devagar pro lado em que foi empurrado
+    modo = 'solto'; pid = null; quieto = 0;
+    document.documentElement.classList.remove('brincando');
+  }
+
+  /* chamado todo quadro; tx/ty/tang é onde a QUEDA queria que ele estivesse */
+  function passo(dt, tx, ty, tang){
+    /* na mão ele MANTÉM o ângulo em que estava. Endireitar seria assumir que
+       existe "em pé" — e em gravidade zero não existe. */
+    if (modo === 'preso') return;
+
+    if (modo === 'solto'){
+      /* sem gravidade: nada puxa pra baixo. Só o arrasto tira energia, e
+         devagar — é o que faz ele continuar à deriva depois do empurrão. */
+      const k = Math.exp(-AR * dt);
+      vx *= k; vy *= k;
+      x += vx * dt; y += vy * dt;
+      ang += va * dt; va *= Math.exp(-0.5 * dt);
+
+      /* as QUATRO bordas são iguais: em gravidade zero não existe chão, existe
+         parede. Bater devolve quase toda a velocidade e dá um tranco no giro,
+         que é o que faz o quique parecer físico e não um espelhamento. */
+      const meiaL = caixa ? caixa.w * 0.5 : 60;
+      const meiaA = caixa ? caixa.h * 0.5 : 80;
+      const minX = MARGEM + meiaL, maxX = W - MARGEM - meiaL;
+      const minY = MARGEM + meiaA, maxY = H - MARGEM - meiaA;
+
+      if (x < minX){ x = minX; vx = Math.abs(vx) * QUICA; va += vy * 0.03; }
+      if (x > maxX){ x = maxX; vx = -Math.abs(vx) * QUICA; va -= vy * 0.03; }
+      if (y < minY){ y = minY; vy = Math.abs(vy) * QUICA; va -= vx * 0.03; }
+      if (y > maxY){ y = maxY; vy = -Math.abs(vy) * QUICA; va += vx * 0.03; }
+
+      /* só devolve pra queda quando ele realmente perdeu a deriva, e depois de
+         ESPERA segundos assim — em gravidade zero "parar" é raro, então o
+         normal é ele flutuar até a pessoa rolar a página (o some() cuida) */
+      quieto = Math.hypot(vx, vy) < PARADO ? quieto + dt : 0;
+      if (quieto > ESPERA){ modo = 'voltando'; volta = 0; }
+      return;
+    }
+
+    if (modo === 'voltando'){
+      /* volta LENTA e sem quina: depois de flutuar, um puxão de meio segundo
+         pra posição da queda leria como teletransporte */
+      volta = Math.min(1, volta + dt / 2.2);
+      const e = volta < .5 ? 2*volta*volta : 1 - Math.pow(-2*volta + 2, 2)/2;
+      x += (tx - x) * e * 0.12;
+      y += (ty - y) * e * 0.12;
+      ang += (tang - ang) * e * 0.12;
+      if (volta >= 1){ modo = 'queda'; }
+    }
+  }
+
+  /* ---- gestos ---- */
+  addEventListener('pointerdown', e => {
+    if (!podeBrincar() || modo === 'preso') return;
+    if (!dentro(e.clientX, e.clientY)) return;
+    pega(e.clientX, e.clientY, e.pointerId);
+  }, {passive:true});
+
+  addEventListener('pointermove', e => {
+    if (modo !== 'preso' || e.pointerId !== pid) return;
+    move(e.clientX, e.clientY);
+  }, {passive:true});
+
+  ['pointerup','pointercancel'].forEach(ev =>
+    addEventListener(ev, e => { if (e.pointerId === pid) solta(); }, {passive:true}));
+
+  /* o que realmente impede a página de rolar embaixo do dedo */
+  addEventListener('touchmove', e => {
+    if (modo === 'preso') e.preventDefault();
+  }, {passive:false});
+
+  return {
+    get modo(){ return modo; },
+    get ativo(){ return modo !== 'queda'; },
+    get x(){ return x; }, get y(){ return y; }, get ang(){ return ang; },
+    /* a queda dita a posição enquanto ninguém está brincando: assim o
+       primeiro toque começa exatamente de onde ele está na tela */
+    sincroniza(px, py, pang){ if (modo === 'queda'){ x = px; y = py; ang = pang; } },
+    registraCaixa, dentro, some, passo
+  };
+})();
+/* exposto pra depuração e pro painel (tecla D): dá pra ler o modo e a caixa
+   de toque sem instrumentar o laço */
+window.brincaMascote = brinca;
 addEventListener('resize', measure);
 addEventListener('scroll', () => { target = window.scrollY; }, {passive:true});
 
@@ -3727,6 +3908,7 @@ function frame(now){
   if (R){
     mascot.style.opacity = '0';
     if (depthEl) depthEl.style.opacity = '0';
+    brinca.some();
     return;
   }
 
@@ -3749,6 +3931,10 @@ function frame(now){
     mascot.style.opacity = '0';
     if (depthEl) depthEl.style.opacity = '0';
     drawLines(0, 0, '255,255,255');
+    /* saiu de quadro com o dedo em cima (rolou junto, ou chegou no fim da
+       queda): a brincadeira acaba aqui, senão ela fica presa e o próximo
+       toque na tela pega um mascote invisível */
+    brinca.some();
     return;
   }
 
@@ -3785,6 +3971,13 @@ function frame(now){
     curAng += (ang - curAng) * CFG.angEase;
   }
 
+  /* ---- dedo no mascote (celular): o gesto ganha do scroll ----
+     Fora de brincadeira, sincroniza() mantém a física alinhada com a queda,
+     pra o primeiro toque começar exatamente de onde ele está na tela. */
+  brinca.sincroniza(curX, curY, curAng);
+  brinca.passo(dt, tx, ty, ang);
+  if (brinca.ativo){ curX = brinca.x; curY = brinca.y; curAng = brinca.ang; }
+
   /* ---- desenha ---- */
   if (c.ready){
     if (P.lastFile !== c.file){
@@ -3802,6 +3995,9 @@ function frame(now){
   }
 
   const left = curX - hx/100*fw, top = curY - hy/100*fh;
+  /* a caixa do quadro atual é o alvo do dedo — guardada aqui porque é o único
+     lugar que sabe o tamanho real do frame depois do sprite escolhido */
+  brinca.registraCaixa(left, top, fw, fh);
   mascot.style.transformOrigin = `${hx}% ${hy}%`;
   mascot.style.transform =
     `translate3d(${left.toFixed(2)}px,${top.toFixed(2)}px,0) rotate(${curAng.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
