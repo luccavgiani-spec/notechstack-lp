@@ -2597,6 +2597,46 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 #ctafinal .pill-cta:hover{ background:#EDEAE4 }
 /* (a dica embaixo do botão saiu na revisão de texto de 14/08) */
 
+/* ═══ PORTAL — travessia do CTA pro "Senta aí" ═══
+   Preto sobre preto de propósito: o #ctafinal já é --lp-preto, então o véu
+   não "aparece", ele FECHA. O que a pessoa vê é o texto do CTA se apagando e
+   a barra nascendo no mesmo lugar — não uma cortina caindo por cima. */
+#portal{
+  position:fixed; inset:0; z-index:200;
+  background:var(--lp-preto);
+  display:grid; place-items:center;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .42s ease, visibility 0s linear .42s;
+}
+#portal.on{
+  opacity:1; visibility:visible; pointer-events:auto;
+  transition:opacity .42s ease, visibility 0s;
+}
+/* a saída é mais lenta que a entrada: fechar é um gesto, abrir é uma
+   revelação — e a sala nova merece ser vista chegando */
+#portal.saindo{ transition:opacity .85s ease, visibility 0s linear .85s }
+.pt-inner{ width:min(280px, 62vw); text-align:center }
+.pt-rot{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.22em;
+  text-transform:uppercase; color:rgba(244,227,194,.5); margin-bottom:14px;
+}
+/* o número é o protagonista (a barra saiu): mono, tabular pra não dançar de
+   largura a cada dígito. As reticências vivem só no rótulo acima — repetidas
+   aqui embaixo viravam o mesmo gesto duas vezes em dois centímetros. */
+.pt-num{ display:flex; align-items:center; justify-content:center }
+.pt-pct{
+  font-family:var(--font-mono); font-size:34px; font-weight:500;
+  letter-spacing:.02em; color:rgba(244,227,194,.92);
+  font-variant-numeric:tabular-nums; line-height:1;
+}
+/* com o véu no ar a página não rola: qualquer rolagem aqui é rolagem às
+   cegas, e ainda por cima atrapalha o salto que acontece atrás dele */
+html.portal-on, html.portal-on body{ overflow:hidden }
+@media (prefers-reduced-motion: reduce){
+  /* sem encenação: a travessia vira um corte seco (ver abrirDiagnostico) */
+  #portal{ display:none }
+}
+
 /* ═══ PORTA DO DIAGNÓSTICO ═══
    #pouso fica FORA do layout até o clique em "Começar projeto". Assim a
    rolagem corrida vai do preto do CTA direto pro bege das ferramentas, sem a
@@ -3296,6 +3336,23 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
     </div>
   </div>
 </section>
+
+<!-- ══ PORTAL — a emenda entre o "vamos conversar?" e o "senta aí" ══
+     A porta do diagnóstico deixou de EXPANDIR a página pra baixo e passou a
+     ser uma travessia: o preto do CTA fecha em cima de tudo, uma barra conta
+     o carregamento real dos vídeos do "Senta aí", e o preto abre já na sala
+     nova. Pra quem olha, as duas seções viraram uma só.
+     O véu é fixed e cobre o viewport inteiro — é atrás dele que a seção
+     destranca, remede e a página salta pra posição, sem ninguém ver o layout
+     crescer. aria-hidden porque é encenação: quem usa leitor de tela não
+     ganha nada com uma barra de progresso decorativa, e o conteúdo real
+     continua anunciado pelo #crt (aria-live). ══ -->
+<div id="portal" aria-hidden="true">
+  <div class="pt-inner">
+    <div class="pt-rot">Loading...</div>
+    <div class="pt-num"><span class="pt-pct">0%</span></div>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
@@ -4090,43 +4147,139 @@ function rolarAte(alvo, ms){
   });
 }
 
+/* ── PORTAL: a travessia do CTA pro "Senta aí" ──
+   A porta deixou de EXPANDIR a página pra baixo. Agora o preto do #ctafinal
+   fecha em cima de tudo, uma barra conta o carregamento REAL dos vídeos do
+   pouso, e o preto abre já na sala nova. Para quem olha, as duas seções são
+   uma só — e o tempo que antes era engasgo de vídeo carregando vira a própria
+   encenação.
+
+   Por que a barra é real e não um relógio fingido: os quatro arquivos da
+   variante ativa somam ~8MB. Fingir progresso aqui seria mentir justamente no
+   lugar onde a espera existe de verdade. */
+const portal = (() => {
+  const el = document.getElementById('portal');
+  if (!el) return { abrir: (prep, fim) => { prep(); fim(); } };
+  const pct   = el.querySelector('.pt-pct');
+  const raiz  = document.documentElement;
+
+  const MIN_MS   = 1100;   // tempo mínimo no ar: abaixo disso a travessia pisca
+  const LIMITE   = 9000;   // teto: ninguém fica refém de uma conexão ruim
+  const COBERTO  = 440;    // igual ao transition de entrada do #portal
+
+  let aberto = false;
+
+  /* progresso ponderado dos assets do pouso. Os vídeos pesam 38% cada porque
+     são eles que fazem esperar; os stills, 12%. Vídeo sem duration conhecida
+     ainda não tem metadata: aí o readyState/4 serve de régua grosseira. */
+  function medir(){
+    const pv = v => {
+      if (!v || !v.getAttribute('src')) return 1;
+      if (v.readyState >= 4) return 1;
+      if (v.duration && v.buffered.length)
+        return Math.min(1, v.buffered.end(v.buffered.length - 1) / v.duration);
+      return v.readyState / 4;
+    };
+    const pi = i => (!i || !i.getAttribute('src')) ? 1
+                  : (i.complete && i.naturalWidth ? 1 : 0);
+    return pv(document.getElementById('vidCaindo')) * 0.38
+         + pv(document.getElementById('vidZoom'))   * 0.38
+         + pi(document.getElementById('monitorStill'))  * 0.12
+         + pi(document.getElementById('monitorTyping')) * 0.12;
+  }
+
+  /* só o número: a porcentagem nunca ANDA PRA TRÁS, mesmo que a medição
+     oscile (buffered pode encolher quando o browser descarta trecho) — ver
+     alguém carregar de 60% pra 48% é pior que não ver número nenhum */
+  let teto = 0;
+  function pinta(v){
+    teto = Math.max(teto, v);
+    pct.textContent = Math.round(teto * 100) + '%';
+  }
+
+  function fechar(aoFim){
+    el.classList.add('saindo');
+    el.classList.remove('on');
+    setTimeout(() => {
+      el.classList.remove('saindo');
+      raiz.classList.remove('portal-on');
+      aberto = false;
+      if (aoFim) aoFim();
+    }, 870);
+  }
+
+  /* prep() roda ATRÁS do véu já opaco: é onde a seção destranca, remede e a
+     página salta. Nada disso pode ser visto acontecendo. */
+  function abrir(prep, aoFim){
+    if (aberto) { prep(); return; }
+    aberto = true;
+    teto = 0; pinta(0);
+    raiz.classList.add('portal-on');
+    el.classList.add('on');
+
+    setTimeout(() => {
+      /* se prep() explodir, o laço abaixo nunca começa e o véu fica no ar pra
+         sempre — com a página travada em overflow:hidden. Um erro na medição
+         do CRT não pode custar o site inteiro. */
+      try { prep(); }
+      catch(e){ console.error('portal: falha ao preparar o pouso', e); fechar(aoFim); return; }
+      const t0 = performance.now();
+      let mostrado = 0;
+      (function passo(now){
+        const t = now - t0;
+        /* o teto por tempo impede a barra de fechar antes do MIN_MS mesmo com
+           tudo já em cache — senão o portal vira um flash sem sentido */
+        const alvo = Math.min(medir(), t / MIN_MS);
+        mostrado += (alvo - mostrado) * 0.14;
+        pinta(mostrado);
+        if ((mostrado > 0.995 && t >= MIN_MS) || t > LIMITE){
+          pinta(1);
+          setTimeout(() => fechar(aoFim), 180);   // a barra cheia chega a ser vista
+          return;
+        }
+        requestAnimationFrame(passo);
+      })(performance.now());
+    }, COBERTO);
+  }
+
+  return { abrir, get aberto(){ return aberto; } };
+})();
+
 window.abrirDiagnostico = function(opts){
   const po = document.getElementById('pouso');
   if (!po) return;
   const primeiraVez = po.hasAttribute('data-gated');
-  if (primeiraVez){
-    po.removeAttribute('data-gated');
-    document.documentElement.classList.add('diag-aberto');
-    /* o CRT mede o retângulo da tela do monitor em px — sem isso, ele
-       herdaria as medidas de quando a seção estava fora do layout */
-    if (window.pousoRefresh) pousoRefresh('pousoLen');
-    if (window.reobserve) reobserve();   // os .reveal de dentro nunca foram vistos
-  }
-  if (opts && opts.semRolar) return;
-
-  const raiz = document.documentElement;
   const alvo = () => po.getBoundingClientRect().top + scrollY;
 
-  if (R){ scrollTo(0, alvo()); return; }          // movimento reduzido: sem encenação
-  if (!primeiraVez){ rolarAte(alvo(), 800); return; }
+  /* destranca + remede. O CRT mede o retângulo da tela do monitor em px — sem
+     isto ele herdaria as medidas de quando a seção estava fora do layout. */
+  const destrancar = () => {
+    if (!po.hasAttribute('data-gated')) return;
+    po.removeAttribute('data-gated');
+    document.documentElement.classList.add('diag-aberto');
+    if (window.pousoRefresh) pousoRefresh('pousoLen');
+    if (window.reobserve) reobserve();   // os .reveal de dentro nunca foram vistos
+  };
 
-  po.classList.add('abrindo');
-  raiz.classList.add('diag-abrindo');
-  /* dois frames antes de soltar: o primeiro aplica o display, o segundo pinta
-     o estado inicial. Num frame só o browser junta as duas mudanças e não
-     acontece transição nenhuma — o palco apareceria pronto. */
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    po.classList.add('assentou');
-    rolarAte(alvo(), 1150);
-    /* a faxina é por RELÓGIO, não pelo fim da rolagem: se o usuário abortar o
-       scroll no meio, a rolagem resolve antes da hora e tirar as classes ali
-       arrancaria o palco do meio da transição (pulo de opacidade). Assim a
-       entrada do palco termina sempre, aborte-se a rolagem ou não. */
-    setTimeout(() => {
-      raiz.classList.remove('diag-abrindo');
-      po.classList.remove('abrindo','assentou');
-    }, 1250);
-  }));
+  /* o painel e o pousoForceNode chamam com semRolar: só querem a seção no
+     layout pra poder medir, sem encenação nenhuma */
+  if (opts && opts.semRolar){ destrancar(); return; }
+
+  /* já aberta: não há travessia a fazer, só levar de volta */
+  if (!primeiraVez){
+    if (R) scrollTo(0, alvo()); else rolarAte(alvo(), 800);
+    return;
+  }
+
+  /* movimento reduzido: corte seco, sem véu nem barra */
+  if (R){ destrancar(); scrollTo(0, alvo()); return; }
+
+  portal.abrir(() => {
+    destrancar();
+    /* 'instant' de verdade: 'auto' herdaria o scroll-behavior:smooth do html
+       e a página rolaria por baixo do véu, chegando fora de posição */
+    window.scrollTo({ top: alvo(), behavior:'instant' });
+  });
 };
 /* quem chega por link direto entra com a porta já aberta */
 if (location.hash === '#pouso') addEventListener('load', () => abrirDiagnostico());
