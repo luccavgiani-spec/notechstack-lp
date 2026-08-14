@@ -464,8 +464,8 @@ curl -s "$FN/painel-dados?v=funil" -H "x-painel-token: SEU_TOKEN"
 
 | Bloco | Estado | Quando | Notas |
 |---|---|---|---|
-| A — container GTM | 🟡 **montado, NÃO publicado** | 14/08/2026 | 26 itens no workspace; publicar só depois do deploy do PR |
-| B — lp-v5.html | ✅ **aplicado e testado** | 14/08/2026 | funil de 16 eventos percorrido ponta a ponta no browser |
+| A — container GTM | ✅ **publicado** | 14/08/2026 | versão "Rastreio da jornada"; `gtm.js` serve pixel + 5 tags GA4 |
+| B — lp-v5.html | ✅ **no ar como home** | 14/08/2026 | PR #17 e #18 mergeados; `/` serve a lp-v5 |
 | C — server-side | ✅ **no ar** | 14/08/2026 | secrets setados; CAPI devolveu `events_received: 1` |
 | D — painel | ✅ **completo** | 14/08/2026 | `painel-leads.html`, três telas |
 
