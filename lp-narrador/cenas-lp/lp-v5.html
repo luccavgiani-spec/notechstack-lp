@@ -887,6 +887,21 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
   .hero-slogan{ font-size:clamp(13px,3.6vw,17px) }
   .hero-right{ gap:13px }
   .hero-desc{ font-size:14px;max-width:none }
+  /* O CTA DESCE PRA ALTURA DOS PÉS (14/08).
+     Medido num iPhone 14 (390x844): o bloco de conteúdo termina em y=490 e a
+     cabeça de TV do mascote começa em y≈492 — o botão tampava exatamente o
+     rosto da marca. Junto dos sapatos a figura é estreita e escura, então a
+     pílula clara ganha contraste em vez de esconder alguma coisa.
+     É `top` (o botão já nasce position:relative) e NÃO `transform`: a entrada
+     .h-rise roda @keyframes fadeUp com fill `both`, que termina em
+     translateY(0) e sobrescreveria qualquer transform declarado aqui.
+     33.5vh vem da geometria do palco: o bloco para a 44% da altura dele e a
+     linha do chão está a 6,1% — a diferença é ~35% do palco, que dá ~34% da
+     janela. Medido em 360x640, 390x844 e 430x932, o centro do botão cai a
+     menos de 8px da linha do chão nos três. Os 0,5vh a menos que a conta
+     redonda são pra folga: com 34vh exatos o botão passava 1px da base do
+     palco no 640, o mais baixo dos três. */
+  #heroCtaBtn{ top:33.5vh }
 }
 
 /* TABLET DEITADO — palco largo e baixo: marca e texto empilham na metade
@@ -2653,9 +2668,50 @@ html.diag-aberto #platforms::before{ display:none }
      calibrados no desktop e no celular viram tela em branco */
   #fluxo #quemsomos{ padding:84px 24px 64px }
   #fluxo #ia{ padding:84px 24px 110px }
-  #ctafinal{ padding:110px 22px 84px; min-height:0 }
   .fx-card{ padding:22px 18px }
   .fx-ledger{ padding:22px 18px 20px }
+
+  /* MARGEM DIREITA (14/08) — a pílula de destaque tem white-space:nowrap pra
+     não partir em pedaços ("o seu?" virava um "o" solto numa linha). Em 390px
+     a frase mais longa do #fluxo, "fecham com o caixa", mede 363px numa
+     coluna de 342 e vazava 21px pra fora: era a ÚNICA seção da página
+     estourando a margem (medido elemento a elemento, o resto está em 24px).
+     Aqui ela volta a quebrar — box-decoration-break:clone, que já está
+     ligado, desenha cada linha como uma pílula inteira, que é exatamente o
+     propósito dele. */
+  .fx-mark{ white-space:normal }
+
+  /* "VAMOS CONVERSAR" EM TELA CHEIA (14/08) — é o ponto em que a página para
+     de explicar e pede o clique; dividir a tela com o fim do capítulo
+     anterior tirava dela esse peso. Ocupando a viewport inteira, não sobra
+     nada em volta pra onde olhar.
+     100svh e não 100vh: no iOS o vh conta a barra de endereço que some, então
+     com vh a seção fica MAIOR que a tela e o botão nasce fora dela. A linha
+     de vh fica antes como reserva pra quem não entende svh. */
+  #ctafinal{
+    padding:64px 22px 64px;
+    min-height:100vh; min-height:100svh;
+    align-content:center;
+  }
+  .cf-kicker{ font-size:12px }
+  .cf-head{ font-size:clamp(34px,10.2vw,50px); margin:18px auto 34px }
+  #ctafinal .pill-cta{ font-size:16.5px; padding:17px 28px }
+
+  /* "SAIBA MAIS" COM PESO DE BOTÃO (14/08) — era texto mono de 12px sem
+     moldura. No celular cada capítulo ocupa a tela toda, e o chamado sumia no
+     rodapé do bloco: a seção acabava sem nada pedindo o próximo passo.
+     A borda usa currentColor de propósito — cada capítulo já traz a própria
+     cor num style inline (--red/--green/--blue/--yellow), então a pílula
+     herda o acento do capítulo sem precisar de uma regra por cor.
+     min-height:46px é alvo de toque (a WCAG pede 44). */
+  .fx-more{
+    display:inline-flex; align-items:center; gap:9px;
+    margin-top:28px; padding:0 22px; min-height:46px;
+    border:1.5px solid currentColor; border-radius:999px;
+    font-size:12.5px; letter-spacing:.12em;
+    background:transparent;
+    background:color-mix(in srgb, currentColor 14%, transparent);
+  }
 
   /* TERMINAL — o sufixo ("· 12 min", "· 6 dias") é o desfecho de cada linha,
      e com nowrap+ellipsis ele era exatamente o que sumia: das 7 linhas, 6
@@ -3563,13 +3619,34 @@ function drawLines(intensity, speed, rgb){
    No desktop a queda acontece num corredor livre à direita das duas colunas.
    No celular a grade vira uma coluna só e esse corredor deixa de existir: com
    os mesmos números o mascote cai EM CIMA do texto (medido: 233px de largura
-   num viewport de 386px, cobrindo 45% da tela). Aqui ele encolhe e encosta na
-   borda, sangrando um pouco pra fora — vira leitura de profundidade em vez de
-   obstáculo. Não mexe no CFG: a calibragem do painel continua sendo a do
-   desktop, isto é um fator aplicado na hora de desenhar. */
+   num viewport de 386px, cobrindo 45% da tela). Não mexe no CFG: a calibragem
+   do painel continua sendo a do desktop, isto é um fator na hora de desenhar.
+
+   REVISÃO 14/08 — a primeira resposta a esse problema foi encolher pra 0.62 e
+   empurrar pra 0.96, deixando o mascote sangrar pela borda ("leitura de
+   profundidade em vez de obstáculo"). Na tela isso não se sustentou: em 390px
+   ele ficava com 93x123px e ia de x=348 a x=441, ou seja, 51px — mais da
+   metade da figura — cortados fora do quadro. Lia-se como bug de layout, não
+   como profundidade, e o mascote é o personagem da página.
+   Agora ele volta a ter presença (mesma altura do desktop) e fica INTEIRO
+   dentro da margem: o x é calculado a partir da largura real desenhada, não
+   de uma fração fixa da tela, que era o que deixava o corte à mercê do
+   tamanho do aparelho. */
 const ehMobile   = () => W < 700;
-const kTamMobile = () => ehMobile() ? 0.62 : 1;
-const xMobile    = () => ehMobile() ? 0.96 : CFG.fallScreenX;
+/* 1 = mesma altura do desktop. Era 0.62 até 14/08. */
+const kTamMobile = () => 1;
+/* goteira que o mascote respeita à direita, a mesma 24px das seções */
+const MARGEM_DIR = 24;
+const xMobile    = () => {
+  if (!ehMobile()) return CFG.fallScreenX;
+  /* fallX é o CENTRO da figura, e em cima dele ainda soma o balanço lateral
+     (swayAmp * 0.45 da largura da tela, ±23px em 390). Se a trava não
+     descontar os dois, o pico do balanço joga o ombro pra fora — que é o que
+     acontecia antes. Então: centro = tela - goteira - meia figura - balanço. */
+  const balanco = W * CFG.swayAmp * 0.45;
+  const folga   = MARGEM_DIR + sitH * 0.5 + balanco;
+  return Math.max(0.5, Math.min(0.92, (W - folga) / W));
+};
 
 function measure(){
   W = innerWidth; H = innerHeight;
