@@ -2644,12 +2644,14 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
 #fluxo .qs-pill{ background:var(--yellow); color:var(--dark) }
 #fluxo .qs-body{ color:#fff; max-width:64ch }
 
-/* ── emendas da nova ordem (14/08) ──
-   hero(bege) → fluxo(preto) → cta final(preto) → [porta] pouso(estúdio) →
-   ferramentas(bege) → footer(preto).
-   O topo do #platforms muda de cor conforme a porta do diagnóstico esteja
-   aberta ou fechada: com ela fechada, quem está acima é o preto do CTA; com
-   ela aberta, é o estúdio marrom do "Senta aí". */
+/* ── emendas da ordem (14/08, revista quando as ferramentas subiram) ──
+   hero(bege) → fluxo(preto) → FERRAMENTAS(bege) → cta final(preto) →
+   [porta] pouso(estúdio) → footer(preto).
+   O que mudou: o #platforms deixou de ser a última seção e passou a viver
+   ENTRE dois pretos. Ganhou com isso — o vizinho de cima agora é sempre o
+   preto do #fluxo, chova ou faça sol, então a rampa do topo não depende mais
+   do estado da porta do diagnóstico (a regra que a desligava com
+   html.diag-aberto saiu junto). */
 #platforms{ position:relative; overflow:hidden }
 /* Rampa QUENTE, não neutra: preto → bege em linha reta passa por um cinza
    morto no meio. Passando pelos marrons da marca (a mesma família do estúdio
@@ -2660,32 +2662,33 @@ html.diag-abrindo #ctafinal .cf-inner{ opacity:.25; transform:translateY(-24px) 
   background:linear-gradient(to bottom,
     var(--lp-preto) 0%, #241C16 24%, #56463A 52%, #9E8E7E 76%, var(--lp-bege) 100%);
 }
-/* Com a porta aberta, o topo das ferramentas NÃO leva overlay nenhum: a
-   tentativa anterior (um lavado do marrom do estúdio por cima do bege) criava
-   uma faixa cor de barro entre as duas seções. A dissolução inteira acontece
-   DENTRO do #pouso — assim o bege da seção de baixo chega puro no corte, e o
-   que se vê é o estúdio sumindo, não duas cores se misturando. */
-html.diag-aberto #platforms::before{ display:none }
+/* O #pouso agora desemboca no FOOTER (preto), não mais nas ferramentas
+   (bege) — elas subiram. Então a rampa de saída do estúdio inverteu de
+   destino: fecha em preto, não em bege. Mantida a curva em três tempos, que
+   é o que impede o degradê de comer o palco logo no começo. */
 #pouso::after{
   content:''; position:absolute; left:0; right:0; bottom:-1px; height:min(46vh,380px);
   pointer-events:none; z-index:3;
-  /* rampa longa em três tempos: some devagar no começo (pra não comer o palco)
-     e fecha em bege sólido nos últimos 15% */
   background:linear-gradient(to bottom,
     rgba(0,0,0,0) 0%,
-    color-mix(in srgb, #C6B29A 26%, transparent) 40%,
-    color-mix(in srgb, #DACBBB 68%, transparent) 70%,
-    color-mix(in srgb, var(--lp-bege) 94%, transparent) 86%,
-    var(--lp-bege) 96%);
+    color-mix(in srgb, #4A3B2E 26%, transparent) 40%,
+    color-mix(in srgb, #241C16 68%, transparent) 70%,
+    color-mix(in srgb, var(--lp-preto) 94%, transparent) 86%,
+    var(--lp-preto) 96%);
 }
 /* o degradê do topo é uma camada por cima da seção — sem isto o rótulo e o
    título das ferramentas nascem lavados por baixo dele */
 #platforms .plat-hdr,#platforms .marquee-wrap{ position:relative; z-index:2 }
-/* ferramentas(bege) → footer(preto) */
+/* ferramentas(bege) → cta final(preto). Antes esta rampa levava ao rodapé,
+   que é uma faixa fina; agora ela entrega numa seção preta de tela inteira,
+   e a emenda pesa mais no olho. Por isso ela fecha de verdade (opacidade 1)
+   em vez dos .4 de antes, e é mais alta: o preto do CTA começa a nascer
+   ainda dentro do bege, como o topo faz do outro lado. */
 #platforms::after{
-  content:''; position:absolute; left:0; right:0; bottom:-1px; height:110px;
-  opacity:.4; pointer-events:none; z-index:1;
-  background:linear-gradient(transparent, var(--lp-preto));
+  content:''; position:absolute; left:0; right:0; bottom:-1px; height:150px;
+  pointer-events:none; z-index:1;
+  background:linear-gradient(to bottom,
+    transparent 0%, #9E8E7E 30%, #56463A 58%, #241C16 80%, var(--lp-preto) 100%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -3097,7 +3100,21 @@ html.diag-aberto #platforms::before{ display:none }
 
 </div><!-- /#fluxo -->
 
-<!-- ══ SEÇÃO 4 · CTA FINAL — é AQUI que o mascote para de cair (fallEndEl) ══ -->
+<!-- ══ SEÇÃO 4 · FERRAMENTAS — a esteira de logos/plataformas da v5.
+     Subiu pra CÁ em 14/08 (antes era a última, depois do "Senta aí"). Agora
+     ela é a última coisa antes do convite: quem chega no "vamos conversar?"
+     acabou de passar os olhos pelo que a gente já rodou. ══ -->
+<section id="platforms" class="sec-studio" style="padding:80px 0">
+  <div class="plat-hdr reveal">
+    <div class="section-label label-yellow" style="justify-content:center">Ferramentas</div>
+    <h2 class="section-title" style="text-align:center">Stacks que já trabalhamos em outros projetos</h2>
+    <p class="section-sub" style="text-align:center;margin:0 auto 48px">Selecionamos e conectamos as plataformas de sua preferência para a sua operação.</p>
+  </div>
+  <div class="marquee-wrap reveal"><div class="marquee-row"><div class="marquee-inner" id="mq1a"></div><div class="marquee-inner" id="mq1b"></div></div></div>
+  <div class="marquee-wrap reveal" style="margin-top:12px"><div class="marquee-row"><div class="marquee-inner rev" id="mq2a"></div><div class="marquee-inner rev" id="mq2b"></div></div></div>
+</section>
+
+<!-- ══ SEÇÃO 5 · CTA FINAL — é AQUI que o mascote para de cair (fallEndEl) ══ -->
 <section id="ctafinal" aria-label="E se o próximo projeto fosse o seu?">
   <div class="cf-inner reveal">
     <div class="cf-kicker">// vamos conversar?</div>
@@ -3265,17 +3282,6 @@ html.diag-aberto #platforms::before{ display:none }
       <div id="crtDebug" aria-hidden="true" hidden></div>
     </div>
   </div>
-</section>
-<!-- ══ SEÇÃO 5 · NOSSA EXPERTISE — última antes do rodapé (14/08).
-     A esteira de logos/plataformas da v5, mantida como está. ══ -->
-<section id="platforms" class="sec-studio" style="padding:80px 0">
-  <div class="plat-hdr reveal">
-    <div class="section-label label-yellow" style="justify-content:center">Nossa expertise</div>
-    <h2 class="section-title" style="text-align:center">O que a gente faz de melhor</h2>
-    <p class="section-sub" style="text-align:center;margin:0 auto 48px">Selecionamos e conectamos as plataformas de sua preferência para a sua operação.</p>
-  </div>
-  <div class="marquee-wrap reveal"><div class="marquee-row"><div class="marquee-inner" id="mq1a"></div><div class="marquee-inner" id="mq1b"></div></div></div>
-  <div class="marquee-wrap reveal" style="margin-top:12px"><div class="marquee-row"><div class="marquee-inner rev" id="mq2a"></div><div class="marquee-inner rev" id="mq2b"></div></div></div>
 </section>
 
 <!-- FOOTER -->
@@ -4327,7 +4333,7 @@ requestAnimationFrame(frame);
       ]
     },
     {
-      id:'ferr', label:'5ª seção — nossa expertise', ir:'#platforms',
+      id:'ferr', label:'4ª seção — ferramentas', ir:'#platforms',
       respiro:[{id:'platforms', label:'Respiro da seção'}],
       textos:[{k:'platHdr', sel:'.plat-hdr', lbl:'rótulo + título + subtítulo'}]
     },
