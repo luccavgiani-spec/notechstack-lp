@@ -2052,13 +2052,23 @@ html.wall-edit #wallStage::after{
    inteiro), porque caixinha de 13px é hostil */
 .cf-consent{
   display:flex; align-items:flex-start; gap:8px; margin:7px 0 2px;
-  font-size:.82em; line-height:1.3; color:rgba(244,227,194,.75); cursor:pointer;
+  font-size:.82em; line-height:1.3; color:rgba(176,176,176,.85); cursor:pointer;
 }
 .cf-consent input{
   flex:none; width:15px; height:15px; margin:1px 0 0; cursor:pointer;
   accent-color:var(--cnA,#e8a33d);
 }
-.cf-consent b{ color:var(--cnA,#e8a33d); font-weight:400 }
+/* os links ficam no MESMO cinza do resto da frase — quem lê não deve sentir
+   um convite a sair da tela no meio do formulário. O sublinhado é o que
+   sinaliza que dá pra clicar; o realce só aparece no hover/foco. */
+.cf-consent a{
+  color:inherit; font-weight:400;
+  text-decoration:underline; text-decoration-thickness:1px;
+  text-underline-offset:2px; text-decoration-color:rgba(176,176,176,.45);
+}
+.cf-consent a:hover,.cf-consent a:focus-visible{
+  color:var(--cnA,#e8a33d); text-decoration-color:currentColor;
+}
 [data-var="portrait"] .cf-consent{ font-size:.76em; margin:5px 0 1px }
 /* erro: some sozinho quando o campo é corrigido (o JS limpa no input) */
 .cf-err{ min-height:1.4em; font-size:.85em; color:#ff8e7e; text-shadow:0 0 6px rgba(255,142,126,.4) }
@@ -3088,12 +3098,18 @@ html.diag-aberto #platforms::before{ display:none }
               <input id="st" class="cf-input" type="text" inputmode="url" autocomplete="url" placeholder="se houver"></label>
             <!-- consentimento (14/08). Marcado por NINGUÉM por padrão: caixa
                  pré-marcada não é consentimento, é pegadinha — e a LGPD trata
-                 assim. Os textos dos termos ainda vão ser escritos; por
-                 enquanto os links são âncoras mortas de propósito, pra não
-                 prometer uma página que não existe. -->
+                 assim.
+                 Frase curta de propósito: precisa caber numa linha só dentro
+                 do vidro do CRT, senão empurra o botão de enviar pra fora.
+                 Os dois <a> são links de verdade (antes eram <b>, ou seja,
+                 pedia-se aceite de um texto que ninguém conseguia abrir).
+                 ATENÇÃO: /termos e /privacidade AINDA NÃO EXISTEM — escrever
+                 as duas páginas é pré-requisito pra publicar como home.
+                 Âncora dentro de <label> não marca a caixa: o HTML manda o
+                 label ignorar cliques em conteúdo interativo descendente. -->
             <label class="cf-consent">
               <input type="checkbox" id="cfTermos">
-              <span>li e aceito os <b>termos de uso</b> e o <b>compartilhamento dos meus dados</b> para a nó entrar em contato</span>
+              <span>li e aceito os <a href="/termos" target="_blank" rel="noopener">termos de uso</a> e o <a href="/privacidade" target="_blank" rel="noopener">compartilhamento dos meus dados</a></span>
             </label>
             <div class="cf-err" data-cf-err="3"></div>
             <button type="button" class="crt-btn" id="subBtn" data-cf="send">[ enviar e receber proposta ]</button>
@@ -6512,10 +6528,15 @@ requestAnimationFrame(frame);
   function cfPlaceSite(){
     const leaf = curLeaf && SCRIPT[curLeaf];
     const noPasso1 = !!(leaf && leaf.site) && !cfDireto;
-    /* entra logo antes da linha de erro da tela escolhida — nas duas o erro
-       é o último elemento antes do botão */
-    const destino = crtForm.querySelector(
-      noPasso1 ? '[data-cf-step="1"] .cf-err' : '[data-cf-step="3"] .cf-err');
+    /* Entra logo antes da linha de erro da tela escolhida — nas duas o erro é
+       o último elemento antes do botão. EXCEÇÃO na tela 3: lá o consentimento
+       mora entre os campos e o erro, e mirar no .cf-err jogava o site_ pra
+       DEPOIS do aceite. O resultado era um formulário que pedia a assinatura
+       no meio dos campos, com a mensagem de erro dizendo "ali em cima" e
+       apontando pra baixo. O aceite é sempre a última coisa antes de enviar. */
+    const tela = noPasso1 ? '[data-cf-step="1"]' : '[data-cf-step="3"]';
+    const destino = crtForm.querySelector(tela + ' .cf-consent')
+                 || crtForm.querySelector(tela + ' .cf-err');
     destino.parentNode.insertBefore(siteRow, destino);
     const inp = document.getElementById('st');
     inp.placeholder = !noPasso1 ? 'se houver'
