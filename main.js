@@ -354,7 +354,12 @@ reobserve();
 /* ─── COUNTERS ─── */
 function cnt(el){var t=+el.dataset.t,p=el.dataset.p||'',s=el.dataset.s||'',d=1800,st=performance.now();(function u(now){var prog=Math.min((now-st)/d,1),ease=1-Math.pow(1-prog,3);el.textContent=p+Math.floor(ease*t)+s;if(prog<1)requestAnimationFrame(u);else el.textContent=p+t+s;})(performance.now());}
 var co=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.querySelectorAll('[data-t]').forEach(cnt);co.unobserve(e.target);}});},{threshold:.3});
-co.observe(document.getElementById('stats'));
+/* Guarda de nulo: este arquivo é compartilhado por páginas que não têm #stats
+   (a /agendar/, por exemplo). Sem o if, o observe() lança TypeError e MATA
+   silenciosamente todo o main.js daqui pra baixo — inclusive o goTo() da
+   navegação suave, que fica indefinido sem nenhum sintoma óbvio. */
+var elStats = document.getElementById('stats');
+if (elStats) co.observe(elStats);
 
 /* parallax removed — caused scroll jank */
 
