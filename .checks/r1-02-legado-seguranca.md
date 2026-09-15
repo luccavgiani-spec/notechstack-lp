@@ -31,7 +31,7 @@
 | Forma da migration | decidida | uma migration nova criada por `supabase migration new`, reexecutável: `alter view`, `revoke`, `create index if not exists`, `drop policy if exists` + `create policy`. |
 | Replay local das views `thais_*` | resolvida por captura read-only em 15/09/2026 | reproduzir na migration as definições hospedadas exatas via `create or replace view ... with (security_invoker = true)`; alternativa rejeitada: `alter view` isolado, pois as views não existiam no histórico local e quebrariam `db reset`. |
 | Aplicação da migration no Supabase hospedado | autorizada pela fonte da task, mas só após provas locais | medir contagens antes, aplicar apenas a migration R1-02 e então medir advisors/contagens; não executar push/deploy/DNS. |
-| Token do painel em produção | aberto | não ler secrets; provar localmente com token sintético e só executar a leitura hospedada se o token já estiver disponível sem abrir `.env` ou pedir segredo em chat. |
+| Token do painel em produção | resolvido pelo operador em 15/09/2026 | sem expor o secret ao agente, Lucca abriu o painel local, informou o token diretamente no navegador e confirmou que o painel hospedado carregou; o próprio cliente só revela o app depois de `response.ok` da Edge Function. |
 | Escrita de funil em produção | proibida pela própria task | C8 grava somente no Supabase local; produção recebe apenas leitura autenticada do painel. |
 
 ## Checks
@@ -49,9 +49,9 @@
   - [x] Hospedada: advisor read-only após aplicação retornou zero `auth_rls_initplan`.
 - [x] **C6 — semântica tenant X/Y permanece igual.** JWT local com claim `client_id=X` lê somente X em `ad_metrics_daily` e `scheduled_posts`; assertions excluem Y.
 - [x] **C7 — migration hospedada não reduz dados do funil.** Medição imediatamente anterior em 15/09/2026 19:11:41 UTC: `leads=17`, `lead_sessoes=64`, `lead_eventos=568`; medição posterior em 19:11:55 UTC: `17`, `64`, `568`. Todos os valores posteriores são iguais aos anteriores.
-- [ ] **C8 — painel continua lendo e `track-evento` continua gravando.**
+- [x] **C8 — painel continua lendo e `track-evento` continua gravando.**
   - [x] Local: functions servidas com configuração sintética; `painel-dados?v=funil&dias=7` respondeu 200 e lote N em `track-evento` gerou exatamente N novas linhas em `lead_eventos`.
-  - [ ] Hospedada: GET 200 não executado porque o `PAINEL_TOKEN` não está disponível sem abrir um secret; nenhum segredo será lido ou solicitado no chat.
+  - [x] Hospedada: em 15/09/2026, Lucca abriu `painel-leads.html`, informou o `PAINEL_TOKEN` diretamente no navegador e confirmou que o painel carregou. O cliente em `busca()` só troca o gate pelo painel após `fetch(.../painel-dados)` retornar `response.ok`; 401 ou qualquer outro HTTP não-2xx mantém erro visível. O token não foi lido, copiado nem enviado ao agente.
 
 ## Swept
 
@@ -80,9 +80,9 @@
 
 - Tamanho estimado: ~62 kB; lote único local de SQL, pgTAP e regressão das duas funções.
 - O builder termina em commit convencional somente após reset/testes/advisors locais.
-- A etapa hospedada só começa após revisão do diff e das contagens prévias; se o token do painel não estiver disponível sem abrir secrets, a parcela remota de C8 permanece explicitamente pendente.
+- A etapa hospedada só começa após revisão do diff e das contagens prévias; a parcela remota de C8 foi concluída pelo operador diretamente no navegador, sem compartilhar o secret.
 - Verificador independente fresco roda depois do último commit local e novamente após eventual prova hospedada.
 - No encerramento do lote local, C1, C2 e C6 estavam fechados e as parcelas locais de C3–C5 e C8 estavam verdes; a etapa hospedada posterior está registrada abaixo.
 - Definição resolvida durante o build: as quatro views foram reproduzidas pelas definições hospedadas exatas capturadas read-only, já registrada em `Landing`; nenhuma outra clarificação mudou checks ou escopo.
 - Abandonado: `supabase db query --file` para a prova adicional de reaplicação, pois a CLI 2.95.4 rejeitou o arquivo multi-statement; a mesma migration foi reaplicada no Postgres local via `psql -v ON_ERROR_STOP=1`, e o pgTAP continuou verde.
-- Etapa hospedada em 15/09/2026: migration `r1_02_isolate_legacy_risks` aplicada com sucesso após todas as provas locais; C3, C4, C5 e C7 fecharam. C8 permanece parcial exclusivamente pela indisponibilidade segura do `PAINEL_TOKEN`.
+- Etapa hospedada em 15/09/2026: migration `r1_02_isolate_legacy_risks` aplicada com sucesso após todas as provas locais; C3, C4, C5 e C7 fecharam. C8 foi fechada depois por confirmação do operador no cliente real, com o secret mantido fora do chat e do código.
