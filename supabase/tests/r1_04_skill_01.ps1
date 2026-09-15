@@ -59,15 +59,21 @@ function Insert-Row([string]$Table, [hashtable]$Row) {
   return @($result.Body)[0]
 }
 
-function New-AuthUser([string]$Email, [string]$Password, [string]$Role) {
+function New-AuthUser([string]$Email, [string]$Password, [string]$Role, [bool]$EmailConfirm = $true) {
   $result = Invoke-Json 'POST' "$script:apiUrl/auth/v1/admin/users" @{
     email = $Email
     password = $Password
-    email_confirm = $true
+    email_confirm = $EmailConfirm
     app_metadata = @{ role = $Role }
   } $script:adminHeaders
   if ($result.Status -notin @(200, 201)) { throw "Auth user create failed ($($result.Status))" }
   return $result.Body
+}
+
+function Test-JsonEqual($Left, $Right) {
+  $leftNode = [System.Text.Json.Nodes.JsonNode]::Parse(($Left | ConvertTo-Json -Depth 30 -Compress))
+  $rightNode = [System.Text.Json.Nodes.JsonNode]::Parse(($Right | ConvertTo-Json -Depth 30 -Compress))
+  return [System.Text.Json.Nodes.JsonNode]::DeepEquals($leftNode, $rightNode)
 }
 
 function Sign-In([string]$Email, [string]$Password) {
@@ -211,18 +217,40 @@ try {
     }
     Assert-True ($cli.ExitCode -eq 0 -and $linkMatch.Success) "C1 CLI libera projeto em $state e imprime convite"
     $projectRow = (Get-Rows "projects?id=eq.$($project.Id)&select=lead_status,access_status,access_released_at,modules")[0]
-    $roadmapRow = (Get-Rows "roadmaps?project_id=eq.$($project.Id)&select=published_at,preferred_tier,prototype_url")[0]
+    $roadmapRow = (Get-Rows "roadmaps?project_id=eq.$($project.Id)&select=answers,references,stack,costs,next_steps,tiers,preferred_tier,prototype_url,published_at")[0]
     $membershipRows = Get-Rows "memberships?client_id=eq.$($project.ClientId)&select=user_id,role"
     Assert-True (
       (Count-AuthEmail $project.Email) -eq 1 -and $membershipRows.Count -eq 1 -and $membershipRows[0].role -eq 'CLIENT' -and
       $projectRow.lead_status -eq 'JANELA_DE_DECISAO' -and $projectRow.access_status -eq 'INICIAL_15_DIAS' -and
       $null -ne $projectRow.access_released_at -and $null -ne $roadmapRow.published_at -and
+      (Test-JsonEqual $roadmapRow.answers $content.answers) -and
+      (Test-JsonEqual $roadmapRow.references $content.references) -and
+      (Test-JsonEqual $roadmapRow.stack $content.stack) -and
+      (Test-JsonEqual $roadmapRow.costs $content.costs) -and
+      (Test-JsonEqual $roadmapRow.next_steps $content.next_steps) -and
+      (Test-JsonEqual $roadmapRow.tiers $content.tiers) -and
+      $roadmapRow.preferred_tier -eq $content.preferred_tier -and
+      $roadmapRow.prototype_url -eq $content.prototype_url -and
       $projectRow.modules.como_funciona -eq 'ativo' -and $projectRow.modules.prototipo -eq 'ativo' -and
       $projectRow.modules.etapas -eq 'ativo' -and $projectRow.modules.editor -eq 'bloqueado' -and
       $projectRow.modules.versoes -eq 'bloqueado' -and $projectRow.modules.marca -eq 'bloqueado'
     ) "C1 agregado exato é publicado para $state"
     $activated += [pscustomobject]@{ Project = $project; Link = $linkMatch.Groups[1].Value; Release = [string]$projectRow.access_released_at }
   }
+
+  $reuseEmail = "r104-reuse-$($script:runId)@example.test"
+  $originProject = New-Project 'ROADMAP_PAGO' 'reuse-origin' $reuseEmail
+  $reuseUser = New-AuthUser $reuseEmail 'R104-reuse-password-123!' 'CLIENT' $false
+  $null = Insert-Row 'memberships' @{ client_id = $originProject.ClientId; user_id = $reuseUser.id; role = 'CLIENT' }
+  $targetProject = New-Project 'ROADMAP_PAGO' 'reuse-target' $reuseEmail
+  $reuseResponse = Invoke-Skill $targetProject.Id $content
+  $reuseMemberships = Get-Rows "memberships?user_id=eq.$($reuseUser.id)&select=client_id"
+  Assert-True (
+    $reuseResponse.Status -eq 200 -and (Count-AuthEmail $reuseEmail) -eq 1 -and
+    $reuseMemberships.Count -eq 2 -and
+    @($reuseMemberships.client_id) -contains $originProject.ClientId -and
+    @($reuseMemberships.client_id) -contains $targetProject.ClientId
+  ) 'C1 usuário existente é reutilizado entre dois tenants com memberships distintas'
 
   $primary = $activated[0]
   $activity = Get-Rows "activity_events?project_id=eq.$($primary.Project.Id)&type=eq.skill_01_dashboard_ativado&select=actor_id,request_id,occurred_at"
@@ -265,13 +293,14 @@ try {
   $inviteResponse = Invoke-NoRedirect $retry.Body.inviteLink
   $inviteLocation = [string]$inviteResponse.Headers.Location
   $inviteFragment = Parse-Fragment $inviteLocation
-  Assert-True ($inviteResponse.StatusCode -in @(302, 303) -and $inviteLocation.Contains("/acesso?projectId=$($primary.Project.Id)") -and $inviteFragment.access_token) 'C7 convite local redireciona para o projeto e cria sessão'
+  $inviteUser = Invoke-Json 'GET' "$script:apiUrl/auth/v1/user" $null @{ apikey = $script:anonKey; Authorization = "Bearer $($inviteFragment.access_token)" }
+  Assert-True ($inviteResponse.StatusCode -in @(302, 303) -and $inviteLocation.Contains("/acesso?projectId=$($primary.Project.Id)") -and $inviteFragment.access_token -and $inviteUser.Status -eq 200 -and $inviteUser.Body.app_metadata.role -eq 'CLIENT') 'C7 convite local redireciona para o projeto com sessão CLIENT'
 
   $newPassword = 'R104-new-client-password-123!'
   $passwordUpdate = Invoke-Json 'PUT' "$script:apiUrl/auth/v1/user" @{ password = $newPassword } @{ apikey = $script:anonKey; Authorization = "Bearer $($inviteFragment.access_token)" }
   $newSession = Sign-In $primary.Project.Email $newPassword
   $visibleProjects = Get-Rows "projects?id=eq.$($primary.Project.Id)&select=id" $newSession.access_token
-  Assert-True ($passwordUpdate.Status -eq 200 -and $newSession.user.email -eq $primary.Project.Email -and $visibleProjects.Count -eq 1) 'C7 token é aceito uma vez, senha entra e membership alcança o projeto'
+  Assert-True ($passwordUpdate.Status -eq 200 -and $newSession.user.email -eq $primary.Project.Email -and $newSession.user.app_metadata.role -eq 'CLIENT' -and $visibleProjects.Count -eq 1) 'C7 token é aceito uma vez, senha entra como CLIENT e membership alcança o projeto'
 
   $authCountBeforeReuse = Count-AuthEmail $primary.Project.Email
   $membershipCountBeforeReuse = (Get-Rows "memberships?client_id=eq.$($primary.Project.ClientId)&select=id").Count

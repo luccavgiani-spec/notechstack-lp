@@ -113,6 +113,24 @@ Deno.serve(async (request) => {
 
   const createdUser = existingUser === null;
   const userId = generated.data.user.id;
+  const currentRole = generated.data.user.app_metadata.role;
+  if (currentRole && currentRole !== "CLIENT") {
+    if (createdUser) await admin.auth.admin.deleteUser(userId);
+    log("warn", "skill_01_auth_role_conflict", { projectId, code: "AUTH_ROLE_CONFLICT" });
+    return json(request, 409, { error_code: "AUTH_ROLE_CONFLICT" });
+  }
+
+  if (currentRole !== "CLIENT") {
+    const roleUpdate = await admin.auth.admin.updateUserById(userId, {
+      app_metadata: { ...generated.data.user.app_metadata, role: "CLIENT" },
+    });
+    if (roleUpdate.error) {
+      if (createdUser) await admin.auth.admin.deleteUser(userId);
+      log("error", "skill_01_auth_role_failed", { projectId, code: roleUpdate.error.code || "AUTH" });
+      return json(request, 502, { error_code: "AUTH_UNAVAILABLE" });
+    }
+  }
+
   const activation = await admin.rpc("activate_dashboard", {
     p_project_id: projectId,
     p_user_id: userId,

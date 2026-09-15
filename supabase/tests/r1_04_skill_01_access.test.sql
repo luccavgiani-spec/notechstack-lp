@@ -62,6 +62,37 @@ select is(
 );
 select ok((select published_at is not null from public.roadmaps where project_id = '43000000-0000-4000-8000-000000000001'), 'C1 roadmap is published');
 select is((select preferred_tier from public.roadmaps where project_id = '43000000-0000-4000-8000-000000000001'), 'basico', 'C1 roadmap content is stored');
+select is(
+  (
+    select jsonb_build_object(
+      'answers', answers,
+      'references', "references",
+      'stack', stack,
+      'costs', costs,
+      'next_steps', next_steps,
+      'tiers', tiers,
+      'preferred_tier', preferred_tier,
+      'prototype_url', prototype_url
+    )
+    from public.roadmaps
+    where project_id = '43000000-0000-4000-8000-000000000001'
+  ),
+  '{
+    "answers":{"objetivo":"Operar melhor"},
+    "references":[],
+    "stack":["React"],
+    "costs":[],
+    "next_steps":["Validar"],
+    "tiers":{
+      "essencial":{"escopo":[],"profundidade":"núcleo","exclusoes":[],"complexidade":"baixa","prazo_dias":15,"valor_centavos":null,"faixa":"sob proposta"},
+      "basico":{"escopo":[],"profundidade":"operação","exclusoes":[],"complexidade":"média","prazo_dias":30,"valor_centavos":null,"faixa":"sob proposta"},
+      "completo":{"escopo":[],"profundidade":"completo","exclusoes":[],"complexidade":"alta","prazo_dias":45,"valor_centavos":null,"faixa":"sob proposta"}
+    },
+    "preferred_tier":"basico",
+    "prototype_url":"https://example.test/prototipo"
+  }'::jsonb,
+  'C1 stores every roadmap field exactly'
+);
 
 select is((select count(*)::integer from public.activity_events where request_id = 'skill-01:43000000-0000-4000-8000-000000000001'), 1, 'C2 first activation records one attributed activity event');
 select is((select actor_id from public.activity_events where request_id = 'skill-01:43000000-0000-4000-8000-000000000001'), '41000000-0000-4000-8000-000000000001'::uuid, 'C2 activity identifies NO_ADMIN');
