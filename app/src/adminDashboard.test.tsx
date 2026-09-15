@@ -69,7 +69,7 @@ describe('R1-06 dashboard projections', () => {
     expect(cards.map(({ id }) => id)).toEqual(['first', 'soon', 'late'])
   })
 
-  it('C2 project filters search and distinct empty state', () => {
+  it('C2 project filters search and distinct empty state', async () => {
     const cards = [project({ niche: 'saúde', clientName: 'Ana', nextScheduledDate: '2026-09-14' }), project({ id: 'other', niche: 'hotelaria', clientName: 'Bruno', companyName: 'Hotel Lua', leadStatus: 'CONVERTIDO', projectStatus: 'CONVERTIDO', tier: 'completo', paymentStatus: 'approved', nextScheduledDate: '2026-09-15' }), project({ id: 'done', projectStatus: 'CONCLUIDO' }), project({ id: 'archived', projectStatus: 'ARQUIVADO' })]
     expect(filterProjectCards(cards, { search: 'bruno' })).toHaveLength(1)
     expect(filterProjectCards(cards, { search: 'hotel lua' })).toHaveLength(1)
@@ -82,6 +82,11 @@ describe('R1-06 dashboard projections', () => {
     expect(filterProjectCards(cards, { deadline: 'hoje' }, '2026-09-15')).toHaveLength(1)
     expect(filterProjectCards(cards, { lifecycle: 'concluido' })).toHaveLength(1)
     expect(filterProjectCards(cards, { lifecycle: 'arquivado' })).toHaveLength(1)
+    renderAt('/no/projetos', <AdminProjectsPage />)
+    const stateFilter = await screen.findByLabelText('Estado')
+    for (const label of ['Formulário preenchido', 'Pagamento pendente', 'Dashboard liberado', 'Não convertido', 'V1 em desenvolvimento', 'V1 publicada', 'V2 em desenvolvimento', 'V2 publicada', 'V3 / Go-live']) {
+      expect(within(stateFilter).getByRole('option', { name: label })).toBeVisible()
+    }
   })
 
   it('C6 kanban order is position then scheduled date', () => {
@@ -121,6 +126,7 @@ describe('R1-06 dashboard projections', () => {
     expect(screen.getByText('Empresa Nó')).toBeVisible()
     expect(screen.getByText('cliente@example.test')).toBeVisible()
     expect(screen.getByText('https://prototype.example.test')).toBeVisible()
+    expect(screen.getByLabelText('Valor formatado')).toHaveTextContent('R$ 1.200,00')
   })
 
   it('C4 commercial edit reloads', async () => {
