@@ -21,6 +21,37 @@
 
 /* ── 1 · leads: colunas próprias ─────────────────────────────────────────── */
 
+/*
+   Reparo de replay local (autorizado em 15/09/2026): a tabela `leads` já
+   existia no projeto hospedado quando esta migration foi criada, mas sua
+   criação nunca entrou no histórico versionado. Sem esta base idempotente,
+   um banco novo falha no primeiro `alter table` abaixo.
+
+   A forma corresponde às colunas anteriores a esta migration, confirmadas
+   por inspeção read-only do schema hospedado. Em ambientes onde a tabela já
+   existe, este bloco é um no-op.
+*/
+create table if not exists public.leads (
+  nome          text not null,
+  email         text not null,
+  whatsapp      text,
+  contexto      text,
+  objetivos     text,
+  investimento  text,
+  prazo         text,
+  ai_analysis   text,
+  processed_at  timestamptz,
+  run_id        text,
+  id             uuid primary key default gen_random_uuid(),
+  processed      boolean default false,
+  created_at     timestamptz default now()
+);
+
+alter table public.leads enable row level security;
+
+grant select, insert, update, delete, truncate, references, trigger
+  on table public.leads to anon, authenticated, service_role;
+
 alter table public.leads
   /* costura com lead_sessoes e com o event_id do CAPI */
   add column if not exists sid           text,
