@@ -25,6 +25,10 @@ vi.mock('./lib/supabase', () => ({
   },
 }))
 
+vi.mock('./client-dashboard/ClientDashboardPage', () => ({
+  ClientDashboardPage: () => <h1>Seu primeiro plano está pronto.</h1>,
+}))
+
 function buildUser(role: 'CLIENT' | 'NO_ADMIN' = 'CLIENT'): User {
   return {
     id: role === 'CLIENT' ? 'client-user' : 'admin-user',
@@ -81,7 +85,7 @@ describe('C7 — convite válido', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/p/projeto-a/como-funciona')
     })
-    expect(screen.getByRole('heading', { name: 'Seu projeto começa aqui.' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Seu primeiro plano está pronto.' })).toBeVisible()
   })
 
   it('keeps the form when the password update fails', async () => {

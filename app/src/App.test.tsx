@@ -27,6 +27,10 @@ vi.mock('./lib/supabase', () => ({
   },
 }))
 
+vi.mock('./client-dashboard/ClientDashboardPage', () => ({
+  ClientDashboardPage: () => <h1>Seu primeiro plano está pronto.</h1>,
+}))
+
 function buildUser(role?: 'CLIENT' | 'NO_ADMIN'): User {
   return {
     id: role === 'NO_ADMIN' ? 'admin-user' : 'client-user',
@@ -94,7 +98,7 @@ describe('criterion 11 — destinos pós-login', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/p/projeto-a/como-funciona')
     })
-    expect(screen.getByRole('heading', { name: 'Seu projeto começa aqui.' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Seu primeiro plano está pronto.' })).toBeVisible()
   })
 
   it('leva CLIENT com mais de um projeto para a lista de projetos', async () => {
@@ -129,7 +133,7 @@ describe('criterion 11 — destinos pós-login', () => {
     await userEvent.click(betaLink)
 
     expect(window.location.pathname).toBe('/p/projeto-b/como-funciona')
-    expect(screen.getByRole('heading', { name: 'Seu projeto começa aqui.' })).toBeVisible()
+    expect(screen.getByRole('heading', { name: 'Seu primeiro plano está pronto.' })).toBeVisible()
   })
 
   it('busca e lista projetos acessíveis ao abrir /p/projetos diretamente', async () => {
