@@ -314,3 +314,11 @@ export async function publishProjectVersion(values: { projectId: string; label: 
   if (error) throw error
   return data as { versionId: string; projectStatus: ProjectStatus; replayed: boolean }
 }
+
+export async function activateDashboard(projectId: string, content: unknown) {
+  const { data, error } = await supabase.functions.invoke('skill-01-ativar-dashboard', {
+    body: { projectId, content },
+  })
+  if (error) throw error
+  return data as { inviteLink: string; projectId: string; accessReleasedAt: string }
+}

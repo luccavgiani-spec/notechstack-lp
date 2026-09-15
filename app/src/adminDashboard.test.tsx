@@ -14,6 +14,7 @@ const serviceMocks = vi.hoisted(() => ({
   transitionLead: vi.fn(),
   convertProject: vi.fn(),
   activateBrandModule: vi.fn(),
+  activateDashboard: vi.fn(),
   transitionProjectStatus: vi.fn(),
 }))
 vi.mock('./admin-dashboard/admin-dashboard-service', async (importOriginal) => ({
@@ -56,6 +57,7 @@ beforeEach(() => {
   serviceMocks.transitionLead.mockResolvedValue({})
   serviceMocks.convertProject.mockResolvedValue({})
   serviceMocks.activateBrandModule.mockResolvedValue({})
+  serviceMocks.activateDashboard.mockResolvedValue({ inviteLink: 'https://invite.example.test/opaque', projectId: 'project-1', accessReleasedAt: '2026-09-15T12:00:00Z' })
   serviceMocks.transitionProjectStatus.mockResolvedValue({})
 })
 
@@ -148,6 +150,33 @@ describe('R1-06 dashboard projections', () => {
     await user.selectOptions(column, 'concluido')
 
     await waitFor(() => expect(serviceMocks.saveKanbanItem).toHaveBeenCalledWith('project-1', expect.objectContaining({ id: 'item-1', status: 'concluido' })))
+  })
+
+  it('R1-07 C1 ficha confirma e libera dashboard com convite copiável', async () => {
+    renderAt('/no/projetos/project-1', <AdminProjectDetailPage />)
+    const user = userEvent.setup()
+    const content = {
+      answers: {}, references: [], stack: [], costs: [], next_steps: [],
+      tiers: Object.fromEntries(['essencial', 'basico', 'completo'].map((tier) => [tier, { escopo: [], profundidade: 'x', exclusoes: [], complexidade: 'x', prazo_dias: 0, valor_centavos: null, faixa: null }])),
+    }
+    const file = new File([JSON.stringify(content)], 'roadmap.json', { type: 'application/json' })
+    await user.upload(await screen.findByLabelText('Arquivo de conteúdo do roadmap'), file)
+    await user.click(screen.getByRole('button', { name: 'Liberar dashboard' }))
+    expect(screen.getByText('Confirmar liberação?')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Confirmar liberação' }))
+    await waitFor(() => expect(serviceMocks.activateDashboard).toHaveBeenCalledWith('project-1', content))
+    expect(await screen.findByRole('button', { name: 'Copiar link de convite' })).toBeVisible()
+  })
+
+  it('R1-07 C2 mostra campos inválidos retornados pela função', async () => {
+    serviceMocks.activateDashboard.mockRejectedValue({ context: { json: async () => ({ invalidFields: ['tiers.completo'] }) } })
+    renderAt('/no/projetos/project-1', <AdminProjectDetailPage />)
+    const user = userEvent.setup()
+    const file = new File(['{}'], 'invalido.json', { type: 'application/json' })
+    await user.upload(await screen.findByLabelText('Arquivo de conteúdo do roadmap'), file)
+    await user.click(screen.getByRole('button', { name: 'Liberar dashboard' }))
+    await user.click(screen.getByRole('button', { name: 'Confirmar liberação' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('tiers.completo')
   })
 
   it('C15 activity has seven ordered views', async () => {
