@@ -40,23 +40,23 @@
 
 ## Checks
 
-- [ ] **C1 — oferta usa somente a copy e o preço R$ 149,90.** Prova: teste estático/DOM afirma os quatro textos exatos e ausência de `R$ 199,90`/`R$ 450,00` na etapa 7.
-- [ ] **C2 — três marcos de entrega aparecem com os textos do §12.** Prova: teste estático/DOM enumera Dia 1, Dias 2 e 3 e Entrega, com respectivos apoios.
-- [ ] **C3 — Pix cria lead roadmap e um pagamento pendente de 14990, exibindo QR e copia-e-cola.** Prova: harness chama `send-lead-email` e `roadmap-checkout` contra Supabase/gateway mock locais, compara delta 1 e resposta/render.
-- [ ] **C4 — cartão é tokenizado no browser e checkout recebe somente token; aprovado aparece na tela.** Prova: teste de browser/JS intercepta `/tokens`, inspeciona o corpo enviado à Edge Function e gateway mock devolve `paid`.
-- [ ] **C5 — cartão recusado mantém a tela com retry, grava `failed` e não cria projeto.** Prova: gateway mock de recusa + assertions de DOM e contagens.
-- [ ] **C6 — preço do corpo não altera os 14990 centavos.** Prova: request malicioso + inspeção do pedido no mock e da linha `payments`.
-- [ ] **C7 — `leadId`/`sid` divergentes retornam 403 e não criam pagamento.** Prova: request local e delta zero.
-- [ ] **C8 — duplo submit para o mesmo lead reutiliza pagamento e Pix.** Prova: duas requests; mesmo `paymentId`, `gateway_order_id`, QR e contagem 1.
-- [ ] **C9 — nenhum PAN, CVV ou validade chega a banco/log.** Prova: busca no schema/linhas/eventos/log capturado e teste do contrato da chamada server-side.
-- [ ] **C10 — evento pago autenticado e confirmado cria todo o agregado.** Prova: webhook local + RPC; `payments=approved`, 1 evento, 1 cliente, 1 projeto `ROADMAP_PAGO`, 1 roadmap com answers, 2 itens D+1/D+3 e 1 atividade.
-- [ ] **C11 — repetir o mesmo evento não duplica efeitos.** Prova: segunda chamada 200 e vetor de contagens invariável.
-- [ ] **C12 — Basic ausente/incorreta retorna 401 sem escrita.** Prova: duas chamadas e vetor de contagens invariável.
-- [ ] **C13 — reconsulta divergente só registra evento.** Prova: payload `paid`, mock `pending`; evento +1, pagamento/projeto invariáveis.
-- [ ] **C14 — falha posterior a `approved` não regride status.** Prova: evento novo confirmado `failed`; histórico +1 e pagamento ainda aprovado.
-- [ ] **C15 — Pix pendente confirmado `failed/canceled` vira `failed` sem projeto.** Prova: duas variantes do mock e contagens.
-- [ ] **C16 — telemetria v7 e consumidores legados de `send-lead-email` continuam válidos.** Prova: pgTAP/RPC aceita `cta_click`, `capitulo_visto`, `diag_abrir`; harness envia shapes de lp-v5, agendar, Roteador e health e mede quatro leads.
-- [ ] **C17 — gates e testes locais passam.** Prova: `app` build/lint/`tsc -b`; reset; pgTAP; harness de functions cobrindo válido, repetido, auth inválida, divergente e fora de ordem.
+- [x] **C1 — oferta usa somente a copy e o preço R$ 149,90.** Prova: teste estático/DOM afirma os quatro textos exatos e ausência de `R$ 199,90`/`R$ 450,00` na etapa 7.
+- [x] **C2 — três marcos de entrega aparecem com os textos do §12.** Prova: teste estático/DOM enumera Dia 1, Dias 2 e 3 e Entrega, com respectivos apoios.
+- [x] **C3 — Pix cria lead roadmap e um pagamento pendente de 14990, exibindo QR e copia-e-cola.** Prova: harness chama `send-lead-email` e `roadmap-checkout` contra Supabase/gateway mock locais, compara delta 1 e resposta/render.
+- [x] **C4 — cartão é tokenizado no browser e checkout recebe somente token; aprovado aparece na tela.** Prova: teste de browser/JS intercepta `/tokens`, inspeciona o corpo enviado à Edge Function e gateway mock devolve `paid`.
+- [x] **C5 — cartão recusado mantém a tela com retry, grava `failed` e não cria projeto.** Prova: gateway mock de recusa + assertions de DOM e contagens.
+- [x] **C6 — preço do corpo não altera os 14990 centavos.** Prova: request malicioso + inspeção do pedido no mock e da linha `payments`.
+- [x] **C7 — `leadId`/`sid` divergentes retornam 403 e não criam pagamento.** Prova: request local e delta zero.
+- [x] **C8 — duplo submit para o mesmo lead reutiliza pagamento e Pix.** Prova: duas requests; mesmo `paymentId`, `gateway_order_id`, QR e contagem 1.
+- [x] **C9 — nenhum PAN, CVV ou validade chega a banco/log.** Prova: busca no schema/linhas/eventos/log capturado e teste do contrato da chamada server-side.
+- [x] **C10 — evento pago autenticado e confirmado cria todo o agregado.** Prova: webhook local + RPC; `payments=approved`, 1 evento, 1 cliente, 1 projeto `ROADMAP_PAGO`, 1 roadmap com answers, 2 itens D+1/D+3 e 1 atividade.
+- [x] **C11 — repetir o mesmo evento não duplica efeitos.** Prova: segunda chamada 200 e vetor de contagens invariável.
+- [x] **C12 — Basic ausente/incorreta retorna 401 sem escrita.** Prova: duas chamadas e vetor de contagens invariável.
+- [x] **C13 — reconsulta divergente só registra evento.** Prova: payload `paid`, mock `pending`; evento +1, pagamento/projeto invariáveis.
+- [x] **C14 — falha posterior a `approved` não regride status.** Prova: evento novo confirmado `failed`; histórico +1 e pagamento ainda aprovado.
+- [x] **C15 — Pix pendente confirmado `failed/canceled` vira `failed` sem projeto.** Prova: duas variantes do mock e contagens.
+- [x] **C16 — telemetria v7 e consumidores legados de `send-lead-email` continuam válidos.** Prova: pgTAP/RPC aceita `cta_click`, `capitulo_visto`, `diag_abrir`; harness envia shapes de lp-v5, agendar, Roteador e health e mede quatro leads.
+- [x] **C17 — gates e testes locais passam.** Prova: `app` build/lint/`tsc -b`; reset; pgTAP; harness de functions cobrindo válido, repetido, auth inválida, divergente e fora de ordem.
 
 ## Test policy
 
