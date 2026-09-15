@@ -56,10 +56,10 @@
 
 ### S3 — login, guards e toolchain
 
-- [ ] **C11 — destino pós-login depende do papel.** Testes da aplicação cobrem CLIENT com um projeto → `/p/:projectId/como-funciona`, CLIENT com mais de um → lista, NO_ADMIN → `/no/projetos`. Prova: `npm test -- --run` em `app/`, testes `criterion 11`.
-- [ ] **C12 — falha de login preserva página e limpa senha.** Mock de `signInWithPassword` falha; rota permanece `/login`, mensagem aparece e input password fica vazio. Prova: `npm test -- --run`, teste `criterion 12`.
-- [ ] **C13 — guards de sessão e papel.** Sem sessão, `/p/*` e `/no/*` redirecionam a `/login`; CLIENT em `/no/*` recebe tela provisória de não autorizado. Prova: `npm test -- --run`, testes `criterion 13`.
-- [ ] **C14 — build, lint, TypeScript e banco local verdes.** Provas: `npm run build`, `npm run lint`, `npx tsc -b --pretty false` em `app/`; `supabase db reset --local`; `supabase test db supabase/tests/r1_01_tenant_auth_rls.test.sql`; nenhum comando `--linked` ou remoto.
+- [x] **C11 — destino pós-login depende do papel.** Testes da aplicação cobrem CLIENT com um projeto → `/p/:projectId/como-funciona`, CLIENT com mais de um → lista, NO_ADMIN → `/no/projetos`. Prova: `npm test -- --run` em `app/`, testes `criterion 11`.
+- [x] **C12 — falha de login preserva página e limpa senha.** Mock de `signInWithPassword` falha; rota permanece `/login`, mensagem aparece e input password fica vazio. Prova: `npm test -- --run`, teste `criterion 12`.
+- [x] **C13 — guards de sessão e papel.** Sem sessão, `/p/*` e `/no/*` redirecionam a `/login`; CLIENT em `/no/*` recebe tela provisória de não autorizado. Prova: `npm test -- --run`, testes `criterion 13`.
+- [x] **C14 — build, lint, TypeScript e banco local verdes.** Provas: `npm run build`, `npm run lint`, `npx tsc -b --pretty false` em `app/`; `supabase db reset --local`; `supabase test db supabase/tests/r1_01_tenant_auth_rls.test.sql`; nenhum comando `--linked` ou remoto.
 
 ## Swept
 
@@ -101,3 +101,11 @@
 - `supabase db lint --local --schema public --level warning --fail-on error` — PASS; `No schema errors found`.
 - `supabase db advisors --local --type security --level warn --fail-on error` — PASS; `No issues found`.
 - `supabase db advisors --local --type performance --level warn --fail-on error` — exit 0; sete warnings `auth_rls_initplan`, todos nas policies Meta legadas que esta task proíbe alterar (`clients`, `ad_metrics_daily`, `social_metrics_daily`, `scheduled_posts`, `ad_accounts`). Nenhum warning aponta para objeto criado por R1-01.
+
+## Provas do Lote B
+
+- `npm test -- --run` em `app/` — PASS; 1 arquivo e 7 testes: três destinos em `criterion 11`, falha de autenticação em `criterion 12` e três cenários de guard em `criterion 13`.
+- `npm run lint` em `app/` — PASS; ESLint 10 sem erros ou warnings.
+- `npx tsc -b --pretty false` em `app/` — PASS; exit 0.
+- `npm run build` em `app/` — PASS; TypeScript e Vite 8 concluídos, 77 módulos transformados.
+- Revisão condensada `react-best-practices` aplicada após os TSX: provider com assinatura de auth estável, cleanup da subscription, tratamento da inicialização rejeitada, componentes fora do render, conteúdo estático hoisted, condicionais explícitas e controles acessíveis.
