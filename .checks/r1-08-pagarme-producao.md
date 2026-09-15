@@ -254,3 +254,10 @@ externa ainda estiver aberta.
 - [x] Em app/, Vitest, lint, TypeScript e build passaram; E2E R1-05 passou em desktop e mobile.
 - [x] Parser somente leitura de supabase/config.toml: roadmap-checkout=false, pagarme-webhook-no=false, skill-01-ativar-dashboard=true, project-convert=true.
 - [ ] C1–C6 seguem BLOCKED: não houve push, deploy, DNS, leitura/escrita hospedada, configuração de secrets, conta Pagar.me nem teste Pix real. PAINEL_TOKEN continua pendente de rotação ao final de todas as ondas.
+
+## Descoberta externa sanitizada — 15/09/2026
+
+- [x] A home existente responde pela Vercel e `www.notechstack.com.br` já aponta para a Vercel; a home não deve ser movida.
+- [x] O DNS autoritativo de `notechstack.com.br` é o Registro.br, e `app.notechstack.com.br` ainda não possui registro.
+- [ ] R1-08 continua pendente: não havia sessão autenticada na conta Vercel, nem acesso ao painel DNS; portanto não foram criados projeto, domínio, registro, deploy, secret ou função hospedada.
+- [ ] As chaves e as credenciais de webhook Pagar.me de produção continuam necessárias apenas como secrets do Supabase. Seus valores não foram lidos, registrados ou transmitidos. `PAINEL_TOKEN` segue pendente de rotação ao final de todas as ondas.
