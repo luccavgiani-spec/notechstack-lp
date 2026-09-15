@@ -6,10 +6,16 @@ export type SignInResult = {
   error: AuthError | null
 }
 
+export type UpdatePasswordResult = {
+  user: User | null
+  error: AuthError | null
+}
+
 export type AuthContextValue = {
   session: Session | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<SignInResult>
+  updatePassword: (password: string) => Promise<UpdatePasswordResult>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)
