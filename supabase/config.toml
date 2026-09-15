@@ -63,3 +63,9 @@ verify_jwt = true
 
 [functions.refresh-tokens]
 verify_jwt = true
+
+[functions.roadmap-checkout]
+verify_jwt = false
+
+[functions.pagarme-webhook-no]
+verify_jwt = false
