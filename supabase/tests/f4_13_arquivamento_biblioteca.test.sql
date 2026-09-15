@@ -45,7 +45,7 @@ reset role;
 select throws_ok($$update public.archive_assets set tags = '{}'::jsonb where project_id = '94000000-0000-4000-8000-000000000001'$$, 'P0001', 'ARCHIVE_ASSET_IMMUTABLE', 'C5 archive snapshot cannot be changed');
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"91000000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"NO_ADMIN"}}', true);
-select throws_ok($$select public.archive_project('94000000-0000-4000-8000-000000000005', '{}'::jsonb, false, false, true, 'f413-active')$$, 'P0001', 'PROJECT_ARCHIVE_NOT_ALLOWED', 'C3 active project cannot archive');
+select throws_ok($$select public.archive_project('94000000-0000-4000-8000-000000000005', '{}'::jsonb, false, false, true, 'f413-active')$$, 'PT409', 'PROJECT_ARCHIVE_NOT_ALLOWED', 'C3 active project returns the PostgREST 409 conflict code');
 select is((select count(*)::integer from public.archive_assets where project_id = '94000000-0000-4000-8000-000000000005'), 0, 'C3 rejected archive creates no snapshot');
 select lives_ok($$select public.archive_project('94000000-0000-4000-8000-000000000002', '{"nicho":["saas"]}', false, true, false, 'f413-case')$$, 'C2 completed project archives');
 select lives_ok($$select public.archive_project('94000000-0000-4000-8000-000000000003', '{"nicho":["servicos"]}', false, false, false, 'f413-private')$$, 'C7 private project archives');

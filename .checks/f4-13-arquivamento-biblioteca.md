@@ -24,6 +24,9 @@ originais. A Biblioteca consome somente projeções não confidenciais por RPC `
 | Ativo arquivável | uma linha `archive_assets` por projeto arquivado, com `snapshot` do projeto, roadmap, protótipo, versões e referências de arquivos | uma linha por arquivo/componente — exige taxonomia e produtor ainda inexistentes |
 | Direitos | `internal_reuse`, `public_case`, `confidential`, todos booleanos; confidencial começa `true` | enum único — não expressa permissões independentes |
 
+O padrão inicial conservador de `confidential = true` substitui o rascunho anterior da task (`false`):
+o usuário delegou a decisão de biblioteca e foi escolhido não expor um snapshot sem revisão explícita.
+
 ## Test policy
 
 | Code | Required proofs | Coverage expectation |
@@ -36,7 +39,7 @@ originais. A Biblioteca consome somente projeções não confidenciais por RPC `
 ### S1 — Arquivar e preservar · migration/RPC/UI · ~30k
 
 - [x] **C1/C2** — `NO_ADMIN` arquiva somente janela expirada ou projeto concluído, marca `ARQUIVADO`, bloqueia CLIENT e cria um evento. Proof: pgTAP `f4_13_arquivamento_biblioteca.test.sql` (24 provas locais).
-- [x] **C3/C4** — projeto ativo retorna erro sem delta e nenhum agregado histórico é apagado. Proof: pgTAP `f4_13_arquivamento_biblioteca.test.sql`.
+- [x] **C3/C4** — projeto ativo retorna conflito `PT409` (mapeado por PostgREST para HTTP 409) sem delta e nenhum agregado histórico é apagado. Proof: pgTAP `f4_13_arquivamento_biblioteca.test.sql`.
 - [x] **C5** — snapshot contém projeto, roadmap, protótipo, versões e lista explícita de arquivos; trigger impede alteração/exclusão. Proof: pgTAP `f4_13_arquivamento_biblioteca.test.sql`.
 
 ### S2 — Direitos e Biblioteca · migration/RPC/UI · ~24k
