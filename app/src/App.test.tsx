@@ -83,7 +83,10 @@ describe('criterion 11 — destinos pós-login', () => {
       data: { user: session.user, session },
       error: null,
     })
-    mocks.order.mockResolvedValue({ data: [{ id: 'projeto-a' }], error: null })
+    mocks.order.mockResolvedValue({
+      data: [{ id: 'projeto-a', name: 'Projeto Alfa' }],
+      error: null,
+    })
 
     renderAt('/login')
     await submitLogin()
@@ -101,7 +104,10 @@ describe('criterion 11 — destinos pós-login', () => {
       error: null,
     })
     mocks.order.mockResolvedValue({
-      data: [{ id: 'projeto-a' }, { id: 'projeto-b' }],
+      data: [
+        { id: 'projeto-a', name: 'Projeto Alfa' },
+        { id: 'projeto-b', name: 'Projeto Beta' },
+      ],
       error: null,
     })
 
@@ -111,7 +117,43 @@ describe('criterion 11 — destinos pós-login', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/p/projetos')
     })
-    expect(screen.getByRole('heading', { name: 'Escolha um projeto.' })).toBeVisible()
+    expect(
+      await screen.findByRole('heading', { name: 'Escolha um projeto.' }),
+    ).toBeVisible()
+    const alfaLink = screen.getByRole('link', { name: 'Abrir Projeto Alfa' })
+    const betaLink = screen.getByRole('link', { name: 'Abrir Projeto Beta' })
+    expect(alfaLink).toHaveAttribute('href', '/p/projeto-a/como-funciona')
+    expect(betaLink).toHaveAttribute('href', '/p/projeto-b/como-funciona')
+    expect(mocks.from).toHaveBeenCalledTimes(1)
+
+    await userEvent.click(betaLink)
+
+    expect(window.location.pathname).toBe('/p/projeto-b/como-funciona')
+    expect(screen.getByRole('heading', { name: 'Seu projeto começa aqui.' })).toBeVisible()
+  })
+
+  it('busca e lista projetos acessíveis ao abrir /p/projetos diretamente', async () => {
+    mocks.getSession.mockResolvedValue({ data: { session: buildSession('CLIENT') }, error: null })
+    mocks.order.mockResolvedValue({
+      data: [
+        { id: 'projeto-a', name: 'Projeto Alfa' },
+        { id: 'projeto-b', name: 'Projeto Beta' },
+      ],
+      error: null,
+    })
+
+    renderAt('/p/projetos')
+
+    expect(await screen.findByRole('link', { name: 'Abrir Projeto Alfa' })).toHaveAttribute(
+      'href',
+      '/p/projeto-a/como-funciona',
+    )
+    expect(screen.getByRole('link', { name: 'Abrir Projeto Beta' })).toHaveAttribute(
+      'href',
+      '/p/projeto-b/como-funciona',
+    )
+    expect(mocks.from).toHaveBeenCalledWith('projects')
+    expect(mocks.select).toHaveBeenCalledWith('id, name')
   })
 
   it('leva NO_ADMIN para a lista operacional', async () => {

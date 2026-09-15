@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/auth-context'
 import { BrandShell } from '../components/BrandShell'
-import { supabase } from '../lib/supabase'
+import { listAccessibleProjects } from '../projects/project-service'
 
 const GENERIC_LOGIN_ERROR = 'Não foi possível entrar. Confira seus dados e tente novamente.'
 
@@ -33,10 +33,7 @@ export function LoginPage() {
       return
     }
 
-    const { data: projects, error: projectsError } = await supabase
-      .from('projects')
-      .select('id')
-      .order('created_at', { ascending: true })
+    const { projects, error: projectsError } = await listAccessibleProjects()
 
     if (projectsError) {
       setPassword('')
@@ -50,7 +47,7 @@ export function LoginPage() {
       return
     }
 
-    navigate('/p/projetos', { replace: true })
+    navigate('/p/projetos', { replace: true, state: { projects } })
   }
 
   return (

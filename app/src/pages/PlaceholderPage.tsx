@@ -1,11 +1,6 @@
 import { BrandShell } from '../components/BrandShell'
 
 const pageContent = {
-  'client-projects': {
-    eyebrow: 'Seus projetos',
-    title: 'Escolha um projeto.',
-    description: 'A lista completa será construída na próxima etapa do produto.',
-  },
   'project-overview': {
     eyebrow: 'Como funciona',
     title: 'Seu projeto começa aqui.',
