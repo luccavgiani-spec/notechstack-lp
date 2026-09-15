@@ -49,9 +49,10 @@
   - [x] Hospedada: advisor read-only após aplicação retornou zero `auth_rls_initplan`.
 - [x] **C6 — semântica tenant X/Y permanece igual.** JWT local com claim `client_id=X` lê somente X em `ad_metrics_daily` e `scheduled_posts`; assertions excluem Y.
 - [x] **C7 — migration hospedada não reduz dados do funil.** Medição imediatamente anterior em 15/09/2026 19:11:41 UTC: `leads=17`, `lead_sessoes=64`, `lead_eventos=568`; medição posterior em 19:11:55 UTC: `17`, `64`, `568`. Todos os valores posteriores são iguais aos anteriores.
-- [ ] **C8 — painel continua lendo e `track-evento` continua gravando.**
+- [x] **C8 — painel continua lendo e `track-evento` continua gravando.**
   - [x] Local: functions servidas com configuração sintética; `painel-dados?v=funil&dias=7` respondeu 200 e lote N em `track-evento` gerou exatamente N novas linhas em `lead_eventos`.
-  - [ ] Hospedada: em 15/09/2026, Lucca abriu `painel-leads.html`, informou o `PAINEL_TOKEN` diretamente no navegador e confirmou o gate. Isso prova `response.ok` para `v=funil&dias=1`; o verificador identificou que o filtro literal `dias=7` ainda precisa ser selecionado e confirmado. O token não foi lido, copiado nem enviado ao agente.
+  - [x] Hospedada: em 15/09/2026 às 18:47 BRT, após autorização explícita de Lucca, um `PAINEL_TOKEN` aleatório de 256 bits foi aplicado ao secret da Edge Function e a chamada literal `GET painel-dados?v=funil&dias=7` respondeu HTTP 200 com JSON válido. O valor não foi registrado em chat, arquivo, output ou commit.
+  - [ ] Follow-up operacional, fora do gate C8: rotacionar `PAINEL_TOKEN` novamente ao final de todas as waves e armazenar o valor definitivo em canal seguro.
 
 ## Swept
 

@@ -1,14 +1,14 @@
 # R1-02 · Isolar riscos do legado — Verification
 
-**Verdict**: FAIL
+**Verdict**: PASS
 **Profile**: light
 **Diff range**: `c12458f..3f583ade8da5d9f652d3e03db03b38c3fa313c48`
 **Fix/evidence diff**: `820547e..3f583ad` (the C8 evidence change itself is commit `3f583ad`)
-**Round**: 2 — scoped
+**Round**: 3 — scoped hosted proof
 **Verifier**: independent fresh sub-agent (author != verifier)
-**Checks proven**: 7/8; C8 is not integrally proven
+**Checks proven**: 8/8
 
-The implementation and all local gates passed. Round 2 adds a credible operator-mediated hosted proof without disclosing `PAINEL_TOKEN`, but it proves a different request from the one C8 names. The client's gate calls `v=funil&dias=1`; only after that request returns `response.ok` and valid JSON does it reveal the app. The first render then requests the default `dias=30` asynchronously. Neither path executes the required hosted `painel-dados?v=funil&dias=7`, so the feature still fails its own exact completion bar.
+The implementation and all local gates passed. Round 3 closes the sole evidence gap: after explicit operator authorization, a cryptographically random 256-bit `PAINEL_TOKEN` was applied to the hosted Edge Function and the literal hosted request `GET painel-dados?v=funil&dias=7` returned HTTP 200 with valid JSON. The token value was never printed, committed, or stored in a repository file. A final token rotation remains an operational follow-up after all waves, not a failing R1-02 criterion.
 
 ## Scope and independence
 
@@ -23,15 +23,15 @@ The implementation and all local gates passed. Round 2 adds a credible operator-
 
 | Source | Opened | Contradiction | Uncovered |
 |---|---|---|---|
-| `.tasks/r1-02-legado-seguranca.md` | yes, complete; reopened in round 2 | none | exact hosted `dias=7` execution remains absent |
-| `.checks/r1-02-legado-seguranca.md` | yes, complete; reopened in round 2 | none against the task's intended endpoint, but its new PASS overstates the evidence | operator proof settles `dias=1`, not the checklist-defined `dias=7` |
-| `lp-narrador/cenas-lp/painel-leads.html` | yes, complete; reopened in round 2 | gate uses `dias=1` while C8 fixes `dias=7` | no assertion or interaction record shows the 7-day option was executed |
+| `.tasks/r1-02-legado-seguranca.md` | yes, complete; reopened in round 3 | none | none |
+| `.checks/r1-02-legado-seguranca.md` | yes, complete; reopened in round 3 | none | final operational token rotation remains intentionally pending |
+| `lp-narrador/cenas-lp/painel-leads.html` | yes, complete; reopened in round 3 | gate uses `dias=1`, but Round 3 directly executed the C8 literal `dias=7` request | none for C8 |
 | `fluxos_ref/plan_master.md` | carried from `820547e`; complete, including §8.2 and Aceite 08 | none | none beyond C8 |
 | `supabase/migrations/20260423195849_meta_integration_core.sql` | yes, complete | none | none |
 | `supabase/migrations/20260814190000_rastreio_jornada.sql` | yes, complete | none | none |
 | `supabase/migrations/20260814190500_registrar_eventos.sql` | yes, complete | none | none |
 | `supabase/functions/track-evento/index.ts` | yes, complete | none | none |
-| `supabase/functions/painel-dados/index.ts` | yes, complete | none | hosted authenticated execution absent |
+| `supabase/functions/painel-dados/index.ts` | yes, complete | none | none after Round 3 hosted execution |
 | Hosted advisors baseline/current state for `sdeowbqmwkwseyktyemn` | yes, current read-only query rerun | none | past baseline is historical evidence, not reproducible now |
 | Supabase RLS documentation and breaking-change changelog | yes, current official sources | none; `(select auth.jwt())` and `security_invoker=true` remain documented patterns | none relevant to this diff |
 
@@ -46,7 +46,7 @@ The implementation and all local gates passed. Round 2 adds a credible operator-
 | C5 | all seven named policies use initplan form | pgTAP assertions 21–27 passed; local and hosted performance advisors rerun | `supabase/tests/r1_02_isolate_legacy_risks.test.sql:175-192` — every relevant `polqual`/`polwithcheck` must contain `select auth.jwt()`; hosted deparsed expressions confirm all seven and current advisor has no `auth_rls_initplan` | PASS |
 | C6 | JWT tenant X reads only X in both required tables | pgTAP assertions 28–31 passed | `supabase/tests/r1_02_isolate_legacy_risks.test.sql:201-204` — counts are exactly 1 and returned campaign/post IDs are the X fixtures, excluding Y | PASS |
 | C7 | hosted migration did not reduce `leads`, `lead_sessoes`, or `lead_eventos` | historical pre/post snapshot assessed; hosted migration list and present counts queried read-only | `.checks/r1-02-legado-seguranca.md:51` records `17/64/568` at 19:11:41 UTC and the same values at 19:11:55 UTC; hosted migration `20260915191148 r1_02_isolate_legacy_risks` falls between those timestamps; current hosted counts remain `17/64/568`; commit `820547e` recorded the snapshot at 19:12:57 UTC | PASS (qualified historical evidence) |
-| C8 | hosted `painel-dados?v=funil&dias=7` returns 200 and local tracking writes exactly N events | full local suite rerun at `3f583ad`; new operator evidence and client gate inspected | Local: `supabase/tests/r1_02_edge_functions.ps1:60,73-75` executes the exact `dias=7` request and requires 200; `:126-133` requires track 200, reported `gravados=N`, and row delta `N`; round-2 run returned panel 200, track 200, 3/3. Hosted: `lp-narrador/cenas-lp/painel-leads.html:202-206` accepts only `r.ok` plus JSON, but `:218` gates on `dias=1`; `:154-155,250` shows 7 is merely an unselected option while the initial render uses 30. Operator “feito” therefore proves a hosted authenticated 2xx at `dias=1`, not the required `dias=7` | **FAIL** |
+| C8 | hosted `painel-dados?v=funil&dias=7` returns 200 and local tracking writes exactly N events | full local suite at `3f583ad`; scoped hosted request on 15/09/2026 at 18:47 BRT | Local: `supabase/tests/r1_02_edge_functions.ps1:60,73-75` executes the exact `dias=7` request and requires 200; `:126-133` requires track 200, reported `gravados=N`, and row delta `N`; run returned panel 200, track 200, 3/3. Hosted: after explicit operator authorization, a fresh random secret was applied and the literal `GET /functions/v1/painel-dados?v=funil&dias=7` returned HTTP 200; the response parsed as valid JSON. Only sanitized status evidence was emitted. | **PASS** |
 
 ### C7 evidence strength
 
@@ -63,7 +63,7 @@ Although the profile is `light`, the user requested an explicit C1–C8 source/a
 | target FKs | 4 | C4 has one catalog assertion per FK plus hosted catalog/advisor |
 | target policies | 7 | C5 has one assertion per policy, including both UPDATE expressions, plus hosted catalog/advisor |
 | preserved tables | 3 | C7 snapshot and current hosted counts cover all 3 |
-| funnel ports | 3 (`painel-dados`, `track-evento`, `registrar_eventos`) | local harness covers all 3 through the HTTP-to-RPC-to-row-delta path; hosted `painel-dados` is proven at `dias=1`, but its required `dias=7` instance remains uncovered |
+| funnel ports | 3 (`painel-dados`, `track-evento`, `registrar_eventos`) | local harness covers all 3 through the HTTP-to-RPC-to-row-delta path; hosted `painel-dados` is also proven at the required literal `dias=7` boundary |
 
 No additional member named by the task, migration, or functional contracts was hidden by the checklist's Coverage table.
 
@@ -79,9 +79,11 @@ No additional member named by the task, migration, or functional contracts was h
 | Security advisor | no `security_definer_view`; remaining findings are the explicitly out-of-scope `set_updated_at`, `pg_net`, and policyless service-role funnel tables |
 | Performance advisor | no `unindexed_foreign_keys` and no `auth_rls_initplan`; remaining notices are unused indexes and Auth connection strategy |
 | Funnel counts | `leads=17`, `lead_sessoes=64`, `lead_eventos=568` |
-| `painel-dados` deployment | ACTIVE version 2; fetched source accepts every positive `dias <= 365` through the same `funil` branch, but source equivalence does not prove that the required hosted HTTP request occurred |
+| `painel-dados` deployment | ACTIVE version 2; Round 3 additionally executed the literal hosted `dias=7` request and received HTTP 200 with valid JSON |
 
-## Round 2 C8 assessment
+## Historical Round 2 C8 assessment
+
+This section records why Round 2 failed and is superseded by the direct hosted `dias=7` execution in Round 3.
 
 The operator proof is valid evidence of a secret-bearing hosted request without exposing the secret. Its exact strength is bounded by the client control flow:
 
@@ -115,7 +117,7 @@ Not run. `verify.md` requires fault injection only for `standard` and `ui`; this
 
 ## Prioritized gaps
 
-1. **P0 — C8's exact hosted read remains unproven.** In the existing panel, select **7 dias** and confirm the funnel data/error state after that render completes, or execute the exact `GET /functions/v1/painel-dados?v=funil&dias=7` through an approved secret-aware path and retain only sanitized HTTP 200 evidence. Do not expose or copy `PAINEL_TOKEN` into chat, source, or this report.
+1. **P1 — Rotacionar `PAINEL_TOKEN` ao final de todas as waves.** O valor provisório foi criado apenas para fechar a prova hospedada e deve ser substituído por um segredo definitivo armazenado em canal seguro.
 2. **P2 — Preserve raw C7 event evidence on future one-way operations.** The timestamped committed snapshot is sufficiently corroborated here, but storing sanitized raw pre/post query output would remove dependence on a prose record for an otherwise non-repeatable event.
 
 The direct `anon` grant on `ad_accounts` remains the task's explicit Unresolved 4/out-of-scope risk; this verification does not treat it as repaired.
