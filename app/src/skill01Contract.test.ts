@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest'
-import {
-  ROADMAP_REQUIRED_FIELDS,
-  ROADMAP_TIER_FIELDS,
-  ROADMAP_TIER_KEYS,
-  validateRoadmapContent,
-} from '../../supabase/functions/_shared/roadmap-content'
+import { validateRoadmapContent } from '../../supabase/functions/_shared/roadmap-content'
+
+const REQUIRED_FIELDS = ['answers', 'references', 'stack', 'costs', 'next_steps', 'tiers'] as const
+const REQUIRED_TIER_KEYS = ['essencial', 'basico', 'completo'] as const
+const REQUIRED_TIER_FIELDS = [
+  'escopo',
+  'profundidade',
+  'exclusoes',
+  'complexidade',
+  'prazo_dias',
+  'valor_centavos',
+  'faixa',
+] as const
 
 const tier = {
   escopo: ['Fluxo principal'],
@@ -32,7 +39,7 @@ function content() {
 }
 
 describe('C4 — contrato de conteúdo da Skill 01', () => {
-  it.each(ROADMAP_REQUIRED_FIELDS)(
+  it.each(REQUIRED_FIELDS)(
     'rejeita o campo obrigatório ausente: %s',
     (field) => {
       const candidate = content() as Record<string, unknown>
@@ -44,7 +51,7 @@ describe('C4 — contrato de conteúdo da Skill 01', () => {
     },
   )
 
-  it.each(ROADMAP_TIER_KEYS)(
+  it.each(REQUIRED_TIER_KEYS)(
     'rejeita a chave de tier ausente: %s',
     (tierKey) => {
       const candidate = content()
@@ -56,7 +63,7 @@ describe('C4 — contrato de conteúdo da Skill 01', () => {
     },
   )
 
-  it.each(ROADMAP_TIER_FIELDS)(
+  it.each(REQUIRED_TIER_FIELDS)(
     'rejeita o campo aninhado ausente: %s',
     (field) => {
       const candidate = content()
