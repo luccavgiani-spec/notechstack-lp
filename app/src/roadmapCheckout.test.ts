@@ -2,6 +2,7 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { fireEvent, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 type CheckoutApi = {
@@ -24,9 +25,85 @@ const ok = (body: unknown) =>
     headers: { 'Content-Type': 'application/json' },
   }))
 
+function mountDiagnostic() {
+  document.body.innerHTML = `
+    <section id="diagnostico">
+      <div class="dg-palco">
+        <div class="dg-vaga"></div>
+        <div class="dg-foto"><img alt=""></div>
+        <div class="dg-tela">
+          <div class="dg-nav">
+            <button type="button" data-nav="voltar">voltar</button>
+            <span class="dg-fase"></span>
+            <button type="button" data-nav="proximo">próximo</button>
+          </div>
+          <form class="dg-corpo"></form>
+          <div class="dg-pe">
+            <span class="dg-dica"></span>
+            <button type="button" class="dg-bt" data-nav="acao">próximo</button>
+          </div>
+        </div>
+      </div>
+    </section>`
+
+  Object.defineProperty(Element.prototype, 'animate', {
+    configurable: true,
+    value: vi.fn(() => ({ cancel: vi.fn() })),
+  })
+  Object.assign(window, {
+    leadSid: 'sid-dom',
+    matchMedia: vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+    requestAnimationFrame: (callback: FrameRequestCallback) => {
+      callback(0)
+      return 1
+    },
+    scrollTo: vi.fn(),
+  })
+  vi.stubGlobal('ResizeObserver', class {
+    observe() {}
+    disconnect() {}
+  })
+  window.eval(diagnosticSource)
+}
+
+function fill(name: string, value: string) {
+  const field = document.querySelector(`[name="${name}"]`)
+  if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+    throw new Error(`Campo ${name} ausente`)
+  }
+  fireEvent.input(field, { target: { value } })
+}
+
+function next() {
+  fireEvent.click(document.querySelector<HTMLButtonElement>('[data-nav="proximo"]')!)
+}
+
+function completeBriefing() {
+  fill('nome', 'Ana')
+  fireEvent.click(document.querySelector<HTMLButtonElement>('[data-nav="comecar"]')!)
+  fireEvent.click(document.querySelector<HTMLInputElement>('input[name="objetivo"][value="novo"]')!)
+  fill('negocio', 'Loja')
+  next()
+  fireEvent.click(document.querySelector<HTMLInputElement>('input[name="publico"][value="clientes"]')!)
+  next()
+  fill('ferramentas', 'WhatsApp')
+  next()
+  fill('resultado', 'Organizar todos os pedidos')
+  next()
+  fill('email', 'ana@example.com')
+  fill('telefone', '11999999999')
+  next()
+}
+
 describe('checkout do roadmap na home', () => {
   beforeEach(() => {
+    vi.unstubAllGlobals()
     vi.restoreAllMocks()
+    document.body.innerHTML = ''
     Object.assign(window, {
       NO_CHECKOUT_CONFIG: {
         sendLeadUrl: 'https://local.test/send-lead-email',
@@ -109,6 +186,85 @@ describe('checkout do roadmap na home', () => {
     expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('send-lead-email'))).toHaveLength(1)
     expect(fetchMock.mock.calls.filter(([url]) => String(url).includes('roadmap-checkout'))).toHaveLength(2)
   })
+
+  it('percorre o DOM, tokeniza o cartão e mostra o estado aprovado', async () => {
+    const fetchMock = vi.fn((input: string | URL, init?: RequestInit) => {
+      void init
+      const url = String(input)
+      if (url.includes('send-lead-email')) return ok({ saved: true, leadId: 'lead-dom-card' })
+      if (url.includes('/tokens')) return ok({ id: 'token_dom_card' })
+      return ok({ paymentId: 'payment-dom-card', status: 'approved' })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mountDiagnostic()
+    completeBriefing()
+
+    const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
+    expect(action).toHaveTextContent('Quero meu roadmap + protótipo — R$ 149,90')
+    fireEvent.click(action)
+    fireEvent.click(document.querySelector<HTMLButtonElement>('[data-pagamento="cartao"]')!)
+    fill('cartao_nome', 'ANA TESTE')
+    fill('cartao_numero', '4000000000000010')
+    fill('cartao_validade', '12/30')
+    fill('cartao_cvv', '123')
+    fireEvent.click(action)
+
+    await waitFor(() => expect(document.body).toHaveTextContent('pagamento aprovado'))
+    expect(document.body).toHaveTextContent('No Dia 1, a Nó entra em contato pelo WhatsApp')
+    const checkoutCall = fetchMock.mock.calls.find(([url]) => String(url).includes('roadmap-checkout'))
+    const checkoutBody = JSON.parse(String(checkoutCall?.[1]?.body))
+    expect(checkoutBody).toMatchObject({ metodo: 'cartao', cardToken: 'token_dom_card', sid: 'sid-dom' })
+    expect(JSON.stringify(checkoutBody)).not.toMatch(/4000000000000010|"cvv"|exp_month|exp_year/i)
+  })
+
+  it('percorre o DOM e mostra QR e copia-e-cola do Pix', async () => {
+    const fetchMock = vi.fn((input: string | URL) => {
+      if (String(input).includes('send-lead-email')) return ok({ saved: true, leadId: 'lead-dom-pix' })
+      return ok({
+        paymentId: 'payment-dom-pix',
+        status: 'pending',
+        pix: { qrCode: '000201-pix-dom', qrCodeUrl: 'https://local.test/pix.png' },
+      })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mountDiagnostic()
+    completeBriefing()
+
+    const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
+    fireEvent.click(action)
+    fireEvent.click(document.querySelector<HTMLButtonElement>('[data-pagamento="pix"]')!)
+    fireEvent.click(action)
+
+    await waitFor(() => expect(document.body).toHaveTextContent('seu Pix está pronto'))
+    expect(document.querySelector<HTMLTextAreaElement>('.dg-pix-codigo textarea')).toHaveValue('000201-pix-dom')
+    expect(document.querySelector<HTMLImageElement>('.dg-pix-qr')).toHaveAttribute('src', 'https://local.test/pix.png')
+  })
+
+  it('mantém o formulário de cartão aberto e permite retry na recusa', async () => {
+    const fetchMock = vi.fn((input: string | URL) => {
+      const url = String(input)
+      if (url.includes('send-lead-email')) return ok({ saved: true, leadId: 'lead-dom-failed' })
+      if (url.includes('/tokens')) return ok({ id: 'token_dom_failed' })
+      return ok({ paymentId: 'payment-dom-failed', status: 'failed' })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mountDiagnostic()
+    completeBriefing()
+
+    const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
+    fireEvent.click(action)
+    fireEvent.click(document.querySelector<HTMLButtonElement>('[data-pagamento="cartao"]')!)
+    fill('cartao_nome', 'ANA TESTE')
+    fill('cartao_numero', '4000000000000028')
+    fill('cartao_validade', '12/30')
+    fill('cartao_cvv', '123')
+    fireEvent.click(action)
+
+    await waitFor(() => expect(document.body).toHaveTextContent('pagamento recusado'))
+    expect(document.querySelector('[name="cartao_numero"]')).toBeInTheDocument()
+    expect(action).toBeEnabled()
+    expect(action).toHaveTextContent('pagar →')
+  })
 })
 
 declare global {
@@ -116,5 +272,6 @@ declare global {
     NO_CHECKOUT_CONFIG?: Record<string, string>
     NoRoadmapCheckout?: CheckoutApi
     VITE_PAGARME_PUBLIC_KEY?: string
+    leadSid?: string
   }
 }
