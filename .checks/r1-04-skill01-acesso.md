@@ -55,47 +55,47 @@ Evidence:
 
 ### S1 — Execução da Skill 01 · função, RPC, CLI e provas · ~18 arquivos · ~45k
 
-**C1** — Para cada estado inicial `ROADMAP_PAGO`, `REFERENCIAS_PENDENTES` e `EM_PRODUCAO`, o comando autenticado cria/reusa exatamente um usuário pelo `clients.email`, uma membership `CLIENT`, publica o roadmap, ativa 01–03, bloqueia 04–06, inicia `INICIAL_15_DIAS`, grava `JANELA_DE_DECISAO` e imprime um convite para `/acesso`.
+- [x] **C1** — Para cada estado inicial `ROADMAP_PAGO`, `REFERENCIAS_PENDENTES` e `EM_PRODUCAO`, o comando autenticado cria/reusa exatamente um usuário pelo `clients.email`, uma membership `CLIENT`, publica o roadmap, ativa 01–03, bloqueia 04–06, inicia `INICIAL_15_DIAS`, grava `JANELA_DE_DECISAO` e imprime um convite para `/acesso`.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertions `C1` para os três estados e execução real de `npm run skill:01`.
 Proof: `supabase test db` — pgTAP `C1 activate_dashboard transaction publishes the exact aggregate`.
 
-**C2** — A primeira liberação grava exatamente um `activity_events` do tipo `skill_01_dashboard_ativado`, com `actor_id`, `project_id`, `occurred_at` e `request_id` idempotente.
+- [x] **C2** — A primeira liberação grava exatamente um `activity_events` do tipo `skill_01_dashboard_ativado`, com `actor_id`, `project_id`, `occurred_at` e `request_id` idempotente.
 Proof: `supabase test db` — pgTAP `C2 first activation records one attributed activity event`.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertion `C2 activity identifies operator and project`.
 
-**C3** — Sem sessão a fronteira retorna 401; com sessão `CLIENT` retorna 403; em ambos os casos os vetores `auth.users`, `memberships`, `roadmaps`, `projects` e `activity_events` ficam invariáveis.
+- [x] **C3** — Sem sessão a fronteira retorna 401; com sessão `CLIENT` retorna 403; em ambos os casos os vetores `auth.users`, `memberships`, `roadmaps`, `projects` e `activity_events` ficam invariáveis.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertions `C3 unauthenticated 401/no delta` e `C3 CLIENT 403/no delta`.
 
-**C4** — Conteúdo sem qualquer campo obrigatório (`answers`, `references`, `stack`, `costs`, `next_steps`, `tiers`), sem cada chave `essencial`, `basico`, `completo`, ou com tier sem o shape da R1-01 retorna 422 com `invalidFields` enumerado e delta zero em Auth e banco; `preferred_tier` e `prototype_url` são opcionais, mas tipados quando presentes.
+- [x] **C4** — Conteúdo sem qualquer campo obrigatório (`answers`, `references`, `stack`, `costs`, `next_steps`, `tiers`), sem cada chave `essencial`, `basico`, `completo`, ou com tier sem o shape da R1-01 retorna 422 com `invalidFields` enumerado e delta zero em Auth e banco; `preferred_tier` e `prototype_url` são opcionais, mas tipados quando presentes.
 Proof: `npm test -- --run app/src/skill01Contract.test.ts` — tabela `C4 every required roadmap field tier key and nested tier field is rejected individually`.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertion `C4 boundary returns 422 with exact invalidFields and no delta`.
 
-**C5** — Se a RPC rejeita o projeto depois de o convite criar um usuário novo, a função remove esse usuário e não deixa membership, roadmap publicado, liberação ou atividade parcial.
+- [x] **C5** — Se a RPC rejeita o projeto depois de o convite criar um usuário novo, a função remove esse usuário e não deixa membership, roadmap publicado, liberação ou atividade parcial.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertion `C5 rejected project compensates newly created auth user and public rows`.
 
-**C6** — Reexecutar num projeto liberado produz link diferente, conserva um usuário e uma membership e preserva exatamente o primeiro `access_released_at` e a única atividade de ativação.
+- [x] **C6** — Reexecutar num projeto liberado produz link diferente, conserva um usuário e uma membership e preserva exatamente o primeiro `access_released_at` e a única atividade de ativação.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertion `C6 retry rotates invite without duplicating or restarting access`.
 Proof: `supabase test db` — pgTAP `C6 repeated RPC preserves release instant and aggregate cardinality`.
 
 ### S2 — Primeiro acesso · rota `/acesso` e Auth local · ~8 arquivos · ~24k
 
-**C7** — Um convite válido mostra o formulário de senha; senha válida atualiza o usuário autenticado, mantém uma sessão CLIENT e redireciona para `/p/:projectId/como-funciona`.
+- [x] **C7** — Um convite válido mostra o formulário de senha; senha válida atualiza o usuário autenticado, mantém uma sessão CLIENT e redireciona para `/p/:projectId/como-funciona`.
 Proof: `npm test -- --run app/src/AccessPage.test.tsx` — test `C7 valid invite sets password and redirects to its project`.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertion `C7 local invite token is accepted once and password login reaches the member project`.
 
-**C8** — Convite usado, inválido ou vencido mostra o estado provisório “convite vencido” e a orientação de pedir novo link à Nó; não cria outro usuário nem membership.
+- [x] **C8** — Convite usado, inválido ou vencido mostra o estado provisório “convite vencido” e a orientação de pedir novo link à Nó; não cria outro usuário nem membership.
 Proof: `npm test -- --run app/src/AccessPage.test.tsx` — table `C8 used invalid and expired invite states ask for a new link`.
 Proof: `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1` — assertion `C8 consumed token cannot create a second session or identity`.
 
 ### S3 — Estado efetivo · view e limites de tempo · ~3 arquivos · ~10k
 
-**C9** — Em `access_released_at + 15 days + 1 second`, projeto não convertido retorna `effective_access_status = 'EXPIRADO'` e `effective_lead_status = 'NAO_CONVERTIDO'`.
+- [x] **C9** — Em `access_released_at + 15 days + 1 second`, projeto não convertido retorna `effective_access_status = 'EXPIRADO'` e `effective_lead_status = 'NAO_CONVERTIDO'`.
 Proof: `supabase test db` — pgTAP `C9 after 15 days plus one second derives expired and NAO_CONVERTIDO`.
 
-**C10** — Em 14 dias e em 15 dias menos 1 segundo, o status efetivo permanece `JANELA_DE_DECISAO`; um projeto `CONVERTIDO` após 15 dias preserva `CONVERTIDO` e acesso ativo.
+- [x] **C10** — Em 14 dias e em 15 dias menos 1 segundo, o status efetivo permanece `JANELA_DE_DECISAO`; um projeto `CONVERTIDO` após 15 dias preserva `CONVERTIDO` e acesso ativo.
 Proof: `supabase test db` — pgTAP table `C10 decision-window boundaries and converted exception`.
 
-**C11** — Build, lint, TypeScript, reset/replay, pgTAP, harness HTTP/Auth, testes DOM e CLI passam no mesmo HEAD.
+- [x] **C11** — Build, lint, TypeScript, reset/replay, pgTAP, harness HTTP/Auth, testes DOM e CLI passam no mesmo HEAD.
 Proof: `npm run build`, `npm run lint`, `npx tsc -b`, `npm test -- --run`, `supabase db reset`, `supabase test db` e `pwsh -NoProfile -File supabase/tests/r1_04_skill_01.ps1`.
 
 ## Swept
