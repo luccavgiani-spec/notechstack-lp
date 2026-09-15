@@ -151,6 +151,9 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   Assert-True ($pix.Body.pix.qrCode -like '000201-mock-*' -and $pix.Body.pix.qrCodeUrl -like 'https://mock.test/qr/*') 'C3 Pix retorna QR e copia-e-cola'
   $pixPayment = (Get-Rows "payments?lead_id=eq.$($pixLead.Id)&select=*")[0]
   Assert-True ($pixPayment.amount_cents -eq 14990 -and $pixPayment.method -eq 'pix' -and $pixPayment.status -eq 'pending') 'C3 pagamento Pix persiste 14990'
+  $pixLeadRow = (Get-Rows "leads?id=eq.$($pixLead.Id)&select=nome,email,whatsapp,contexto,sid")[0]
+  Assert-True ($pixLeadRow.nome -eq 'Lead pix' -and $pixLeadRow.email -eq 'pix@example.test') 'C3 lead roadmap preserva nome e email'
+  Assert-True ($pixLeadRow.whatsapp -eq '(11) 99999-0000' -and $pixLeadRow.contexto -eq 'roadmap' -and $pixLeadRow.sid -eq $pixLead.Sid) 'C3 lead roadmap preserva WhatsApp contexto e sid'
 
   $pixAgain = Checkout $pixLead 'pix'
   Assert-True ($pixAgain.Body.paymentId -eq $pix.Body.paymentId -and $pixAgain.Body.pix.qrCode -eq $pix.Body.pix.qrCode) 'C8 duplo submit reutiliza pagamento e Pix'
@@ -180,7 +183,9 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $approvedPayment = (Get-Rows "payments?id=eq.$($pix.Body.paymentId)&select=*")[0]
   $projectRows = Get-Rows "projects?lead_id=eq.$($pixLead.Id)&select=*"
   $projectId = [string]$projectRows[0].id
+  $clientRows = Get-Rows "clients?email=eq.pix@example.test&select=id,name"
   Assert-True ($approvedPayment.status -eq 'approved' -and $approvedPayment.project_id -eq $projectId) 'C10 payment liga ao projeto aprovado'
+  Assert-True ($clientRows.Count -eq 1 -and $clientRows[0].name -eq 'Lead pix') 'C10 cria cliente com o mesmo nome do lead'
   Assert-True ($projectRows.Count -eq 1 -and $projectRows[0].lead_status -eq 'ROADMAP_PAGO') 'C10 cria projeto ROADMAP_PAGO'
   Assert-True ((Get-Rows "roadmaps?project_id=eq.$projectId&select=*").Count -eq 1) 'C10 cria roadmap com answers'
   $items = Get-Rows "kanban_items?project_id=eq.$projectId&select=title,scheduled_date"
@@ -190,6 +195,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
 
   $vectorBefore = @(
     (Get-Rows "payment_events?payment_id=eq.$($pix.Body.paymentId)&select=id").Count,
+    $clientRows.Count,
     $projectRows.Count,
     $items.Count,
     (Get-Rows "activity_events?project_id=eq.$projectId&select=id").Count
@@ -197,6 +203,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $duplicate = Invoke-Webhook $paidEventId 'order.paid' $pixPayment.gateway_order_id
   $vectorAfter = @(
     (Get-Rows "payment_events?payment_id=eq.$($pix.Body.paymentId)&select=id").Count,
+    (Get-Rows "clients?email=eq.pix@example.test&select=id").Count,
     (Get-Rows "projects?lead_id=eq.$($pixLead.Id)&select=id").Count,
     (Get-Rows "kanban_items?project_id=eq.$projectId&select=id").Count,
     (Get-Rows "activity_events?project_id=eq.$projectId&select=id").Count
@@ -272,12 +279,47 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   }
   Assert-True ($telemetry.Status -eq 200 -and $telemetry.Body.gravados -eq 3) 'C16 telemetria v7 aceita os três eventos'
 
-  $legacyBefore = (Get-Rows 'leads?contexto=in.(lp-v5,agendar,Roteador,health)&select=id').Count
-  foreach ($legacy in @('lp-v5', 'agendar', 'Roteador', 'health')) {
-    $null = New-Lead $legacy "legacy-$($legacy.ToLowerInvariant())"
+  $legacyPayloads = @(
+    @{
+      consumer = 'lp-v5'; nome = 'Lead lp-v5'; email = 'lp-v5@example.test'; whatsapp = '(11) 91111-0001';
+      contexto = 'Site institucional · QUER FALAR AGORA'; objetivos = 'Site e automação'; investimento = ''; prazo = 'o quanto antes';
+      aiAnalysis = 'Contexto completo da árvore'; sid = "r103-lpv5-$($script:runId)"; site = 'https://cliente.example';
+      descricao = 'Operação comercial'; folha = 'site'; nicho = 'serviços'; caminho = 'negócio → site'; modo = 'direto'; valor = 3;
+      origem = 'google'; fbp = 'fb.1.test'; fbc = 'fb.1.click'; event_source_url = 'https://notechstack.com.br/'
+    },
+    @{
+      consumer = 'agendar'; nome = 'Lead agendar'; email = 'agendar@example.test'; whatsapp = '(11) 91111-0002';
+      contexto = 'Agendamento de diagnóstico'; objetivos = 'Marcar conversa'; investimento = ''; prazo = 'esta semana';
+      aiAnalysis = 'Horário solicitado pelo lead'; sid = "r103-agendar-$($script:runId)"; site = $null;
+      descricao = 'Agenda comercial'; folha = 'agenda'; nicho = 'serviços'; caminho = 'diagnóstico → agenda'; modo = 'ponte'; valor = 2;
+      origem = 'direto'; fbp = $null; fbc = $null; event_source_url = 'https://notechstack.com.br/agendar/'
+    },
+    @{
+      consumer = 'Roteador'; nome = 'Lead Roteador'; email = 'roteador@example.test'; whatsapp = '(11) 91111-0003';
+      contexto = 'Roteador — landing page'; objetivos = 'Já tem telemedicina rodando, Quer atender também, além de encaminhar';
+      investimento = ''; prazo = ''; aiAnalysis = 'Mensagem do formulário'
+    },
+    @{
+      consumer = 'health'; nome = 'Lead Health'; email = 'health@example.test'; whatsapp = '(11) 91111-0004';
+      contexto = 'nó Health — landing page'; objetivos = 'Estruturar atendimento (telemedicina)';
+      investimento = ''; prazo = ''; aiAnalysis = 'Mensagem sobre a clínica'
+    }
+  )
+  foreach ($payload in $legacyPayloads) {
+    $consumer = [string]$payload.consumer
+    $body = @{}
+    foreach ($entry in $payload.GetEnumerator()) {
+      if ($entry.Key -ne 'consumer') { $body[$entry.Key] = $entry.Value }
+    }
+    $result = Invoke-Json 'POST' "$script:apiUrl/functions/v1/send-lead-email" $body
+    Assert-True ($result.Status -eq 200 -and $result.Body.saved -and $result.Body.leadId) "C16 consumidor $consumer grava seu payload real"
   }
-  $legacyRows = Get-Rows 'leads?contexto=in.(lp-v5,agendar,Roteador,health)&select=id'
-  Assert-True (($legacyRows.Count - $legacyBefore) -eq 4) 'C16 quatro consumidores legados continuam gravando leads'
+  $legacyRows = Get-Rows 'leads?email=in.(lp-v5@example.test,agendar@example.test,roteador@example.test,health@example.test)&select=email,contexto,objetivos,sid,site,modo'
+  Assert-True ($legacyRows.Count -eq 4) 'C16 quatro consumidores legados continuam gravando leads'
+  Assert-True (($legacyRows | Where-Object email -eq 'lp-v5@example.test').sid -eq "r103-lpv5-$($script:runId)" -and ($legacyRows | Where-Object email -eq 'lp-v5@example.test').modo -eq 'direto') 'C16 lp-v5 preserva shape completo com sid e modo'
+  Assert-True (($legacyRows | Where-Object email -eq 'agendar@example.test').contexto -eq 'Agendamento de diagnóstico' -and ($legacyRows | Where-Object email -eq 'agendar@example.test').site -eq $null) 'C16 agendar preserva seu contexto e campo opcional nulo'
+  Assert-True (($legacyRows | Where-Object email -eq 'roteador@example.test').contexto -eq 'Roteador — landing page' -and ($legacyRows | Where-Object email -eq 'roteador@example.test').objetivos -like '*telemedicina*') 'C16 Roteador preserva marcas próprias'
+  Assert-True (($legacyRows | Where-Object email -eq 'health@example.test').contexto -eq 'nó Health — landing page' -and ($legacyRows | Where-Object email -eq 'health@example.test').objetivos -eq 'Estruturar atendimento (telemedicina)') 'C16 health preserva contexto e objetivo próprios'
 
   [pscustomobject]@{
     result = 'PASS'

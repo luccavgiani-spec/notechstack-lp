@@ -116,7 +116,7 @@ describe('checkout do roadmap na home', () => {
     window.eval(checkoutSource)
   })
 
-  it('mantém a oferta exata de R$ 149,90 e os três marcos', () => {
+  it('renderiza a oferta exata de R$ 149,90 e os três marcos', () => {
     expect(diagnosticSource).toContain('Transforme sua ideia em um plano que dá para executar.')
     expect(diagnosticSource).toContain('Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara uma primeira direção de protótipo e mostra caminhos reais para colocar o produto no ar.')
     expect(diagnosticSource).toContain('Seu material fica pronto em até 3 dias após a confirmação do pagamento.')
@@ -130,6 +130,23 @@ describe('checkout do roadmap na home', () => {
     expect(diagnosticSource).toContain('plano, protótipo e caminhos de construção.')
     expect(diagnosticSource).toContain('Entrega — seu dashboard')
     expect(diagnosticSource).toContain('acesso próprio para navegar e decidir como continuar.')
+
+    mountDiagnostic()
+    completeBriefing()
+
+    const offer = document.querySelector<HTMLElement>('.dg-passo[data-passo="7"]')!
+    expect(offer).toBeVisible()
+    expect(offer.querySelector('.dg-preco-por')).toHaveTextContent(/^R\$ 149,90$/)
+    expect(offer.querySelector('.dg-preco-rot')).toHaveTextContent(
+      'Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara uma primeira direção de protótipo e mostra caminhos reais para colocar o produto no ar.',
+    )
+    expect(offer).not.toHaveTextContent('R$ 149,91')
+    expect(offer).not.toHaveTextContent('R$ 199,90')
+    expect(offer).not.toHaveTextContent('R$ 450,00')
+    expect(offer.querySelectorAll('.dg-prazo li')).toHaveLength(3)
+    expect(offer).toHaveTextContent('Dia 1 — referências')
+    expect(offer).toHaveTextContent('Dias 2 e 3 — organização')
+    expect(offer).toHaveTextContent('Entrega — seu dashboard')
   })
 
   it('envia contexto roadmap, tokeniza no browser e não manda PAN/CVV ao servidor', async () => {
@@ -152,7 +169,13 @@ describe('checkout do roadmap na home', () => {
 
     const calls = fetchMock.mock.calls
     const leadBody = JSON.parse(String(calls[0][1]?.body))
-    expect(leadBody).toMatchObject({ contexto: 'roadmap', sid: 'sid-1', nome: 'Ana' })
+    expect(leadBody).toMatchObject({
+      contexto: 'roadmap',
+      sid: 'sid-1',
+      nome: 'Ana',
+      email: 'ana@example.com',
+      whatsapp: '11999999999',
+    })
 
     expect(String(calls[1][0])).toBe('https://local.test/tokens?appId=pk_test_publica')
     expect(JSON.parse(String(calls[1][1]?.body))).toMatchObject({
@@ -262,8 +285,41 @@ describe('checkout do roadmap na home', () => {
 
     await waitFor(() => expect(document.body).toHaveTextContent('pagamento recusado'))
     expect(document.querySelector('[name="cartao_numero"]')).toBeInTheDocument()
+    expect(action).toBeVisible()
     expect(action).toBeEnabled()
     expect(action).toHaveTextContent('pagar →')
+  })
+
+  it('mostra loading e recupera de erro genérico com retry visível', async () => {
+    let finishCheckout: ((response: Response) => void) | undefined
+    const pendingCheckout = new Promise<Response>((resolve) => {
+      finishCheckout = resolve
+    })
+    const fetchMock = vi.fn((input: string | URL) => {
+      if (String(input).includes('send-lead-email')) return ok({ saved: true, leadId: 'lead-dom-error' })
+      return pendingCheckout
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    mountDiagnostic()
+    completeBriefing()
+
+    const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
+    fireEvent.click(action)
+    fireEvent.click(document.querySelector<HTMLButtonElement>('[data-pagamento="pix"]')!)
+    fireEvent.click(action)
+
+    await waitFor(() => expect(action).toHaveTextContent('processando…'))
+    expect(action).toBeDisabled()
+
+    finishCheckout?.(new Response(JSON.stringify({ error_code: 'PAGARME_ORDER_FAILED' }), {
+      status: 502,
+      headers: { 'Content-Type': 'application/json' },
+    }))
+
+    await waitFor(() => expect(document.body).toHaveTextContent('não foi possível concluir agora'))
+    expect(action).toBeVisible()
+    expect(action).toBeEnabled()
+    expect(action).toHaveTextContent('gerar Pix →')
   })
 })
 

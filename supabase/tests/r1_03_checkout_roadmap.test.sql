@@ -60,6 +60,7 @@ select is(
 select is((select status from public.payments where id = '32000000-0000-4000-8000-000000000001'), 'approved', 'C10 payment is approved');
 select is((select count(*)::integer from public.payment_events where payment_id = '32000000-0000-4000-8000-000000000001'), 1, 'C10 one event is stored');
 select is((select count(*)::integer from public.clients where email = 'pago@example.test'), 1, 'C10 one client is created');
+select is((select name from public.clients where email = 'pago@example.test'), 'Lead Pago', 'C10 client name matches lead name');
 select is((select count(*)::integer from public.projects where lead_id = '31000000-0000-4000-8000-000000000001' and lead_status = 'ROADMAP_PAGO'), 1, 'C10 one ROADMAP_PAGO project is created');
 select is((select count(*)::integer from public.roadmaps r join public.projects p on p.id = r.project_id where p.lead_id = '31000000-0000-4000-8000-000000000001'), 1, 'C10 one roadmap is created');
 select is((select answers ->> 'resultado' from public.roadmaps r join public.projects p on p.id = r.project_id where p.lead_id = '31000000-0000-4000-8000-000000000001'), 'MVP', 'C10 answers move to roadmap');
@@ -73,6 +74,7 @@ select ok((public.apply_roadmap_payment_event(
   '{"id":"evt_paid"}', '2026-09-15 02:30:00+00'
 ) ->> 'idempotent')::boolean, 'C11 duplicate gateway event is idempotent');
 select is((select count(*)::integer from public.payment_events where gateway_event_id = 'evt_paid'), 1, 'C11 duplicate does not add event');
+select is((select count(*)::integer from public.clients where email = 'pago@example.test'), 1, 'C11 duplicate does not add client');
 select is((select count(*)::integer from public.projects where lead_id = '31000000-0000-4000-8000-000000000001'), 1, 'C11 duplicate does not add project');
 select is((select count(*)::integer from public.kanban_items k join public.projects p on p.id = k.project_id where p.lead_id = '31000000-0000-4000-8000-000000000001'), 2, 'C11 duplicate does not add items');
 
