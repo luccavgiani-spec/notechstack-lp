@@ -11,6 +11,7 @@ import { ClientProjectsPage } from './pages/ClientProjectsPage'
 import { AccessPage } from './pages/AccessPage'
 import { LoginPage } from './pages/LoginPage'
 import { UnauthorizedPage } from './pages/UnauthorizedPage'
+import { SaldosPage } from './pages/SaldosPage'
 
 export function AppRoutes() {
   return (
@@ -29,6 +30,7 @@ export function AppRoutes() {
           <Route path="projetos" element={<AdminProjectsPage />} />
           <Route path="projetos/:projectId" element={<AdminProjectDetailPage />} />
           <Route path="atividade" element={<AdminActivityPage />} />
+          <Route path="saldos" element={<SaldosPage />} />
         </Route>
       </Route>
       <Route path="/nao-autorizado" element={<UnauthorizedPage />} />

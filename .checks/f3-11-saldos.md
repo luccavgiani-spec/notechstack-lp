@@ -250,3 +250,11 @@ webhook e a classificação financeira seriam cobertos somente por um caminho de
   distintos.
 - Nenhum reset enquanto outra task estiver em verificação; nenhuma operação remota, deploy,
   push ou DNS pertence a esta implementação.
+
+## Evidência local — 15/09/2026
+
+- [x] C3, C5, C6, C8 e C10–C12: pgTAP F3-11 → PASS, 18 asserts; cobre autorização CLIENT, roadmap aprovado, reembolso idempotente, três faixas, recebimento e vencimento.
+- [x] Serviço de classificação: Vitest saldos-service → PASS, 4 testes.
+- [x] Regressão de webhook: harness R1-03 → PASS, 64 assertions.
+- [x] Gates locais: após reset limpo, pgTAP completo → PASS, 288 testes; lint, TypeScript e build também passaram.
+- [ ] C1–C2/C4/C6–C9/C13 de DOM, harness F3 dedicado e Playwright ainda não possuem prova específica; não foram marcados por equivalência.
