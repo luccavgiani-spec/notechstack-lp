@@ -99,10 +99,16 @@ function Set-OrderStatus([string]$OrderId, [string]$Status) {
 
 function Invoke-Webhook([string]$EventId, [string]$Type, [string]$OrderId, [string]$Auth = $script:validBasic) {
   $headers = if ($Auth) { @{ Authorization = $Auth } } else { @{} }
+  $eventStatus = if ($Type -like '*.paid') { 'paid' } elseif ($Type -like '*canceled*' -or $Type -like '*expired*') { 'canceled' } else { 'failed' }
+  $eventData = if ($Type.StartsWith('charge.')) {
+    @{ id = "ch-event-$EventId"; status = $eventStatus; order = @{ id = $OrderId } }
+  } else {
+    @{ id = $OrderId; status = $eventStatus }
+  }
   return Invoke-Json 'POST' "$script:apiUrl/functions/v1/pagarme-webhook-no" @{
     id = $EventId
     type = $Type
-    data = @{ id = $OrderId; status = if ($Type -like '*.paid') { 'paid' } elseif ($Type -like '*canceled*') { 'canceled' } else { 'failed' } }
+    data = $eventData
   } $headers
 }
 
@@ -215,7 +221,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
     $terminalLead = New-Lead 'roadmap' "pix-$terminal"
     $terminalCheckout = Checkout $terminalLead 'pix'
     $terminalPayment = (Get-Rows "payments?id=eq.$($terminalCheckout.Body.paymentId)&select=*")[0]
-    $eventType = if ($terminal -eq 'failed') { 'charge.payment_failed' } else { 'order.canceled' }
+    $eventType = if ($terminal -eq 'failed') { 'charge.payment_failed' } else { 'charge.expired' }
     $terminalWebhook = Invoke-Webhook "$($script:runId)-$terminal-main" $eventType $terminalPayment.gateway_order_id
     Assert-True ($terminalWebhook.Status -eq 200 -and (Get-Rows "payments?id=eq.$($terminalCheckout.Body.paymentId)&status=eq.failed&select=id").Count -eq 1) "C15 Pix confirmado $terminal vira failed"
     Assert-True ((Get-Rows "projects?lead_id=eq.$($terminalLead.Id)&select=id").Count -eq 0) "C15 Pix $terminal não cria projeto"
@@ -226,7 +232,14 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $card = Checkout $cardLead 'cartao' 'tok_test_approved'
   Assert-True ($card.Status -eq 200 -and $card.Body.status -eq 'approved') 'C4 cartão tokenizado retorna aprovado'
   $cardPayment = (Get-Rows "payments?id=eq.$($card.Body.paymentId)&select=*")[0]
-  Assert-True ($cardPayment.method -eq 'cartao' -and $cardPayment.status -eq 'approved') 'C4 cartão aprovado persiste sem dados abertos'
+  Assert-True ($cardPayment.method -eq 'cartao' -and $cardPayment.status -eq 'pending') 'C4 cartão aguarda confirmação canônica do webhook'
+  Assert-True ((Get-Rows "projects?lead_id=eq.$($cardLead.Id)&select=id").Count -eq 0) 'C4 resposta síncrona aprovada ainda não cria projeto'
+  $cardAgain = Checkout $cardLead 'cartao' 'tok_test_should_not_be_sent'
+  Assert-True ($cardAgain.Body.status -eq 'approved' -and $cardAgain.Body.paymentId -eq $card.Body.paymentId) 'C4 retry preserva checkoutStatus aprovado sem nova cobrança'
+  $cardPaid = Invoke-Webhook "$($script:runId)-card-paid" 'order.paid' $cardPayment.gateway_order_id
+  Assert-True ($cardPaid.Status -eq 200 -and $cardPaid.Body.status -eq 'approved') 'C10 webhook confirma cartão aprovado'
+  Assert-True ((Get-Rows "payments?id=eq.$($card.Body.paymentId)&status=eq.approved&select=id").Count -eq 1) 'C10 cartão só avança para approved pelo webhook'
+  Assert-True ((Get-Rows "projects?lead_id=eq.$($cardLead.Id)&select=id").Count -eq 1) 'C10 webhook do cartão cria projeto único'
 
   Set-Scenario 'failed' 'failed'
   $declinedLead = New-Lead 'roadmap' 'card-declined'

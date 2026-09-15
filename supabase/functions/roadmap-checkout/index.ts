@@ -45,7 +45,7 @@ function responseForPayment(request: Request, payment: Record<string, unknown>):
   const pix = gateway.pix as Record<string, unknown> | undefined;
   return json(request, 200, {
     paymentId: payment.id,
-    status: payment.status,
+    status: gateway.checkoutStatus || payment.status,
     ...(pix ? { pix } : {}),
   });
 }
@@ -155,12 +155,18 @@ Deno.serve(async (request) => {
       qrCodeUrl: transaction.qr_code_url || null,
       expiresAt: transaction.expires_at || transaction.expiration_date || null,
     } : undefined;
-    const status = normalizedStatus(gatewayStatus(orderResult.data));
-    const gatewayPayload = { answers, gateway: { ...(pix ? { pix } : {}) } };
+    const checkoutStatus = normalizedStatus(gatewayStatus(orderResult.data));
+    // A resposta síncrona pode informar cartão aprovado, mas o estado canônico
+    // só avança para approved depois que o webhook reconsulta o pedido.
+    const persistedStatus = checkoutStatus === "approved" ? "pending" : checkoutStatus;
+    const gatewayPayload = {
+      answers,
+      gateway: { checkoutStatus, ...(pix ? { pix } : {}) },
+    };
     const updated = await sb.from("payments").update({
       gateway_order_id: String(orderResult.data.id),
       gateway_charge_id: charge.id ? String(charge.id) : null,
-      status,
+      status: persistedStatus,
       payload: gatewayPayload,
     }).eq("id", payment.id).select("id,status,gateway_order_id,payload").single();
     if (updated.error || !updated.data) {
@@ -173,7 +179,8 @@ Deno.serve(async (request) => {
 
     log("info", "roadmap_checkout_created", {
       paymentId: payment.id,
-      status,
+      status: persistedStatus,
+      checkoutStatus,
       method,
     });
     return responseForPayment(request, updated.data);

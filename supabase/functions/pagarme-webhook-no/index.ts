@@ -41,6 +41,7 @@ function safeEnvelope(
 ): Record<string, unknown> {
   const charges = Array.isArray(data.charges) ? data.charges : [];
   const charge = (charges[0] || {}) as Record<string, unknown>;
+  const isChargeEvent = type.startsWith("charge.");
   return {
     id: eventId,
     type,
@@ -48,8 +49,8 @@ function safeEnvelope(
       id: data.id || null,
       code: data.code || null,
       status: data.status || null,
-      charge_id: charge.id || null,
-      charge_status: charge.status || null,
+      charge_id: isChargeEvent ? data.id || null : charge.id || null,
+      charge_status: isChargeEvent ? data.status || null : charge.status || null,
     },
   };
 }
@@ -68,7 +69,12 @@ Deno.serve(async (request) => {
     const eventId = String(body.id || "").trim();
     const type = String(body.type || "").trim();
     const data = body.data && typeof body.data === "object" ? body.data as Record<string, unknown> : {};
-    const orderId = String(data.id || (data.order as Record<string, unknown> | undefined)?.id || "").trim();
+    const nestedOrder = data.order && typeof data.order === "object"
+      ? data.order as Record<string, unknown>
+      : {};
+    const orderId = String(
+      nestedOrder.id || data.order_id || (type.startsWith("order.") ? data.id : "") || "",
+    ).trim();
     if (!eventId || !type || !orderId) return json(400, { error_code: "INVALID_EVENT" });
 
     const orderResult = await pagarmeRequest("GET", `/orders/${encodeURIComponent(orderId)}`);
