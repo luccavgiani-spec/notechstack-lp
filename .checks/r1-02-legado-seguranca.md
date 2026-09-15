@@ -38,20 +38,20 @@
 
 - [x] **C1 — anon e authenticated recebem 42501 nas quatro views `thais_*`.** Prova local: pgTAP troca os dois papéis, executa `select` em cada view e afirma oito erros `42501`.
 - [x] **C2 — service role mantém a leitura do cliente fixo.** Fixtures X/Y nas tabelas Meta e pgTAP afirmam que cada uma das quatro views retorna apenas linhas de `75d5ccc3-054a-452d-9dc0-cbf87ddd0758` sob service role.
-- [ ] **C3 — zero `security_definer_view` nas quatro views.**
+- [x] **C3 — zero `security_definer_view` nas quatro views.**
   - [x] Local: catálogo confirma `security_invoker=true` nas quatro views e advisor security local não lista nenhuma delas.
-  - [ ] Hospedada: advisor read-only após aplicação retorna zero achados desse tipo.
-- [ ] **C4 — quatro FKs passam a ter índice de cobertura.**
+  - [x] Hospedada: advisor read-only após aplicação em 15/09/2026 retornou zero `security_definer_view`; os demais avisos são os itens explicitamente fora de escopo.
+- [x] **C4 — quatro FKs passam a ter índice de cobertura.**
   - [x] Local: catálogo/pgTAP cobre `lead_sessoes_lead_id_fkey`, `scheduled_posts_account_id_fkey`, `scheduled_posts_client_id_fkey`, `sync_logs_account_id_fkey` e advisor local zera esses nomes.
-  - [ ] Hospedada: advisor read-only repete a prova após aplicação.
-- [ ] **C5 — sete policies usam initplan.**
+  - [x] Hospedada: advisor read-only após aplicação retornou zero `unindexed_foreign_keys`.
+- [x] **C5 — sete policies usam initplan.**
   - [x] Local: pgTAP inspeciona as expressões das sete policies e advisor local não lista `auth_rls_initplan` nesses nomes.
-  - [ ] Hospedada: advisor read-only repete a prova após aplicação.
+  - [x] Hospedada: advisor read-only após aplicação retornou zero `auth_rls_initplan`.
 - [x] **C6 — semântica tenant X/Y permanece igual.** JWT local com claim `client_id=X` lê somente X em `ad_metrics_daily` e `scheduled_posts`; assertions excluem Y.
-- [ ] **C7 — migration hospedada não reduz dados do funil.** Capturar `count(*)` de `leads`, `lead_sessoes`, `lead_eventos` imediatamente antes e depois da aplicação; cada pós-contagem deve ser `>=` à pré-contagem. Nenhuma escrita funcional é executada.
+- [x] **C7 — migration hospedada não reduz dados do funil.** Medição imediatamente anterior em 15/09/2026 19:11:41 UTC: `leads=17`, `lead_sessoes=64`, `lead_eventos=568`; medição posterior em 19:11:55 UTC: `17`, `64`, `568`. Todos os valores posteriores são iguais aos anteriores.
 - [ ] **C8 — painel continua lendo e `track-evento` continua gravando.**
   - [x] Local: functions servidas com configuração sintética; `painel-dados?v=funil&dias=7` respondeu 200 e lote N em `track-evento` gerou exatamente N novas linhas em `lead_eventos`.
-  - [ ] Hospedada: GET 200 com token disponível sem leitura de segredo.
+  - [ ] Hospedada: GET 200 não executado porque o `PAINEL_TOKEN` não está disponível sem abrir um secret; nenhum segredo será lido ou solicitado no chat.
 
 ## Swept
 
@@ -82,6 +82,7 @@
 - O builder termina em commit convencional somente após reset/testes/advisors locais.
 - A etapa hospedada só começa após revisão do diff e das contagens prévias; se o token do painel não estiver disponível sem abrir secrets, a parcela remota de C8 permanece explicitamente pendente.
 - Verificador independente fresco roda depois do último commit local e novamente após eventual prova hospedada.
-- O lote local fechou C1, C2 e C6, além das parcelas locais de C3–C5 e C8; C7 e todas as parcelas hospedadas continuam abertas. O hash do commit é entregue ao orquestrador fora deste artefato.
+- No encerramento do lote local, C1, C2 e C6 estavam fechados e as parcelas locais de C3–C5 e C8 estavam verdes; a etapa hospedada posterior está registrada abaixo.
 - Definição resolvida durante o build: as quatro views foram reproduzidas pelas definições hospedadas exatas capturadas read-only, já registrada em `Landing`; nenhuma outra clarificação mudou checks ou escopo.
 - Abandonado: `supabase db query --file` para a prova adicional de reaplicação, pois a CLI 2.95.4 rejeitou o arquivo multi-statement; a mesma migration foi reaplicada no Postgres local via `psql -v ON_ERROR_STOP=1`, e o pgTAP continuou verde.
+- Etapa hospedada em 15/09/2026: migration `r1_02_isolate_legacy_risks` aplicada com sucesso após todas as provas locais; C3, C4, C5 e C7 fecharam. C8 permanece parcial exclusivamente pela indisponibilidade segura do `PAINEL_TOKEN`.
