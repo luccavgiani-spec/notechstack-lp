@@ -253,8 +253,9 @@ webhook e a classificação financeira seriam cobertos somente por um caminho de
 
 ## Evidência local — 15/09/2026
 
-- [x] C3, C5, C6, C8 e C10–C12: pgTAP F3-11 → PASS, 18 asserts; cobre autorização CLIENT, roadmap aprovado, reembolso idempotente, três faixas, recebimento e vencimento.
-- [x] Serviço de classificação: Vitest saldos-service → PASS, 4 testes.
+- [x] C3, C5–C12: pgTAP F3-11 → PASS, 24 asserts; cobre autorização CLIENT, roadmap aprovado, reembolso idempotente, chargeback, reembolso fora de ordem, três faixas, recebimento e vencimento.
+- [x] Serviço de classificação: Vitest `saldos-service` → PASS, 4 testes.
+- [x] C1/C4/C11 da tela: Testing Library → PASS (3 testes em `saldos.test.tsx`), incluindo os três blocos, vazio e confirmação/recarga de parcela.
 - [x] Regressão de webhook: harness R1-03 → PASS, 64 assertions.
-- [x] Gates locais: após reset limpo, pgTAP completo → PASS, 288 testes; lint, TypeScript e build também passaram.
-- [ ] C1–C2/C4/C6–C9/C13 de DOM, harness F3 dedicado e Playwright ainda não possuem prova específica; não foram marcados por equivalência.
+- [x] Gates locais: após reset limpo, pgTAP completo → PASS, 294 testes; Vitest completo → PASS (89 testes); lint, TypeScript, build e E2E R1-05 desktop/mobile também passaram.
+- [ ] C2/C5–C10/C12–C13 ainda não têm harness F3 nem Playwright próprios; não foram marcados por equivalência.

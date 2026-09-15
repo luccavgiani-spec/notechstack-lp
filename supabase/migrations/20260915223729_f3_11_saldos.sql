@@ -244,6 +244,7 @@ declare
   v_paid_date date;
   v_old_skip text;
   v_activity_type text;
+  v_final_status text;
 begin
   if nullif(trim(p_gateway_event_id), '') is null or nullif(trim(p_type), '') is null or nullif(trim(p_gateway_order_id), '') is null then
     raise exception 'missing payment event identity' using errcode = '22023';
@@ -255,17 +256,24 @@ begin
   if v_event_id is null then return jsonb_build_object('idempotent', true, 'applied', false); end if;
   if v_payment.id is null then return jsonb_build_object('idempotent', false, 'applied', false, 'reason', 'payment_not_found'); end if;
 
+  v_final_status := case when p_confirmed_status in ('refunded', 'chargedback') then p_confirmed_status else null end;
   if p_confirmed_status in ('refunded', 'chargedback') then
     if v_payment.status in ('refunded', 'chargedback') then
       return jsonb_build_object('idempotent', false, 'applied', false, 'status', v_payment.status);
     end if;
     if v_payment.status <> 'approved' then
-      return jsonb_build_object('idempotent', false, 'applied', false, 'reason', 'awaiting_approval', 'status', v_payment.status);
+      if p_event_status is distinct from 'paid' then
+        return jsonb_build_object('idempotent', false, 'applied', false, 'reason', 'awaiting_approval', 'status', v_payment.status);
+      end if;
+      -- The approval delivery may reconsult the gateway after a refund. Provision
+      -- the aggregate once, then persist the confirmed final financial state.
+      p_confirmed_status := 'paid';
+    else
+      update public.payments set status = p_confirmed_status, gateway_charge_id = coalesce(p_gateway_charge_id, gateway_charge_id) where id = v_payment.id;
+      v_activity_type := case when p_confirmed_status = 'refunded' then 'payment.refunded' else 'payment.chargedback' end;
+      perform public.r1_06_event(v_payment.project_id, v_activity_type, jsonb_build_object('payment_id', v_payment.id, 'amount_cents', v_payment.amount_cents, 'gateway_event_id', p_gateway_event_id), 'payment-state:' || p_confirmed_status || ':' || v_payment.id::text);
+      return jsonb_build_object('idempotent', false, 'applied', true, 'status', p_confirmed_status, 'project_id', v_payment.project_id);
     end if;
-    update public.payments set status = p_confirmed_status, gateway_charge_id = coalesce(p_gateway_charge_id, gateway_charge_id) where id = v_payment.id;
-    v_activity_type := case when p_confirmed_status = 'refunded' then 'payment.refunded' else 'payment.chargedback' end;
-    perform public.r1_06_event(v_payment.project_id, v_activity_type, jsonb_build_object('payment_id', v_payment.id, 'amount_cents', v_payment.amount_cents, 'gateway_event_id', p_gateway_event_id), 'payment-state:' || p_confirmed_status || ':' || v_payment.id::text);
-    return jsonb_build_object('idempotent', false, 'applied', true, 'status', p_confirmed_status, 'project_id', v_payment.project_id);
   end if;
   if p_event_status is distinct from p_confirmed_status then return jsonb_build_object('idempotent', false, 'applied', false, 'reason', 'status_mismatch'); end if;
   if p_confirmed_status in ('failed', 'canceled') then
@@ -282,9 +290,13 @@ begin
   v_paid_date := (coalesce(p_paid_at, now()) at time zone 'America/Sao_Paulo')::date;
   insert into public.kanban_items(project_id, title, phase, scheduled_date, position) values(v_project_id, 'Dia 1 — referências', 'roadmap', v_paid_date + 1, 0), (v_project_id, 'Entrega — seu dashboard', 'roadmap', v_paid_date + 3, 1);
   insert into public.activity_events(project_id, type, payload, request_id) values(v_project_id, 'payment.approved', jsonb_build_object('payment_id', v_payment.id, 'amount_cents', v_payment.amount_cents, 'method', v_payment.method), 'payment-approved:' || v_payment.id::text);
-  update public.payments set status = 'approved', project_id = v_project_id, gateway_charge_id = coalesce(p_gateway_charge_id, gateway_charge_id) where id = v_payment.id;
+  update public.payments set status = coalesce(v_final_status, 'approved'), project_id = v_project_id, gateway_charge_id = coalesce(p_gateway_charge_id, gateway_charge_id) where id = v_payment.id;
   perform set_config('app.skip_activity', coalesce(v_old_skip, 'off'), true);
-  return jsonb_build_object('idempotent', false, 'applied', true, 'status', 'approved', 'project_id', v_project_id);
+  if v_final_status is not null then
+    v_activity_type := case when v_final_status = 'refunded' then 'payment.refunded' else 'payment.chargedback' end;
+    perform public.r1_06_event(v_project_id, v_activity_type, jsonb_build_object('payment_id', v_payment.id, 'amount_cents', v_payment.amount_cents, 'gateway_event_id', p_gateway_event_id), 'payment-state:' || v_final_status || ':' || v_payment.id::text);
+  end if;
+  return jsonb_build_object('idempotent', false, 'applied', true, 'status', coalesce(v_final_status, 'approved'), 'project_id', v_project_id);
 end;
 $$;
 

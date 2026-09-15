@@ -12,13 +12,19 @@ values
 insert into public.clients (id, name, slug, email)
 values ('82000000-0000-4000-8000-000000000001', 'Cliente F311', 'cliente-f311', 'f311-client@example.test');
 insert into public.leads (id, nome, email)
-values ('83000000-0000-4000-8000-000000000001', 'Lead F311', 'lead-f311@example.test');
+values
+  ('83000000-0000-4000-8000-000000000001', 'Lead F311', 'lead-f311@example.test'),
+  ('83000000-0000-4000-8000-000000000002', 'Lead Chargeback', 'chargeback-f311@example.test'),
+  ('83000000-0000-4000-8000-000000000003', 'Lead Fora de Ordem', 'out-of-order-f311@example.test');
 insert into public.projects (id, client_id, lead_id, name, niche, lead_status, project_status, access_status, access_released_at, modules)
 values ('84000000-0000-4000-8000-000000000001', '82000000-0000-4000-8000-000000000001', '83000000-0000-4000-8000-000000000001', 'Financeiro F311', 'servicos', 'CONVERTIDO', 'CONVERTIDO', 'ATIVO_ATE_FIM_DO_PROJETO', now(), '{"como_funciona":"ativo","prototipo":"ativo","etapas":"ativo","editor":"ativo","versoes":"ativo","marca":"ativo"}');
 insert into public.memberships (client_id, user_id, role)
 values ('82000000-0000-4000-8000-000000000001', '81000000-0000-4000-8000-000000000002', 'CLIENT');
 insert into public.payments (id, lead_id, project_id, purpose, method, amount_cents, status, gateway_order_id)
-values ('85000000-0000-4000-8000-000000000001', '83000000-0000-4000-8000-000000000001', '84000000-0000-4000-8000-000000000001', 'roadmap', 'pix', 14990, 'approved', 'f311-order');
+values
+  ('85000000-0000-4000-8000-000000000001', '83000000-0000-4000-8000-000000000001', '84000000-0000-4000-8000-000000000001', 'roadmap', 'pix', 14990, 'approved', 'f311-order'),
+  ('85000000-0000-4000-8000-000000000002', '83000000-0000-4000-8000-000000000002', '84000000-0000-4000-8000-000000000001', 'roadmap', 'pix', 2000, 'pending', 'f311-chargeback'),
+  ('85000000-0000-4000-8000-000000000003', '83000000-0000-4000-8000-000000000003', null, 'roadmap', 'pix', 3000, 'pending', 'f311-out-of-order');
 
 truncate table public.activity_events restart identity;
 set local role authenticated;
@@ -45,6 +51,16 @@ select lives_ok($$select public.apply_roadmap_payment_event('f311-refund-event',
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"81000000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"NO_ADMIN"}}', true);
 select is((select count(*)::integer from public.activity_events where type = 'payment.refunded'), 1, 'C8 replay keeps one payment activity');
+reset role;
+update public.payments set status = 'approved' where id = '85000000-0000-4000-8000-000000000002';
+select lives_ok($$select public.apply_roadmap_payment_event('f311-chargeback-event', 'charge.chargedback', 'f311-chargeback', 'f311-charge', 'chargedback', 'chargedback', '{}'::jsonb)$$, 'C7 confirmed chargeback is applied');
+select is((select status from public.payments where id = '85000000-0000-4000-8000-000000000002'), 'chargedback', 'C7 payment becomes chargedback');
+select lives_ok($$select public.apply_roadmap_payment_event('f311-out-before', 'charge.refunded', 'f311-out-of-order', 'f311-charge', 'refunded', 'refunded', '{}'::jsonb)$$, 'C9 refund before approval is retained');
+select is((select status from public.payments where id = '85000000-0000-4000-8000-000000000003'), 'pending', 'C9 out-of-order refund keeps payment pending');
+select lives_ok($$select public.apply_roadmap_payment_event('f311-out-paid', 'order.paid', 'f311-out-of-order', 'f311-charge', 'paid', 'refunded', '{}'::jsonb)$$, 'C9 approval reconsults final refund state');
+select is((select status from public.payments where id = '85000000-0000-4000-8000-000000000003'), 'refunded', 'C9 approval converges payment to refunded');
+set local role authenticated;
+select set_config('request.jwt.claims', '{"sub":"81000000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"NO_ADMIN"}}', true);
 select lives_ok($$select public.upsert_installment('84000000-0000-4000-8000-000000000001', 4, 100000, ((now() at time zone 'America/Sao_Paulo')::date - 1), 'f311-overdue')$$, 'C12 overdue installment persists');
 select is((select jsonb_array_length(public.list_admin_saldos() -> 'pending')), 1, 'C12 overdue installment is pending');
 
