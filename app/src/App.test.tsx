@@ -173,7 +173,7 @@ describe('criterion 11 — destinos pós-login', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/no/projetos')
     })
-    expect(screen.getByRole('heading', { name: 'Projetos.' })).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'Todos os projetos.' })).toBeVisible()
     expect(mocks.from).not.toHaveBeenCalled()
   })
 })
@@ -196,7 +196,7 @@ describe('criterion 12 — falha de login', () => {
 })
 
 describe('criterion 13 — guards de sessão e papel', () => {
-  it.each(['/p/projeto-a/como-funciona', '/no/projetos'])(
+  it.each(['/p/projeto-a/como-funciona', '/no/projetos', '/no/projetos/projeto-a', '/no/atividade'])(
     'redireciona sessão ausente em %s para /login',
     async (protectedPath) => {
       renderAt(protectedPath)
@@ -219,4 +219,16 @@ describe('criterion 13 — guards de sessão e papel', () => {
     expect(window.location.pathname).toBe('/nao-autorizado')
     expect(screen.getByText('Texto provisório · revisar copy')).toBeVisible()
   })
+
+  it.each(['/no/projetos/projeto-a', '/no/atividade'])(
+    'mostra não autorizado para CLIENT em %s',
+    async (adminPath) => {
+      mocks.getSession.mockResolvedValue({ data: { session: buildSession('CLIENT') }, error: null })
+
+      renderAt(adminPath)
+
+      expect(await screen.findByRole('heading', { name: 'Acesso não autorizado.' })).toBeVisible()
+      expect(window.location.pathname).toBe('/nao-autorizado')
+    },
+  )
 })

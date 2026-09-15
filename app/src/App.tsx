@@ -1,11 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { RoleRoute } from './auth/RoleRoute'
+import {
+  AdminActivityPage,
+  AdminProjectDetailPage,
+  AdminProjectsPage,
+} from './admin-dashboard/AdminDashboardPages'
 import { ClientDashboardPage } from './client-dashboard/ClientDashboardPage'
 import { ClientProjectsPage } from './pages/ClientProjectsPage'
 import { AccessPage } from './pages/AccessPage'
 import { LoginPage } from './pages/LoginPage'
-import { PlaceholderPage } from './pages/PlaceholderPage'
 import { UnauthorizedPage } from './pages/UnauthorizedPage'
 
 export function AppRoutes() {
@@ -22,7 +26,9 @@ export function AppRoutes() {
         <Route path="/p/:projectId/versoes" element={<ClientDashboardPage module="versoes" />} />
         <Route path="/p/:projectId/marca" element={<ClientDashboardPage module="marca" />} />
         <Route path="/no/*" element={<RoleRoute role="NO_ADMIN" />}>
-          <Route path="projetos" element={<PlaceholderPage area="admin-projects" />} />
+          <Route path="projetos" element={<AdminProjectsPage />} />
+          <Route path="projetos/:projectId" element={<AdminProjectDetailPage />} />
+          <Route path="atividade" element={<AdminActivityPage />} />
         </Route>
       </Route>
       <Route path="/nao-autorizado" element={<UnauthorizedPage />} />
