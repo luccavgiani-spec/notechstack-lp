@@ -34,7 +34,7 @@ test.describe('R1-06 · dashboard operacional da Nó', () => {
     await expect(page.getByLabel('Estado')).toBeVisible()
     await expect(page.getByLabel('Tier')).toBeVisible()
     await expect(page.getByLabel('Prazo')).toBeVisible()
-    await expect(page.getByLabel('Pagamento')).toBeVisible()
+    await expect(page.getByLabel('Pagamento', { exact: true })).toBeVisible()
     await expect(page.getByLabel('Conversão')).toBeVisible()
     await expect(page.getByLabel('Situação')).toBeVisible()
 

@@ -46,7 +46,7 @@ function ProjectCardView({ project }: { project: ProjectCard }) {
 }
 
 function SelectField({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: ReactNode }) {
-  return <label className="block text-sm"><span className="mb-1 block text-cinza">{label}</span><select className="w-full rounded-xl border border-borda bg-white px-3 py-2.5" value={value} onChange={(event) => onChange(event.target.value)}><option value="">Todos</option>{children}</select></label>
+  return <label className="block text-sm"><span className="mb-1 block text-cinza">{label}</span><select aria-label={label} className="w-full rounded-xl border border-borda bg-white px-3 py-2.5" value={value} onChange={(event) => onChange(event.target.value)}><option value="">Todos</option>{children}</select></label>
 }
 
 export function AdminProjectsPage() {
