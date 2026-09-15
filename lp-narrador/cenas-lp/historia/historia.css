@@ -30,7 +30,7 @@ html.sem-mascote #mascot, html.sem-mascote #lines, html.sem-mascote .depth{ disp
 #platforms::before{ background:linear-gradient(to bottom, var(--hs-bege) 0%, var(--lp-bege) 100%) }
 
 /* ── capítulo ── */
-.hs-cap{ padding:120px 6vw 60px; overflow:visible }
+.hs-cap{ padding:88px 6vw 48px; overflow:visible }
 .hs-cap:last-child{ padding-bottom:180px }
 .hs-split{
   display:grid; align-items:center; gap:clamp(40px,5vw,96px);
@@ -623,6 +623,46 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
 .hs-entg-final .pill-cta:hover{ background:#F4B65A }
 .hs-entg-final .pill-cta-circle{ background:var(--hs-tinta); color:#fff }
 
+/* ═══ FAQ — bloco editorial enxuto, depois do diagnóstico ═══ */
+.hs-faq{
+  --hs-tinta:#141414; --hs-tinta-2:rgba(20,20,20,.68); --hs-ambar-txt:#9A6418;
+  position:relative; z-index:61; padding:96px 6vw 112px;
+  scroll-margin-top:120px; background:var(--hs-branco); color:var(--hs-tinta);
+}
+.hs-faq-in{ max-width:920px; margin:0 auto }
+.hs-faq-topo{ padding-bottom:34px }
+.hs-faq-topo h2{
+  margin:0; font-family:var(--font); font-weight:var(--no-weight-titulo);
+  font-size:clamp(34px,4vw,54px); line-height:1.02; letter-spacing:var(--no-tracking-headline);
+  text-transform:uppercase; color:var(--hs-tinta);
+}
+.hs-faq-topo p{
+  max-width:540px; margin:14px 0 0; font-family:var(--font);
+  font-size:15px; line-height:1.6; color:var(--hs-tinta-2);
+}
+.hs-faq-lista{ border-top:1px solid rgba(20,20,20,.16) }
+.hs-faq-item{ border-bottom:1px solid rgba(20,20,20,.16) }
+.hs-faq-item summary{
+  display:grid; grid-template-columns:40px minmax(0,1fr) 24px; align-items:center; gap:12px;
+  min-height:74px; padding:10px 0; list-style:none; cursor:pointer;
+  font-family:var(--font); font-size:clamp(16px,1.4vw,19px); font-weight:400;
+  line-height:1.4; color:var(--hs-tinta);
+}
+.hs-faq-item summary::-webkit-details-marker{ display:none }
+.hs-faq-n{ font-family:var(--font-mono); font-size:10px; font-weight:500; letter-spacing:.12em; color:var(--hs-ambar-txt) }
+.hs-faq-item summary i{ position:relative; width:24px; height:24px; border:1px solid rgba(20,20,20,.24); border-radius:50% }
+.hs-faq-item summary i::before,.hs-faq-item summary i::after{
+  content:""; position:absolute; left:6px; right:6px; top:11px; height:1px;
+  background:var(--hs-tinta); transition:transform .25s ease;
+}
+.hs-faq-item summary i::after{ transform:rotate(90deg) }
+.hs-faq-item[open] summary i::after{ transform:rotate(0) }
+.hs-faq-item summary:hover i,.hs-faq-item summary:focus-visible i{ border-color:var(--hs-ambar-txt) }
+.hs-faq-item summary:focus-visible{ outline:2px dashed var(--hs-ambar-txt); outline-offset:4px }
+.hs-faq-r{ padding:0 48px 24px 52px; animation:hs-faq-entra .28s ease both }
+.hs-faq-r p{ max-width:740px; margin:0; font-family:var(--font); font-size:15px; line-height:1.65; color:var(--hs-tinta-2) }
+@keyframes hs-faq-entra{ from{ opacity:0; transform:translateY(-5px) } to{ opacity:1; transform:translateY(0) } }
+
 /* ═══ responsivo ═══ */
 /* abaixo de 1100px o resumo vira linha do tempo vertical */
 @media(max-width:1100px){
@@ -642,7 +682,7 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
   .hs-palco-3d{ height:clamp(400px,62vw,560px) }
 }
 @media(max-width:760px){
-  .hs-cap{ padding:84px 20px 30px }
+  .hs-cap{ padding:64px 20px 24px }
   .hs-cap:last-child{ padding-bottom:110px }
   .hs-abre{ margin-bottom:76px }
   .hs-abre-p{ font-size:15px }
@@ -700,6 +740,16 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
   .hs-entg-comp{ grid-template-columns:1fr; gap:26px; margin-top:48px }
   .hs-entg-final{ padding:28px 24px; margin-top:48px; border-radius:22px }
   .hs-entg-final .pill-cta{ width:100%; justify-content:space-between }
+
+  .hs-faq{ padding:76px 20px 80px }
+  .hs-faq-topo{ padding-bottom:28px }
+  .hs-faq-topo h2{ font-size:clamp(32px,9.5vw,42px) }
+  .hs-faq-topo p{ margin-top:12px; font-size:14px }
+  .hs-faq-item summary{ grid-template-columns:30px minmax(0,1fr) 22px; gap:8px; min-height:66px; font-size:15px }
+  .hs-faq-item summary i{ width:22px; height:22px }
+  .hs-faq-item summary i::before,.hs-faq-item summary i::after{ left:5px; right:5px; top:10px }
+  .hs-faq-r{ padding:0 4px 20px 38px }
+  .hs-faq-r p{ font-size:14px; line-height:1.6 }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -707,6 +757,7 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
   .hs-ent-pan,.hs-cel-tela,.hs-op-card.novo,.hs-op-log li,.hs-ed-carimbo{ animation:none }
   .hs-cursor{ display:none }
   .hs-arq-no,.hs-arq-centro,.hs-road-col span{ opacity:1; transform:none; transition:none }
+  .hs-faq-r{ animation:none }
 }
 
 /* painel aberto (tecla D): a regra geral de edição dá resize + overflow:auto
@@ -951,6 +1002,8 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
 .dg-fase{ min-width:68px; text-align:center; padding:2px 0; color:var(--dg-ambar); font-size:.84em; letter-spacing:.08em }
 .dg-tela.em-inicio [data-nav="proximo"]{ visibility:hidden }
 .dg-tela.em-inicio .dg-pe{ display:none }
+.dg-tela.em-escolha-pagamento [data-nav="proximo"]{ visibility:hidden }
+.dg-tela.em-escolha-pagamento .dg-pe{ display:none }
 .dg-corpo{ flex:1 1 auto; min-height:0; margin:0; padding:9px 2px 6px; overflow-y:auto; scrollbar-width:none }
 .dg-corpo::-webkit-scrollbar{ display:none }
 .dg-corpo.tem-mais{
@@ -976,7 +1029,7 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
 .dg-comecar{ display:block; margin:9px auto 0; padding:5px 20px; border:1.5px solid var(--dg-ambar); border-radius:10px; background:rgba(237,163,59,.12); color:var(--dg-ambar)!important; font-size:1em; text-align:center }
 .dg-comecar:hover,.dg-comecar:focus-visible{ background:var(--dg-ambar); color:#1a1109!important; outline:none }
 .dg-k{ margin:0 0 2px; font-size:.74em; letter-spacing:.14em; text-transform:uppercase; color:rgba(237,163,59,.8) }
-.dg-q{ margin:0 0 8px; font:inherit; font-size:1.02em; font-weight:600; color:#FFF3DC; outline:none }
+.dg-q{ margin:0 0 14px; font:inherit; font-size:1.02em; font-weight:600; color:#FFF3DC; outline:none }
 .dg-q::before{ content:"> "; color:var(--dg-ambar) }
 .dg-s{ margin:9px 0 5px; font-size:.86em; color:var(--dg-fosforo-2) }
 .dg-ops{ display:flex; flex-wrap:wrap; gap:6px }
@@ -1003,16 +1056,11 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
 .dg-contato .dg-campo{ min-width:0; max-width:none; margin-top:0; gap:1px }
 .dg-contato .dg-campo:first-child{ grid-column:1/-1 }
 .dg-contato .dg-campo input{ min-width:0; padding:3px 6px }
-.dg-passo[data-passo="5"] .dg-q{ margin-bottom:4px }
+.dg-passo[data-passo="5"] .dg-q{ margin-bottom:12px }
 .dg-campo input::placeholder,.dg-campo textarea::placeholder{ color:rgba(244,227,194,.32) }
 .dg-campo input:focus,.dg-campo textarea:focus{ outline:none; border-bottom-color:var(--dg-ambar); background:rgba(30,20,10,.7) }
 .dg-erro{ margin:8px 0 0; color:#FF9B7A; font-size:.86em }
 .dg-aviso{ margin:0 0 6px; color:var(--dg-ambar); font-size:.84em }
-.dg-dl{ margin:0; display:flex; flex-direction:column }
-.dg-linha{ display:grid; grid-template-columns:1fr auto; grid-template-areas:"dt ed" "dd dd"; gap:0 8px; align-items:baseline; padding:5px 0; border-bottom:1px dashed rgba(237,163,59,.22) }
-.dg-linha dt{ grid-area:dt; font-size:.74em; letter-spacing:.1em; text-transform:uppercase; color:rgba(237,163,59,.82) }
-.dg-linha dd{ grid-area:dd; margin:0; color:#FFF3DC; font-size:.9em; overflow-wrap:anywhere }
-.dg-editar{ grid-area:ed; border:0; background:none; padding:2px 0 2px 6px; font-size:.78em!important; color:var(--dg-ambar)!important; text-decoration:underline; text-underline-offset:3px }
 .dg-preco{ margin:4px 0 10px; padding:10px 12px; border:1px solid rgba(237,163,59,.55); border-radius:10px; background:rgba(237,163,59,.07) }
 .dg-preco p{ margin:0 }
 .dg-preco-rot{ font-size:.8em; color:var(--dg-fosforo-2) }
@@ -1021,22 +1069,82 @@ label.hs-ed-ctl{ flex-direction:row; flex-wrap:wrap; justify-content:space-betwe
 .dg-preco-por{ font-size:1.9em; font-weight:700; line-height:1.1; color:var(--dg-ambar) }
 .dg-preco-unico{ font-size:.82em; color:#FFF3DC }
 .dg-preco-nota{ margin-top:6px!important; font-size:.76em; color:var(--dg-fosforo-2) }
-.dg-demo{ margin:10px 0 0; padding-left:9px; border-left:2px solid var(--dg-ambar); font-size:.86em; color:var(--dg-fosforo) }
+.dg-metodos{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px }
+.dg-metodos button{
+  min-height:82px; padding:10px; border:1.5px solid rgba(237,163,59,.58); border-radius:10px;
+  background:rgba(237,163,59,.08); color:var(--dg-ambar); text-align:left; transition:background .2s,border-color .2s,transform .2s;
+}
+.dg-metodos button:hover,.dg-metodos button:focus-visible{ border-color:var(--dg-ambar); background:rgba(237,163,59,.18); outline:none; transform:translateY(-2px) }
+.dg-metodos b{ display:block; margin-bottom:6px; font-size:1.12em }
+.dg-metodos span{ display:block; font-size:.72em; line-height:1.25; color:var(--dg-fosforo-2) }
+.dg-pag-metodo{ display:flex; align-items:center; gap:12px; min-height:92px; padding:12px; border:1px solid rgba(237,163,59,.5); border-radius:10px; background:rgba(237,163,59,.07) }
+.dg-pag-metodo p{ margin:4px 0 0; font-size:.78em; color:var(--dg-fosforo-2) }
+.dg-pag-selo{ display:grid; place-items:center; width:54px; aspect-ratio:1; flex:none; border:1px dashed var(--dg-ambar); border-radius:9px; color:var(--dg-ambar); font-weight:700 }
+.dg-cartao{ display:grid; grid-template-columns:1fr 1fr; gap:7px 9px }
+.dg-cartao > .dg-campo:first-child{ grid-column:1/-1 }
+.dg-cartao .dg-campo{ margin-top:0 }
+.dg-cartao-linha{ display:grid; grid-template-columns:1fr .7fr; gap:9px }
 
 /* ── celular: texto em cima, monitor embaixo, tudo no mesmo painel ── */
 @media (max-width:760px){
-  #diagnostico{ padding-bottom:14px; padding-inline:0 }
-  .dg-palco{ height:auto; min-height:0 }
-  .dg-conteudo{ height:auto; grid-template-columns:minmax(0, 1fr); grid-template-rows:auto auto; padding:24px 18px 18px }
+  #diagnostico{ padding-top:0; padding-bottom:0; padding-inline:0 }
+  .dg-palco{ height:auto; min-height:0; border-radius:0 0 20px 20px; background:#B9A289 }
+  .dg-conteudo{ height:auto; grid-template-columns:minmax(0, 1fr); grid-template-rows:auto auto; padding:30px 18px 18px }
   .dg-texto{ grid-column:1; grid-row:1; align-self:start; padding-top:0 }
-  .dg-vaga{ grid-column:1; grid-row:2; height:clamp(380px, 110vw, 480px) }
+  .dg-vaga{ grid-column:1; grid-row:2; height:clamp(342px, 89vw, 378px) }
   .dg-role{ position:static; transform:none }
+  .dg-rot{ margin-bottom:16px }
   .dg-h{ font-size:clamp(50px, 13.5vw, 68px); white-space:nowrap }
-  .dg-sub{ font-size:17px }
-  .dg-lista{ margin-top:22px; gap:11px }
+  .dg-sub{ margin-top:20px; font-size:17px }
+  .dg-lista{ margin-top:28px; gap:11px }
   .dg-ico{ width:36px; height:36px; border-radius:10px }
   .dg-lema{ display:none }
   .dg-foto::after{ background:linear-gradient(180deg, rgba(250,247,241,.4) 0%, rgba(250,247,241,.14) 38%, transparent 52%) }
+
+  /* O vidro é pequeno demais para repetir a ação no topo e no rodapé.
+     No celular, voltar/avançar ficam na barra superior e todo o restante da
+     altura pertence ao conteúdo da etapa. */
+  .dg-tela{ padding:9px 13px 8px; font-size:15px; line-height:1.28 }
+  .dg-nav{ padding-bottom:4px }
+  .dg-nav button{ min-height:28px; padding:3px 0 }
+  .dg-corpo{ padding:5px 1px 3px; overflow:hidden; -webkit-mask-image:none!important; mask-image:none!important }
+  .dg-pe{ display:none!important }
+
+  .dg-abertura{ margin:3px 0 6px; font-size:1em }
+  .dg-inicio .dg-campo{ margin-top:2px }
+  .dg-comecar{ margin-top:6px; padding:4px 16px }
+  .dg-k{ font-size:.68em }
+  .dg-q{ margin-bottom:10px; font-size:.94em; line-height:1.2 }
+  .dg-s{ margin:5px 0 3px; font-size:.76em }
+  .dg-ops{ gap:4px }
+  .dg-ops.col{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:4px; align-items:stretch }
+  .dg-op{ min-height:28px; padding:2px 7px; font-size:.8em }
+  .dg-campo{ gap:2px; margin-top:6px; font-size:.76em }
+  .dg-campo input,.dg-campo textarea{ padding:4px 6px; line-height:1.2 }
+  .dg-campo textarea{ height:3.15em }
+  .dg-contato{ gap:3px 6px }
+
+  /* Oferta final em composição curta: preço e contexto dividem a mesma linha. */
+  .dg-passo[data-passo="5"] .dg-q{ margin-bottom:9px }
+  .dg-passo[data-passo="7"] .dg-q{ margin-bottom:4px }
+  .dg-preco{
+    display:grid; grid-template-columns:auto 1fr; align-items:end; gap:1px 8px;
+    margin:2px 0 4px; padding:6px 8px;
+  }
+  .dg-preco-rot,.dg-preco-unico,.dg-preco-nota{ grid-column:1/-1 }
+  .dg-preco-de{ margin-top:1px!important; font-size:.72em }
+  .dg-preco-por{ font-size:1.55em }
+  .dg-preco-unico{ font-size:.7em }
+  .dg-preco-nota{ margin-top:2px!important; font-size:.62em; line-height:1.2 }
+  .dg-metodos{ gap:7px; margin-top:2px }
+  .dg-metodos button{ min-height:74px; padding:8px }
+  .dg-metodos b{ margin-bottom:4px; font-size:1em }
+  .dg-metodos span{ font-size:.66em }
+  .dg-pag-metodo{ min-height:82px; padding:9px; gap:9px }
+  .dg-pag-selo{ width:45px }
+  .dg-cartao{ gap:4px 7px }
+  .dg-cartao-linha{ gap:7px }
+  .dg-passo[data-passo="9"] .dg-campo{ margin-top:0 }
 }
 @media (prefers-reduced-motion: reduce){
   .dg-foto img{ transition:none }
