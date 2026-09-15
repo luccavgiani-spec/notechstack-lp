@@ -246,3 +246,11 @@ externa ainda estiver aberta.
 - A verificação final precisa ser fresca sobre o último commit funcional, reexecutar gates locais e
   obter evidência remota de C1–C6. Se qualquer porta externa continuar aberta, o veredito deve ser
   `BLOCKED`, não `PASS` parcial.
+
+## Preflight local — 15/09/2026
+
+- [x] Reset local e pgTAP completo passaram (288 testes).
+- [x] Harness R1-03 passou (64 assertions).
+- [x] Em app/, Vitest, lint, TypeScript e build passaram; E2E R1-05 passou em desktop e mobile.
+- [x] Parser somente leitura de supabase/config.toml: roadmap-checkout=false, pagarme-webhook-no=false, skill-01-ativar-dashboard=true, project-convert=true.
+- [ ] C1–C6 seguem BLOCKED: não houve push, deploy, DNS, leitura/escrita hospedada, configuração de secrets, conta Pagar.me nem teste Pix real. PAINEL_TOKEN continua pendente de rotação ao final de todas as ondas.
