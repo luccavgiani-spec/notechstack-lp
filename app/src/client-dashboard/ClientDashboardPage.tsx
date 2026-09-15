@@ -9,6 +9,7 @@ import {
   type KanbanItem,
   type KanbanStatus,
   type ModuleKey,
+  type ProjectVersion,
   type Roadmap,
   type Tier,
   type TierKey,
@@ -308,6 +309,30 @@ function StagesModule({ items }: { items: KanbanItem[] }) {
   )
 }
 
+function VersionsModule({ versions }: { versions: ProjectVersion[] }) {
+  if (versions.length === 0) {
+    return <EmptyState>A primeira versão ainda está sendo preparada.</EmptyState>
+  }
+
+  return (
+    <section>
+      <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-azul">Histórico de entregas</p>
+      <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.04em]">Versões do projeto</h2>
+      <ol className="mt-7 space-y-4">
+        {versions.map((version) => (
+          <li className="rounded-2xl border border-borda bg-white p-5 shadow-card" key={version.id}>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div><h3 className="text-xl font-bold">{version.label}</h3><p className="mt-1 text-sm text-cinza">{version.status} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeZone: 'America/Sao_Paulo' }).format(new Date(version.published_at))}</p></div>
+              {version.is_current ? <span className="rounded-full bg-verde px-3 py-1 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-white">Atual</span> : null}
+            </div>
+            <p className="mt-4 whitespace-pre-wrap text-sm leading-6">{version.changelog}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
 function DashboardModule({
   module,
   data,
@@ -323,6 +348,12 @@ function DashboardModule({
   saveError: boolean
   onSelectTier: (tier: TierKey) => void
 }) {
+  if (module === 'editor' && data.shell?.modules.editor !== 'ativo') {
+    return <LockedState title="Editor"><p>O Editor é liberado quando a primeira versão do seu projeto fica pronta.</p><p>Você poderá testar textos, cores, logos e ajustes visuais antes de nos enviar suas preferências para a próxima versão.</p></LockedState>
+  }
+  if (module === 'versoes' && data.shell?.modules.versoes !== 'ativo') {
+    return <LockedState title="Versões"><p>Suas versões aparecem aqui quando a construção começar.</p><p>Cada entrega fica registrada para você acompanhar a evolução do produto até o go-live.</p></LockedState>
+  }
   if (module === 'como_funciona') {
     return <OverviewModule roadmap={data.roadmap} selectedTier={selectedTier} savingTier={savingTier} saveError={saveError} onSelectTier={onSelectTier} />
   }
@@ -341,12 +372,7 @@ function DashboardModule({
     )
   }
   if (module === 'versoes') {
-    return (
-      <LockedState title="Versões">
-        <p>Suas versões aparecem aqui quando a construção começar.</p>
-        <p>Cada entrega fica registrada para você acompanhar a evolução do produto até o go-live.</p>
-      </LockedState>
-    )
+    return <VersionsModule versions={data.versions ?? []} />
   }
 
   return (

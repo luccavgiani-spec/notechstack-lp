@@ -51,14 +51,27 @@ export type KanbanItem = {
   position: number
 }
 
+export type ProjectVersion = {
+  id: string
+  label: string
+  macro: 'V1' | 'V2' | 'V3'
+  status: string
+  published_at: string
+  changelog: string
+  build_reference: string
+  is_current: boolean
+  created_at: string
+}
+
 export type DashboardData = {
   shell: ProjectShell | null
   roadmap: Roadmap | null
   kanban: KanbanItem[]
+  versions?: ProjectVersion[]
 }
 
 export async function loadClientDashboard(projectId: string): Promise<DashboardData> {
-  const [shellResult, roadmapResult, kanbanResult] = await Promise.all([
+  const [shellResult, roadmapResult, kanbanResult, versionsResult] = await Promise.all([
     supabase.rpc('get_client_project_shell', { p_project_id: projectId }).maybeSingle(),
     supabase
       .from('roadmaps')
@@ -71,9 +84,15 @@ export async function loadClientDashboard(projectId: string): Promise<DashboardD
       .eq('project_id', projectId)
       .order('position', { ascending: true })
       .order('scheduled_date', { ascending: true, nullsFirst: false }),
+    supabase
+      .from('project_versions')
+      .select('id, label, macro, status, published_at, changelog, build_reference, is_current, created_at')
+      .eq('project_id', projectId)
+      .order('published_at', { ascending: false })
+      .order('created_at', { ascending: false }),
   ])
 
-  const error = shellResult.error ?? roadmapResult.error ?? kanbanResult.error
+  const error = shellResult.error ?? roadmapResult.error ?? kanbanResult.error ?? versionsResult.error
   if (error) {
     throw error
   }
@@ -82,6 +101,7 @@ export async function loadClientDashboard(projectId: string): Promise<DashboardD
     shell: shellResult.data as ProjectShell | null,
     roadmap: roadmapResult.data as Roadmap | null,
     kanban: (kanbanResult.data ?? []) as KanbanItem[],
+    versions: (versionsResult.data ?? []) as ProjectVersion[],
   }
 }
 

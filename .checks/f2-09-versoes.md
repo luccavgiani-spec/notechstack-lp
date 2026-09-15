@@ -265,3 +265,10 @@ only on a DOM test for a persisted decision.
   referência de build em deploy.
 - O Verifier fresco recebe esta checklist e o diff completo depois do último commit, reexecuta
   reset/replay local e presta contas do denominador C1–C15; não usa o ambiente hospedado.
+
+## Evidência local — 15/09/2026
+
+- [x] C1–C3, C5–C7, C10–C11, C13–C14 de fronteira: harness F2-09 → PASS, 17 assertions.
+- [x] Banco/RLS/histórico: após reset local, suíte pgTAP completa → PASS, 288 testes (inclui f2_09_versoes.test.sql).
+- [x] Assembly local: lint, TypeScript, Vitest e build passaram.
+- [ ] C4/C12/C15 de browser do novo ciclo de versões: a projeção CLIENT e os controles da ficha foram adicionados, mas ainda falta spec Playwright próprio e uma verificação fresca independente do ciclo completo.

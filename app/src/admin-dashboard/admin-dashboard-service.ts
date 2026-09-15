@@ -306,3 +306,11 @@ export async function transitionProjectStatus(projectId: string, target: Project
   if (error) throw error
   return data
 }
+
+export async function publishProjectVersion(values: { projectId: string; label: string; macro: 'V1' | 'V2' | 'V3'; changelog: string; buildReference: string }, requestId = crypto.randomUUID()) {
+  const { data, error } = await supabase.functions.invoke('project-publish-version', {
+    body: { ...values, requestId },
+  })
+  if (error) throw error
+  return data as { versionId: string; projectStatus: ProjectStatus; replayed: boolean }
+}

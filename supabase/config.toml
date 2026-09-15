@@ -78,3 +78,6 @@ verify_jwt = true
 
 [functions.project-status-transition]
 verify_jwt = true
+
+[functions.project-publish-version]
+verify_jwt = true
