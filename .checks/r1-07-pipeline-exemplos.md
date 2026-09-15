@@ -314,3 +314,9 @@ snapshot in C3.
   denominator, verifies screenshots and checks that no secret or production mutation occurred.
 - No push, deploy, DNS, hosted migration, hosted function publish or final PAINEL_TOKEN
   rotation is authorized by this checklist; those remain after all tasks.
+
+## Evidência local — 15/09/2026
+
+- [x] S2/C3–C6: harness local R1-07 → PASS, 15 assertions. O comando foi executado sobre banco local recém-recriado; ele é intencionalmente idempotente e a falha injetada preservou o snapshot anterior.
+- [x] C4/C5 de fonte: Vitest de pipeline examples → PASS (2 testes), comparando 5 fases/27 itens/17 concluídos e os materiais Hello Best.
+- [ ] C1–C2 e C7–C12: sem evidência nesta rodada; requerem o consumidor da Skill 01 na ficha e as jornadas Playwright A/C. Não são inferidos pelos testes de seed.
