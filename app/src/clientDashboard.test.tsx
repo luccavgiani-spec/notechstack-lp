@@ -231,6 +231,21 @@ describe('dashboard do cliente', () => {
     expect(screen.getByText('Cada entrega fica registrada para você acompanhar a evolução do produto até o go-live.')).toBeVisible()
   })
 
+  it('F2-09 C4 e C12 exibem histórico ativo da versão mais recente', async () => {
+    const data = dashboardData({
+      shell: { ...dashboardData().shell!, modules: { ...dashboardData().shell!.modules, editor: 'ativo', versoes: 'ativo' } },
+      versions: [
+        { id: 'v2', label: 'V2', macro: 'V2', status: 'publicada', published_at: '2026-09-16T12:00:00Z', changelog: 'Segunda entrega', build_reference: 'build-v2', is_current: true, created_at: '2026-09-16T12:00:00Z' },
+        { id: 'v1', label: 'V1', macro: 'V1', status: 'publicada', published_at: '2026-09-15T12:00:00Z', changelog: 'Primeira entrega', build_reference: 'build-v1', is_current: false, created_at: '2026-09-15T12:00:00Z' },
+      ],
+    })
+    renderDashboard('versoes', data)
+    expect(await screen.findByText('V2')).toBeVisible()
+    expect(screen.getByText('Atual')).toBeVisible()
+    expect(screen.getByText('Segunda entrega')).toBeVisible()
+    expect(screen.getByText('Primeira entrega')).toBeVisible()
+  })
+
   it('C15 Marca e arquivos permanece bloqueado', async () => {
     renderDashboard('marca')
     expect(await screen.findByRole('heading', { name: 'Marca & arquivos' })).toBeVisible()

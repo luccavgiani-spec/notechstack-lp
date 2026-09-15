@@ -269,6 +269,7 @@ only on a DOM test for a persisted decision.
 ## Evidência local — 15/09/2026
 
 - [x] C1–C3, C5–C7, C10–C11, C13–C14 de fronteira: harness F2-09 → PASS, 17 assertions.
-- [x] Banco/RLS/histórico: após reset local, suíte pgTAP completa → PASS, 288 testes (inclui f2_09_versoes.test.sql).
-- [x] Assembly local: lint, TypeScript, Vitest e build passaram.
-- [ ] C4/C12/C15 de browser do novo ciclo de versões: a projeção CLIENT e os controles da ficha foram adicionados, mas ainda falta spec Playwright próprio e uma verificação fresca independente do ciclo completo.
+- [x] Banco/RLS/histórico: após reset local, suíte pgTAP completa → PASS, 294 testes (inclui `f2_09_versoes.test.sql`).
+- [x] C4/C12 na projeção CLIENT: Testing Library → PASS (`clientDashboard.test.tsx`), histórico com V2 atual e V1 preservada.
+- [x] Assembly local: Vitest completo → PASS (89 testes); lint, TypeScript e build passaram; E2E R1-05 passou em desktop e mobile.
+- [ ] C15: ainda não há spec Playwright próprio para o ciclo de versões; a regressão de navegador existente não substitui a jornada de publicação.
