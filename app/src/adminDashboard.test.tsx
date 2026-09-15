@@ -15,6 +15,7 @@ const serviceMocks = vi.hoisted(() => ({
   convertProject: vi.fn(),
   activateBrandModule: vi.fn(),
   activateDashboard: vi.fn(),
+  archiveProject: vi.fn(),
   transitionProjectStatus: vi.fn(),
 }))
 vi.mock('./admin-dashboard/admin-dashboard-service', async (importOriginal) => ({
@@ -58,6 +59,7 @@ beforeEach(() => {
   serviceMocks.convertProject.mockResolvedValue({})
   serviceMocks.activateBrandModule.mockResolvedValue({})
   serviceMocks.activateDashboard.mockResolvedValue({ inviteLink: 'https://invite.example.test/opaque', projectId: 'project-1', accessReleasedAt: '2026-09-15T12:00:00Z' })
+  serviceMocks.archiveProject.mockResolvedValue({ assetId: 'archive-1', replayed: false, projectStatus: 'ARQUIVADO' })
   serviceMocks.transitionProjectStatus.mockResolvedValue({})
 })
 
@@ -177,6 +179,16 @@ describe('R1-06 dashboard projections', () => {
     await user.click(screen.getByRole('button', { name: 'Liberar dashboard' }))
     await user.click(screen.getByRole('button', { name: 'Confirmar liberação' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('tiers.completo')
+  })
+
+  it('F4-13 pede confirmação antes de arquivar projeto concluído', async () => {
+    serviceMocks.loadAdminProject.mockResolvedValue(detail({ projectStatus: 'CONCLUIDO' }))
+    renderAt('/no/projetos/project-1', <AdminProjectDetailPage />)
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: 'Arquivar' }))
+    expect(screen.getByText('Confirmar arquivamento?')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Confirmar arquivamento' }))
+    await waitFor(() => expect(serviceMocks.archiveProject).toHaveBeenCalledWith(expect.objectContaining({ projectId: 'project-1', confidential: true })))
   })
 
   it('C15 activity has seven ordered views', async () => {

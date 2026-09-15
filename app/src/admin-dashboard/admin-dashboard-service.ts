@@ -108,6 +108,18 @@ export type ActivityEvent = {
 
 export type ActivityKanbanItem = KanbanItem & { project_name: string }
 
+export type ArchiveAsset = {
+  id: string
+  project_id: string
+  project_name: string
+  source_version: string | null
+  tags: Record<string, unknown>
+  internal_reuse: boolean
+  public_case: boolean
+  rights_label: string
+  created_at: string
+}
+
 export type ProjectFilters = {
   niche?: string
   state?: string
@@ -321,4 +333,27 @@ export async function activateDashboard(projectId: string, content: unknown) {
   })
   if (error) throw error
   return data as { inviteLink: string; projectId: string; accessReleasedAt: string }
+}
+
+export async function archiveProject(values: { projectId: string; tags: Record<string, unknown>; internalReuse: boolean; publicCase: boolean; confidential: boolean }, requestId = crypto.randomUUID()) {
+  const { data, error } = await supabase.rpc('archive_project', {
+    p_project_id: values.projectId,
+    p_tags: values.tags,
+    p_internal_reuse: values.internalReuse,
+    p_public_case: values.publicCase,
+    p_confidential: values.confidential,
+    p_request_id: requestId,
+  }).single()
+  if (error) throw error
+  return data as { assetId: string; replayed: boolean; projectStatus: ProjectStatus }
+}
+
+export async function listArchiveAssets(filters: { tags?: Record<string, unknown>; reusableOnly?: boolean; caseOnly?: boolean } = {}): Promise<ArchiveAsset[]> {
+  const { data, error } = await supabase.rpc('list_archive_assets', {
+    p_tags: filters.tags ?? {},
+    p_reusable_only: filters.reusableOnly ?? false,
+    p_case_only: filters.caseOnly ?? false,
+  })
+  if (error) throw error
+  return (data ?? []) as ArchiveAsset[]
 }

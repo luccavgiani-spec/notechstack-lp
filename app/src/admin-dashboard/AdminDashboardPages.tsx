@@ -9,6 +9,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   activateBrandModule,
   activateDashboard,
+  archiveProject,
   convertProject,
   filterActivityEvents,
   filterProjects,
@@ -1102,6 +1103,25 @@ function KanbanEditor({
   );
 }
 
+function ArchiveControl({ project, onChanged }: { project: ProjectDetail; onChanged: () => void }) {
+  const eligible = project.projectStatus === "CONCLUIDO" || (project.leadStatus === "JANELA_DE_DECISAO" && project.effectiveAccessStatus === "EXPIRADO");
+  const [tags, setTags] = useState("");
+  const [internalReuse, setInternalReuse] = useState(false);
+  const [publicCase, setPublicCase] = useState(false);
+  const [confidential, setConfidential] = useState(true);
+  const [confirm, setConfirm] = useState(false);
+  const [message, setMessage] = useState("");
+  if (!eligible) return null;
+  const parsedTags = () => ({ componente: tags.split(",").map((tag) => tag.trim()).filter(Boolean) });
+  async function archive() {
+    try {
+      await archiveProject({ projectId: project.id, tags: parsedTags(), internalReuse, publicCase, confidential });
+      setMessage("Projeto arquivado e snapshot preservado."); setConfirm(false); onChanged();
+    } catch { setMessage("Não foi possível arquivar este projeto."); }
+  }
+  return <section className="rounded-2xl border border-ambar bg-ambar-tint p-5"><h2 className="font-mono text-xs font-semibold uppercase tracking-[.14em]">Arquivar projeto</h2><p className="mt-2 text-sm text-cinza">Cria um snapshot preservado. O cliente perde o acesso; nenhum histórico é apagado.</p><label className="mt-4 block text-sm">Componentes ou padrões reutilizáveis<input className="mt-1 w-full rounded-lg border border-borda bg-white px-3 py-2" value={tags} onChange={(event) => setTags(event.target.value)} placeholder="ex.: hero, formulário" /></label><div className="mt-3 grid gap-2 text-sm"><label><input type="checkbox" checked={internalReuse} onChange={(event) => setInternalReuse(event.target.checked)} /> Reutilizável internamente</label><label><input type="checkbox" checked={publicCase} onChange={(event) => setPublicCase(event.target.checked)} /> Autorizado para case</label><label><input type="checkbox" checked={confidential} onChange={(event) => setConfidential(event.target.checked)} /> Manter confidencial na biblioteca</label></div>{confirm ? <div className="mt-4 rounded-xl border border-ambar bg-white p-4"><p className="font-semibold">Confirmar arquivamento?</p><div className="mt-3 flex gap-2"><button type="button" className="rounded-xl bg-tinta px-4 py-2 text-sm font-semibold text-white" onClick={() => void archive()}>Confirmar arquivamento</button><button type="button" className="rounded-xl border border-borda px-4 py-2 text-sm" onClick={() => setConfirm(false)}>Cancelar</button></div></div> : <button type="button" className="mt-4 rounded-xl border border-tinta bg-white px-4 py-2 text-sm font-semibold" onClick={() => setConfirm(true)}>Arquivar</button>}{message ? <p className="mt-3 text-sm" role="status">{message}</p> : null}</section>;
+}
+
 export function AdminProjectDetailPage() {
   const { projectId = "" } = useParams();
   const [project, setProject] = useState<ProjectDetail | null>(null);
@@ -1302,6 +1322,9 @@ export function AdminProjectDetailPage() {
         </div>
         <div className="mt-5">
           <VersionControls project={project} onChanged={reload} />
+        </div>
+        <div className="mt-5">
+          <ArchiveControl project={project} onChanged={reload} />
         </div>
         <div className="mt-5">
           <KanbanEditor
