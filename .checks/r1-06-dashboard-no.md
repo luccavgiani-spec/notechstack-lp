@@ -124,31 +124,31 @@ filter and timezone tables.
 
 ### S1 — Projetos e ficha · ~103 kB floor
 
-- [ ] **C1 — um projeto criado aparece na leitura seguinte como um card completo e ordenado.**
+- [x] **C1 — um projeto criado aparece na leitura seguinte como um card completo e ordenado.**
   A lista refaz a consulta após criação e mostra cliente, nicho, `project_status` ou fallback
   `lead_status`, tier e a menor `scheduled_date` não concluída; cards ordenam essa data crescente,
   com empate por `created_at` decrescente e sem data no fim.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C1 project cards refresh fields and order"`.
-- [ ] **C2 — a lista oferece nove dimensões de recorte e busca nos três nomes.** Nicho, estado,
+- [x] **C2 — a lista oferece nove dimensões de recorte e busca nos três nomes.** Nicho, estado,
   tier, prazo (`atrasado|hoje|proximos_7_dias|sem_data`), situação de pagamento, convertido/não
   convertido e ativo/concluído/arquivado filtram fixtures distinguíveis; a busca casa
   `clients.name`, empresa e `projects.name`. Resultado zero por filtro mostra “Nenhum projeto para
   os filtros selecionados.”, distinto de “Nenhum projeto cadastrado ainda.”
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C2 project filters search and distinct empty state"`.
-- [ ] **C3 — a ficha mostra os cinco grupos e todos os campos normativos.** Identificação contém
+- [x] **C3 — a ficha mostra os cinco grupos e todos os campos normativos.** Identificação contém
   cliente, empresa, contato, nicho, origem e entrada; diagnóstico contém exatamente cinco respostas,
   referências, materiais e observações; comercial contém tier, valor em centavos formatado em BRL,
   forma, parcelas, datas e status financeiro; execução contém início, prazo, fase, versão, próxima
   entrega, dashboard, links técnicos e observações internas; entregáveis contém roadmap e protótipo.
   Ausência persistida rende `—` ou estado vazio explícito.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C3 project detail renders every normative group"`.
-- [ ] **C4 — salvar um único campo comercial persiste e audita antes/depois exatamente uma vez.**
+- [x] **C4 — salvar um único campo comercial persiste e audita antes/depois exatamente uma vez.**
   Após reload o valor é o novo; existe um evento atribuído ao admin/projeto com o nome literal do
   campo, valor anterior e valor novo, sem segundo evento de `updated_at`.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — assertion group
   `C4 commercial edit persists one before-after event`; DOM complement:
   `npm test -- --run src/adminDashboard.test.tsx -t "C4 commercial edit reloads"`.
-- [ ] **C5 — somente as duas transições de lead desta rodada atualizam ficha e geram um evento.**
+- [x] **C5 — somente as duas transições de lead desta rodada atualizam ficha e geram um evento.**
   `ROADMAP_PAGO → REFERENCIAS_PENDENTES` e `REFERENCIAS_PENDENTES → EM_PRODUCAO` são exercitadas
   separadamente, cada uma com delta de um evento atribuído.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — table group
@@ -156,47 +156,47 @@ filter and timezone tables.
 
 ### S2 — Kanban sincronizado · ~76 kB floor
 
-- [ ] **C6 — as seis ações do Kanban mudam a tela e gravam exatamente um evento cada.** Criar,
+- [x] **C6 — as seis ações do Kanban mudam a tela e gravam exatamente um evento cada.** Criar,
   mover coluna, concluir, reabrir, mudar `scheduled_date` e mudar `position` são executadas com seis
   `request_id` distintos; cada delta é um e cada evento contém `actor_id`, `project_id`, tipo e
   `occurred_at` não nulos.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — table group
   `C6 six kanban actions emit one attributed event each`; DOM complement:
   `npm test -- --run src/adminDashboard.test.tsx -t "C6 kanban actions repaint"`.
-- [ ] **C7 — uma movimentação administrativa é visível ao cliente na leitura seguinte.** Depois de
+- [x] **C7 — uma movimentação administrativa é visível ao cliente na leitura seguinte.** Depois de
   mudar a coluna como `NO_ADMIN`, uma leitura nova de `kanban_items` com JWT CLIENT do tenant retorna
   o mesmo item no status novo, sem escrita pelo cliente.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — assertion group
   `C7 client sees admin kanban move on next read`.
-- [ ] **C8 — concluir e reabrir mantêm a dupla status/data consistente.** Concluir define
+- [x] **C8 — concluir e reabrir mantêm a dupla status/data consistente.** Concluir define
   `status=concluido` e `completed_at` não nulo; reabrir define `status=a_fazer` e `completed_at=null`.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — assertion group
   `C8 completion and reopen synchronize completed_at`.
 
 ### S3 — Conversão e transições administrativas · ~91 kB floor
 
-- [ ] **C9 — converter uma janela válida aplica o agregado completo uma única vez.** Request com
+- [x] **C9 — converter uma janela válida aplica o agregado completo uma única vez.** Request com
   `projectId`, tier, `amountCents`, forma, parcelas, prazo e `requestId` retorna 200 com
   `{projectId, leadStatus:"CONVERTIDO", projectStatus:"CONVERTIDO", accessStatus:"ATIVO_ATE_FIM_DO_PROJETO"}`;
   persiste `commercial_terms`, `projects.tier`, ativa `modules.marca` e grava um evento.
   Proof: `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C9`.
-- [ ] **C10 — projeto efetivamente expirado também converte e recupera acesso.** Com
+- [x] **C10 — projeto efetivamente expirado também converte e recupera acesso.** Com
   `project_access.effective_access_status=EXPIRADO`, a mesma chamada retorna 200 e produz exatamente
   o estado agregado de C9; CLIENT volta a ler o projeto.
   Proof: `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C10`.
-- [ ] **C11 — cada campo obrigatório ausente retorna 422 e snapshot idêntico.** A tabela de casos
+- [x] **C11 — cada campo obrigatório ausente retorna 422 e snapshot idêntico.** A tabela de casos
   omite, um por vez, `tier`, `amountCents`, `paymentMethod`, `installments` e `deadlineDays`; a resposta
   enumera o campo faltante e nenhum caso muda projeto, módulos, termos ou atividade.
   Proof: `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C11`.
-- [ ] **C12 — nova conversão de projeto já convertido retorna 409 sem efeito.** Um `requestId` novo
+- [x] **C12 — nova conversão de projeto já convertido retorna 409 sem efeito.** Um `requestId` novo
   contra projeto `CONVERTIDO` retorna 409; snapshots de projeto, termos e atividade permanecem iguais.
   Proof: `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C12`.
-- [ ] **C13 — ativação manual de Marca em não convertido é persistida e auditada uma vez.**
+- [x] **C13 — ativação manual de Marca em não convertido é persistida e auditada uma vez.**
   `modules.marca` muda de `bloqueado` para `ativo`, demais cinco chaves ficam idênticas e um evento
   atribuído é criado.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — assertion group
   `C13 manual brand activation changes one module and audits`.
-- [ ] **C14 — a única transição de projeto desta rodada é `CONVERTIDO → AGENDADO`.** Ela atualiza a
+- [x] **C14 — a única transição de projeto desta rodada é `CONVERTIDO → AGENDADO`.** Ela atualiza a
   ficha e gera um evento; cada outra origem/destino entre os 11 valores de `project_status` retorna
   409 e não muda estado nem atividade.
   Proof: `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C14` plus pgTAP
@@ -204,36 +204,36 @@ filter and timezone tables.
 
 ### S4 — Atividade, autorização e jornada · ~118 kB floor
 
-- [ ] **C15 — Atividade expõe exatamente sete visões.** Os controles aparecem nesta ordem: Hoje,
+- [x] **C15 — Atividade expõe exatamente sete visões.** Os controles aparecem nesta ordem: Hoje,
   Ontem, Pendências, Atrasados, Últimos 7 dias, Por projeto e Por evento; uma troca de visão atualiza
   a lista sem rota paralela.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C15 activity has seven ordered views"`.
-- [ ] **C16 — Hoje e Ontem usam dias civis de `America/Sao_Paulo`.** Casos em ambos os lados de
+- [x] **C16 — Hoje e Ontem usam dias civis de `America/Sao_Paulo`.** Casos em ambos os lados de
   meia-noite UTC/São Paulo entram no dia correto, e cada lista ordena `occurred_at` decrescente.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C16 Sao Paulo day windows and descending order"`.
-- [ ] **C17 — Pendências e Atrasados particionam itens abertos pela data local.** Pendências contém
+- [x] **C17 — Pendências e Atrasados particionam itens abertos pela data local.** Pendências contém
   somente não concluídos com `scheduled_date` igual a hoje ou nula; Atrasados contém somente não
   concluídos com data anterior a hoje; futuro e concluído ficam fora de ambas.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C17 pending and overdue partitions"`.
-- [ ] **C18 — cada linha de evento identifica ator, projeto navegável, tipo e instante.** O ator é
+- [x] **C18 — cada linha de evento identifica ator, projeto navegável, tipo e instante.** O ator é
   exibido por identificação segura/fallback de UUID, o projeto aponta a `/no/projetos/:projectId`,
   o tipo é legível e data/hora usa locale `pt-BR` em `America/Sao_Paulo`; listas paginam 20 por vez.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C18 activity row fields link and pagination"`.
-- [ ] **C19 — retry com o mesmo `request_id` conserva um único evento e um único efeito.** A segunda
+- [x] **C19 — retry com o mesmo `request_id` conserva um único evento e um único efeito.** A segunda
   chamada repete o resultado da primeira; contagem de eventos e snapshot do agregado não mudam.
   Proof: `supabase test db supabase/tests/r1_06_dashboard_no.test.sql` — assertion group
   `C19 same request id is idempotent`; HTTP complement:
   `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C19`.
-- [ ] **C20 — CLIENT não acessa nenhuma superfície administrativa.** As três rotas mostram a tela
+- [x] **C20 — CLIENT não acessa nenhuma superfície administrativa.** As três rotas mostram a tela
   de não autorizado; chamadas de conversão e transição de estado retornam 403; snapshots de projeto,
   termos, Kanban e atividade não mudam.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C20 client is unauthorized on admin routes"`
   and `pwsh -NoProfile -File supabase/tests/r1_06_dashboard_no.ps1 -Scenario C20`.
-- [ ] **C21 — vazios de base são próprios de cada superfície.** Com zero projetos, Projetos mostra
+- [x] **C21 — vazios de base são próprios de cada superfície.** Com zero projetos, Projetos mostra
   “Nenhum projeto cadastrado ainda.”; com zero eventos no dia, Hoje mostra “Nenhuma atividade hoje.”;
   ambos são distintos dos estados de loading, erro com “Tentar de novo” e filtro sem resultado.
   Proof: `npm test -- --run src/adminDashboard.test.tsx -t "C21 base empty states are distinct"`.
-- [ ] **C22 — gates e E2E completos passam em desktop e mobile.** Build, lint e `tsc -b` têm exit 0;
+- [x] **C22 — gates e E2E completos passam em desktop e mobile.** Build, lint e `tsc -b` têm exit 0;
   Playwright percorre C1–C21 em 1440×900 e 375×812 contra Supabase local, inclui loading/vazio/erro/
   sucesso/não autorizado, confirma labels/foco por teclado e falha em qualquer `console.error`,
   `pageerror` ou resposta inesperada ≥500.
