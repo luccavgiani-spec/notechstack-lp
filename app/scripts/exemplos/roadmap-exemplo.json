@@ -1,0 +1,48 @@
+{
+  "answers": {
+    "objetivo": "Organizar a operação comercial",
+    "negocio": "Serviços profissionais",
+    "publico": "Equipe e clientes",
+    "ferramentas": "WhatsApp e planilhas",
+    "resultado": "Acompanhar cada oportunidade até a entrega"
+  },
+  "references": [
+    { "label": "Referência visual", "url": "https://example.com/referencia" }
+  ],
+  "stack": ["React", "Supabase"],
+  "costs": [
+    { "item": "Infraestrutura", "faixa": "conforme uso" }
+  ],
+  "next_steps": ["Validar o roadmap", "Escolher o tier"],
+  "tiers": {
+    "essencial": {
+      "escopo": ["Fluxo principal"],
+      "profundidade": "Validação do núcleo",
+      "exclusoes": ["Automações avançadas"],
+      "complexidade": "baixa",
+      "prazo_dias": 15,
+      "valor_centavos": null,
+      "faixa": "sob proposta"
+    },
+    "basico": {
+      "escopo": ["Fluxo principal", "Painel operacional"],
+      "profundidade": "Operação inicial completa",
+      "exclusoes": ["Integrações especiais"],
+      "complexidade": "média",
+      "prazo_dias": 30,
+      "valor_centavos": null,
+      "faixa": "sob proposta"
+    },
+    "completo": {
+      "escopo": ["Produto completo", "Integrações e automações"],
+      "profundidade": "Operação ponta a ponta",
+      "exclusoes": [],
+      "complexidade": "alta",
+      "prazo_dias": 45,
+      "valor_centavos": null,
+      "faixa": "sob proposta"
+    }
+  },
+  "preferred_tier": null,
+  "prototype_url": null
+}

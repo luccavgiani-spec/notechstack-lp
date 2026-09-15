@@ -38,7 +38,7 @@ file_size_limit = "50MiB"
 [auth]
 enabled = true
 site_url = "https://notechstack.com.br"
-additional_redirect_urls = ["https://*.notechstack.com.br"]
+additional_redirect_urls = ["https://*.notechstack.com.br", "http://localhost:*/acesso", "http://127.0.0.1:*/acesso"]
 jwt_expiry = 3600
 enable_signup = false
 
@@ -69,3 +69,6 @@ verify_jwt = false
 
 [functions.pagarme-webhook-no]
 verify_jwt = false
+
+[functions.skill-01-ativar-dashboard]
+verify_jwt = true
