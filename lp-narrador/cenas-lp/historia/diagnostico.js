@@ -110,7 +110,7 @@
   const campo = n => form.elements[n];
   const valor = n => { const el=campo(n); return el && el.value != null ? String(el.value).trim() : ''; };
   const marcados = n => Array.from(form.querySelectorAll(`input[name="${n}"]:checked`)).map(i=>i.value);
-  let atual=0, telaFinalCriada=false, metodoPagamento='';
+  let atual=0, telaFinalCriada=false, metodoPagamento='', pagamentoEmCurso=false, pagamentoConcluido=false;
   function marcaMais(){
     const mais=form.scrollHeight-form.scrollTop-form.clientHeight>6;
     form.classList.toggle('tem-mais',mais);
@@ -158,11 +158,13 @@
   function criaFinal(){
     if (telaFinalCriada) return;
     telaFinalCriada=true;
-    telaPasso(7).innerHTML='<p class="dg-k">seu protótipo</p><h4 class="dg-q" id="dgQ7" tabindex="-1">pronto para dar o primeiro passo?</h4>'+
-      '<div class="dg-preco"><p class="dg-preco-rot">protótipo navegável deste briefing</p>'+
-      '<p class="dg-preco-de">de <s>R$ 450,00</s> por</p><p class="dg-preco-por">R$ 199,90</p>'+
-      '<p class="dg-preco-unico">pagamento único do protótipo</p>'+
-      '<p class="dg-preco-nota">o desenvolvimento completo é contratado depois, com escopo definido no roadmap.</p></div>'+
+    telaPasso(7).innerHTML='<p class="dg-k">seu roadmap + protótipo</p><h4 class="dg-q" id="dgQ7" tabindex="-1">Transforme sua ideia em um plano que dá para executar.</h4>'+
+      '<div class="dg-preco"><p class="dg-preco-rot">Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara uma primeira direção de protótipo e mostra caminhos reais para colocar o produto no ar.</p>'+
+      '<p class="dg-preco-por">R$ 149,90</p>'+
+      '<p class="dg-preco-nota">Seu material fica pronto em até 3 dias após a confirmação do pagamento.</p></div>'+
+      '<ol class="dg-prazo"><li><b>Dia 1 — referências</b><span>contato para referências, marca e contexto complementar.</span></li>'+
+      '<li><b>Dias 2 e 3 — organização</b><span>plano, protótipo e caminhos de construção.</span></li>'+
+      '<li><b>Entrega — seu dashboard</b><span>acesso próprio para navegar e decidir como continuar.</span></li></ol>'+
       '<p class="dg-erro" role="alert" hidden></p>';
     telaPasso(8).innerHTML='<p class="dg-k">pagamento</p><h4 class="dg-q" id="dgQ8" tabindex="-1">como você quer pagar?</h4>'+
       '<div class="dg-metodos" role="group" aria-label="Escolha a forma de pagamento">'+
@@ -184,6 +186,64 @@
         '<label class="dg-campo"><span>CVV</span><input name="cartao_cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4"></label></div></div>'+
         '<p class="dg-erro" role="alert" hidden></p>';
     }
+  }
+
+  const respostas = () => ({
+    objetivo: marcados('objetivo')[0] || '',
+    negocio: valor('negocio'),
+    publico: marcados('publico')[0] || '',
+    ferramentas: valor('ferramentas'),
+    resultado: valor('resultado')
+  });
+  const contato = () => ({
+    nome: valor('nome'), email: valor('email'), whatsapp: valor('telefone'),
+    sid: String(window.leadSid || '')
+  });
+  function cartao(){
+    const validade=valor('cartao_validade').replace(/\s/g,'').split('/');
+    return {
+      number:valor('cartao_numero').replace(/\D/g,''),
+      holder_name:valor('cartao_nome'),
+      exp_month:Number(validade[0]),
+      exp_year:Number(validade[1]),
+      cvv:valor('cartao_cvv').replace(/\D/g,'')
+    };
+  }
+  function validaCartao(){
+    if (metodoPagamento!=='cartao') return true;
+    const c=cartao();
+    if (c.holder_name.length<3) return mostraErro(telaPasso(9),'› confira o nome no cartão.',campo('cartao_nome')),false;
+    if (c.number.length<13||c.number.length>19) return mostraErro(telaPasso(9),'› confira o número do cartão.',campo('cartao_numero')),false;
+    if (!(c.exp_month>=1&&c.exp_month<=12)||!Number.isInteger(c.exp_year)) return mostraErro(telaPasso(9),'› confira a validade em MM/AA.',campo('cartao_validade')),false;
+    if (c.cvv.length<3) return mostraErro(telaPasso(9),'› confira o CVV.',campo('cartao_cvv')),false;
+    mostraErro(telaPasso(9),'');
+    return true;
+  }
+  function ocupaPagamento(ocupado){
+    pagamentoEmCurso=ocupado;
+    tela.querySelectorAll('[data-nav="proximo"],[data-nav="acao"],button[data-pagamento]').forEach(b=>{ b.disabled=ocupado; });
+    atualizaNav();
+  }
+  function mostraPix(data){
+    const s=telaPasso(9), pix=data.pix||{};
+    s.innerHTML='<p class="dg-k">pagamento via Pix</p><h4 class="dg-q" id="dgQ9" tabindex="-1">seu Pix está pronto</h4>'+
+      '<div class="dg-pix-pronto"><img class="dg-pix-qr" alt="QR Code do Pix"><div><b>escaneie ou copie o código</b><p>Assim que o pagamento for confirmado, começamos seu material.</p></div></div>'+
+      '<label class="dg-campo dg-pix-codigo"><span>Pix copia e cola</span><textarea readonly rows="3"></textarea></label>'+
+      '<button type="button" class="dg-copiar-pix">copiar código Pix</button><p class="dg-erro" role="alert" hidden></p>';
+    const img=s.querySelector('.dg-pix-qr');
+    if (pix.qrCodeUrl) img.src=String(pix.qrCodeUrl); else img.hidden=true;
+    s.querySelector('.dg-pix-codigo textarea').value=String(pix.qrCode||'');
+    s.querySelector('.dg-copiar-pix').addEventListener('click',async e=>{
+      try{ await navigator.clipboard.writeText(String(pix.qrCode||'')); e.currentTarget.textContent='código copiado'; }
+      catch(_){ e.currentTarget.textContent='selecione e copie o código acima'; }
+    });
+    pagamentoConcluido=true;
+  }
+  function mostraAprovado(){
+    telaPasso(9).innerHTML='<p class="dg-k">pagamento aprovado</p><h4 class="dg-q" id="dgQ9" tabindex="-1">já começamos por aqui.</h4>'+
+      '<div class="dg-aprovado"><b>Seu material fica pronto em até 3 dias após a confirmação do pagamento.</b>'+
+      '<p>No Dia 1, a Nó entra em contato pelo WhatsApp para pedir referências, marca e contexto complementar.</p></div>';
+    pagamentoConcluido=true;
   }
   function vai(n,focar=true){
     if (n===7&&ultimaEtapa()!==6){
@@ -213,21 +273,43 @@
       vai(atual===5?7:atual+1);
     }
   }
-  function pagar(){
+  async function pagar(){
     if (atual===7){ vai(8); return; }
-    if (atual!==9) return;
-    // A integração de pagamento escuta este evento e assume o envio ao provedor.
-    tela.dispatchEvent(new CustomEvent('nostack:pagamento',{bubbles:true,detail:{metodo:metodoPagamento}}));
+    if (atual!==9||pagamentoEmCurso||pagamentoConcluido) return;
+    if (!validaCartao()) return;
+    if (!window.NoRoadmapCheckout){ mostraErro(telaPasso(9),'› pagamento indisponível. Recarregue a página e tente novamente.'); return; }
+    ocupaPagamento(true);
+    mostraErro(telaPasso(9),'');
+    try{
+      const dados=await window.NoRoadmapCheckout.checkout({
+        lead:contato(), answers:respostas(), metodo:metodoPagamento,
+        card:metodoPagamento==='cartao'?cartao():undefined
+      });
+      if (metodoPagamento==='cartao') ['cartao_numero','cartao_validade','cartao_cvv'].forEach(n=>{ const el=campo(n); if(el) el.value=''; });
+      if (dados.status==='approved') mostraAprovado();
+      else if (dados.status==='failed') mostraErro(telaPasso(9),'› pagamento recusado. Confira os dados e tente de novo.',campo('cartao_numero'));
+      else if (metodoPagamento==='pix'&&dados.pix) mostraPix(dados);
+      else mostraErro(telaPasso(9),'› pedido criado, mas o gateway não devolveu os dados do pagamento. Tente novamente.');
+    }catch(e){
+      const recusa=e&&['CARD_DECLINED','PAYMENT_FAILED'].includes(e.code);
+      mostraErro(telaPasso(9),recusa?'› pagamento recusado. Confira os dados e tente de novo.':'› não foi possível concluir agora. Tente novamente.');
+    }finally{
+      ocupaPagamento(false);
+    }
   }
   function atualizaNav(){
     tela.classList.toggle('em-inicio',atual===0);
+    tela.classList.toggle('em-oferta',atual===7);
     tela.classList.toggle('em-escolha-pagamento',atual===8);
     tela.querySelector('[data-nav="voltar"]').disabled=atual===0;
     tela.querySelector('.dg-fase').textContent=String(Math.min(atual,5)).padStart(2,'0')+' / 05';
     const nx=tela.querySelector('[data-nav="proximo"]'), acao=tela.querySelector('[data-nav="acao"]');
-    nx.disabled=atual===0;
-    nx.textContent=atual===5?'continuar →':atual===7?'pagar →':atual===9?(metodoPagamento==='pix'?'gerar Pix →':'pagar →'):'próximo →';
+    nx.disabled=atual===0||pagamentoEmCurso;
+    nx.hidden=pagamentoConcluido;
+    nx.textContent=pagamentoEmCurso?'processando…':atual===5?'continuar →':atual===7?'Quero meu roadmap + protótipo — R$ 149,90':atual===9?(metodoPagamento==='pix'?'gerar Pix →':'pagar →'):'próximo →';
     acao.textContent=nx.textContent;
+    acao.disabled=nx.disabled;
+    acao.hidden=nx.hidden;
     dica.textContent=atual===7?'revise e avance':atual===8?'escolha uma opção':atual===9?'pagamento seguro':'↵ enter avança';
   }
   tela.addEventListener('click',e=>{
