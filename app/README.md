@@ -15,10 +15,13 @@ npm run dev
 
 ```powershell
 npm test -- --run
+npm run test:e2e
 npm run lint
 npx tsc -b --pretty false
 npm run build
 ```
+
+O E2E usa Chromium local em `1440x900` e `375x812`, inicia o Vite na porta 5174 quando necessário e reutiliza um servidor já saudável.
 
 ## Assets oficiais copiados
 
