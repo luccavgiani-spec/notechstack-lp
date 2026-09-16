@@ -312,3 +312,14 @@ Fontes oficiais verificadas nesta retomada:
 - [Pagar.me — configuração de webhooks](https://pagarme.helpjuice.com/pt_BR/p2-funcionalidades/configura%C3%A7%C3%B5es-como-configurar-webhooks)
 - [Pagar.me — eventos de webhook](https://docs.pagar.me/reference/eventos-de-webhook-1)
 - [Supabase — secrets de produção](https://supabase.com/docs/guides/functions/secrets)
+
+## DNS e secrets cadastrados — 16/09/2026
+
+- [x] Titular confirmou recuperação do domínio na conta Registro.br e criação dos três secrets. Listagem sanitizada confirmou somente nomes/presença de PAGARME_SECRET_KEY, PAGARME_WEBHOOK_USER e PAGARME_WEBHOOK_PASS, sem ler valores/digests. Isso não prova ainda a validade/ambiente da chave na API Pagar.me.
+- [x] Probe de checkout POST com objeto vazio retornou HTTP 400 / INVALID_REQUEST em vez de SERVER_CONFIG_MISSING. Payload recusado antes de escrita ou chamada ao gateway; não houve cobrança.
+- [x] Zona Registro.br inspecionada antes de alteração: sete registros existentes. Adicionado exclusivamente CNAME `app.notechstack.com.br → 94650c4a99bb5500.vercel-dns-016.com.` conforme recomendação atual da API Vercel. Após salvar e reabrir, oito registros e todos os sete anteriores intactos; apex, www, MX, TXT e nameservers preservados.
+- [x] Consulta ao nameserver autoritativo confirmou o novo CNAME; Vercel informou configuredBy=CNAME e misconfigured=false.
+- [ ] C1 ainda aguarda HTTP 200/assembly em HTTPS no domínio próprio; consulta posterior ao apontamento ainda não conseguiu abrir HTTPS. Não bypassar certificado nem substituir esta prova pela URL Vercel.
+- [x] Formulário de **criação** de webhook preparado na conta Pagar.me existente, sem editar endpoints legados: URL exata do endpoint da nó, ativo, autenticação habilitada e somente order.paid/order.payment_failed/order.canceled/charge.refunded/charge.chargedback selecionados. Os numerosos eventos extras inicialmente selecionados foram removidos apenas deste rascunho novo.
+- [ ] Titular deve conferir/preencher usuário e senha Basic iguais aos secrets e concluir o salvamento/validação transacional diretamente no painel. Nenhum valor desses campos foi lido ou modificado pelo agente; formulário preservado como handoff.
+- [ ] C2 continua parcial até confirmar a chave de produção em uso; C3 aguarda webhook salvo, teste/replay e contagens; C5/C6 aguardam a prova Pix real e regressão do legado.
