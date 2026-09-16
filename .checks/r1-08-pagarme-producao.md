@@ -396,3 +396,10 @@ Fontes: [Tokenização e endereço não tokenizado](https://docs.pagar.me/refere
 - [ ] C3 replay, C5 Pix aprovado e C6 regressão do legado continuam pendentes. PAINEL_TOKEN permanece pendente de rotação ao final das ondas; demais pendências anteriores não foram silenciosamente encerradas.
 
 Commits validados: `723d823` (conta confirmada) e `670f83c` (case demonstrativo/testes).
+
+## Login CLIENT e simulação de conversão/V1 — 16/09/2026
+
+- [x] A pendência de login CLIENT da seção anterior foi resolvida: titular iniciou sessão própria em notechstack-app.vercel.app, separada da sessão NO_ADMIN no domínio app. Plano Completo, histórico V1 e Editor foram verificados nessa sessão; painel administrativo recusado ao CLIENT.
+- [x] Simulação autorizada de fechamento/publicação executada pelas interfaces NO_ADMIN, com valor contratual zero e observações de teste. Única V1 atual e controles do Editor demonstrativos, sem bridge no Discordia real; salvamento/reload do rascunho aprovados. Detalhes/evidências em f2-10-editor.md.
+- [x] Pagamento real anterior de 14990 centavos permaneceu o único pagamento do projeto. Nenhuma cobrança/receita fictícia ou novo export criado para esta simulação.
+- [ ] Esta demonstração não encerra C3 replay, C5 Pix aprovado, C6 legado ou rotação final do PAINEL_TOKEN, nem representa contratação/entrega real do case.

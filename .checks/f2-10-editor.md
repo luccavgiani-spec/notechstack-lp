@@ -37,3 +37,17 @@
 - Integrar o bridge apenas nos previews de cada cliente, com os identificadores corretos, antes de habilitar `bridge_enabled`.
 - Aplicação das alterações no código do cliente continua sendo trabalho da Nó na próxima entrega, conforme o escopo aprovado.
 - Produção e rotação do PAINEL_TOKEN são acompanhadas em R1-08; provas locais não equivalem a go-live.
+
+## Demonstração em produção — Completo e V1 — 16/09/2026
+
+- [x] Titular entrou na conta CLIENT em sessão separada do NO_ADMIN; nenhuma senha ou sessão foi lida/registrada. Preferência Completo salva pela interface CLIENT e confirmada no banco.
+- [x] Pelo painel NO_ADMIN: termos demonstrativos com amount_cents=0, forma/status/observações explicitamente SIMULACAO; conversão e fluxo CONVERTIDO → AGENDADO → V1_EM_DESENVOLVIMENTO → V1_PUBLICADA. Acesso ATIVO_ATE_FIM_DO_PROJETO, sem aviso de expiração de 15 dias no CLIENT.
+- [x] Uma V1 demonstrativa atual, com changelog explicitando ausência de nova entrega no Discordia. Referência registrada: discordia-demo@816d3845782c89e4d9c618fa9c69fb5aa99716c6; não equivale a deploy novo do case.
+- [x] Publicação ativou Editor/Versões mantendo os demais módulos, inclusive Marca já ativada pelo titular. Uma configuração de Editor por V1 e uma atividade demo.editor_configured; inserção restrita ao projeto/versão, sem sobrescrever configuração existente.
+- [x] Allowlist de quatro componentes demonstrativos da entrada: título/subtítulo com texto/tamanho/cor, botão com texto/cor e logo com URL. bridge_enabled=false: sem postMessage/injeção no Discordia real; este exercício valida formulário/rascunho, não preview visual do case.
+- [x] Na sessão CLIENT real: histórico mostrou V1 publicada/Atual; Editor · V1 carregou quatro grupos e apenas controles liberados. Título demonstrativo e tamanho 24 salvos; ambos permaneceram após reload.
+- [x] CLIENT recebeu Acesso não autorizado ao tentar /no/projetos; lista própria mostrou somente o projeto esperado. Editor ficou aberto para validação conjunta, preservando o rascunho.
+- [x] Consulta final: CONVERTIDO/V1_PUBLICADA/completo; todos os seis módulos ativos; uma versão/uma atual; valor contratual zero; somente o pagamento original approved de 14990 centavos, exports=0. Sem nova cobrança, recebimento fictício, submissão de pacote ou mudança no Discordia.
+- [ ] Preview visual controlado deste case exige build de preview opt-in própria; não habilitar bridge apontando para o Discordia real sem integrar o runtime/identificadores e testar. Envio/Storage/ingestão desta conta real não foram exercitados nesta demonstração.
+
+Não houve mudança de código/schema neste exercício; testes automatizados não foram repetidos. Resultados anteriores 152/152 do app e 25/25 da liberação permanecem históricos, não execuções novas.
