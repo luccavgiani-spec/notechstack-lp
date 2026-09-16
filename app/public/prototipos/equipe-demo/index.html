@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Equipe em fluxo · protótipo de validação</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    @font-face{font-family:Sora;src:url('/fonts/sora-variable-wght.woff2')}@font-face{font-family:Mono;src:url('/fonts/jetbrains-mono-variable-wght.woff2')}
+    *{box-sizing:border-box}body{margin:0;background:#FAFAF7;color:#141414;font-family:Sora,system-ui,sans-serif;font-size:14px}body:before{content:'';display:block;height:5px;background:linear-gradient(to right,#3D63DB 0 25%,#E0543C 25% 50%,#EDA33B 50% 75%,#30A46C 75%)}
+    header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;justify-content:space-between;align-items:center;gap:16px}header img{width:64px}header span,.label{font:11px Mono,monospace;letter-spacing:.12em;text-transform:uppercase}.notice{background:#FCF3E0;border:1px solid #EDA33B;padding:15px;border-radius:12px;font-size:12px;line-height:1.6}h1{font-size:clamp(28px,5vw,48px);letter-spacing:-.04em;line-height:1.1;margin:24px 0 12px;text-transform:uppercase}p{line-height:1.7;color:#6B6F76}.intro{max-width:65ch}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:24px 0}.metric,.column{background:white;border:1px solid #ECEBE6;border-radius:16px;padding:18px}.metric strong{display:block;font-size:26px;margin-top:8px}.toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:28px 0 16px}.filters{display:flex;gap:8px;flex-wrap:wrap}button,input{font:inherit;border-radius:10px;border:1px solid #ECEBE6;padding:12px;background:white;color:#141414}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:3px solid #3D63DB;outline-offset:2px}button[aria-pressed=true]{background:#E9EEFB;border-color:#3D63DB}.primary{background:#141414;color:white;border-color:#141414}.board{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.column h2{font-size:14px;margin:0 0 18px}.column:nth-child(1){border-top:4px solid #EDA33B}.column:nth-child(2){border-top:4px solid #3D63DB}.column:nth-child(3){border-top:4px solid #30A46C}.task{border:1px solid #ECEBE6;border-radius:12px;padding:16px;margin:12px 0}.task h3{font-size:14px;margin:0}.task p{font-size:12px;margin:8px 0 14px}.task button{font-size:12px;padding:8px 10px}.empty{font-size:12px}.steps{margin-top:32px;padding:24px;background:#141414;color:white;border-radius:16px}.steps p{color:#ccc}.steps ol{padding-left:20px;line-height:2}dialog{width:calc(100% - 32px);max-width:440px;border:1px solid #ECEBE6;border-radius:18px;padding:24px}dialog::backdrop{background:rgba(20,20,20,.35)}label{display:block;margin:16px 0}label input{display:block;width:100%;margin-top:8px}.dialog-actions{display:flex;justify-content:flex-end;gap:8px}footer{font-size:11px;color:#6B6F76}#feedback{min-height:20px;font-size:12px;color:#30A46C}@media(max-width:700px){header,main,footer{padding:18px}.board{grid-template-columns:1fr}.metrics{gap:8px}.metric{padding:12px}.metric strong{font-size:22px}.label{font-size:9px}header span{font-size:9px}}
+  </style>
+</head>
+<body>
+  <header><img src="/no-tech-stack-tinta-ponto-ambar.svg" alt="nó"><span>primeira direção · equipe</span></header>
+  <main>
+    <div class="notice"><strong>Demonstração antecipada.</strong> Dados fictícios para validar navegação e fluxo. Não representa uma entrega final, prazo vencido ou operação real. Alterações aqui são temporárias e não chegam ao banco.</div>
+    <h1>Menos mensagens.<br>Mais fluxo.</h1>
+    <p class="intro">Uma visão simples para a equipe saber o que precisa começar, o que está em andamento e o que já foi entregue.</p>
+    <div class="metrics"><div class="metric"><span class="label">demandas</span><strong id="total">3</strong></div><div class="metric"><span class="label">em execução</span><strong id="active">1</strong></div><div class="metric"><span class="label">concluídas</span><strong id="done">1</strong></div></div>
+    <div class="toolbar"><div class="filters" aria-label="Filtrar tarefas"><button data-filter="all" aria-pressed="true">Todas</button><button data-filter="active" aria-pressed="false">Em andamento</button></div><button class="primary" id="new">+ Nova tarefa</button></div>
+    <p id="feedback" role="status" aria-live="polite"></p>
+    <div class="board"><section class="column"><h2>A fazer</h2><div id="todo-list"></div></section><section class="column"><h2>Em andamento</h2><div id="active-list"></div></section><section class="column"><h2>Concluído</h2><div id="done-list"></div></section></div>
+    <section class="steps"><span class="label">como validar</span><h2>Teste o fluxo, não a promessa.</h2><ol><li>Crie uma tarefa de exemplo.</li><li>Comece a execução e acompanhe o quadro.</li><li>Conclua a tarefa e confira os indicadores.</li></ol><p>Depois da validação, o escopo e as integrações reais são definidos no roadmap.</p></section>
+  </main>
+  <footer>nó · tech stack · protótipo de validação · sem dados pessoais</footer>
+  <dialog id="task-dialog"><form id="task-form"><h2>Nova tarefa de exemplo</h2><label>Título<input name="title" required maxlength="80" autocomplete="off" placeholder="Ex.: revisar uma solicitação"></label><p>Use apenas dados fictícios nesta demonstração.</p><div class="dialog-actions"><button type="button" id="cancel">Cancelar</button><button class="primary" type="submit">Criar tarefa</button></div></form></dialog>
+  <script>
+    const tasks=[{title:'Organizar as solicitações',status:'todo'},{title:'Revisar o fluxo da equipe',status:'active'},{title:'Mapear o primeiro objetivo',status:'done'}];
+    let filter='all';
+    const labels={todo:'Começar',active:'Concluir',done:'Concluído'};
+    const feedback=document.getElementById('feedback'),dialog=document.getElementById('task-dialog');
+    function render(){
+      for(const status of ['todo','active','done']){
+        const list=document.getElementById(status+'-list');list.replaceChildren();
+        tasks.forEach((task,index)=>{
+          if(task.status!==status||(filter==='active'&&status!=='active'))return;
+          const card=document.createElement('article');card.className='task';
+          const title=document.createElement('h3');title.textContent=task.title;
+          const description=document.createElement('p');description.textContent='Equipe de exemplo · prioridade normal';card.append(title,description);
+          if(status!=='done'){
+            const button=document.createElement('button');button.textContent=labels[status];
+            button.addEventListener('click',()=>{tasks[index].status=status==='todo'?'active':'done';feedback.textContent=status==='todo'?'Tarefa iniciada na demonstração.':'Tarefa concluída na demonstração.';render()});card.append(button);
+          }
+          list.append(card);
+        });
+        if(!list.childElementCount){const empty=document.createElement('p');empty.className='empty';empty.textContent='Nenhuma tarefa nesta seleção.';list.append(empty)}
+      }
+      document.getElementById('total').textContent=tasks.length;
+      document.getElementById('active').textContent=tasks.filter(t=>t.status==='active').length;
+      document.getElementById('done').textContent=tasks.filter(t=>t.status==='done').length;
+    }
+    document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{filter=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));render()}));
+    document.getElementById('new').addEventListener('click',()=>{document.getElementById('task-form').reset();dialog.showModal()});
+    document.getElementById('cancel').addEventListener('click',()=>dialog.close());
+    document.getElementById('task-form').addEventListener('submit',event=>{event.preventDefault();const title=event.currentTarget.elements.title.value.trim();if(!title)return;tasks.push({title,status:'todo'});filter='all';document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter==='all')));dialog.close();feedback.textContent='Tarefa de exemplo criada.';render()});
+    render();
+  </script>
+</body>
+</html>

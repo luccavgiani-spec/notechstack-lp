@@ -363,3 +363,9 @@ Veredito atualizado: **C1/C2/C4 aprovados; C3/C5/C6 pendentes de prova real**. N
 - [ ] A prova de cartão não substitui automaticamente C5, que exige Pix real. O Pix gerado anteriormente segue pendente até pagamento/expiração; não criar cobrança extra para fabricar evidência.
 
 Fontes: [Tokenização e endereço não tokenizado](https://docs.pagar.me/reference/criar-token-cart%C3%A3o-1), [cartão a partir de token](https://docs.pagar.me/reference/criar-cart%C3%A3o), [pedido PSP usando card_id](https://docs.pagar.me/reference/criar-pedido-2).
+
+## Protótipo para demonstração antecipada — 16/09/2026
+
+- [x] Preparado `app/public/prototipos/equipe-demo/index.html`, organização de equipe com dados fictícios: criar tarefa, iniciar, concluir e filtrar. Não publica o texto de teste do briefing, PII ou referências a terceiros. Aviso explícito de demonstração antecipada; estado temporário apenas em memória, sem chamadas ao banco.
+- [x] Dez assertions de browser local em 1440px/375px: aviso, criação, início, conclusão, contadores e ausência de overflow horizontal. Build incluiu artefato estático; rewrite Vercel preserva protótipos, fontes e assets oficiais em vez do fallback SPA.
+- [ ] Ainda não associado/liberado para cliente: depende de aprovação real e ativação pelo fluxo Skill 01. Datas D+1/D+3 e status financeiro não foram adulterados para simular passagem de três dias.
