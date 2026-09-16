@@ -124,7 +124,7 @@ dos seis critérios por si só.
   Prova externa, somente com `Unresolved 5` e `Unresolved 1`: inspeção do cadastro no painel,
   envio de teste, consulta read-only de `payment_events` e replay do mesmo `gateway_event_id`.
 
-- [ ] **C4 — o cadastro público do Auth de produção é recusado.**
+- [x] **C4 — o cadastro público do Auth de produção é recusado.**
   Uma chamada pública válida a `/auth/v1/signup` é recusada com status de política de signup
   desabilitado e não cria usuário nem qualquer dado derivado. A validação compara snapshots de
   contagem antes/depois e não usa e-mail pessoal ou credencial real; o endereço efêmero de teste,
@@ -262,3 +262,23 @@ externa ainda estiver aberta.
 - [x] O DNS autoritativo de `notechstack.com.br` é o Registro.br, e `app.notechstack.com.br` ainda não possui registro.
 - [ ] R1-08 continua pendente: não havia sessão autenticada na conta Vercel, nem acesso ao painel DNS; portanto não foram criados projeto, domínio, registro, deploy, secret ou função hospedada.
 - [ ] As chaves e as credenciais de webhook Pagar.me de produção continuam necessárias apenas como secrets do Supabase. Seus valores não foram lidos, registrados ou transmitidos. `PAINEL_TOKEN` segue pendente de rotação ao final de todas as ondas.
+
+## Release autorizado — retomada de 16/09/2026
+
+Esta seção atualiza o estado histórico acima. Lucca autorizou explicitamente push, deploy, DNS e mudanças em produção nesta retomada; autorização não substitui evidência nem acesso aos serviços.
+
+- [x] Gates locais finais: pgTAP 364/364 após reset limpo, Vitest 105/105, Playwright das Ondas 2/3 8/8 (desktop/mobile), lint, TypeScript e build aprovados. Não somar reexecuções como casos distintos.
+- [x] Push de `main` até `b50e591`, preservando as alterações publicadas da home e as alterações não relacionadas do worktree.
+- [x] Quinze migrations necessárias aplicadas ao Supabase correto; migrations legadas já existentes preservadas. Histórico remoto usa timestamps de aplicação diferentes dos locais: reconciliar explicitamente antes de qualquer futuro `db push`; não executá-lo cegamente.
+- [x] Seis functions ativas: quatro da task com flags JWT false/false/true/true, além de project-status-transition e project-publish-version autenticadas. Demais functions legadas preservadas.
+- [x] Projeto Vercel `notechstack-app` separado da home, Root Directory `app`, variáveis públicas Supabase configuradas e deploy de produção `dpl_6Qw1bxK8UpgJWyNmmMU7Qq6xLptZ` READY. Browser confirmou assembly/login em `https://notechstack-app.vercel.app/login`. Uma primeira tentativa falhou por import compartilhado fora da raiz; configuração monorepo corrigida e build remoto aprovado antes da promoção.
+- [ ] C1 parcial: `app.notechstack.com.br` associado ao projeto correto, mas DNS ainda pendente. Nameservers confirmados `e.sec.dns.br` e `f.sec.dns.br`; recuperação do acesso Registro.br necessária. Não alterar apex, www, MX ou nameservers. Home existente respondeu HTTP 200; critério exige ainda a prova final dos dois domínios.
+- [ ] C2 parcial: functions verificadas; os três secrets Pagar.me não estavam presentes na última inspeção somente por nome. Configuração segura pelo titular pendente, sem transmissão de valores ao chat.
+- [ ] C3 pendente: webhook exclusivo da nó e teste/replay reais ainda necessários. Conta Pagar.me existente do mesmo CNPJ será preservada, sem modificar o roteador.
+- [x] C4 aprovado: signup público desligado no painel e chamada controlada recusada com HTTP 422 / signup_disabled; contagem de usuários permaneceu inalterada durante a prova.
+- [x] Duas contas criadas pelo titular e confirmadas; papéis NO_ADMIN e CLIENT configurados. Nenhuma senha registrada neste checklist. A conta cliente ainda precisa da associação a um projeto real; nenhum exemplo foi semeado em produção.
+- [ ] C5 e C6 pendentes: Pix real de R$ 149,90, agregado único/replay e prova final do funil/telemetria legados. Pagamentos do roteador não são evidência desta task.
+- [ ] PAINEL_TOKEN permanece pendente de rotação ao final de todas as ondas, após mapear consumidores.
+- [ ] sync-vault bloqueada: a skill permite somente `05-Codex/context`, mas o vault atual usa `05-Núcleo/context`. Nenhuma escrita fora da restrição nem mapa duplicado foi criado.
+
+Veredito R1-08: **PENDENTE DE PROVAS EXTERNAS** (C4 aprovado; demais critérios não recebem PASS por inferência). Próxima retomada segura: login das contas na URL Vercel, secrets/webhook Pagar.me, recuperação Registro.br e apontamento exclusivo do subdomínio app; depois prova Pix única e regressão do legado.
