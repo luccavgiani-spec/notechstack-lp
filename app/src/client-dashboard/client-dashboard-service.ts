@@ -125,3 +125,15 @@ export function calculateProgress(items: KanbanItem[]) {
   const completed = items.filter((item) => item.status === 'concluido').length
   return Math.round((completed / items.length) * 100)
 }
+
+export type EditorConfig = { versionId: string; label: string; buildReference: string; allowedComponents: Array<{ id: string; label?: string; controls?: string[] }>; bridgeEnabled: boolean }
+export async function loadEditorConfig(projectId: string): Promise<EditorConfig | null> {
+  const { data, error } = await supabase.rpc('get_client_editor_config', { p_project_id: projectId }).maybeSingle()
+  if (error) throw error
+  return data as EditorConfig | null
+}
+export async function submitEditorExport(projectId: string, baseVersionId: string, changes: unknown[], manifest: Record<string, unknown>, requestId = crypto.randomUUID()) {
+  const { data, error } = await supabase.rpc('submit_client_editor_export', { p_project_id: projectId, p_base_version_id: baseVersionId, p_changes: changes, p_manifest: manifest, p_request_id: requestId }).single()
+  if (error) throw error
+  return data
+}

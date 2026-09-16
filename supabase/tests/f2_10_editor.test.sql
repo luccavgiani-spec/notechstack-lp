@@ -1,0 +1,18 @@
+begin;
+create extension if not exists pgtap with schema extensions;
+set search_path=public,extensions; select no_plan();
+insert into auth.users(id,aud,role,email,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values ('f2100000-0000-4000-8000-000000000001','authenticated','authenticated','f2@example.test','{"role":"CLIENT"}','{}',now(),now());
+insert into public.clients(id,name,slug,email) values ('f2200000-0000-4000-8000-000000000001','F2','f2','f2@example.test');
+insert into public.projects(id,client_id,name,lead_status,project_status,access_status,access_released_at,modules) values ('f2300000-0000-4000-8000-000000000001','f2200000-0000-4000-8000-000000000001','F2','CONVERTIDO','V1_PUBLICADA','ATIVO_ATE_FIM_DO_PROJETO',now(),'{"editor":"ativo","versoes":"ativo"}');
+insert into public.memberships(client_id,user_id,role) values ('f2200000-0000-4000-8000-000000000001','f2100000-0000-4000-8000-000000000001','CLIENT');
+insert into public.project_versions(id,project_id,label,macro,status,changelog,build_reference,is_current) values ('f2400000-0000-4000-8000-000000000001','f2300000-0000-4000-8000-000000000001','V1','V1','publicada','ok','build-fixed',true);
+insert into public.editor_version_configs(version_id,allowed_components) values ('f2400000-0000-4000-8000-000000000001','[{"id":"hero"}]');
+set local role authenticated; select set_config('request.jwt.claims','{"sub":"f2100000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"CLIENT"}}',true);
+select is((public.get_client_editor_config('f2300000-0000-4000-8000-000000000001')->>'buildReference'),'build-fixed','C1 config references immutable build');
+select lives_ok($$select public.submit_client_editor_export('f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001','[{"component":"hero"}]','{"project_id":"f2300000-0000-4000-8000-000000000001"}','f210-export')$$,'C4 export accepted');
+reset role;
+select is((select count(*)::integer from public.editor_exports),1,'C5 one export'); select is((select count(*)::integer from public.editor_export_checklists),1,'C5 one checklist');
+set local role authenticated; select set_config('request.jwt.claims','{"sub":"f2100000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"CLIENT"}}',true);
+select is((select (public.submit_client_editor_export('f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001','[]','{}','f210-export')->>'replayed')::boolean),true,'C5 replay');
+select is((select build_reference from public.project_versions where id='f2400000-0000-4000-8000-000000000001'),'build-fixed','C3 export cannot change build');
+reset role; select * from finish(); rollback;

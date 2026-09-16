@@ -14,6 +14,7 @@ import {
   type Tier,
   type TierKey,
 } from './client-dashboard-service'
+import { EditorModule } from './EditorModule'
 
 const MODULES: Array<{ key: ModuleKey; number: string; label: string; path: string }> = [
   { key: 'como_funciona', number: '01', label: 'Como funciona', path: 'como-funciona' },
@@ -364,12 +365,7 @@ function DashboardModule({
     return <StagesModule items={data.kanban} />
   }
   if (module === 'editor') {
-    return (
-      <LockedState title="Editor">
-        <p>O Editor é liberado quando a primeira versão do seu projeto fica pronta.</p>
-        <p>Você poderá testar textos, cores, logos e ajustes visuais antes de nos enviar suas preferências para a próxima versão.</p>
-      </LockedState>
-    )
+    return <EditorModule projectId={data.shell?.project_id ?? ''} />
   }
   if (module === 'versoes') {
     return <VersionsModule versions={data.versions ?? []} />
