@@ -22,6 +22,10 @@ const diagnosticSource = readFileSync(
   resolve(process.cwd(), '../lp-narrador/cenas-lp/historia/diagnostico.js'),
   'utf8',
 )
+const publicConfigSource = readFileSync(
+  resolve(process.cwd(), '../lp-narrador/cenas-lp/historia/pagarme-public-config.js'), 'utf8',
+)
+const homeSource = readFileSync(resolve(process.cwd(), '../lp-narrador/cenas-lp/lp-v7.html'), 'utf8')
 
 const ok = (body: unknown) =>
   Promise.resolve(new Response(JSON.stringify(body), {
@@ -159,6 +163,23 @@ describe('checkout do roadmap na home', () => {
     expect(offer).toHaveTextContent('Dia 1 — referências')
     expect(offer).toHaveTextContent('Dias 2 e 3 — organização')
     expect(offer).toHaveTextContent('Entrega — seu dashboard')
+  })
+
+  it('carrega somente chave pública e preserva os endpoints configurados', () => {
+    const previous = { ...window.NO_CHECKOUT_CONFIG }
+    window.eval(publicConfigSource)
+    expect(window.NO_CHECKOUT_CONFIG!.pagarmePublicKey).toMatch(/^pk_[A-Za-z0-9]+$/)
+    expect(publicConfigSource).not.toMatch(/sk_[A-Za-z0-9]+/)
+    expect(window.NO_CHECKOUT_CONFIG!.checkoutUrl).toBe(previous.checkoutUrl)
+    expect(window.NO_CHECKOUT_CONFIG!.sendLeadUrl).toBe(previous.sendLeadUrl)
+  })
+
+  it('carrega configuração pública antes do checkout e diagnóstico com defer', () => {
+    const configIndex = homeSource.indexOf('pagarme-public-config.js?v=1')
+    expect(configIndex).toBeGreaterThan(-1)
+    expect(configIndex).toBeLessThan(homeSource.indexOf('roadmap-checkout.js?v=3'))
+    expect(configIndex).toBeLessThan(homeSource.indexOf('diagnostico.js?v=64'))
+    expect(homeSource).toContain('pagarme-public-config.js?v=1" defer')
   })
 
   it('envia contexto roadmap, tokeniza no browser e não manda PAN/CVV ao servidor', async () => {

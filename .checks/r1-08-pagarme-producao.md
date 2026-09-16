@@ -375,3 +375,10 @@ Fontes: [Tokenização e endereço não tokenizado](https://docs.pagar.me/refere
 - [x] Commits `d58e9f0` (cartão PSP/validação) e `add6e07` (protótipo), push em main; somente roadmap-checkout republicada no Supabase. App deployment `dpl_2XpDHm1x1yd7A564DHQ3NZJok8s5` e home `dpl_5HakvLX4u9naXRAqWqdSnWotXETG` READY no commit add6e07.
 - [x] Domínio próprio do app serviu /prototipos/equipe-demo/index.html HTTP 200 com conteúdo/aviso de demonstração, não fallback SPA. Home HTTP 200 com scripts v3/v64. Probe negativo remoto cartão sem endereço retornou 400/INVALID_BILLING_ADDRESS antes de escrita/gateway; contagem de pagamentos/pedidos do cliente de teste continua zero.
 - [ ] Fluxo real aguarda somente preparações que ainda exigem evidência: chave pública/domínio de tokenização, pagamento aprovado e entrega webhook, depois ativação/convite e browser autenticado dos dois papéis. Não houve criação de senha, conta liberada ou associação do protótipo sem aprovação.
+
+## Chave pública de cartão recebida — 16/09/2026
+
+- [x] Titular forneceu a chave pública da conta. Configurada em pagarme-public-config.js e carregada com defer antes do checkout/diagnóstico. Apenas chave pública permitida no navegador; não foi lido arquivo .env, chave secreta ou credencial Basic.
+- [x] Testes: checkout 39/39, suíte completa Vitest 149/149, lint/TypeScript/build aprovados. Novas provas verificam prefixo público/ausência de chave secreta, preservação de endpoints e ordem de scripts. Banco/harness/E2E anteriores não foram repetidos nesta mudança de configuração pública.
+- [x] OPTIONS somente leitura ao endpoint oficial tokens com origem www recebeu HTTP 200, CORS *, header content-type permitido. Não tokenizou cartão, não recebeu PAN/CVV e não criou pedido/cobrança; preflight genérico não comprova a allowlist da conta nem validade/ambiente da chave.
+- [ ] Cadastro do domínio na conta ainda exige confirmação do titular ou resposta real de tokenização bem-sucedida. Aprovação real, entrega/replay webhook, agregado e acesso do cliente continuam pendentes; não repetir cobrança para fabricar prova.
