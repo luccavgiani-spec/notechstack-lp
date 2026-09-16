@@ -369,3 +369,9 @@ Fontes: [Tokenização e endereço não tokenizado](https://docs.pagar.me/refere
 - [x] Preparado `app/public/prototipos/equipe-demo/index.html`, organização de equipe com dados fictícios: criar tarefa, iniciar, concluir e filtrar. Não publica o texto de teste do briefing, PII ou referências a terceiros. Aviso explícito de demonstração antecipada; estado temporário apenas em memória, sem chamadas ao banco.
 - [x] Dez assertions de browser local em 1440px/375px: aviso, criação, início, conclusão, contadores e ausência de overflow horizontal. Build incluiu artefato estático; rewrite Vercel preserva protótipos, fontes e assets oficiais em vez do fallback SPA.
 - [ ] Ainda não associado/liberado para cliente: depende de aprovação real e ativação pelo fluxo Skill 01. Datas D+1/D+3 e status financeiro não foram adulterados para simular passagem de três dias.
+
+## Publicação da preparação cartão/protótipo — 16/09/2026
+
+- [x] Commits `d58e9f0` (cartão PSP/validação) e `add6e07` (protótipo), push em main; somente roadmap-checkout republicada no Supabase. App deployment `dpl_2XpDHm1x1yd7A564DHQ3NZJok8s5` e home `dpl_5HakvLX4u9naXRAqWqdSnWotXETG` READY no commit add6e07.
+- [x] Domínio próprio do app serviu /prototipos/equipe-demo/index.html HTTP 200 com conteúdo/aviso de demonstração, não fallback SPA. Home HTTP 200 com scripts v3/v64. Probe negativo remoto cartão sem endereço retornou 400/INVALID_BILLING_ADDRESS antes de escrita/gateway; contagem de pagamentos/pedidos do cliente de teste continua zero.
+- [ ] Fluxo real aguarda somente preparações que ainda exigem evidência: chave pública/domínio de tokenização, pagamento aprovado e entrega webhook, depois ativação/convite e browser autenticado dos dois papéis. Não houve criação de senha, conta liberada ou associação do protótipo sem aprovação.
