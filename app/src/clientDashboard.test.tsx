@@ -235,8 +235,8 @@ describe('dashboard do cliente', () => {
     const data = dashboardData({
       shell: { ...dashboardData().shell!, modules: { ...dashboardData().shell!.modules, editor: 'ativo', versoes: 'ativo' } },
       versions: [
-        { id: 'v2', label: 'V2', macro: 'V2', status: 'publicada', published_at: '2026-09-16T12:00:00Z', changelog: 'Segunda entrega', build_reference: 'build-v2', is_current: true, created_at: '2026-09-16T12:00:00Z' },
-        { id: 'v1', label: 'V1', macro: 'V1', status: 'publicada', published_at: '2026-09-15T12:00:00Z', changelog: 'Primeira entrega', build_reference: 'build-v1', is_current: false, created_at: '2026-09-15T12:00:00Z' },
+        { id: 'v2', label: 'V2', macro: 'V2', status: 'publicada', published_at: '2026-09-16T12:00:00Z', changelog: 'Segunda entrega', build_reference: 'build-v2', is_current: true, created_at: '2026-09-16T12:00:00Z', editor_checklists: [{ id: 'check-1', versionId: 'v2', status: 'ingerido', baseVersionLabel: 'V1', items: [{ screen: 'home', component: 'hero', changes: [{ before: {}, after: { text: 'Novo' } }] }] }] },
+        { id: 'v1', label: 'V1', macro: 'V1', status: 'publicada', published_at: '2026-09-15T12:00:00Z', changelog: 'Primeira entrega', build_reference: 'build-v1', is_current: false, created_at: '2026-09-15T12:00:00Z', editor_checklists: [] },
       ],
     })
     renderDashboard('versoes', data)
@@ -246,6 +246,8 @@ describe('dashboard do cliente', () => {
     expect(screen.getByText('Primeira entrega')).toBeVisible()
     expect(screen.getByText('Build: build-v2')).toBeVisible()
     expect(screen.getByText('Build: build-v1')).toBeVisible()
+    expect(screen.getByText('Ajustes do Editor incorporados')).toBeVisible()
+    expect(screen.getByText('home / hero')).toBeVisible()
   })
 
   it('C15 Marca e arquivos permanece bloqueado', async () => {

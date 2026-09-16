@@ -9,6 +9,10 @@ const serviceMocks = vi.hoisted(() => ({
   loadAdminProject: vi.fn(),
   listAdminActivity: vi.fn(),
   listAdminKanbanItems: vi.fn(),
+  listAdminEditorExports: vi.fn(),
+  listAdminProjectVersions: vi.fn(),
+  ingestEditorExport: vi.fn(),
+  associateEditorChecklistVersion: vi.fn(),
   saveCommercialTerms: vi.fn(),
   saveKanbanItem: vi.fn(),
   transitionLead: vi.fn(),
@@ -53,6 +57,10 @@ beforeEach(() => {
   serviceMocks.loadAdminProject.mockResolvedValue(detail())
   serviceMocks.listAdminActivity.mockResolvedValue([])
   serviceMocks.listAdminKanbanItems.mockResolvedValue([])
+  serviceMocks.listAdminEditorExports.mockResolvedValue([])
+  serviceMocks.listAdminProjectVersions.mockResolvedValue([])
+  serviceMocks.ingestEditorExport.mockResolvedValue({ replayed: false, items: 1, checklistId: 'check-1' })
+  serviceMocks.associateEditorChecklistVersion.mockResolvedValue({ replayed: false, versionId: 'v2' })
   serviceMocks.saveCommercialTerms.mockImplementation(async (_projectId: string, values: object) => ({ ...detail().commercialTerms, ...values }))
   serviceMocks.saveKanbanItem.mockImplementation(async (_projectId: string, value: object) => ({ ...detail().kanban[0], ...value }))
   serviceMocks.transitionLead.mockResolvedValue({})
@@ -131,6 +139,33 @@ describe('R1-06 dashboard projections', () => {
     expect(screen.getByText('cliente@example.test')).toBeVisible()
     expect(screen.getByText('https://prototype.example.test')).toBeVisible()
     expect(screen.getByLabelText('Valor formatado')).toHaveTextContent('R$ 1.200,00')
+  })
+
+  it('F2-10 C7 ingere checklist agrupado e associa à próxima versão', async () => {
+    serviceMocks.loadAdminProject.mockResolvedValue(detail({ projectStatus: 'EM_REVISAO_CLIENTE' }))
+    serviceMocks.listAdminProjectVersions.mockResolvedValue([
+      { id: 'v1', label: 'V1', macro: 'V1', published_at: '2026-09-15T10:00:00Z', is_current: false },
+      { id: 'v2', label: 'V2', macro: 'V2', published_at: '2026-09-16T10:00:00Z', is_current: true },
+    ])
+    serviceMocks.listAdminEditorExports.mockResolvedValue([{
+      id: 'export-1', projectId: 'project-1', baseVersionId: 'v1', baseVersionLabel: 'V1', contentSha256: 'abcdef1234567890', filesReadyAt: '2026-09-15T12:01:00Z', changes: [], manifest: {}, conflict: false, createdAt: '2026-09-15T12:00:00Z',
+      checklist: { id: 'check-1', status: 'recebido', items: [{ screen: 'home', component: 'hero', changes: [{ before: { text: 'A' }, after: { text: 'B' } }] }], versionId: null, versionLabel: null, ingestedAt: null, associatedAt: null },
+    }])
+    const view = renderAt('/no/projetos/project-1', <AdminProjectDetailPage />)
+    const user = userEvent.setup()
+    expect(await screen.findByText('home / hero')).toBeVisible()
+    await user.click(screen.getByRole('button', { name: 'Ingerir no Kanban' }))
+    await waitFor(() => expect(serviceMocks.ingestEditorExport).toHaveBeenCalledWith('export-1'))
+    view.unmount()
+
+    serviceMocks.listAdminEditorExports.mockResolvedValue([{
+      id: 'export-1', projectId: 'project-1', baseVersionId: 'v1', baseVersionLabel: 'V1', contentSha256: 'abcdef1234567890', filesReadyAt: '2026-09-15T12:01:00Z', changes: [], manifest: {}, conflict: false, createdAt: '2026-09-15T12:00:00Z',
+      checklist: { id: 'check-1', status: 'ingerido', items: [{ screen: 'home', component: 'hero', changes: [] }], versionId: null, versionLabel: null, ingestedAt: '2026-09-15T13:00:00Z', associatedAt: null },
+    }])
+    renderAt('/no/projetos/project-1', <AdminProjectDetailPage />)
+    await user.selectOptions(await screen.findByLabelText('Versão de destino para V1'), 'v2')
+    await user.click(screen.getByRole('button', { name: 'Associar checklist' }))
+    await waitFor(() => expect(serviceMocks.associateEditorChecklistVersion).toHaveBeenCalledWith('check-1', 'v2'))
   })
 
   it('C4 commercial edit reloads', async () => {

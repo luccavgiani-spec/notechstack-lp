@@ -123,6 +123,42 @@ export type ArchiveAsset = {
   created_at: string
 }
 
+export type AdminProjectVersion = {
+  id: string
+  label: string
+  macro: 'V1' | 'V2' | 'V3'
+  published_at: string
+  is_current: boolean
+}
+
+export type EditorChecklistGroup = {
+  screen: string
+  component: string
+  changes: Array<{ before: Record<string, unknown>; after: Record<string, unknown> }>
+}
+
+export type AdminEditorExport = {
+  id: string
+  projectId: string
+  baseVersionId: string
+  baseVersionLabel: string
+  contentSha256: string
+  filesReadyAt: string | null
+  changes: unknown[]
+  manifest: Record<string, unknown>
+  conflict: boolean
+  createdAt: string
+  checklist: {
+    id: string
+    status: string
+    items: EditorChecklistGroup[]
+    versionId: string | null
+    versionLabel: string | null
+    ingestedAt: string | null
+    associatedAt: string | null
+  }
+}
+
 export type ProjectFilters = {
   niche?: string
   state?: string
@@ -246,6 +282,35 @@ export async function loadAdminProject(projectId: string): Promise<ProjectDetail
   const { data, error } = await supabase.rpc('get_admin_project', { p_project_id: projectId }).maybeSingle()
   if (error) throw error
   return data as ProjectDetail | null
+}
+
+export async function listAdminEditorExports(projectId: string): Promise<AdminEditorExport[]> {
+  const { data, error } = await supabase.rpc('list_admin_editor_exports', { p_project_id: projectId })
+  if (error) throw error
+  return (data ?? []) as AdminEditorExport[]
+}
+
+export async function listAdminProjectVersions(projectId: string): Promise<AdminProjectVersion[]> {
+  const { data, error } = await supabase
+    .from('project_versions')
+    .select('id, label, macro, published_at, is_current')
+    .eq('project_id', projectId)
+    .order('published_at', { ascending: true })
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return (data ?? []) as AdminProjectVersion[]
+}
+
+export async function ingestEditorExport(exportId: string, requestId = crypto.randomUUID()) {
+  const { data, error } = await supabase.rpc('ingest_editor_export', { p_export_id: exportId, p_request_id: requestId })
+  if (error) throw error
+  return data as { replayed: boolean; items?: number; checklistId?: string }
+}
+
+export async function associateEditorChecklistVersion(checklistId: string, versionId: string, requestId = crypto.randomUUID()) {
+  const { data, error } = await supabase.rpc('associate_editor_checklist_version', { p_checklist_id: checklistId, p_version_id: versionId, p_request_id: requestId })
+  if (error) throw error
+  return data as { replayed: boolean; versionId: string }
 }
 
 export async function listAdminActivity(): Promise<ActivityEvent[]> {

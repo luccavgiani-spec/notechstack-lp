@@ -10,13 +10,17 @@ import {
   activateBrandModule,
   activateDashboard,
   archiveProject,
+  associateEditorChecklistVersion,
   convertProject,
   filterActivityEvents,
   filterProjects,
   listAdminActivity,
+  listAdminEditorExports,
   listAdminKanbanItems,
+  listAdminProjectVersions,
   listAdminProjects,
   loadAdminProject,
+  ingestEditorExport,
   publishProjectVersion,
   saveCommercialTerms,
   saveKanbanItem,
@@ -26,6 +30,8 @@ import {
   type ActivityEvent,
   type ActivityView,
   type ActivityKanbanItem,
+  type AdminEditorExport,
+  type AdminProjectVersion,
   type CommercialTerms,
   type KanbanItem,
   type ProjectCard,
@@ -51,6 +57,71 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
       </button>
     </div>
   );
+}
+
+function EditorExportsControl({ project, onChanged }: { project: ProjectDetail; onChanged: () => void }) {
+  const [exports, setExports] = useState<AdminEditorExport[]>([]);
+  const [versions, setVersions] = useState<AdminProjectVersion[]>([]);
+  const [targets, setTargets] = useState<Record<string, string>>({});
+  const [refreshToken, setRefreshToken] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    void Promise.all([listAdminEditorExports(project.id), listAdminProjectVersions(project.id)])
+      .then(([nextExports, nextVersions]) => {
+        if (active) { setExports(nextExports); setVersions(nextVersions); }
+      })
+      .catch(() => { if (active) setError(true); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [project.id, refreshToken]);
+
+  async function ingest(item: AdminEditorExport) {
+    setBusy(item.id); setMessage("");
+    try {
+      const result = await ingestEditorExport(item.id);
+      setMessage(`${result.items ?? item.checklist.items.length} grupo(s) encaminhado(s) ao Kanban.`);
+      setRefreshToken((value) => value + 1); onChanged();
+    } catch { setMessage("Não foi possível ingerir o pacote. O projeto deve estar em revisão do cliente."); }
+    finally { setBusy(null); }
+  }
+
+  async function associate(item: AdminEditorExport) {
+    const versionId = targets[item.checklist.id];
+    if (!versionId) { setMessage("Selecione a versão que incorporou este checklist."); return; }
+    setBusy(item.checklist.id); setMessage("");
+    try {
+      await associateEditorChecklistVersion(item.checklist.id, versionId);
+      setMessage("Checklist associado à versão e liberado no histórico do cliente.");
+      setRefreshToken((value) => value + 1);
+    } catch { setMessage("Não foi possível associar: escolha uma versão publicada depois da versão-base."); }
+    finally { setBusy(null); }
+  }
+
+  return <section className="rounded-2xl border border-borda bg-white p-5">
+    <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-azul">Exports do Editor</h2>
+    <p className="mt-2 text-sm text-cinza">Checklist agrupado por tela e componente, com ingestão idempotente no Kanban.</p>
+    {loading ? <p className="mt-5 text-sm text-cinza" role="status">Carregando exports…</p> : null}
+    {error ? <button type="button" className="mt-5 rounded-xl bg-tinta px-4 py-2 text-sm text-white" onClick={() => { setLoading(true); setError(false); setRefreshToken((value) => value + 1); }}>Tentar de novo</button> : null}
+    {!loading && !error && exports.length === 0 ? <p className="mt-5 rounded-xl border border-dashed border-borda p-5 text-sm text-cinza">Nenhum pacote recebido.</p> : null}
+    <div className="mt-5 space-y-4">{exports.map((item) => {
+      const base = versions.find((version) => version.id === item.baseVersionId);
+      const targetsForItem = versions.filter((version) => version.id !== item.baseVersionId && (!base || new Date(version.published_at) >= new Date(base.published_at)));
+      return <article className="rounded-xl border border-borda p-4" key={item.id}>
+        <div className="flex flex-wrap items-center justify-between gap-2"><div><h3 className="font-bold">Base {item.baseVersionLabel}</h3><p className="font-mono text-xs text-cinza">SHA-256 {item.contentSha256.slice(0, 12)}…</p></div><div className="flex gap-2">{item.conflict ? <span className="rounded-full bg-ambar-tint px-3 py-1 text-xs font-semibold">Conflito de base</span> : null}<span className="rounded-full bg-osso px-3 py-1 text-xs font-semibold">{item.checklist.status}</span></div></div>
+        <div className="mt-4 space-y-3">{item.checklist.items.map((group) => <div className="rounded-lg bg-osso p-3" key={`${group.screen}:${group.component}`}><p className="font-semibold">{group.screen} / {group.component}</p>{group.changes.map((change, index) => <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2" key={index}><pre className="overflow-auto rounded bg-white p-2">Antes: {JSON.stringify(change.before, null, 2)}</pre><pre className="overflow-auto rounded bg-white p-2">Depois: {JSON.stringify(change.after, null, 2)}</pre></div>)}</div>)}</div>
+        {!item.filesReadyAt ? <p className="mt-3 text-sm text-cinza">Aguardando os quatro arquivos do pacote.</p> : null}
+        {item.checklist.status === "recebido" ? <button type="button" disabled={busy !== null || !item.filesReadyAt || project.projectStatus !== "EM_REVISAO_CLIENTE"} className="mt-4 rounded-xl bg-tinta px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" onClick={() => void ingest(item)}>Ingerir no Kanban</button> : null}
+        {item.checklist.status === "ingerido" && !item.checklist.versionId ? <div className="mt-4 flex flex-wrap gap-2"><label className="min-w-56 flex-1 text-sm"><span className="sr-only">Versão de destino</span><select aria-label={`Versão de destino para ${item.baseVersionLabel}`} className="w-full rounded-xl border border-borda px-3 py-2" value={targets[item.checklist.id] ?? ""} onChange={(event) => setTargets({ ...targets, [item.checklist.id]: event.target.value })}><option value="">Associar à versão…</option>{targetsForItem.map((version) => <option key={version.id} value={version.id}>{version.label}</option>)}</select></label><button type="button" disabled={busy !== null} className="rounded-xl border border-tinta px-4 py-2 text-sm font-semibold" onClick={() => void associate(item)}>Associar checklist</button></div> : null}
+        {item.checklist.versionLabel ? <p className="mt-4 text-sm font-semibold text-verde">Incorporado em {item.checklist.versionLabel}</p> : null}
+      </article>;
+    })}</div>
+    {message ? <p className="mt-4 text-sm" role="status">{message}</p> : null}
+  </section>;
 }
 
 function EmptyState({
@@ -1319,6 +1390,9 @@ export function AdminProjectDetailPage() {
         </div>
         <div className="mt-5">
           <DashboardRelease project={project} onChanged={reload} />
+        </div>
+        <div className="mt-5">
+          <EditorExportsControl project={project} onChanged={reload} />
         </div>
         <div className="mt-5">
           <VersionControls project={project} onChanged={reload} />

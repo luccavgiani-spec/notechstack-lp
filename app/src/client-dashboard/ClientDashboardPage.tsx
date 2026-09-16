@@ -328,6 +328,11 @@ function VersionsModule({ versions }: { versions: ProjectVersion[] }) {
             </div>
             <p className="mt-4 whitespace-pre-wrap text-sm leading-6">{version.changelog}</p>
             <p className="mt-3 font-mono text-xs text-cinza">Build: {version.build_reference}</p>
+            {version.editor_checklists.map((checklist) => <div className="mt-4 rounded-xl bg-osso p-4" key={checklist.id}>
+              <p className="font-mono text-xs font-semibold uppercase tracking-[0.1em] text-azul">Ajustes do Editor incorporados</p>
+              <p className="mt-1 text-xs text-cinza">Solicitados sobre {checklist.baseVersionLabel}</p>
+              <ul className="mt-3 space-y-2">{checklist.items.map((group) => <li className="text-sm" key={`${group.screen}:${group.component}`}><span className="font-semibold">{group.screen} / {group.component}</span><span className="text-cinza"> · {group.changes.length} ajuste(s)</span>{group.changes.map((change, index) => <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2" key={index}><pre className="overflow-auto rounded bg-white p-2">Antes: {JSON.stringify(change.before, null, 2)}</pre><pre className="overflow-auto rounded bg-white p-2">Depois: {JSON.stringify(change.after, null, 2)}</pre></div>)}</li>)}</ul>
+            </div>)}
           </li>
         ))}
       </ol>
