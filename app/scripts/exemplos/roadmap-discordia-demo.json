@@ -1,0 +1,44 @@
+{
+  "answers": {
+    "objetivo": "Validar a estrutura do dashboard com um case demonstrativo",
+    "negocio": "Discordia — comunidade privada para amigos",
+    "publico": "Pequenas comunidades e grupos de amigos",
+    "ferramentas": "Canais de texto, voz, convites e música sincronizada",
+    "resultado": "Demonstração fictícia; não representa proposta comercial ou contratação"
+  },
+  "references": ["Case Discordia: https://discordia-eight.vercel.app", "Demonstração autorizada para validar o dashboard; nenhuma conta do Discordia será criada ou alterada."],
+  "stack": ["React + Vite", "Supabase", "WebRTC + Cloudflare TURN", "Vercel"],
+  "costs": ["ATENÇÃO: os três planos, preços e prazos abaixo são fictícios, apenas para validar a estrutura. Não constituem oferta, contrato ou cobrança.", "Infraestrutura: valor não estimado nesta demonstração."],
+  "next_steps": ["Conferir os três planos de exemplo", "Abrir o case Discordia na aba Protótipo", "Validar a navegação do dashboard; nenhuma contratação será realizada nesta etapa"],
+  "tiers": {
+    "essencial": {
+      "escopo": ["DEMO: comunidade com convites", "DEMO: canais de texto"],
+      "profundidade": "Fictício — validar o fluxo principal da comunidade",
+      "exclusoes": ["Voz e música", "Qualquer compromisso comercial real"],
+      "complexidade": "Baixa — exemplo fictício",
+      "prazo_dias": 7,
+      "valor_centavos": 100000,
+      "faixa": "R$ 1.000 e 7 dias fictícios; sem cobrança"
+    },
+    "basico": {
+      "escopo": ["DEMO: tudo do Essencial", "DEMO: canais de voz e anexos"],
+      "profundidade": "Fictício — comunidade com comunicação por texto e voz",
+      "exclusoes": ["Música sincronizada", "Qualquer compromisso comercial real"],
+      "complexidade": "Média — exemplo fictício",
+      "prazo_dias": 15,
+      "valor_centavos": 250000,
+      "faixa": "R$ 2.500 e 15 dias fictícios; sem cobrança"
+    },
+    "completo": {
+      "escopo": ["DEMO: tudo do Básico", "DEMO: música sincronizada e fila compartilhada"],
+      "profundidade": "Fictício — experiência completa inspirada no case Discordia",
+      "exclusoes": ["Qualquer compromisso comercial real"],
+      "complexidade": "Alta — exemplo fictício",
+      "prazo_dias": 30,
+      "valor_centavos": 500000,
+      "faixa": "R$ 5.000 e 30 dias fictícios; sem cobrança"
+    }
+  },
+  "preferred_tier": null,
+  "prototype_url": "https://discordia-eight.vercel.app"
+}
