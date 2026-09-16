@@ -282,3 +282,33 @@ Esta seção atualiza o estado histórico acima. Lucca autorizou explicitamente 
 - [ ] sync-vault bloqueada: a skill permite somente `05-Codex/context`, mas o vault atual usa `05-Núcleo/context`. Nenhuma escrita fora da restrição nem mapa duplicado foi criado.
 
 Veredito R1-08: **PENDENTE DE PROVAS EXTERNAS** (C4 aprovado; demais critérios não recebem PASS por inferência). Próxima retomada segura: login das contas na URL Vercel, secrets/webhook Pagar.me, recuperação Registro.br e apontamento exclusivo do subdomínio app; depois prova Pix única e regressão do legado.
+
+## Validação do alias Vercel — 16/09/2026
+
+- [x] Identificado e corrigido CORS: a origem exata `https://notechstack-app.vercel.app` agora é aceita, sem liberar `*.vercel.app`. Publicadas somente as cinco functions da aplicação que usam esse helper; integrações legadas não foram republicadas.
+- [x] Contrato novo: 12/12 testes de origens confiáveis, externas e preflight. Suíte completa atual 117/117, lint e build aprovados; banco continua 364/364 e cenário E2E anterior 8/8 (não reexecutados nesta mudança de cabeçalhos).
+- [x] Prova remota OPTIONS: alias Vercel, app e www próprios receberam suas origens exatas; origem de outro projeto Vercel não foi autorizada. Quatro respostas HTTP 204, sem escrita de negócio.
+- [x] Seis probes remotos sem autenticação: checkout GET recusado com 405; webhook e quatro functions autenticadas recusados com 401. Não foi criado pedido, pagamento ou projeto.
+- [x] Browser autenticado como cliente: seleção de projetos carregou e tentativa de abrir `/no/projetos` redirecionou para `/nao-autorizado`; aba restaurada ao dashboard cliente. Nenhum projeto disponível é esperado enquanto não houver associação real.
+- [x] Leitura pública de sete tabelas sensíveis não retornou linhas: projects, kanban_items, activity_events e memberships vazias sob RLS; project_versions, editor_exports e payments recusadas com 401/42501. Banco de produção está sem projetos; esta prova não substitui os testes de isolamento com dados locais.
+- [x] Home HTTP 200 com marcador v7 `heroSlogan`, assets roadmap-checkout.js e diagnostico.js presentes e servidos HTTP 200 como JavaScript, não fallback HTML. Não equivale à prova C6 pós-pagamento.
+- [ ] Cartão em produção requer ainda a chave pública Pagar.me na configuração pública da home e domínio de tokenização autorizado. Os três secrets abaixo habilitam a base backend/Pix; não provam cartão funcionando.
+- [ ] A documentação atual informa migração de `charge.chargedback` para `chargeback.received` até 30/09/2026. O evento legado está coberto localmente; validar o novo payload/contrato e sua adaptação antes da descontinuação, sem assumir equivalência de shapes.
+
+## Configuração segura pelo titular — Pagar.me
+
+1. No dashboard Pagar.me da conta existente, selecione **Produção/live**, depois **Configurações de Conta → Chaves → Criar Chave**. Nome sugerido: `nó-roadmap-produção`. Crie uma chave separada para esta integração, com leitura/escrita de pedidos e consultas necessárias, usando escopo personalizado quando disponível. Não excluir, redefinir ou trocar a chave do roteador. A chave é exibida uma vez: guardar no gerenciador de senhas e colar diretamente no Supabase, nunca no chat.
+2. No Supabase, abrir `https://supabase.com/dashboard/project/sdeowbqmwkwseyktyemn/functions/secrets` e salvar:
+   - `PAGARME_SECRET_KEY`: chave secreta **de produção** recém-criada na Pagar.me (não chave pública, não chave Pix e não chave do app Stone).
+   - `PAGARME_WEBHOOK_USER`: identificador escolhido pelo titular, exclusivo do webhook da nó, sem dois-pontos. Não é o login do dashboard.
+   - `PAGARME_WEBHOOK_PASS`: senha nova forte e exclusiva, gerada no gerenciador de senhas. Não reutilizar senha de login nem a chave secreta da API.
+3. No Pagar.me, **Configurações → Webhooks → Criar webhook**, sem editar o webhook do roteador. Endpoint: `https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/pagarme-webhook-no`. Habilitar autenticação **Basic** e repetir exatamente o usuário/senha dos dois secrets de webhook; a autenticação é obrigatória para o nosso endpoint, mesmo que opcional no painel.
+4. Eventos atuais tratados: `order.paid`, `order.payment_failed`, `order.canceled`, `charge.refunded` e `charge.chargedback` (ver pendência de migração acima). Após salvar, executar teste/replay supervisionados antes de uma única cobrança Pix real de R$ 149,90. Testes do roteador não comprovam a nó.
+5. Separadamente, guardar a chave **pública** da mesma conta/ambiente para configurar tokenização de cartão na home, sem jamais publicar a chave secreta. Não alterar o modelo de negócio/meios de pagamento compartilhados do roteador para habilitar um simulador.
+
+Fontes oficiais verificadas nesta retomada:
+
+- [Pagar.me — chave secreta/pública e chaves por integração](https://pagarme.helpjuice.com/pt_BR/p2-manual-da-dashboard/4-configura%C3%A7%C3%B5es-como-consultar-a-chave-secreta-e-a-chave-p%C3%BAblica)
+- [Pagar.me — configuração de webhooks](https://pagarme.helpjuice.com/pt_BR/p2-funcionalidades/configura%C3%A7%C3%B5es-como-configurar-webhooks)
+- [Pagar.me — eventos de webhook](https://docs.pagar.me/reference/eventos-de-webhook-1)
+- [Supabase — secrets de produção](https://supabase.com/docs/guides/functions/secrets)
