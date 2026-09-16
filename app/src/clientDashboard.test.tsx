@@ -244,6 +244,8 @@ describe('dashboard do cliente', () => {
     expect(screen.getByText('Atual')).toBeVisible()
     expect(screen.getByText('Segunda entrega')).toBeVisible()
     expect(screen.getByText('Primeira entrega')).toBeVisible()
+    expect(screen.getByText('Build: build-v2')).toBeVisible()
+    expect(screen.getByText('Build: build-v1')).toBeVisible()
   })
 
   it('C15 Marca e arquivos permanece bloqueado', async () => {

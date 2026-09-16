@@ -327,6 +327,7 @@ function VersionsModule({ versions }: { versions: ProjectVersion[] }) {
               {version.is_current ? <span className="rounded-full bg-verde px-3 py-1 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-white">Atual</span> : null}
             </div>
             <p className="mt-4 whitespace-pre-wrap text-sm leading-6">{version.changelog}</p>
+            <p className="mt-3 font-mono text-xs text-cinza">Build: {version.build_reference}</p>
           </li>
         ))}
       </ol>

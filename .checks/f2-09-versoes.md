@@ -266,10 +266,10 @@ only on a DOM test for a persisted decision.
 - O Verifier fresco recebe esta checklist e o diff completo depois do último commit, reexecuta
   reset/replay local e presta contas do denominador C1–C15; não usa o ambiente hospedado.
 
-## Evidência local — 15/09/2026
+## Evidência local — 16/09/2026
 
-- [x] C1–C3, C5–C7, C10–C11, C13–C14 de fronteira: harness F2-09 → PASS, 17 assertions.
-- [x] Banco/RLS/histórico: após reset local, suíte pgTAP completa → PASS, 294 testes (inclui `f2_09_versoes.test.sql`).
-- [x] C4/C12 na projeção CLIENT: Testing Library → PASS (`clientDashboard.test.tsx`), histórico com V2 atual e V1 preservada.
-- [x] Assembly local: Vitest completo → PASS (89 testes); lint, TypeScript e build passaram; E2E R1-05 passou em desktop e mobile.
-- [ ] C15: ainda não há spec Playwright próprio para o ciclo de versões; a regressão de navegador existente não substitui a jornada de publicação.
+- [x] C1–C3, C5–C7, C10–C11, C13–C14 de fronteira: harness F2-09 → PASS, 17 assertions; retries locais de cold start reutilizam o mesmo `requestId`.
+- [x] Banco/RLS/histórico: após reset local, pgTAP F2-09 → PASS, 40 provas; suíte completa → PASS, 335 provas.
+- [x] C4/C12 na projeção CLIENT: Testing Library → PASS; o histórico mostra versão atual, versões anteriores e cada `build_reference`.
+- [x] C15: Playwright próprio → PASS, 2/2 em 1440×900 e 375×812; percorre V1 → V1.1 → V2 → V3 → CONCLUIDO, preserva a ordem CLIENT e não registrou `console.error`, `pageerror` ou HTTP ≥500.
+- [x] Gates do mesmo HEAD: Vitest completo → PASS, 101 testes; lint, TypeScript e build → PASS. O aviso de chunk Vite >500 kB é não bloqueante e não altera o resultado do build.

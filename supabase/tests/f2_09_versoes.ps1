@@ -59,7 +59,13 @@ function SignIn([string]$Email, [string]$Password) {
 }
 
 function Invoke-Function([string]$Name, $Body, [string]$Token) {
-  Invoke-Json 'POST' "$script:apiUrl/functions/v1/$Name" $Body @{ Authorization = "Bearer $Token"; apikey = $script:anonKey }
+  $result = $null
+  foreach ($attempt in 1..4) {
+    $result = Invoke-Json 'POST' "$script:apiUrl/functions/v1/$Name" $Body @{ Authorization = "Bearer $Token"; apikey = $script:anonKey }
+    if ($result.Status -lt 500) { break }
+    Start-Sleep -Milliseconds 400
+  }
+  $result
 }
 
 try {
@@ -96,7 +102,7 @@ try {
 
   if ($Scenario -in @('C2','C3','C5','C6','C7','C10','C13','C14','All')) {
     $status = Invoke-Function 'project-status-transition' @{ projectId = $projectId; target = 'V1_EM_DESENVOLVIMENTO'; requestId = "f209-c1-$nonce" } $adminToken
-    Assert-True ($status.Status -eq 200 -and $status.Body.projectStatus -eq 'V1_EM_DESENVOLVIMENTO') 'C1 HTTP transition enters V1 development'
+    Assert-True ($status.Status -eq 200 -and $status.Body.projectStatus -eq 'V1_EM_DESENVOLVIMENTO') "C1 HTTP transition enters V1 development ($($status.Status): $($status.Body | ConvertTo-Json -Compress))"
     $publish = @{ projectId = $projectId; label = 'V1'; macro = 'V1'; changelog = 'Primeira entrega'; buildReference = 'build-v1'; requestId = "f209-c2-$nonce" }
     $response = Invoke-Function 'project-publish-version' $publish $adminToken
     Assert-True ($response.Status -eq 200 -and $response.Body.versionId -and $response.Body.projectStatus -eq 'V1_PUBLICADA') "C2 HTTP V1 publication returns aggregate ($($response.Status): $($response.Body | ConvertTo-Json -Compress); request=$($publish | ConvertTo-Json -Compress))"
