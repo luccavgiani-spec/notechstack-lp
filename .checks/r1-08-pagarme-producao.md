@@ -247,12 +247,13 @@ externa ainda estiver aberta.
   obter evidência remota de C1–C6. Se qualquer porta externa continuar aberta, o veredito deve ser
   `BLOCKED`, não `PASS` parcial.
 
-## Preflight local — 15/09/2026
+## Preflight local — 16/09/2026
 
-- [x] Reset local e pgTAP completo passaram (288 testes).
-- [x] Harness R1-03 passou (64 assertions).
-- [x] Em app/, Vitest, lint, TypeScript e build passaram; E2E R1-05 passou em desktop e mobile.
+- [x] Reset local e pgTAP completo passaram (335 provas).
+- [x] Harness R1-03 passou (64 assertions); os harnesses da Onda 2 também passaram: R1-07 15, F2-09 17 e F3-11 18 assertions.
+- [x] Em app/, Vitest completo (101 testes), lint, TypeScript e build passaram; Playwright da Onda 2 passou 6/6 em desktop e mobile.
 - [x] Parser somente leitura de supabase/config.toml: roadmap-checkout=false, pagarme-webhook-no=false, skill-01-ativar-dashboard=true, project-convert=true.
+- [x] A Vercel CLI não está instalada e não foi instalada nesta onda, conforme a restrição de não configurar integrações externas; a instalação local recomendada (`npm i -g vercel`) fica para uma retomada autorizada.
 - [ ] C1–C6 seguem BLOCKED: não houve push, deploy, DNS, leitura/escrita hospedada, configuração de secrets, conta Pagar.me nem teste Pix real. PAINEL_TOKEN continua pendente de rotação ao final de todas as ondas.
 
 ## Descoberta externa sanitizada — 15/09/2026
