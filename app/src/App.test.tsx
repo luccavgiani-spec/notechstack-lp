@@ -196,7 +196,7 @@ describe('criterion 12 — falha de login', () => {
 })
 
 describe('criterion 13 — guards de sessão e papel', () => {
-  it.each(['/p/projeto-a/como-funciona', '/no/projetos', '/no/projetos/projeto-a', '/no/atividade'])(
+  it.each(['/p/projeto-a/como-funciona', '/no/projetos', '/no/projetos/projeto-a', '/no/atividade', '/no/cronograma'])(
     'redireciona sessão ausente em %s para /login',
     async (protectedPath) => {
       renderAt(protectedPath)
@@ -220,7 +220,7 @@ describe('criterion 13 — guards de sessão e papel', () => {
     expect(screen.getByText('Texto provisório · revisar copy')).toBeVisible()
   })
 
-  it.each(['/no/projetos/projeto-a', '/no/atividade'])(
+  it.each(['/no/projetos/projeto-a', '/no/atividade', '/no/cronograma'])(
     'mostra não autorizado para CLIENT em %s',
     async (adminPath) => {
       mocks.getSession.mockResolvedValue({ data: { session: buildSession('CLIENT') }, error: null })

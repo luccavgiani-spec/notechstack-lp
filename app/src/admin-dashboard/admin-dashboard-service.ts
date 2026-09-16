@@ -108,6 +108,9 @@ export type ActivityEvent = {
 
 export type ActivityKanbanItem = KanbanItem & { project_name: string }
 
+export type ScheduleSettings = { dailyItemCapacity: number; updatedAt?: string }
+export type ScheduleFilters = { projectId?: string; macroVersion?: string; from?: string; to?: string }
+
 export type ArchiveAsset = {
   id: string
   project_id: string
@@ -263,6 +266,77 @@ export async function listAdminKanbanItems(): Promise<ActivityKanbanItem[]> {
   const { data, error } = await supabase.rpc('list_admin_kanban_items')
   if (error) throw error
   return (data ?? []) as ActivityKanbanItem[]
+}
+
+export async function listAdminScheduleItems(filters: ScheduleFilters = {}): Promise<ActivityKanbanItem[]> {
+  const { data, error } = await supabase.rpc('list_admin_schedule_items', {
+    p_project_id: filters.projectId ?? null,
+    p_macro_version: filters.macroVersion ?? null,
+    p_from: filters.from ?? null,
+    p_to: filters.to ?? null,
+  })
+  if (error) throw error
+  return (data ?? []) as ActivityKanbanItem[]
+}
+
+export async function getAdminScheduleSettings(): Promise<ScheduleSettings> {
+  const { data, error } = await supabase.rpc('get_admin_schedule_settings').single()
+  if (error) throw error
+  const value = (data ?? {}) as Record<string, unknown>
+  return { dailyItemCapacity: Number(value.dailyItemCapacity), updatedAt: value.updatedAt as string | undefined }
+}
+
+export async function setAdminDailyCapacity(dailyItemCapacity: number): Promise<ScheduleSettings> {
+  const { data, error } = await supabase.rpc('set_admin_daily_item_capacity', { p_daily_item_capacity: dailyItemCapacity }).single()
+  if (error) throw error
+  const value = (data ?? {}) as Record<string, unknown>
+  return { dailyItemCapacity: Number(value.dailyItemCapacity) }
+}
+
+export function scheduleLoad(items: ActivityKanbanItem[], from: string, days = 45): Record<string, number> {
+  const load: Record<string, number> = {}
+  const start = new Date(`${from}T12:00:00Z`)
+  for (let offset = 0; offset < days; offset += 1) {
+    load[new Date(start.getTime() + offset * 86400000).toISOString().slice(0, 10)] = 0
+  }
+  for (const item of items) {
+    if (item.status !== 'concluido' && item.scheduled_date && item.scheduled_date in load) load[item.scheduled_date] += 1
+  }
+  return load
+}
+
+export function wouldExceedDailyCapacity(items: ActivityKanbanItem[], candidate: Partial<KanbanItem> & { id?: string }, capacity: number): boolean {
+  if (!candidate.scheduled_date || candidate.status === 'concluido') return false
+  const existing = items.filter((item) => item.id !== candidate.id && item.status !== 'concluido' && item.scheduled_date === candidate.scheduled_date).length
+  return existing + 1 > capacity
+}
+
+export type ScheduleProposalItem = Pick<KanbanItem, 'title' | 'macro_version' | 'status' | 'scheduled_date' | 'position'> & { beyondHorizon: boolean }
+
+const scheduleTemplate = [
+  { title: 'D+1 — referências', day: 1, macro: 'V1' },
+  { title: 'D+3 — dashboard', day: 3, macro: 'V1' },
+  { title: 'V1 — entrega', day: 15, macro: 'V1' },
+  { title: 'Revisão V1 — retorno', day: 16, macro: 'V1' },
+  { title: 'V2 — entrega', day: 22, macro: 'V2' },
+  { title: 'Revisão V2 — retorno', day: 23, macro: 'V2' },
+  { title: 'V3 — go-live', day: 29, macro: 'V3' },
+] as const
+
+function plusDays(date: string, days: number): string {
+  return new Date(new Date(`${date}T12:00:00Z`).getTime() + days * 86400000).toISOString().slice(0, 10)
+}
+
+export function proposeThirtyDaySchedule(items: ActivityKanbanItem[], start: string, capacity: number): ScheduleProposalItem[] {
+  const occupied = new Map<string, number>()
+  for (const item of items) if (item.status !== 'concluido' && item.scheduled_date) occupied.set(item.scheduled_date, (occupied.get(item.scheduled_date) ?? 0) + 1)
+  return scheduleTemplate.map((entry, index) => {
+    let date = plusDays(start, entry.day)
+    const preferredDate = date
+    while ((occupied.get(date) ?? 0) >= capacity) date = plusDays(date, 1)
+    occupied.set(date, (occupied.get(date) ?? 0) + 1)
+    return { title: entry.title, macro_version: entry.macro, status: 'a_fazer', scheduled_date: date, position: items.length + index, beyondHorizon: date > plusDays(start, 45) || date !== preferredDate && date > plusDays(start, 29) }
+  })
 }
 
 export async function saveCommercialTerms(projectId: string, values: Omit<CommercialTerms, 'project_id' | 'updated_at'>, requestId = crypto.randomUUID()) {

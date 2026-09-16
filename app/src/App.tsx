@@ -13,6 +13,7 @@ import { LoginPage } from './pages/LoginPage'
 import { UnauthorizedPage } from './pages/UnauthorizedPage'
 import { SaldosPage } from './pages/SaldosPage'
 import { ArchiveLibraryPage } from './pages/ArchiveLibraryPage'
+import { SchedulePage } from './pages/SchedulePage'
 
 export function AppRoutes() {
   return (
@@ -33,6 +34,7 @@ export function AppRoutes() {
           <Route path="atividade" element={<AdminActivityPage />} />
           <Route path="saldos" element={<SaldosPage />} />
           <Route path="biblioteca" element={<ArchiveLibraryPage />} />
+          <Route path="cronograma" element={<SchedulePage />} />
         </Route>
       </Route>
       <Route path="/nao-autorizado" element={<UnauthorizedPage />} />
