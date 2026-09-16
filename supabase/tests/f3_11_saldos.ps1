@@ -80,6 +80,7 @@ function New-Lead([string]$Suffix) {
 function Checkout($Lead) {
   Invoke-Json 'POST' "$script:apiUrl/functions/v1/roadmap-checkout" @{
     leadId = $Lead.Id; sid = $Lead.Sid; metodo = 'pix'; amount_cents = 1
+    document = '52998224725'
     answers = @{ objetivo = 'Lancar produto'; negocio = 'SaaS'; publico = 'PMEs'; ferramentas = 'Planilhas'; resultado = 'MVP publicado' }
   } @{ apikey = $script:anonKey }
 }

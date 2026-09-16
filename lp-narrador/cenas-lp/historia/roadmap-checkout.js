@@ -95,9 +95,24 @@
     return data.id;
   }
 
-  async function checkout({ lead, answers, metodo, card }) {
+  function normalizePayerCpf(value) {
+    if (typeof value !== 'string' || !/^[\d.\s-]+$/.test(value)) return null;
+    const digits = value.replace(/\D/g, '');
+    if (digits.length !== 11 || /^(\d)\1{10}$/.test(digits)) return null;
+    for (let length = 9; length <= 10; length++) {
+      let sum = 0;
+      for (let i = 0; i < length; i++) sum += Number(digits[i]) * (length + 1 - i);
+      const remainder = (sum * 10) % 11;
+      if ((remainder === 10 ? 0 : remainder) !== Number(digits[length])) return null;
+    }
+    return digits;
+  }
+
+  async function checkout({ lead, answers, metodo, card, document }) {
+    const payerDocument = normalizePayerCpf(document);
+    if (!payerDocument) throw new RoadmapCheckoutError('INVALID_PAYER_DOCUMENT', 'Confira o CPF do pagador.');
     const leadId = await ensureLead(lead, answers);
-    const body = { leadId, sid: lead.sid, metodo, answers };
+    const body = { leadId, sid: lead.sid, metodo, answers, document: payerDocument };
     if (metodo === 'cartao') body.cardToken = await tokenizeCard(card);
 
     return jsonRequest(config().checkoutUrl, {
@@ -110,6 +125,7 @@
   window.NoRoadmapCheckout = {
     checkout,
     tokenizeCard,
+    normalizePayerCpf,
     RoadmapCheckoutError,
     _resetForTests: () => leadBySid.clear(),
   };

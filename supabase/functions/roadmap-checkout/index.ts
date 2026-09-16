@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, handlePreflight } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
+import { normalizePayerCpf } from "../_shared/payer-document.ts";
 import { gatewayCharge, gatewayStatus, pagarmeRequest } from "../_shared/pagarme.ts";
 
 const AMOUNT_CENTS = 14990;
@@ -73,6 +74,8 @@ Deno.serve(async (request) => {
     if (!leadId || !sid || !method || !answers || (method === "cartao" && !cardToken)) {
       return json(request, 400, { error_code: "INVALID_REQUEST" });
     }
+    const document = normalizePayerCpf(body.document);
+    if (!document) return json(request, 400, { error_code: "INVALID_PAYER_DOCUMENT" });
 
     const sb = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
     const { data: lead, error: leadError } = await sb.from("leads")
@@ -121,6 +124,7 @@ Deno.serve(async (request) => {
       name: lead.nome,
       email: lead.email,
       type: "individual",
+      document,
       ...(phone ? { phones: { mobile_phone: phone } } : {}),
     };
     const orderCode = `no-roadmap-${payment.id}`;

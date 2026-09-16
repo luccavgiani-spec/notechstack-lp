@@ -85,7 +85,7 @@ dos seis critérios por si só.
 
 ### S1 — app, functions e configuração hospedada
 
-- [ ] **C1 — o app está servido no domínio próprio sem retirar a home.**
+- [x] **C1 — o app está servido no domínio próprio sem retirar a home.**
   `https://app.notechstack.com.br/login` responde HTTP 200 pelo projeto Vercel correto, cujo Root
   Directory é exatamente `app`; o documento servido contém o assembly do app e não um fallback da
   home. Em paralelo, `https://www.notechstack.com.br/` continua HTTP 200 e mantém o marcador do
@@ -97,7 +97,7 @@ dos seis critérios por si só.
   Prova externa, somente com `Unresolved 5` e `Unresolved 2` resolvidos: inspeção read-only do
   projeto Vercel + `Invoke-WebRequest`/browser nos dois domínios + verificação do Root Directory.
 
-- [ ] **C2 — as quatro functions e os três secrets de produção estão no projeto certo.**
+- [x] **C2 — as quatro functions e os três secrets de produção estão no projeto certo.**
   `roadmap-checkout`, `pagarme-webhook-no`, `skill-01-ativar-dashboard` e `project-convert` estão
   implantadas em `sdeowbqmwkwseyktyemn`, com `verify_jwt` efetivo respectivamente `false`, `false`,
   `true`, `true`, igual ao `supabase/config.toml`. `PAGARME_SECRET_KEY`, `PAGARME_WEBHOOK_USER` e
@@ -323,3 +323,22 @@ Fontes oficiais verificadas nesta retomada:
 - [x] Formulário de **criação** de webhook preparado na conta Pagar.me existente, sem editar endpoints legados: URL exata do endpoint da nó, ativo, autenticação habilitada e somente order.paid/order.payment_failed/order.canceled/charge.refunded/charge.chargedback selecionados. Os numerosos eventos extras inicialmente selecionados foram removidos apenas deste rascunho novo.
 - [ ] Titular deve conferir/preencher usuário e senha Basic iguais aos secrets e concluir o salvamento/validação transacional diretamente no painel. Nenhum valor desses campos foi lido ou modificado pelo agente; formulário preservado como handoff.
 - [ ] C2 continua parcial até confirmar a chave de produção em uso; C3 aguarda webhook salvo, teste/replay e contagens; C5/C6 aguardam a prova Pix real e regressão do legado.
+
+## HTTPS, webhook salvo e correção do documento — 16/09/2026
+
+Esta seção substitui os estados parciais anteriores, sem apagar o histórico das provas.
+
+- [x] C1 aprovado: `https://app.notechstack.com.br/login` HTTP 200 com título/assembly do app; `https://www.notechstack.com.br/` HTTP 200 com marcador v7 e asset checkout. Certificado validado normalmente, sem bypass. Root Directory `app` já verificado no projeto separado.
+- [x] C2 aprovado: quatro functions ACTIVE com flags efetivas false/false/true/true; três secrets presentes por nome. A chave criou pedidos reais na conta live existente, confirmando ambiente/validade sem acesso ao valor. Titular confirmou rotação das credenciais Basic; autenticação por entrega/replay permanece C3, ainda não aprovada.
+- [x] Webhook exclusivo da nó salvo e ativo, autenticação habilitada, endpoint correto e somente os cinco eventos tratados selecionados. Credenciais não foram inspecionadas nem registradas.
+- [x] Três tentativas iniciadas pelo titular resultaram em pagamentos failed de 14990 centavos, sem eventos, projetos ou Kanban. Inspeção restrita da cobrança da nó revelou erro `The customer Document is required.`; nenhuma cobrança do roteador foi alterada, nem tentativa adicional criada pelo agente.
+- [x] Checkout corrigido para o contrato existente de cliente individual: CPF validado no navegador e backend antes de criar pagamento/chamar gateway; encaminhado somente à Pagar.me, sem persistência no lead, payload do pagamento ou telemetria. Cache dos dois scripts da home atualizado.
+- [x] Provas novas: 24/24 testes direcionados do checkout, suíte app 134/134, harness checkout/webhook 71/71 e saldos 18/18; lint, TypeScript/build e diff funcional aprovados. Mock agora exige documento. Banco 364/364 e E2E 8/8 são provas anteriores, não reexecutadas nesta mudança sem schema/React.
+- [ ] C3 pendente: entrega autenticada real e replay com delta/cardinalidade de payment_events; configuração salva não prova entrega.
+- [ ] C5 pendente: um Pix real confirmado, agregado e visualização NO_ADMIN/replay. Não repetir as tentativas falhadas para simular aprovação.
+- [ ] C6 pendente: painel legado e eventos v7 após confirmação.
+- [ ] Cartão live, migração do evento chargeback, PAINEL_TOKEN, reconciliação do histórico remoto e sync-vault continuam conforme pendências anteriores.
+
+Fonte do requisito: [Pagar.me — Pix e dados obrigatórios do cliente](https://docs.pagar.me/reference/pix-2).
+
+Veredito atualizado: **C1/C2/C4 aprovados; C3/C5/C6 pendentes de prova real**. Não registrar go-live integral antes dessas provas.

@@ -39,6 +39,9 @@ const server = http.createServer(async (request, response) => {
   if (request.method === 'POST' && url.pathname === '/orders') {
     const body = await readJson(request);
     requests.push({ method: 'POST', path: '/orders', body });
+    if (!/^\d{11}$/.test(body.customer?.document || '')) {
+      return send(response, 400, { errors: [{ message: 'The customer Document is required.' }] });
+    }
     if (Number(scenario.httpStatus) !== 200) {
       return send(response, Number(scenario.httpStatus), { errors: [{ message: 'mock failure' }] });
     }

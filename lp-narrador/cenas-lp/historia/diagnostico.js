@@ -174,13 +174,15 @@
   function criaMetodoPagamento(forma){
     metodoPagamento=forma;
     const s=telaPasso(9);
+    const documento='<label class="dg-campo"><span>CPF do pagador</span><input name="pagador_documento" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" aria-describedby="dgDocumentoAjuda"></label>'+
+      '<p id="dgDocumentoAjuda">Usado apenas para processar o pagamento na Pagar.me.</p>';
     if (forma==='pix'){
       s.innerHTML='<p class="dg-k">pagamento via Pix</p><h4 class="dg-q" id="dgQ9" tabindex="-1">gere seu Pix</h4>'+
-        '<div class="dg-pag-metodo dg-pix"><span class="dg-pag-selo">Pix</span><div><b>pagamento na hora</b>'+
+        documento+'<div class="dg-pag-metodo dg-pix"><span class="dg-pag-selo">Pix</span><div><b>pagamento na hora</b>'+
         '<p>O QR Code e o copia e cola aparecem nesta tela.</p></div></div><p class="dg-erro" role="alert" hidden></p>';
     } else {
       s.innerHTML='<p class="dg-k">pagamento</p><h4 class="dg-q" id="dgQ9" tabindex="-1">dados do cartão</h4>'+
-        '<div class="dg-cartao"><label class="dg-campo"><span>nome no cartão</span><input name="cartao_nome" autocomplete="cc-name"></label>'+
+        documento+'<div class="dg-cartao"><label class="dg-campo"><span>nome no cartão</span><input name="cartao_nome" autocomplete="cc-name"></label>'+
         '<label class="dg-campo"><span>número do cartão</span><input name="cartao_numero" inputmode="numeric" autocomplete="cc-number" maxlength="23"></label>'+
         '<div class="dg-cartao-linha"><label class="dg-campo"><span>validade</span><input name="cartao_validade" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA"></label>'+
         '<label class="dg-campo"><span>CVV</span><input name="cartao_cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4"></label></div></div>'+
@@ -276,13 +278,15 @@
   async function pagar(){
     if (atual===7){ vai(8); return; }
     if (atual!==9||pagamentoEmCurso||pagamentoConcluido) return;
-    if (!validaCartao()) return;
     if (!window.NoRoadmapCheckout){ mostraErro(telaPasso(9),'› pagamento indisponível. Recarregue a página e tente novamente.'); return; }
+    if (!window.NoRoadmapCheckout.normalizePayerCpf(valor('pagador_documento'))){ mostraErro(telaPasso(9),'› confira o CPF do pagador.',campo('pagador_documento')); return; }
+    if (!validaCartao()) return;
     ocupaPagamento(true);
     mostraErro(telaPasso(9),'');
     try{
       const dados=await window.NoRoadmapCheckout.checkout({
         lead:contato(), answers:respostas(), metodo:metodoPagamento,
+        document:valor('pagador_documento'),
         card:metodoPagamento==='cartao'?cartao():undefined
       });
       if (metodoPagamento==='cartao') ['cartao_numero','cartao_validade','cartao_cvv'].forEach(n=>{ const el=campo(n); if(el) el.value=''; });

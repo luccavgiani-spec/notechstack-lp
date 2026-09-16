@@ -4,10 +4,12 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { normalizePayerCpf } from '../../supabase/functions/_shared/payer-document'
 
 type CheckoutApi = {
   checkout(input: Record<string, unknown>): Promise<Record<string, unknown>>
   _resetForTests(): void
+  normalizePayerCpf(value: unknown): string | null
 }
 
 const checkoutSource = readFileSync(
@@ -164,11 +166,14 @@ describe('checkout do roadmap na home', () => {
       lead: { nome: 'Ana', email: 'ana@example.com', whatsapp: '11999999999', sid: 'sid-1' },
       answers: { objetivo: 'novo', negocio: 'Loja', publico: 'clientes', ferramentas: 'WhatsApp', resultado: 'Organizar pedidos' },
       metodo: 'cartao',
+      document: '529.982.247-25',
       card: { number: '4000000000000010', holder_name: 'ANA TESTE', exp_month: 12, exp_year: 30, cvv: '123' },
     })
 
     const calls = fetchMock.mock.calls
     const leadBody = JSON.parse(String(calls[0][1]?.body))
+    expect(leadBody).not.toHaveProperty('document')
+    expect(JSON.stringify(leadBody)).not.toContain('52998224725')
     expect(leadBody).toMatchObject({
       contexto: 'roadmap',
       sid: 'sid-1',
@@ -184,7 +189,7 @@ describe('checkout do roadmap na home', () => {
     })
 
     const checkoutBody = JSON.parse(String(calls[2][1]?.body))
-    expect(checkoutBody).toMatchObject({ leadId: 'lead-1', sid: 'sid-1', metodo: 'cartao', cardToken: 'token_card_1' })
+    expect(checkoutBody).toMatchObject({ leadId: 'lead-1', sid: 'sid-1', metodo: 'cartao', cardToken: 'token_card_1', document: '52998224725' })
     expect(JSON.stringify(checkoutBody)).not.toMatch(/4000000000000010|"cvv"|exp_month|exp_year/i)
   })
 
@@ -201,6 +206,7 @@ describe('checkout do roadmap na home', () => {
       lead: { nome: 'Bia', email: 'bia@example.com', whatsapp: '11988888888', sid: 'sid-pix' },
       answers: { objetivo: 'novo', negocio: 'Clínica', publico: 'equipe', ferramentas: 'Planilha', resultado: 'Organizar agenda' },
       metodo: 'pix',
+      document: '52998224725',
     }
     const first = await api.checkout(input)
     const second = await api.checkout(input)
@@ -230,6 +236,7 @@ describe('checkout do roadmap na home', () => {
     fill('cartao_numero', '4000000000000010')
     fill('cartao_validade', '12/30')
     fill('cartao_cvv', '123')
+    fill('pagador_documento', '529.982.247-25')
     fireEvent.click(action)
 
     await waitFor(() => expect(document.body).toHaveTextContent('pagamento aprovado'))
@@ -256,6 +263,7 @@ describe('checkout do roadmap na home', () => {
     const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
     fireEvent.click(action)
     fireEvent.click(document.querySelector<HTMLButtonElement>('[data-pagamento="pix"]')!)
+    fill('pagador_documento', '529.982.247-25')
     fireEvent.click(action)
 
     await waitFor(() => expect(document.body).toHaveTextContent('seu Pix está pronto'))
@@ -281,6 +289,7 @@ describe('checkout do roadmap na home', () => {
     fill('cartao_numero', '4000000000000028')
     fill('cartao_validade', '12/30')
     fill('cartao_cvv', '123')
+    fill('pagador_documento', '52998224725')
     fireEvent.click(action)
 
     await waitFor(() => expect(document.body).toHaveTextContent('pagamento recusado'))
@@ -306,6 +315,7 @@ describe('checkout do roadmap na home', () => {
     const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
     fireEvent.click(action)
     fireEvent.click(document.querySelector<HTMLButtonElement>('[data-pagamento="pix"]')!)
+    fill('pagador_documento', '52998224725')
     fireEvent.click(action)
 
     await waitFor(() => expect(action).toHaveTextContent('processando…'))
@@ -320,6 +330,38 @@ describe('checkout do roadmap na home', () => {
     expect(action).toBeVisible()
     expect(action).toBeEnabled()
     expect(action).toHaveTextContent('gerar Pix →')
+  })
+  it.each([
+    ['52998224725', '52998224725'],
+    ['529.982.247-25', '52998224725'],
+    [' 529.982.247-25 ', '52998224725'],
+    ['', null], [undefined, null], [null, null], [52998224725, null],
+    ['11111111111', null], ['00000000000', null], ['52998224726', null],
+    ['5299822472', null], ['529982247251', null], ['abc52998224725', null],
+  ])('valida CPF igualmente no navegador e no servidor: %s', (input, expected) => {
+    expect(normalizePayerCpf(input)).toBe(expected)
+    expect(window.NoRoadmapCheckout!.normalizePayerCpf(input)).toBe(expected)
+  })
+
+  it.each(['', '11111111111'])('bloqueia CPF inválido antes de salvar lead ou chamar gateway: %s', async (document) => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(window.NoRoadmapCheckout!.checkout({ document })).rejects.toMatchObject({ code: 'INVALID_PAYER_DOCUMENT' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it.each(['pix', 'cartao'])('mostra CPF no DOM e impede envio vazio para %s', (method) => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    mountDiagnostic()
+    completeBriefing()
+    const action = document.querySelector<HTMLButtonElement>('[data-nav="acao"]')!
+    fireEvent.click(action)
+    fireEvent.click(document.querySelector<HTMLButtonElement>(`[data-pagamento="${method}"]`)!)
+    expect(document.querySelector('[name="pagador_documento"]')).toHaveAttribute('autocomplete', 'off')
+    fireEvent.click(action)
+    expect(document.body).toHaveTextContent('confira o CPF do pagador')
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })
 

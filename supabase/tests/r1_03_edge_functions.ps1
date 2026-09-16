@@ -76,6 +76,7 @@ function Checkout($Lead, [string]$Method, [string]$Token = '') {
     leadId = $Lead.Id
     sid = $Lead.Sid
     metodo = $Method
+    document = '529.982.247-25'
     amount_cents = 1
     answers = @{
       objetivo = 'Lançar produto'
@@ -160,7 +161,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   Assert-True ((Get-Rows "payments?lead_id=eq.$($pixLead.Id)&select=id").Count -eq 1) 'C8 existe um único pagamento aberto'
 
   $badSidBody = @{
-    leadId = $pixLead.Id; sid = 'sid-incorreto'; metodo = 'pix';
+    leadId = $pixLead.Id; sid = 'sid-incorreto'; metodo = 'pix'; document = '52998224725';
     answers = @{ objetivo='a'; negocio='b'; publico='c'; ferramentas='d'; resultado='e' }
   }
   $badSid = Invoke-Json 'POST' "$script:apiUrl/functions/v1/roadmap-checkout" $badSidBody
@@ -170,6 +171,18 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $requests = (Invoke-Json 'GET' "$mockAdmin/__requests").Body
   $firstOrder = @($requests | Where-Object { $_.method -eq 'POST' })[0]
   Assert-True ($firstOrder.body.items[0].amount -eq 14990) 'C6 gateway recebe preço server-side 14990'
+  Assert-True ($firstOrder.body.customer.document -eq '52998224725') 'CPF normalizado chega ao gateway'
+  Assert-True (($pixPayment.payload | ConvertTo-Json -Depth 20) -notmatch '52998224725|document') 'CPF não persiste no payload do pagamento'
+  foreach ($invalidDocument in @('', '11111111111', '52998224726')) {
+    $invalidBody = @{} + $badSidBody
+    $invalidBody.sid = $pixLead.Sid
+    $invalidBody.document = $invalidDocument
+    $invalid = Invoke-Json 'POST' "$script:apiUrl/functions/v1/roadmap-checkout" $invalidBody
+    Assert-True ($invalid.Status -eq 400 -and $invalid.Body.error_code -eq 'INVALID_PAYER_DOCUMENT') 'CPF ausente ou inválido retorna 400 tipado'
+  }
+  Assert-True ((Get-Rows "payments?lead_id=eq.$($pixLead.Id)&select=id").Count -eq 1) 'CPF inválido não cria pagamento'
+  $afterInvalidRequests = (Invoke-Json 'GET' "$mockAdmin/__requests").Body
+  Assert-True (@($afterInvalidRequests | Where-Object { $_.method -eq 'POST' }).Count -eq 1) 'CPF inválido não chama gateway'
 
   $noAuthBefore = (Get-Rows 'payment_events?select=id').Count
   $missingAuth = Invoke-Webhook "$($script:runId)-noauth" 'order.paid' $pixPayment.gateway_order_id ''
