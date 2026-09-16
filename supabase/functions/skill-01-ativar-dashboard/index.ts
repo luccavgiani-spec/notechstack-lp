@@ -100,9 +100,19 @@ Deno.serve(async (request) => {
     return json(request, 502, { error_code: "AUTH_UNAVAILABLE" });
   }
 
-  const redirectTo = `${appUrl}/acesso?projectId=${encodeURIComponent(projectId)}`;
+  if (existingUser?.app_metadata.role && existingUser.app_metadata.role !== "CLIENT") {
+    log("warn", "skill_01_auth_role_conflict", { projectId, code: "AUTH_ROLE_CONFLICT" });
+    return json(request, 409, { error_code: "AUTH_ROLE_CONFLICT" });
+  }
+
+  // Convite é apenas para cadastros ainda não confirmados. Reutilizar uma conta
+  // confirmada não deve recriá-la nem exigir a troca da senha existente.
+  const confirmedUser = Boolean(existingUser?.email_confirmed_at);
+  const redirectTo = confirmedUser
+    ? `${appUrl}/p/${encodeURIComponent(projectId)}/como-funciona`
+    : `${appUrl}/acesso?projectId=${encodeURIComponent(projectId)}`;
   const generated = await admin.auth.admin.generateLink({
-    type: "invite",
+    type: confirmedUser ? "magiclink" : "invite",
     email,
     options: { redirectTo },
   });

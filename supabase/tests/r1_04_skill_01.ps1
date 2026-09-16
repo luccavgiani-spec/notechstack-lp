@@ -252,6 +252,39 @@ try {
     @($reuseMemberships.client_id) -contains $targetProject.ClientId
   ) 'C1 usuário existente é reutilizado entre dois tenants com memberships distintas'
 
+  $confirmedEmail = "r104-confirmed-$($script:runId)@example.test"
+  $confirmedPassword = 'R104-confirmed-password-123!'
+  $confirmedUser = New-AuthUser $confirmedEmail $confirmedPassword '' $true
+  $confirmedProject = New-Project 'ROADMAP_PAGO' 'confirmed' $confirmedEmail
+  $confirmedResponse = Invoke-Skill $confirmedProject.Id $content
+  $confirmedSession = Sign-In $confirmedEmail $confirmedPassword
+  $confirmedMemberships = Get-Rows "memberships?client_id=eq.$($confirmedProject.ClientId)&select=user_id"
+  Assert-True (
+    $confirmedResponse.Status -eq 200 -and (Count-AuthEmail $confirmedEmail) -eq 1 -and
+    $confirmedSession.user.id -eq $confirmedUser.id -and $confirmedSession.user.app_metadata.role -eq 'CLIENT' -and
+    $confirmedMemberships.Count -eq 1 -and $confirmedMemberships[0].user_id -eq $confirmedUser.id
+  ) 'C1 conta já confirmada sem papel é reutilizada como CLIENT preservando sua senha'
+  $confirmedLinkResponse = Invoke-NoRedirect $confirmedResponse.Body.inviteLink
+  $confirmedLocation = [string]$confirmedLinkResponse.Headers.Location
+  $confirmedFragment = Parse-Fragment $confirmedLocation
+  Assert-True (
+    $confirmedLinkResponse.StatusCode -in @(302, 303) -and $confirmedFragment.access_token -and
+    $confirmedLocation.Contains("/p/$($confirmedProject.Id)/como-funciona")
+  ) 'C7 conta confirmada recebe link único para o projeto sem redefinir senha'
+  $confirmedVisibleProjects = Get-Rows "projects?select=id" $confirmedSession.access_token
+  Assert-True (
+    $confirmedVisibleProjects.Count -eq 1 -and $confirmedVisibleProjects[0].id -eq $confirmedProject.Id
+  ) 'C3 conta confirmada acessa somente seu projeto por RLS'
+
+  $conflictProject = New-Project 'ROADMAP_PAGO' 'role-conflict' $adminEmail
+  $conflictBefore = Public-Vector $conflictProject.Id $adminEmail
+  $conflictResponse = Invoke-Skill $conflictProject.Id $content
+  Assert-True (
+    $conflictResponse.Status -eq 409 -and $conflictResponse.Body.error_code -eq 'AUTH_ROLE_CONFLICT' -and
+    $conflictBefore -eq (Public-Vector $conflictProject.Id $adminEmail) -and
+    (Sign-In $adminEmail $adminPassword).user.app_metadata.role -eq 'NO_ADMIN'
+  ) 'C3 conta NO_ADMIN não é rebaixada para CLIENT nem ganha membership'
+
   $primary = $activated[0]
   $activity = Get-Rows "activity_events?project_id=eq.$($primary.Project.Id)&type=eq.skill_01_dashboard_ativado&select=actor_id,request_id,occurred_at"
   Assert-True ($activity.Count -eq 1 -and $activity[0].actor_id -eq $adminUser.id -and $null -ne $activity[0].occurred_at) 'C2 activity identifica operador e projeto'
