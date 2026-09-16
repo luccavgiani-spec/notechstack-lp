@@ -12,7 +12,7 @@
 - [x] **C3** — criar/atualizar pelo Cronograma reutiliza `upsert_admin_kanban_item`, que grava exatamente um evento por ação. Proof: pgTAP `C3 create emits exactly one event`; cobertura de transições do RPC preservada em R1-06.
 - [x] **C4** — filtros por projeto, macroversão e intervalo de datas funcionam no quadro; o RPC aceita os mesmos limites. Proof: pgTAP e Testing Library.
 - [x] **C5/C6** — carga dos próximos 45 dias conta apenas não concluídos; capacidade inicia em 5, é ajustável por `NO_ADMIN` e conflito pede confirmação antes de escrever. Proof: pgTAP e `schedulePage.test.tsx`.
-- [x] **C7** — proposta de 30 dias respeita a capacidade, desloca dia cheio, inclui D+1/D+3/revisões/V1/V2/V3 e só grava após confirmação. Proof: `schedule-service.test.ts`, `schedulePage.test.tsx`.
+- [x] **C7** — proposta de 30 dias respeita a capacidade, desloca dia cheio, inclui D+1/D+3/revisões/V1/V2/V3 e só grava após confirmação transacional/idempotente. Proof: `schedule-service.test.ts`, `schedulePage.test.tsx`, RPC `confirm_admin_schedule_proposal`.
 - [x] **C8** — `CLIENT` recebe zero itens/configuração na API e a rota é barrada por `RoleRoute`. Proof: pgTAP e `App.test.tsx`.
 - [x] **C9** — `npm run lint`, `npm run build`/`tsc -b`, Vitest integral (100) e pgTAP integral (329) passaram em 2026-09-15; `supabase db lint --local` e `supabase db advisors --local` não apontaram problemas.
 

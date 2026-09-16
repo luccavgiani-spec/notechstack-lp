@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   getAdminScheduleSettings,
+  confirmScheduleProposal,
   listAdminProjects,
   listAdminScheduleItems,
   proposeThirtyDaySchedule,
@@ -75,7 +76,7 @@ export function SchedulePage() {
   async function confirmProposal() {
     if (!proposalProjectId || proposal.length === 0) return
     try {
-      for (const item of proposal) await saveKanbanItem(proposalProjectId, item)
+      await confirmScheduleProposal(proposalProjectId, proposal)
       setMessage('Proposta de 30 dias gravada no cronograma.')
       setProposal([])
       reload()

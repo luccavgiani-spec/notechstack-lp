@@ -339,6 +339,12 @@ export function proposeThirtyDaySchedule(items: ActivityKanbanItem[], start: str
   })
 }
 
+export async function confirmScheduleProposal(projectId: string, items: ScheduleProposalItem[], requestId = crypto.randomUUID()) {
+  const { data, error } = await supabase.rpc('confirm_admin_schedule_proposal', { p_project_id: projectId, p_items: items, p_request_id: requestId })
+  if (error) throw error
+  return data
+}
+
 export async function saveCommercialTerms(projectId: string, values: Omit<CommercialTerms, 'project_id' | 'updated_at'>, requestId = crypto.randomUUID()) {
   const { data, error } = await supabase.rpc('update_commercial_terms', {
     p_project_id: projectId,
