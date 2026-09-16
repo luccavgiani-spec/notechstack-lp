@@ -34,6 +34,15 @@ describe('F3-11 saldos', () => {
     expect(await screen.findByText('Nenhum movimento financeiro ainda.')).toBeVisible()
   })
 
+  it('C13 erro de leitura oferece retry e recupera a tela', async () => {
+    mocks.listAdminSaldos.mockRejectedValueOnce(new Error('network')).mockResolvedValueOnce(snapshot())
+    renderPage()
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: 'Tentar de novo' }))
+    expect(await screen.findByRole('heading', { name: 'Realizado' })).toBeVisible()
+    expect(mocks.listAdminSaldos).toHaveBeenCalledTimes(2)
+  })
+
   it('C11 recebimento pede confirmacao e recarrega', async () => {
     renderPage()
     const user = userEvent.setup()

@@ -251,11 +251,10 @@ webhook e a classificação financeira seriam cobertos somente por um caminho de
 - Nenhum reset enquanto outra task estiver em verificação; nenhuma operação remota, deploy,
   push ou DNS pertence a esta implementação.
 
-## Evidência local — 15/09/2026
+## Evidência local — 16/09/2026
 
-- [x] C3, C5–C12: pgTAP F3-11 → PASS, 24 asserts; cobre autorização CLIENT, roadmap aprovado, reembolso idempotente, chargeback, reembolso fora de ordem, três faixas, recebimento e vencimento.
-- [x] Serviço de classificação: Vitest `saldos-service` → PASS, 4 testes.
-- [x] C1/C4/C11 da tela: Testing Library → PASS (3 testes em `saldos.test.tsx`), incluindo os três blocos, vazio e confirmação/recarga de parcela.
-- [x] Regressão de webhook: harness R1-03 → PASS, 64 assertions.
-- [x] Gates locais: após reset limpo, pgTAP completo → PASS, 294 testes; Vitest completo → PASS (89 testes); lint, TypeScript, build e E2E R1-05 desktop/mobile também passaram.
-- [ ] C2/C5–C10/C12–C13 ainda não têm harness F3 nem Playwright próprios; não foram marcados por equivalência.
+- [x] C3, C5–C12: pgTAP F3-11 → PASS, 24 provas; cobre autorização CLIENT, roadmap aprovado, reembolso idempotente, chargeback, reembolso fora de ordem, três faixas, recebimento e vencimento.
+- [x] C5–C9/C13 de fronteira: harness F3-11 → PASS, 18 assertions sobre Edge/PostgREST reais com mock local; cobre Basic inválido, reembolso, estorno, replay, evento antecipado e leitura CLIENT vazia/negada.
+- [x] C1–C4/C10–C13 no app: Vitest direcionado → PASS, 8 testes; inclui erro/retry da tela, classificação, ordem, centavos e janelas por dia civil de São Paulo.
+- [x] C1–C13 no navegador: Playwright próprio → PASS, 2/2 em 1440×900 e 375×812; confirma recebimento em duas etapas, reload, vínculo do projeto e bloqueio CLIENT, sem `console.error`, `pageerror` ou HTTP ≥500.
+- [x] Gates do mesmo HEAD: reset/replay → PASS; pgTAP completo → PASS, 335 provas; Vitest completo → PASS, 101 testes; lint, TypeScript e build → PASS.
