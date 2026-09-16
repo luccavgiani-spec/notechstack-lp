@@ -315,10 +315,11 @@ snapshot in C3.
 - No push, deploy, DNS, hosted migration, hosted function publish or final PAINEL_TOKEN
   rotation is authorized by this checklist; those remain after all tasks.
 
-## Evidência local — 15/09/2026
+## Evidência local — 16/09/2026
 
-- [x] S2/C3–C6: harness local R1-07 → PASS, 15 assertions. O comando foi executado sobre banco local recém-recriado; ele é intencionalmente idempotente e a falha injetada preservou o snapshot anterior.
-- [x] C4/C5 de fonte: Vitest de pipeline examples → PASS (2 testes), comparando 5 fases/27 itens/17 concluídos e os materiais Hello Best.
-- [x] C1/C2 na ficha: Testing Library → PASS (2 testes novos em `adminDashboard.test.tsx`), cobrindo confirmação em duas etapas, chamada exclusiva da porta Skill 01, convite copiável em memória e apresentação de `invalidFields`.
-- [x] Regressão local fresca: reset/replay e pgTAP completo → PASS (294 testes); Vitest completo → PASS (89 testes); lint, TypeScript, build e E2E R1-05 desktop/mobile → PASS.
-- [ ] C7–C12: a jornada integrada A/C em Playwright, com fixture Auth local e screenshots estáveis, não foi criada nesta onda. Não é inferida pelos testes de seed, Skill 01 ou pela regressão R1-05.
+- [x] C3–C6: harness local R1-07 → PASS, 15 assertions após reset; duas execuções e a falha injetada convergem sem duplicar agregados ou eventos.
+- [x] C4/C5 de fonte: Vitest de pipeline examples → PASS, comparando 5 fases/27 itens/17 concluídos e os materiais Hello Best; suíte direcionada de pipeline/admin/cliente → PASS, 40 testes.
+- [x] C1/C2/C7: Skill 01 HTTP → PASS, 21 assertions; checkout/webhook reutilizado pelo cenário A → PASS, 64 assertions; confirmação em duas etapas, validação, convite e provisionamento permanecem nas portas reais.
+- [x] C8–C11: Playwright próprio → PASS, 2/2 em 1440×900 e 375×812; prova isolamento Gazeta↔Hello por URL/RLS, Gazeta com cinco fases e 63%, Hello com protótipo correto, janela ativa/expirada e acesso administrativo preservado.
+- [x] C12: seis screenshots locais sem credenciais foram gerados em `app/test-results/r1-07/` e permanecem ignorados pelo Git; nenhum artefato de teste será commitado.
+- [x] Gates do mesmo HEAD: reset/replay → PASS; pgTAP completo → PASS, 335 provas; Vitest completo → PASS, 101 testes; lint, TypeScript, build e Playwright das três tasks da onda → PASS, 6/6.
