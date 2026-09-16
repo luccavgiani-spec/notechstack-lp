@@ -344,3 +344,22 @@ Fonte do requisito: [Pagar.me — Pix e dados obrigatórios do cliente](https://
 - [x] Correção publicada no commit `f2dfa6b`, push em main e deploy isolado de roadmap-checkout. Home `dpl_2w1XxptXX5KuVjpVXEanVFEBV4zM` e app `dpl_3vE7C7tfGYe3iwfZtVLR6DBsCBEa` READY no mesmo commit. HTTP confirmou scripts v2/v63 e campo CPF da home publicada. Probe remoto com body estruturalmente válido e sem documento retornou 400 / INVALID_PAYER_DOCUMENT, antes de qualquer consulta de lead ou escrita/chamada gateway.
 
 Veredito atualizado: **C1/C2/C4 aprovados; C3/C5/C6 pendentes de prova real**. Não registrar go-live integral antes dessas provas.
+
+## Primeiro Pix gerado após correção — 16/09/2026
+
+- [x] Titular confirmou QR exibido. Consulta somente leitura do pagamento `b48aa307-d42f-4193-8c05-ed77607bf8d9` confirmou method=pix, amount_cents=14990, status=pending, pedido no gateway presente, código e imagem QR presentes. CPF/código Pix/credenciais não foram retornados pela consulta.
+- [ ] Ainda nenhum payment_event, projeto associado, Kanban ou atividade de aprovação. Geração do Pix prova o checkout real, não aprovação, entrega autenticada ou idempotência do webhook.
+- [ ] Próximo passo depende do titular: pagar somente esse Pix uma vez; depois consultar aprovação/agregado, verificar entrega/replay e regressão dos painéis. Nenhum pagamento foi executado pelo agente.
+
+## Preparação do E2E real com cartão — 16/09/2026
+
+- [x] Titular passou a solicitar cartão com um cliente de teste identificado. Consulta restrita confirmou lead roadmap, mas nenhum pagamento para ele. Nenhum dado de cartão foi solicitado/inspecionado e nenhum pagamento foi criado pelo agente.
+- [x] Chave pública ausente na home: o fluxo anterior salvava lead e depois interrompia antes da tokenização. Agora cartão sem chave pública interrompe antes de salvar lead/tokenizar e mostra indisponibilidade de configuração, sem imputar erro aos dados do cliente.
+- [x] Contrato atualizado conforme documentação oficial: endereço de cobrança validado antes de escrita/chamada gateway; token recebido do browser convertido em cartão via /customers e /customers/:id/cards; pedido usa customer_id/card_id e billing_address, compatíveis com PSP, sem PAN/CVV no servidor. Documento/endereço/token não persistem em payload de pagamento ou lead.
+- [x] Provas: Vitest 147/147 (37 direcionados checkout), lint/TypeScript/build; harness R1-03 76/76, incluindo cartão aprovado/recusado, webhook/replay, endereço inválido sem criação de pagamento e contrato PSP. Primeiro rerun encontrou clientes antigos com e-mails fixos; fixtures isoladas por runId e nova execução verde, sem reset ou remoção de dados existentes.
+- [x] APP_URL estava ausente na lista por nomes; configurada para a URL pública https://app.notechstack.com.br, necessária ao convite. Sem leitura de valores de secrets. Cadastro público permanece desabilitado; ativação real só após pagamento confirmado, usando Skill 01/NO_ADMIN.
+- [ ] Chave pública live e domínio autorizado de tokenização dependem do titular; aguardando. Contrato local verde não comprova cartão real aprovado.
+- [ ] Aprovação real, projeto no painel admin e convite/membership do cliente ainda não ocorreram. Senha padrão não será criada/transmitida; cliente a define no fluxo /acesso conforme decisão R1-04/plan_master.
+- [ ] A prova de cartão não substitui automaticamente C5, que exige Pix real. O Pix gerado anteriormente segue pendente até pagamento/expiração; não criar cobrança extra para fabricar evidência.
+
+Fontes: [Tokenização e endereço não tokenizado](https://docs.pagar.me/reference/criar-token-cart%C3%A3o-1), [cartão a partir de token](https://docs.pagar.me/reference/criar-cart%C3%A3o), [pedido PSP usando card_id](https://docs.pagar.me/reference/criar-pedido-2).

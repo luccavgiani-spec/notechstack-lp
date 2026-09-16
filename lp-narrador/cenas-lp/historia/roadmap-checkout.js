@@ -108,12 +108,32 @@
     return digits;
   }
 
-  async function checkout({ lead, answers, metodo, card, document }) {
+  function normalizeBillingAddress(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+    const text = key => typeof value[key] === 'string' ? value[key].trim() : '';
+    const line_1 = text('line_1'), postal = text('zip_code'), zip_code = postal.replace(/\D/g, '');
+    const city = text('city'), state = text('state').toUpperCase();
+    if (line_1.length < 5 || line_1.length > 256 || !/^[\d\s-]+$/.test(postal) || zip_code.length !== 8 ||
+        city.length < 2 || city.length > 100 ||
+        !/^(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)$/.test(state) ||
+        text('country').toUpperCase() !== 'BR') return null;
+    return { line_1, zip_code, city, state, country: 'BR' };
+  }
+
+  async function checkout({ lead, answers, metodo, card, document, billingAddress }) {
     const payerDocument = normalizePayerCpf(document);
     if (!payerDocument) throw new RoadmapCheckoutError('INVALID_PAYER_DOCUMENT', 'Confira o CPF do pagador.');
+    const address = metodo === 'cartao' ? normalizeBillingAddress(billingAddress) : null;
+    if (metodo === 'cartao') {
+      if (!config().pagarmePublicKey) throw new RoadmapCheckoutError('PAGARME_PUBLIC_KEY_MISSING', 'Pagamento por cartão ainda não está disponível.');
+      if (!address) throw new RoadmapCheckoutError('INVALID_BILLING_ADDRESS', 'Confira o endereço de cobrança.');
+    }
     const leadId = await ensureLead(lead, answers);
     const body = { leadId, sid: lead.sid, metodo, answers, document: payerDocument };
-    if (metodo === 'cartao') body.cardToken = await tokenizeCard(card);
+    if (metodo === 'cartao') {
+      body.billingAddress = address;
+      body.cardToken = await tokenizeCard(card);
+    }
 
     return jsonRequest(config().checkoutUrl, {
       method: 'POST',
@@ -126,6 +146,7 @@
     checkout,
     tokenizeCard,
     normalizePayerCpf,
+    normalizeBillingAddress,
     RoadmapCheckoutError,
     _resetForTests: () => leadBySid.clear(),
   };

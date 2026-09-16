@@ -186,6 +186,10 @@
         '<label class="dg-campo"><span>número do cartão</span><input name="cartao_numero" inputmode="numeric" autocomplete="cc-number" maxlength="23"></label>'+
         '<div class="dg-cartao-linha"><label class="dg-campo"><span>validade</span><input name="cartao_validade" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA"></label>'+
         '<label class="dg-campo"><span>CVV</span><input name="cartao_cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="4"></label></div></div>'+
+        '<label class="dg-campo"><span>endereço de cobrança (número, rua e bairro)</span><input name="cobranca_endereco" autocomplete="street-address" maxlength="256"></label>'+
+        '<div class="dg-cartao-linha"><label class="dg-campo"><span>CEP</span><input name="cobranca_cep" inputmode="numeric" autocomplete="postal-code" maxlength="9"></label>'+
+        '<label class="dg-campo"><span>UF</span><input name="cobranca_uf" autocomplete="address-level1" maxlength="2"></label></div>'+
+        '<label class="dg-campo"><span>cidade</span><input name="cobranca_cidade" autocomplete="address-level2" maxlength="100"></label>'+
         '<p class="dg-erro" role="alert" hidden></p>';
     }
   }
@@ -218,9 +222,11 @@
     if (c.number.length<13||c.number.length>19) return mostraErro(telaPasso(9),'› confira o número do cartão.',campo('cartao_numero')),false;
     if (!(c.exp_month>=1&&c.exp_month<=12)||!Number.isInteger(c.exp_year)) return mostraErro(telaPasso(9),'› confira a validade em MM/AA.',campo('cartao_validade')),false;
     if (c.cvv.length<3) return mostraErro(telaPasso(9),'› confira o CVV.',campo('cartao_cvv')),false;
+    if (!window.NoRoadmapCheckout.normalizeBillingAddress(enderecoCobranca())) return mostraErro(telaPasso(9),'› confira o endereço de cobrança, CEP, cidade e UF.',campo('cobranca_endereco')),false;
     mostraErro(telaPasso(9),'');
     return true;
   }
+  const enderecoCobranca = () => ({ line_1:valor('cobranca_endereco'), zip_code:valor('cobranca_cep'), city:valor('cobranca_cidade'), state:valor('cobranca_uf'), country:'BR' });
   function ocupaPagamento(ocupado){
     pagamentoEmCurso=ocupado;
     tela.querySelectorAll('[data-nav="proximo"],[data-nav="acao"],button[data-pagamento]').forEach(b=>{ b.disabled=ocupado; });
@@ -287,6 +293,7 @@
       const dados=await window.NoRoadmapCheckout.checkout({
         lead:contato(), answers:respostas(), metodo:metodoPagamento,
         document:valor('pagador_documento'),
+        billingAddress:metodoPagamento==='cartao'?enderecoCobranca():undefined,
         card:metodoPagamento==='cartao'?cartao():undefined
       });
       if (metodoPagamento==='cartao') ['cartao_numero','cartao_validade','cartao_cvv'].forEach(n=>{ const el=campo(n); if(el) el.value=''; });
@@ -295,6 +302,7 @@
       else if (metodoPagamento==='pix'&&dados.pix) mostraPix(dados);
       else mostraErro(telaPasso(9),'› pedido criado, mas o gateway não devolveu os dados do pagamento. Tente novamente.');
     }catch(e){
+      if (e&&e.code==='PAGARME_PUBLIC_KEY_MISSING'){ mostraErro(telaPasso(9),'› cartão ainda indisponível. A configuração da Nó precisa ser concluída; seus dados não foram enviados ao gateway.'); return; }
       const recusa=e&&['CARD_DECLINED','PAYMENT_FAILED'].includes(e.code);
       mostraErro(telaPasso(9),recusa?'› pagamento recusado. Confira os dados e tente de novo.':'› não foi possível concluir agora. Tente novamente.');
     }finally{

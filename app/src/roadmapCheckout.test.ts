@@ -5,11 +5,13 @@ import { resolve } from 'node:path'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { normalizePayerCpf } from '../../supabase/functions/_shared/payer-document'
+import { normalizeBillingAddress } from '../../supabase/functions/_shared/billing-address'
 
 type CheckoutApi = {
   checkout(input: Record<string, unknown>): Promise<Record<string, unknown>>
   _resetForTests(): void
   normalizePayerCpf(value: unknown): string | null
+  normalizeBillingAddress(value: unknown): Record<string, unknown> | null
 }
 
 const checkoutSource = readFileSync(
@@ -26,6 +28,14 @@ const ok = (body: unknown) =>
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   }))
+
+const billingAddress = { line_1: '123, Rua de Teste, Centro', zip_code: '01001-000', city: 'Sao Paulo', state: 'sp', country: 'BR' }
+function fillBillingAddress() {
+  fill('cobranca_endereco', billingAddress.line_1)
+  fill('cobranca_cep', billingAddress.zip_code)
+  fill('cobranca_cidade', billingAddress.city)
+  fill('cobranca_uf', billingAddress.state)
+}
 
 function mountDiagnostic() {
   document.body.innerHTML = `
@@ -167,12 +177,14 @@ describe('checkout do roadmap na home', () => {
       answers: { objetivo: 'novo', negocio: 'Loja', publico: 'clientes', ferramentas: 'WhatsApp', resultado: 'Organizar pedidos' },
       metodo: 'cartao',
       document: '529.982.247-25',
+      billingAddress,
       card: { number: '4000000000000010', holder_name: 'ANA TESTE', exp_month: 12, exp_year: 30, cvv: '123' },
     })
 
     const calls = fetchMock.mock.calls
     const leadBody = JSON.parse(String(calls[0][1]?.body))
     expect(leadBody).not.toHaveProperty('document')
+    expect(leadBody).not.toHaveProperty('billingAddress')
     expect(JSON.stringify(leadBody)).not.toContain('52998224725')
     expect(leadBody).toMatchObject({
       contexto: 'roadmap',
@@ -190,6 +202,7 @@ describe('checkout do roadmap na home', () => {
 
     const checkoutBody = JSON.parse(String(calls[2][1]?.body))
     expect(checkoutBody).toMatchObject({ leadId: 'lead-1', sid: 'sid-1', metodo: 'cartao', cardToken: 'token_card_1', document: '52998224725' })
+    expect(checkoutBody.billingAddress).toMatchObject({ zip_code: '01001000', state: 'SP' })
     expect(JSON.stringify(checkoutBody)).not.toMatch(/4000000000000010|"cvv"|exp_month|exp_year/i)
   })
 
@@ -237,6 +250,7 @@ describe('checkout do roadmap na home', () => {
     fill('cartao_validade', '12/30')
     fill('cartao_cvv', '123')
     fill('pagador_documento', '529.982.247-25')
+    fillBillingAddress()
     fireEvent.click(action)
 
     await waitFor(() => expect(document.body).toHaveTextContent('pagamento aprovado'))
@@ -290,6 +304,7 @@ describe('checkout do roadmap na home', () => {
     fill('cartao_validade', '12/30')
     fill('cartao_cvv', '123')
     fill('pagador_documento', '52998224725')
+    fillBillingAddress()
     fireEvent.click(action)
 
     await waitFor(() => expect(document.body).toHaveTextContent('pagamento recusado'))
@@ -361,6 +376,32 @@ describe('checkout do roadmap na home', () => {
     expect(document.querySelector('[name="pagador_documento"]')).toHaveAttribute('autocomplete', 'off')
     fireEvent.click(action)
     expect(document.body).toHaveTextContent('confira o CPF do pagador')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    undefined, null, {}, [], { ...billingAddress, zip_code: '123' },
+    { ...billingAddress, zip_code: 'abc01001000' }, { ...billingAddress, state: 'ZZ' },
+    { ...billingAddress, city: '' }, { ...billingAddress, line_1: '' }, { ...billingAddress, country: 'US' },
+  ])('rejeita endereço incompleto igualmente no browser e backend: %j', (input) => {
+    expect(normalizeBillingAddress(input)).toBeNull()
+    expect(window.NoRoadmapCheckout!.normalizeBillingAddress(input)).toBeNull()
+  })
+  it('normaliza endereço de cobrança igualmente no browser e backend', () => {
+    expect(normalizeBillingAddress(billingAddress)).toEqual({ ...billingAddress, zip_code: '01001000', state: 'SP' })
+    expect(window.NoRoadmapCheckout!.normalizeBillingAddress(billingAddress)).toEqual(normalizeBillingAddress(billingAddress))
+  })
+  it('não salva lead nem tokeniza quando falta chave pública de cartão', async () => {
+    window.NO_CHECKOUT_CONFIG!.pagarmePublicKey = ''
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(window.NoRoadmapCheckout!.checkout({ metodo: 'cartao', document: '52998224725', billingAddress })).rejects.toMatchObject({ code: 'PAGARME_PUBLIC_KEY_MISSING' })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+  it('rejeita endereço inválido antes de salvar lead ou tokenizar', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    await expect(window.NoRoadmapCheckout!.checkout({ metodo: 'cartao', document: '52998224725' })).rejects.toMatchObject({ code: 'INVALID_BILLING_ADDRESS' })
     expect(fetchMock).not.toHaveBeenCalled()
   })
 })

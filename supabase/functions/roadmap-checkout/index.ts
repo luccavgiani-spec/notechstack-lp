@@ -2,6 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders, handlePreflight } from "../_shared/cors.ts";
 import { log } from "../_shared/logger.ts";
 import { normalizePayerCpf } from "../_shared/payer-document.ts";
+import { normalizeBillingAddress } from "../_shared/billing-address.ts";
 import { gatewayCharge, gatewayStatus, pagarmeRequest } from "../_shared/pagarme.ts";
 
 const AMOUNT_CENTS = 14990;
@@ -76,6 +77,8 @@ Deno.serve(async (request) => {
     }
     const document = normalizePayerCpf(body.document);
     if (!document) return json(request, 400, { error_code: "INVALID_PAYER_DOCUMENT" });
+    const billingAddress = method === "cartao" ? normalizeBillingAddress(body.billingAddress) : null;
+    if (method === "cartao" && !billingAddress) return json(request, 400, { error_code: "INVALID_BILLING_ADDRESS" });
 
     const sb = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
     const { data: lead, error: leadError } = await sb.from("leads")
@@ -125,19 +128,34 @@ Deno.serve(async (request) => {
       email: lead.email,
       type: "individual",
       document,
+      ...(billingAddress ? { address: billingAddress } : {}),
       ...(phone ? { phones: { mobile_phone: phone } } : {}),
     };
+    let customerId = "";
+    let cardId = "";
+    if (method === "cartao") {
+      // PSP requires card_id; exchange the browser token without receiving PAN/CVV.
+      const customerResult = await pagarmeRequest("POST", "/customers", { ...customer, code: leadId });
+      if (!customerResult.ok || !customerResult.data.id) return json(request, 502, { error_code: "PAGARME_CUSTOMER_FAILED", paymentId: payment.id });
+      customerId = String(customerResult.data.id);
+      const cardResult = await pagarmeRequest("POST", `/customers/${encodeURIComponent(customerId)}/cards`, {
+        token: cardToken, billing_address: billingAddress,
+      });
+      if (!cardResult.ok || !cardResult.data.id) return json(request, 502, { error_code: "PAGARME_CARD_FAILED", paymentId: payment.id });
+      cardId = String(cardResult.data.id);
+    }
     const orderCode = `no-roadmap-${payment.id}`;
     const gatewayBody: Record<string, unknown> = {
       code: orderCode,
-      customer,
+      ...(customerId ? { customer_id: customerId } : { customer }),
       items: [{ amount: AMOUNT_CENTS, description: "Roadmap + protótipo", quantity: 1, code: "ROADMAP" }],
       payments: method === "pix"
         ? [{ payment_method: "pix", pix: { expires_in: 3600 } }]
         : [{
           payment_method: "credit_card",
           credit_card: {
-            card_token: cardToken,
+            card_id: cardId,
+            billing_address: billingAddress,
             installments: 1,
             statement_descriptor: "NO TECH STACK",
           },

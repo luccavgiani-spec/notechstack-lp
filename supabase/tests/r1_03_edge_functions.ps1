@@ -55,7 +55,7 @@ function New-Lead([string]$Context, [string]$Suffix) {
   $sid = "r103-$Suffix-" + [guid]::NewGuid().ToString('N').Substring(0, 12)
   $body = @{
     nome = "Lead $Suffix"
-    email = "$Suffix@example.test"
+    email = "$Suffix-$($script:runId)@example.test"
     whatsapp = '(11) 99999-0000'
     contexto = $Context
     sid = $sid
@@ -68,7 +68,7 @@ function New-Lead([string]$Context, [string]$Suffix) {
     Start-Sleep -Milliseconds 500
   }
   Assert-True ($result.Status -eq 200 -and $result.Body.saved -and $result.Body.leadId) "C16 send-lead-email grava contexto $Context"
-  return [pscustomobject]@{ Id = [string]$result.Body.leadId; Sid = $sid }
+  return [pscustomobject]@{ Id = [string]$result.Body.leadId; Sid = $sid; Email = $body.email }
 }
 
 function Checkout($Lead, [string]$Method, [string]$Token = '') {
@@ -87,6 +87,7 @@ function Checkout($Lead, [string]$Method, [string]$Token = '') {
     }
   }
   if ($Token) { $body.cardToken = $Token }
+  if ($Method -eq 'cartao') { $body.billingAddress = @{ line_1='123, Rua de Teste, Centro'; zip_code='01001-000'; city='Sao Paulo'; state='sp'; country='BR' } }
   return Invoke-Json 'POST' "$script:apiUrl/functions/v1/roadmap-checkout" $body
 }
 
@@ -153,7 +154,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $pixPayment = (Get-Rows "payments?lead_id=eq.$($pixLead.Id)&select=*")[0]
   Assert-True ($pixPayment.amount_cents -eq 14990 -and $pixPayment.method -eq 'pix' -and $pixPayment.status -eq 'pending') 'C3 pagamento Pix persiste 14990'
   $pixLeadRow = (Get-Rows "leads?id=eq.$($pixLead.Id)&select=nome,email,whatsapp,contexto,sid")[0]
-  Assert-True ($pixLeadRow.nome -eq 'Lead pix' -and $pixLeadRow.email -eq 'pix@example.test') 'C3 lead roadmap preserva nome e email'
+  Assert-True ($pixLeadRow.nome -eq 'Lead pix' -and $pixLeadRow.email -eq $pixLead.Email) 'C3 lead roadmap preserva nome e email'
   Assert-True ($pixLeadRow.whatsapp -eq '(11) 99999-0000' -and $pixLeadRow.contexto -eq 'roadmap' -and $pixLeadRow.sid -eq $pixLead.Sid) 'C3 lead roadmap preserva WhatsApp contexto e sid'
 
   $pixAgain = Checkout $pixLead 'pix'
@@ -196,7 +197,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $approvedPayment = (Get-Rows "payments?id=eq.$($pix.Body.paymentId)&select=*")[0]
   $projectRows = Get-Rows "projects?lead_id=eq.$($pixLead.Id)&select=*"
   $projectId = [string]$projectRows[0].id
-  $clientRows = Get-Rows "clients?email=eq.pix@example.test&select=id,name"
+  $clientRows = Get-Rows "clients?email=eq.$($pixLead.Email)&select=id,name"
   Assert-True ($approvedPayment.status -eq 'approved' -and $approvedPayment.project_id -eq $projectId) 'C10 payment liga ao projeto aprovado'
   Assert-True ($clientRows.Count -eq 1 -and $clientRows[0].name -eq 'Lead pix') 'C10 cria cliente com o mesmo nome do lead'
   Assert-True ($projectRows.Count -eq 1 -and $projectRows[0].lead_status -eq 'ROADMAP_PAGO') 'C10 cria projeto ROADMAP_PAGO'
@@ -216,7 +217,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   $duplicate = Invoke-Webhook $paidEventId 'order.paid' $pixPayment.gateway_order_id
   $vectorAfter = @(
     (Get-Rows "payment_events?payment_id=eq.$($pix.Body.paymentId)&select=id").Count,
-    (Get-Rows "clients?email=eq.pix@example.test&select=id").Count,
+    (Get-Rows "clients?email=eq.$($pixLead.Email)&select=id").Count,
     (Get-Rows "projects?lead_id=eq.$($pixLead.Id)&select=id").Count,
     (Get-Rows "kanban_items?project_id=eq.$projectId&select=id").Count,
     (Get-Rows "activity_events?project_id=eq.$projectId&select=id").Count
@@ -249,7 +250,17 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
 
   Set-Scenario 'paid' 'paid'
   $cardLead = New-Lead 'roadmap' 'card-paid'
+  foreach ($invalidAddress in @($null, @{ line_1='123, Rua de Teste, Centro'; zip_code='123'; city='Sao Paulo'; state='SP'; country='BR' })) {
+    $invalidCardBody = @{ leadId=$cardLead.Id; sid=$cardLead.Sid; metodo='cartao'; document='52998224725'; cardToken='tok_test_invalid_address'; billingAddress=$invalidAddress; answers=@{objetivo='a';negocio='b';publico='c';ferramentas='d';resultado='e'} }
+    $invalidCard = Invoke-Json 'POST' "$script:apiUrl/functions/v1/roadmap-checkout" $invalidCardBody
+    Assert-True ($invalidCard.Status -eq 400 -and $invalidCard.Body.error_code -eq 'INVALID_BILLING_ADDRESS') 'Endereço ausente ou inválido retorna 400 antes de criar pagamento'
+  }
+  Assert-True ((Get-Rows "payments?lead_id=eq.$($cardLead.Id)&select=id").Count -eq 0) 'Endereço inválido não cria pagamento'
   $card = Checkout $cardLead 'cartao' 'tok_test_approved'
+  $cardRequests = (Invoke-Json 'GET' "$mockAdmin/__requests").Body
+  $cardOrder = @($cardRequests | Where-Object { $_.path -eq '/orders' -and $_.body.payments[0].payment_method -eq 'credit_card' })[0]
+  Assert-True ($cardOrder.body.customer_id -and $cardOrder.body.payments[0].credit_card.card_id -and -not $cardOrder.body.payments[0].credit_card.card_token) 'Cartão PSP usa customer_id e card_id sem token no pedido'
+  Assert-True ($cardOrder.body.payments[0].credit_card.billing_address.zip_code -eq '01001000') 'Cartão encaminha endereço de cobrança normalizado'
   Assert-True ($card.Status -eq 200 -and $card.Body.status -eq 'approved') 'C4 cartão tokenizado retorna aprovado'
   $cardPayment = (Get-Rows "payments?id=eq.$($card.Body.paymentId)&select=*")[0]
   Assert-True ($cardPayment.method -eq 'cartao' -and $cardPayment.status -eq 'pending') 'C4 cartão aguarda confirmação canônica do webhook'
@@ -320,6 +331,7 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
   )
   foreach ($payload in $legacyPayloads) {
     $consumer = [string]$payload.consumer
+    $payload.email = "$consumer-$($script:runId)@example.test"
     $body = @{}
     foreach ($entry in $payload.GetEnumerator()) {
       if ($entry.Key -ne 'consumer') { $body[$entry.Key] = $entry.Value }
@@ -327,12 +339,13 @@ PAGARME_API_URL=http://host.docker.internal:$mockPort
     $result = Invoke-Json 'POST' "$script:apiUrl/functions/v1/send-lead-email" $body
     Assert-True ($result.Status -eq 200 -and $result.Body.saved -and $result.Body.leadId) "C16 consumidor $consumer grava seu payload real"
   }
-  $legacyRows = Get-Rows 'leads?email=in.(lp-v5@example.test,agendar@example.test,roteador@example.test,health@example.test)&select=email,contexto,objetivos,sid,site,modo'
+  $legacyEmails = ($legacyPayloads | ForEach-Object { $_.email }) -join ','
+  $legacyRows = Get-Rows "leads?email=in.($legacyEmails)&select=email,contexto,objetivos,sid,site,modo"
   Assert-True ($legacyRows.Count -eq 4) 'C16 quatro consumidores legados continuam gravando leads'
-  Assert-True (($legacyRows | Where-Object email -eq 'lp-v5@example.test').sid -eq "r103-lpv5-$($script:runId)" -and ($legacyRows | Where-Object email -eq 'lp-v5@example.test').modo -eq 'direto') 'C16 lp-v5 preserva shape completo com sid e modo'
-  Assert-True (($legacyRows | Where-Object email -eq 'agendar@example.test').contexto -eq 'Agendamento de diagnóstico' -and ($legacyRows | Where-Object email -eq 'agendar@example.test').site -eq $null) 'C16 agendar preserva seu contexto e campo opcional nulo'
-  Assert-True (($legacyRows | Where-Object email -eq 'roteador@example.test').contexto -eq 'Roteador — landing page' -and ($legacyRows | Where-Object email -eq 'roteador@example.test').objetivos -like '*telemedicina*') 'C16 Roteador preserva marcas próprias'
-  Assert-True (($legacyRows | Where-Object email -eq 'health@example.test').contexto -eq 'nó Health — landing page' -and ($legacyRows | Where-Object email -eq 'health@example.test').objetivos -eq 'Estruturar atendimento (telemedicina)') 'C16 health preserva contexto e objetivo próprios'
+  Assert-True (($legacyRows | Where-Object email -eq $legacyPayloads[0].email).sid -eq "r103-lpv5-$($script:runId)" -and ($legacyRows | Where-Object email -eq $legacyPayloads[0].email).modo -eq 'direto') 'C16 lp-v5 preserva shape completo com sid e modo'
+  Assert-True (($legacyRows | Where-Object email -eq $legacyPayloads[1].email).contexto -eq 'Agendamento de diagnóstico' -and ($legacyRows | Where-Object email -eq $legacyPayloads[1].email).site -eq $null) 'C16 agendar preserva seu contexto e campo opcional nulo'
+  Assert-True (($legacyRows | Where-Object email -eq $legacyPayloads[2].email).contexto -eq 'Roteador — landing page' -and ($legacyRows | Where-Object email -eq $legacyPayloads[2].email).objetivos -like '*telemedicina*') 'C16 Roteador preserva marcas próprias'
+  Assert-True (($legacyRows | Where-Object email -eq $legacyPayloads[3].email).contexto -eq 'nó Health — landing page' -and ($legacyRows | Where-Object email -eq $legacyPayloads[3].email).objetivos -eq 'Estruturar atendimento (telemedicina)') 'C16 health preserva contexto e objetivo próprios'
 
   [pscustomobject]@{
     result = 'PASS'
