@@ -137,3 +137,6 @@ export async function submitEditorExport(projectId: string, baseVersionId: strin
   if (error) throw error
   return data
 }
+export async function uploadEditorExportFiles(projectId: string, requestId: string, files: Record<string, string>) {
+  for (const [name, text] of Object.entries(files)) { const { error } = await supabase.storage.from('editor-exports').upload(`${projectId}/${requestId}/${name}`, new Blob([text], { type: 'text/plain' }), { upsert: false }); if (error) throw error }
+}
