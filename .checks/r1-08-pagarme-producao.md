@@ -341,4 +341,6 @@ Esta seção substitui os estados parciais anteriores, sem apagar o histórico d
 
 Fonte do requisito: [Pagar.me — Pix e dados obrigatórios do cliente](https://docs.pagar.me/reference/pix-2).
 
+- [x] Correção publicada no commit `f2dfa6b`, push em main e deploy isolado de roadmap-checkout. Home `dpl_2w1XxptXX5KuVjpVXEanVFEBV4zM` e app `dpl_3vE7C7tfGYe3iwfZtVLR6DBsCBEa` READY no mesmo commit. HTTP confirmou scripts v2/v63 e campo CPF da home publicada. Probe remoto com body estruturalmente válido e sem documento retornou 400 / INVALID_PAYER_DOCUMENT, antes de qualquer consulta de lead ou escrita/chamada gateway.
+
 Veredito atualizado: **C1/C2/C4 aprovados; C3/C5/C6 pendentes de prova real**. Não registrar go-live integral antes dessas provas.
