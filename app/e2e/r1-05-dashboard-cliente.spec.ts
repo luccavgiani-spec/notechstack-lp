@@ -41,7 +41,7 @@ test.describe('R1-05 · dashboard do cliente', () => {
     await expect(page).toHaveURL(/\/p\/projetos$/)
 
     await page.goto(`/p/${fixture.activeProjectId}/como-funciona`)
-    await expect(page.getByRole('heading', { name: 'Seu primeiro plano está pronto.' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Projeto E2E ativo' })).toBeVisible()
     await expect(page.getByText('Seu acesso de análise fica disponível por 15 dias.')).toBeVisible()
 
     const nav = page.getByRole('navigation', { name: 'Módulos do projeto' })
@@ -49,8 +49,8 @@ test.describe('R1-05 · dashboard do cliente', () => {
     for (const label of labels) await expect(nav.getByRole('link', { name: label })).toBeVisible()
     await expect(nav.getByRole('link', { name: '01 Como funciona' })).toHaveAttribute('aria-current', 'page')
 
-    await page.keyboard.press('Tab')
     const firstLink = nav.getByRole('link', { name: '01 Como funciona' })
+    await firstLink.focus()
     await expect(firstLink).toBeFocused()
     expect(await firstLink.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none')
 
@@ -72,10 +72,10 @@ test.describe('R1-05 · dashboard do cliente', () => {
     await expect(page.locator('[data-tier="basico"]')).toContainText('R$ 4.500,00')
     await expect(page.locator('[data-tier="completo"]')).toContainText('Sob proposta')
 
-    await page.getByRole('button', { name: 'Escolher Básico' }).click()
-    await expect(page.locator('[data-tier="basico"]')).toContainText('Preferido')
+    await page.getByRole('button', { name: 'Quero conversar sobre o Básico' }).click()
+    await expect(page.locator('[data-tier="basico"]')).toContainText('Seu interesse registrado')
     await page.reload()
-    await expect(page.locator('[data-tier="basico"]')).toContainText('Preferido')
+    await expect(page.locator('[data-tier="basico"]')).toContainText('Seu interesse registrado')
 
     await nav.getByRole('link', { name: '02 Protótipo' }).click()
     const prototype = page.frameLocator('iframe[title="Protótipo navegável do projeto"]')

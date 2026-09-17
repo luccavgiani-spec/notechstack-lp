@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/((?!assets/|fonts/|prototipos/|no-tech-stack-tinta-ponto-ambar\\.svg|barra-topo-4-cores\\.svg|no-editor-preview\\.js|favicon\\.svg).*)", "destination": "/index.html" }],
+  "rewrites": [{ "source": "/((?!assets/|fonts/|prototipos/|no-tech-stack-(?:tinta|branca)-ponto-ambar\\.svg|mascote-cliente\\.png|barra-topo-4-cores\\.svg|no-editor-preview\\.js|favicon\\.svg).*)", "destination": "/index.html" }],
   "headers": [{ "source": "/(.*)", "headers": [
     { "key": "X-Content-Type-Options", "value": "nosniff" },
     { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
