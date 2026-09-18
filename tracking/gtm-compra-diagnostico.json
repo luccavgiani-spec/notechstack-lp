@@ -1,0 +1,164 @@
+{
+ "exportFormatVersion": 2,
+ "exportTime": "2026-09-18 18:00:00",
+ "containerVersion": {
+  "accountId": "6348281513",
+  "containerId": "248523885",
+  "variable": [
+   {
+    "accountId": "6348281513",
+    "containerId": "248523885",
+    "variableId": "901",
+    "name": "dl.transaction_id",
+    "type": "v",
+    "parameter": [
+     {
+      "type": "INTEGER",
+      "key": "dataLayerVersion",
+      "value": "2"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "setDefaultValue",
+      "value": "false"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "name",
+      "value": "transaction_id"
+     }
+    ]
+   }
+  ],
+  "trigger": [
+   {
+    "accountId": "6348281513",
+    "containerId": "248523885",
+    "triggerId": "902",
+    "name": "ce.diag_pagamento (compra aprovada)",
+    "type": "CUSTOM_EVENT",
+    "customEventFilter": [
+     {
+      "type": "EQUALS",
+      "parameter": [
+       {
+        "type": "TEMPLATE",
+        "key": "arg0",
+        "value": "{{_event}}"
+       },
+       {
+        "type": "TEMPLATE",
+        "key": "arg1",
+        "value": "diag_pagamento"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "tag": [
+   {
+    "accountId": "6348281513",
+    "containerId": "248523885",
+    "tagId": "903",
+    "name": "Meta - Purchase (diagnóstico)",
+    "type": "html",
+    "parameter": [
+     {
+      "type": "TEMPLATE",
+      "key": "html",
+      "value": "<script>window.fbq&&fbq(\"track\",\"Purchase\",{value:{{dl.valor}},currency:\"BRL\"},{eventID:\"purchase-{{dl.transaction_id}}\"});</script>"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "supportDocumentWrite",
+      "value": "false"
+     }
+    ],
+    "firingTriggerId": [
+     "902"
+    ],
+    "tagFiringOption": "ONCE_PER_EVENT"
+   },
+   {
+    "accountId": "6348281513",
+    "containerId": "248523885",
+    "tagId": "904",
+    "name": "GA4 - purchase (diagnóstico)",
+    "type": "gaawe",
+    "parameter": [
+     {
+      "type": "TEMPLATE",
+      "key": "eventName",
+      "value": "purchase"
+     },
+     {
+      "type": "TEMPLATE",
+      "key": "measurementIdOverride",
+      "value": "G-1YEB89RVER"
+     },
+     {
+      "type": "BOOLEAN",
+      "key": "sendEcommerceData",
+      "value": "false"
+     },
+     {
+      "type": "LIST",
+      "key": "eventSettingsTable",
+      "list": [
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "parameter",
+          "value": "value"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "parameterValue",
+          "value": "{{dl.valor}}"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "parameter",
+          "value": "currency"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "parameterValue",
+          "value": "BRL"
+         }
+        ]
+       },
+       {
+        "type": "MAP",
+        "map": [
+         {
+          "type": "TEMPLATE",
+          "key": "parameter",
+          "value": "transaction_id"
+         },
+         {
+          "type": "TEMPLATE",
+          "key": "parameterValue",
+          "value": "{{dl.transaction_id}}"
+         }
+        ]
+       }
+      ]
+     }
+    ],
+    "firingTriggerId": [
+     "902"
+    ],
+    "tagFiringOption": "ONCE_PER_EVENT"
+   }
+  ]
+ }
+}

@@ -107,6 +107,8 @@ function palco(fig, montar){
     renderer.setSize(w, h, false);
     aspecto = w / h; camera.aspect = aspecto;
     cena.enquadra(aspecto);
+    /* data-zoom no figure afasta a câmera (lp-v8: cena grande com folga em volta) */
+    camera.zoom = (aspecto >= 1.05 && Number(fig.dataset.zoom)) || 1;
     camera.updateProjectionMatrix();
     desenha(performance.now());
   }
@@ -350,7 +352,7 @@ function cenaIdeia({ raiz, camera, fig }){
         if (!REDUZ && qs >= 1) aro.scale.setScalar(1 + Math.sin(t * 3) * .06);
         const pronto = prontas === fichas.length && qs >= 1;
         if (chips[4]) chips[4].classList.toggle('on', pronto);
-        if (rotulo) rotulo.lastChild.textContent = pronto ? 'briefing organizado' : 'briefing em montagem';
+        if (rotulo) rotulo.lastChild.textContent = fase(rotulo, pronto ? 1 : 0, ['briefing em montagem', 'briefing organizado']);
       }
     };
   }
@@ -497,7 +499,7 @@ function cenaSistema({ raiz, camera, fig }){
         const qo = dt >= 5.6 && !REDUZ ? ((t - inicioQa - 5.6) % 2.6) / 2.6 : 0;
         onda.material.opacity = dt >= 5.6 && !REDUZ ? (1 - qo) * .8 : 0;
         onda.scale.setScalar(1 + qo * 1.6);
-        if (rotulo) rotulo.lastChild.textContent = dt >= 5.6 ? 'primeira versão aprovada' : dt >= 0 ? 'verificando' : 'primeira versão em construção';
+        if (rotulo) rotulo.lastChild.textContent = fase(rotulo, dt >= 5.6 ? 2 : dt >= 0 ? 1 : 0, ['primeira versão em construção', 'verificando', 'primeira versão aprovada']);
       }
     };
   }
@@ -521,6 +523,12 @@ function cenaSistema({ raiz, camera, fig }){
     },
     atualiza: pl.atualiza
   };
+}
+
+/* o texto do rótulo pode vir da página: data-fases="fase 0|fase 1|…" */
+function fase(rotulo, i, padrao){
+  const f = rotulo.dataset.fases ? rotulo.dataset.fases.split('|') : padrao;
+  return f[i] || padrao[i];
 }
 
 async function inicia(){

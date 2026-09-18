@@ -134,7 +134,7 @@ describe('checkout do roadmap na home', () => {
 
   it('renderiza a oferta exata de R$ 149,90 e os três marcos', () => {
     expect(diagnosticSource).toContain('Transforme sua ideia em um plano que dá para executar.')
-    expect(diagnosticSource).toContain('Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara uma primeira direção de protótipo e mostra caminhos reais para colocar o produto no ar.')
+    expect(diagnosticSource).toContain('Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara um protótipo que você pode testar e mostra 3 opções para colocar o produto no ar, cada uma com o que entra, prazo e valor.')
     expect(diagnosticSource).toContain('Seu material fica pronto em até 3 dias após a confirmação do pagamento.')
     expect(diagnosticSource).toContain('Quero meu roadmap + protótipo — R$ 149,90')
     expect(diagnosticSource).not.toContain('R$ 199,90')
@@ -144,8 +144,8 @@ describe('checkout do roadmap na home', () => {
     expect(diagnosticSource).toContain('contato para referências, marca e contexto complementar.')
     expect(diagnosticSource).toContain('Dias 2 e 3 — organização')
     expect(diagnosticSource).toContain('plano, protótipo e caminhos de construção.')
-    expect(diagnosticSource).toContain('Entrega — seu dashboard')
-    expect(diagnosticSource).toContain('acesso próprio para navegar e decidir como continuar.')
+    expect(diagnosticSource).toContain('Dia 3 — acesso ao app')
+    expect(diagnosticSource).toContain('plano, protótipo e as 3 opções num acesso só seu. Você tem 15 dias para decidir como continuar.')
 
     mountDiagnostic()
     completeBriefing()
@@ -154,7 +154,7 @@ describe('checkout do roadmap na home', () => {
     expect(offer).toBeVisible()
     expect(offer.querySelector('.dg-preco-por')).toHaveTextContent(/^R\$ 149,90$/)
     expect(offer.querySelector('.dg-preco-rot')).toHaveTextContent(
-      'Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara uma primeira direção de protótipo e mostra caminhos reais para colocar o produto no ar.',
+      'Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara um protótipo que você pode testar e mostra 3 opções para colocar o produto no ar, cada uma com o que entra, prazo e valor.',
     )
     expect(offer).not.toHaveTextContent('R$ 149,91')
     expect(offer).not.toHaveTextContent('R$ 199,90')
@@ -162,7 +162,7 @@ describe('checkout do roadmap na home', () => {
     expect(offer.querySelectorAll('.dg-prazo li')).toHaveLength(3)
     expect(offer).toHaveTextContent('Dia 1 — referências')
     expect(offer).toHaveTextContent('Dias 2 e 3 — organização')
-    expect(offer).toHaveTextContent('Entrega — seu dashboard')
+    expect(offer).toHaveTextContent('Dia 3 — acesso ao app')
   })
 
   it('carrega somente chave pública e preserva os endpoints configurados', () => {
@@ -177,8 +177,8 @@ describe('checkout do roadmap na home', () => {
   it('carrega configuração pública antes do checkout e diagnóstico com defer', () => {
     const configIndex = homeSource.indexOf('pagarme-public-config.js?v=1')
     expect(configIndex).toBeGreaterThan(-1)
-    expect(configIndex).toBeLessThan(homeSource.indexOf('roadmap-checkout.js?v=3'))
-    expect(configIndex).toBeLessThan(homeSource.indexOf('diagnostico.js?v=64'))
+    expect(configIndex).toBeLessThan(homeSource.search(/roadmap-checkout\.js\?v=\d+/))
+    expect(configIndex).toBeLessThan(homeSource.search(/diagnostico\.js\?v=\d+/))
     expect(homeSource).toContain('pagarme-public-config.js?v=1" defer')
   })
 
@@ -397,7 +397,10 @@ describe('checkout do roadmap na home', () => {
     expect(document.querySelector('[name="pagador_documento"]')).toHaveAttribute('autocomplete', 'off')
     fireEvent.click(action)
     expect(document.body).toHaveTextContent('confira o CPF do pagador')
-    expect(fetchMock).not.toHaveBeenCalled()
+    // o lead é gravado ao concluir a etapa 5 (antes do pagamento); CPF vazio
+    // nunca chega ao checkout nem à tokenização
+    const urls = fetchMock.mock.calls.map(([url]) => String(url))
+    expect(urls.every((url) => url.includes('send-lead-email'))).toBe(true)
   })
 
   it.each([

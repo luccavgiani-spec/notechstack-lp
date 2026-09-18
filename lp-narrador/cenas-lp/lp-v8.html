@@ -143,7 +143,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="view-transition" content="same-origin">
 <meta name="facebook-domain-verification" content="nnp34mxbka50bgauppz7inoutl6gts">
-<title>nó — tech stack IA</title>
+<title>nó — sites, apps e painéis para a sua empresa</title>
 <!-- v7 · three.js das cenas 3D: um nome só ("three") pra todos os módulos
      (cenas3d.js e giro.js) dividirem a mesma instância -->
 <script type="importmap">
@@ -1512,7 +1512,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 html.brincando, html.brincando *{
   user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
 }
-html.brincando{ cursor:grabbing }
+html.brincando, html.brincando *{ cursor:grabbing!important }
+html.mascote-mira, html.mascote-mira body{ cursor:grab }
 #lines{ position:fixed; inset:0; z-index:55; pointer-events:none; opacity:0; transition:opacity .5s }
 #sizer{ position:absolute; left:-9999px; top:0; width:0; height:var(--mh); pointer-events:none }
 
@@ -2079,6 +2080,8 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 }
 </style>
 <link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/historia.css?v=62">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap">
+<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=13">
 <!-- HERO -->
 <section id="hero">
   <!-- Fundo em vídeo, avançado/retrocedido pelo movimento horizontal do mouse.
@@ -2103,15 +2106,15 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
              src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="1633" height="964">
         <!-- slogan: entra 3s depois que o vídeo de fundo carrega -->
         <p class="hero-slogan" id="heroSlogan">
-          <span>IA e Sistemas</span>
-          <span>Tudo no mesmo nó.</span>
+          <span>Sites, apps e painéis</span>
+          <span>feitos para a sua empresa.</span>
         </p>
       </div>
       <div class="hero-right">
-        <p class="hero-desc h-rise" style="animation-delay:.62s">Você traz a ideia. A nó organiza o fluxo,
-        constrói e coloca o sistema no ar — uma etapa de cada vez.</p>
-        <a href="#ctafinal" id="heroCtaBtn" class="pill-cta h-rise" style="animation-delay:.82s"
-           onclick="goTo('ctafinal');return false">Começar um projeto
+        <p class="hero-desc h-rise" style="animation-delay:.62s">Comece pelo diagnóstico da sua ideia: em até 3 dias
+        você recebe um plano, um protótipo para testar e 3 opções de construção, com prazo e valor.</p>
+        <a href="#diagnostico" id="heroCtaBtn" class="pill-cta h-rise" style="animation-delay:.82s"
+           onclick="abrirDiagnostico({origem:'hero'});return false">Diagnóstico da ideia
           <span class="pill-cta-circle" aria-hidden="true">→</span>
         </a>
       </div>
@@ -2120,528 +2123,454 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 </section>
 
 <!-- ══════════════════════════════════════════════════════════════════════
-     SEÇÃO 2 · A HISTÓRIA — da ideia ao sistema funcionando (v7, 14/09/2026)
-     Cinco etapas num fundo preto contínuo: ideia (3D) → plano (entregável) →
-     protótipo (editor) → sistema (3D) → resultado (painel). O argumento que
-     atravessa tudo: antes de contratar o sistema inteiro, paga-se o protótipo.
-     O id #fluxo segue aqui de propósito: a queda do mascote começa nele e as
-     emendas de cor com a hero e as ferramentas dependem dele.
-     CSS em historia/historia.css · mockups em historia/historia.js ·
-     cenas 3D em historia/cenas3d.js.
+     LP v8 (18/09/2026) · o que é → ferramentas → como funciona → app →
+     editor → cronograma → clientes → formulário.
+     #fluxo continua envolvendo o miolo: a queda do mascote começa nele e
+     termina em #ctafinal (logo antes do formulário).
+     CSS: historia/v8.css · JS: historia/v8.js (galerias, fluxograma, app,
+     cronograma) · editor: historia.js · cenas 3D: cenas3d.js.
      ══════════════════════════════════════════════════════════════════════ -->
 <div id="fluxo">
 
-<!-- trilha das cinco etapas: acompanha a leitura (só desktop largo) -->
-<nav class="hs-trilha" id="hsTrilha" aria-label="Etapas do projeto">
-  <a href="#ideia" data-etapa="ideia"><b>01</b><span>ideia</span></a>
-  <a href="#plano" data-etapa="plano"><b>02</b><span>plano</span></a>
-  <a href="#prototipo" data-etapa="prototipo"><b>03</b><span>protótipo</span></a>
-  <a href="#sistema" data-etapa="sistema"><b>04</b><span>sistema</span></a>
-  <a href="#resultado" data-etapa="resultado"><b>05</b><span>progresso</span></a>
-</nav>
-
-<!-- 01 · IDEIA — abre a história e traz a cena 3D do briefing -->
-<section id="ideia" class="fx-sec hs-cap hs-tom-branco" data-etapa="ideia">
-  <div class="hs-split">
-    <div class="hs-col">
-      <div class="hs-num reveal"><b>01</b><span>ideia</span></div>
-      <h3 class="fx-h2 reveal reveal-d1">Você traz a ideia. <span class="fx-mark">A nó organiza.</span></h3>
-      <p class="hs-prazo reveal reveal-d2">Você preenche o briefing abaixo com a ideia básica. A nó organiza o projeto.</p>
-      <div class="hs-entrega reveal reveal-d3">
-        <span>entrega</span>
-        <p>Briefing objetivo, prioridades, custos discriminados e o contexto da operação por escrito.</p>
-      </div>
-      <a href="#ctafinal" class="pill-cta hs-cta reveal reveal-d4" data-cta="ideia" onclick="goTo('ctafinal');return false">Começar meu projeto
-        <span class="pill-cta-circle" aria-hidden="true">→</span>
-      </a>
+<!-- 02 · O QUE É A NÓ -->
+<section id="o-que-e" class="fx-sec v8-sec v8-claro" data-etapa="o-que-e">
+  <div class="v8-in v8-split">
+    <div class="v8-col">
+      <p class="v8-k reveal">o que é a nó</p>
+      <h2 class="v8-h reveal reveal-d1">A Nó cria o sistema que a sua empresa usa no dia a dia.</h2>
+      <p class="v8-p reveal reveal-d2">Sistema é uma ferramenta digital feita sob medida para o seu negócio. A gente planeja, desenha e constrói. Você acompanha tudo por um app, do primeiro dia até a entrega.</p>
+      <ul class="v8-servicos reveal reveal-d3">
+        <li><i style="--c:var(--blue)"></i><b>Sites</b><span>A página da sua empresa na internet, com formulário, agenda ou loja.</span></li>
+        <li><i style="--c:var(--yellow)"></i><b>Apps</b><span>Um aplicativo para os seus clientes ou a sua equipe usarem no celular.</span></li>
+        <li><i style="--c:var(--green)"></i><b>Painéis</b><span>Uma tela que junta pedidos, vendas e números da empresa num lugar só.</span></li>
+      </ul>
     </div>
-    <figure class="hs-palco hs-palco-3d reveal reveal-d1" id="cenaIdeia" aria-label="Cena 3D: as informações soltas da operação se organizam num briefing">
+    <figure class="hs-palco hs-palco-3d v8-palco-3d reveal reveal-d1" id="cenaIdeia" data-zoom=".86" aria-label="Animação: as informações soltas de uma empresa se organizam num plano">
       <div class="hs-cena"><canvas class="hs-canvas" aria-hidden="true"></canvas></div>
-      <div class="hs-palco-rot"><i></i>briefing em montagem</div>
+      <div class="hs-palco-rot" data-fases="sua ideia sendo organizada|ideia organizada"><i></i>sua ideia sendo organizada</div>
       <figcaption class="hs-palco-leg"><span>o problema</span><span>quem usa</span><span>onde trava</span><span>ferramentas</span><span>prioridades</span></figcaption>
     </figure>
   </div>
 </section>
 
-<!-- 02 · PLANO — reprodução do entregável real (marca da cliente omitida) -->
-<section id="plano" class="fx-sec hs-cap hs-tom-bege" data-etapa="plano">
-  <div class="hs-split hs-rev">
-    <figure class="hs-palco hs-palco-ui reveal reveal-d1" aria-label="Reprodução do entregável de plano, com três abas navegáveis">
-      <div class="hs-ent" id="hsEntregavel">
-        <div class="hs-janela-bar">
-          <i></i><i></i><i></i>
-          <span class="hs-url">primeira-visao / portal-de-noticias</span>
-          <span class="hs-dia">dia 3</span>
-        </div>
-        <div class="hs-ent-tabs" role="tablist" aria-label="Seções do entregável">
-          <button type="button" role="tab" id="entTab1" aria-controls="entPan1" aria-selected="true" data-aba="0">Como funciona</button>
-          <button type="button" role="tab" id="entTab2" aria-controls="entPan2" aria-selected="false" data-aba="1" tabindex="-1">Protótipo</button>
-          <button type="button" role="tab" id="entTab3" aria-controls="entPan3" aria-selected="false" data-aba="2" tabindex="-1">Próximos passos</button>
-          <span class="hs-ent-ind" aria-hidden="true"></span>
-        </div>
-
-        <div class="hs-ent-tela">
-          <!-- aba 1 · como funciona (portal de notícias; nome do jornal omitido) -->
-          <div class="hs-ent-pan" role="tabpanel" id="entPan1" aria-labelledby="entTab1">
-            <div class="hs-ent-k">como o portal funciona</div>
-            <div class="hs-ent-h">a redação publica. o leitor encontra.</div>
-            <div class="hs-arq">
-              <div class="hs-arq-col">
-                <div class="hs-arq-no"><b>Redação</b><span>escreve e revisa</span></div>
-                <div class="hs-arq-no"><b>Painel</b><span>agenda e publica</span></div>
-                <div class="hs-arq-no"><b>Acervo</b><span>matérias antigas migradas</span></div>
-              </div>
-              <svg class="hs-arq-fios" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M0 25 C50 25 50 75 100 75"/><path d="M0 75 L100 75"/><path d="M0 125 C50 125 50 75 100 75"/>
-              </svg>
-              <div class="hs-arq-centro"><b>o portal</b><span>casa própria do jornal</span></div>
-              <svg class="hs-arq-fios" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M0 75 C50 75 50 45 100 45"/><path d="M0 75 C50 75 50 105 100 105"/>
-              </svg>
-              <div class="hs-arq-col hs-arq-saida">
-                <div class="hs-arq-no"><b>Leitor</b><span>capa, matéria e editorias</span></div>
-                <div class="hs-arq-no"><b>Endereços antigos</b><span>redirecionados, sem perder busca</span></div>
-              </div>
-            </div>
-            <p class="hs-ent-nota">Não é imagem parada: é o site de verdade, navegável, com a marca aplicada.</p>
-          </div>
-
-          <!-- aba 2 · protótipo: o portal navegado como leitor -->
-          <div class="hs-ent-pan" role="tabpanel" id="entPan2" aria-labelledby="entTab2" hidden>
-            <div class="hs-ent-proto">
-              <div class="hs-ent-proto-txt">
-                <div class="hs-ent-k">protótipo navegável</div>
-                <div class="hs-ent-h">o portal, lido como leitor.</div>
-                <ul class="hs-ent-telas" aria-label="Páginas do protótipo">
-                  <li><button type="button" data-tela="0" aria-pressed="true">capa</button></li>
-                  <li><button type="button" data-tela="1" aria-pressed="false">matéria</button></li>
-                  <li><button type="button" data-tela="2" aria-pressed="false">editoria</button></li>
-                </ul>
-                <p class="hs-ent-nota">Nome do jornal e da cidade omitidos nesta reprodução.</p>
-              </div>
-              <div class="hs-cel hs-cel-jornal" aria-label="Celular com o portal de notícias">
-                <div class="hs-cel-top"><span>9:41</span><span>•••</span></div>
-                <div class="hs-jr-topo">
-                  <div class="hs-jr-plantao"><b>plantão</b>chuva forte alaga avenida e trânsito é desviado no Centro</div>
-                  <div class="hs-jr-marca"><span class="hs-jr-omitido" title="nome do jornal omitido"></span><small>notícias da cidade e região</small></div>
-                  <nav class="hs-jr-menu" aria-label="Editorias">
-                    <button type="button" data-ir-tela="0" class="on">últimas</button><button type="button" data-ir-tela="2">política</button><button type="button" data-ir-tela="1">cidade</button><span>economia</span><span>esportes</span>
-                  </nav>
-                </div>
-                <div class="hs-cel-telas">
-                  <div class="hs-cel-tela" data-tela="0">
-                    <button type="button" class="hs-jr-manchete" data-ir-tela="1">
-                      <img src="/lp-narrador/cenas-lp/historia/img/j1.webp" alt="" loading="lazy" width="480" height="320">
-                      <small>cidade · destaque</small>
-                      <b>Governo confirma Hospital Regional e obra começa em outubro</b>
-                    </button>
-                    <div class="hs-jr-rot">últimas notícias</div>
-                    <ul class="hs-jr-lista">
-                      <li><small>saúde</small>Vacinação contra a gripe é ampliada para todas as idades</li>
-                      <li><small>cidade</small>Feira do produtor rural muda de praça a partir de sábado</li>
-                    </ul>
-                  </div>
-                  <div class="hs-cel-tela" data-tela="1" hidden>
-                    <div class="hs-jr-trilha">capa › cidade</div>
-                    <small class="hs-jr-chapeu">cidade · destaque</small>
-                    <h5 class="hs-jr-h">Governo confirma Hospital Regional e obra começa em outubro</h5>
-                    <p class="hs-jr-fina">Unidade terá 200 leitos e seis salas cirúrgicas, e vai atender as 12 cidades da microrregião.</p>
-                    <div class="hs-jr-byline">da redação · 4 min de leitura</div>
-                    <img class="hs-jr-foto" src="/lp-narrador/cenas-lp/historia/img/j1.webp" alt="" loading="lazy" width="480" height="320">
-                    <p class="hs-jr-corpo">A confirmação veio nesta terça-feira. O terreno já foi doado e o contrato prevê 30 meses de execução, com repasse mensal fiscalizado.</p>
-                  </div>
-                  <div class="hs-cel-tela" data-tela="2" hidden>
-                    <div class="hs-jr-trilha">capa › política</div>
-                    <h5 class="hs-jr-editoria">Política</h5>
-                    <p class="hs-jr-fina">Câmara, Prefeitura e contas públicas da região.</p>
-                    <img class="hs-jr-foto" src="/lp-narrador/cenas-lp/historia/img/j2.webp" alt="" loading="lazy" width="480" height="320">
-                    <ul class="hs-jr-lista">
-                      <li><small>câmara</small>Câmara aprova LDO de 2027 com R$ 1,3 bilhão</li>
-                      <li><small>prefeitura</small>Decreto reorganiza secretarias e cria a de Projetos</li>
-                      <li><small>câmara</small>Vereadores aprovam reajuste de 4,1% para servidores</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- aba 3 · próximos passos / roadmap (fases reais do projeto) -->
-          <div class="hs-ent-pan" role="tabpanel" id="entPan3" aria-labelledby="entTab3" hidden>
-            <div class="hs-ent-k">próximos passos · roadmap</div>
-            <div class="hs-ent-h">duas aprovações agora. o resto em fases.</div>
-            <div class="hs-road">
-              <div class="hs-road-col is-agora">
-                <small>aprovar agora</small>
-                <span>logo, entre 4 propostas aplicadas no site</span><span>painel da redação: escrever, revisar, publicar</span><span>capa, matéria, editorias e colunas</span>
-              </div>
-              <div class="hs-road-col">
-                <small>próximas fases</small>
-                <span>migração do acervo com redirecionamento</span><span>comunidade de leitores</span><span>go-live no domínio do jornal</span>
-              </div>
-            </div>
-            <ol class="hs-aprov" aria-label="Fluxo de aprovação">
-              <li><small>fase 1</small><b>protótipo e marca</b><i>aprova</i></li>
-              <li><small>fase 2</small><b>migração</b><i>aprova</i></li>
-              <li><small>fase 4</small><b>go-live</b><i>aprova</i></li>
-            </ol>
-          </div>
-        </div>
-        <div class="hs-cursor" aria-hidden="true"></div>
-      </div>
-      <figcaption class="hs-legenda">Reprodução de um entregável real · nome do jornal omitido</figcaption>
-    </figure>
-    <div class="hs-col">
-      <div class="hs-num reveal"><b>02</b><span>plano · até 3 dias</span></div>
-      <h3 class="fx-h2 reveal reveal-d1">Em até 3 dias, <span class="fx-mark">o plano fica visível.</span></h3>
-      <p class="hs-prazo reveal reveal-d2">Você recebe um arquivo navegável com protótipo, tech stack, funções por etapa e próximos passos.</p>
-      <div class="hs-entrega reveal reveal-d4">
-        <span>entrega</span>
-        <p>Roadmap + protótipo navegável + cronograma em semanas.</p>
-      </div>
-    </div>
+<!-- 03 · FERRAMENTAS — galeria curva, 2 linhas em sentidos opostos -->
+<section id="ferramentas" class="fx-sec v8-sec v8-branco v8-sec-galeria" data-etapa="ferramentas">
+  <div class="v8-in v8-topo-centro">
+    <p class="v8-k reveal">ferramentas que já conectamos</p>
+    <h2 class="v8-h reveal reveal-d1">Seu sistema conversa com o que você já usa.</h2>
+    <p class="v8-p reveal reveal-d2">WhatsApp, planilhas, pagamentos, agenda, e-mail. Estas são as ferramentas que já ligamos aos sistemas que entregamos.</p>
   </div>
+  <div class="v8-galeria reveal reveal-d2" data-galeria="ferramentas" data-linha="0" data-curva="-1" aria-label="Ferramentas, linha 1"></div>
+  <div class="v8-galeria reveal reveal-d3" data-galeria="ferramentas" data-linha="1" data-curva="1" data-sentido="-1" aria-label="Ferramentas, linha 2"></div>
 </section>
 
-<!-- 03 · PROTÓTIPO — editor: o cliente ajusta e aprova antes da obra -->
-<section id="prototipo" class="fx-sec hs-cap hs-tom-branco" data-etapa="prototipo">
-  <div class="hs-split">
-    <div class="hs-col">
-      <div class="hs-num reveal"><b>03</b><span>protótipo</span></div>
-      <h3 class="fx-h2 reveal reveal-d1">Você testa. <span class="fx-mark">A nó ajusta.</span></h3>
-      <p class="hs-prazo reveal reveal-d2">Você recebe o protótipo do sistema em um editor para ajustar textos, tamanhos, cores e a posição dos elementos.</p>
-      <p class="hs-dica reveal reveal-d3">Experimente: clique no título da tela, mude o tamanho e aprove.</p>
-      <div class="hs-entrega reveal reveal-d4">
-        <span>entrega</span>
-        <p>Protótipo com os seus ajustes + aprovação do layout e da arquitetura.</p>
-      </div>
-    </div>
-    <figure class="hs-palco hs-palco-ui reveal reveal-d1" aria-label="Editor do protótipo, com ajuste de texto e aprovação">
-      <div class="hs-ed" id="hsEditor">
-        <div class="hs-janela-bar">
-          <i></i><i></i><i></i>
-          <span class="hs-url">protótipo · pedidos da equipe</span>
-          <span class="hs-ed-modo" id="edModo">demonstração</span>
+<!-- 04 · COMO FUNCIONA — fluxograma animado pela rolagem -->
+<section id="como-funciona" class="fx-sec v8-sec v8-escuro" data-etapa="como-funciona">
+  <div class="v8-in v8-topo-centro">
+    <p class="v8-k reveal">como funciona</p>
+    <h2 class="v8-h reveal reveal-d1">Do diagnóstico à entrega, em 7 passos.</h2>
+    <p class="v8-p reveal reveal-d2">Você começa pagando só o diagnóstico da ideia: R$ 149,90. Ele inclui o plano, um protótipo para testar e 3 opções de como construir. A partir daí, cada passo tem prazo.</p>
+  </div>
+
+  <div class="v8-fluxo" id="v8Fluxo">
+    <svg class="v8-fluxo-fio" aria-hidden="true" preserveAspectRatio="none"><path class="v8-fio-base"/><path class="v8-fio-cheio"/></svg>
+    <i class="v8-fluxo-ponto" aria-hidden="true"></i>
+    <ol class="v8-passos">
+      <li class="v8-passo" data-cor="azul">
+        <span class="v8-n">01</span>
+        <div class="v8-card">
+          <small class="v8-quando">hoje</small>
+          <h3>Você compra o diagnóstico da ideia</h3>
+          <p>R$ 149,90, por Pix ou cartão, direto no formulário desta página.</p>
+          <ul class="v8-inclui"><li>plano do passo a passo</li><li>protótipo para testar</li><li>3 opções de construção</li></ul>
         </div>
-        <div class="hs-ed-corpo">
-          <aside class="hs-ed-telas" aria-label="Telas">
-            <small>telas</small>
-            <span class="on">novo pedido</span><span>fila da equipe</span><span>painel do gestor</span>
-          </aside>
-          <div class="hs-ed-canvas">
-            <div class="hs-ed-app">
-              <div class="hs-ed-app-top"><b>operação</b><i></i></div>
-              <div class="hs-ed-alvo" id="edAlvo">
-                <h4 id="edTitulo" spellcheck="false">Peça em 1 minuto. A equipe responde.</h4>
-                <span class="hs-ed-alca" aria-hidden="true"></span>
-              </div>
-              <div class="hs-ed-campo"><small>o que você precisa?</small><span>troca do banner da loja</span></div>
-              <div class="hs-ed-campo"><small>para quando?</small><span>sexta-feira</span></div>
-              <div class="hs-ed-cta" id="edCta">enviar pedido</div>
-              <div class="hs-ed-pino" id="edPino" hidden><b>1</b><span>“pedido” soa melhor que “chamado”</span></div>
-            </div>
+      </li>
+      <li class="v8-passo" data-cor="vermelho">
+        <span class="v8-n">02</span>
+        <div class="v8-card">
+          <small class="v8-quando">dia 1</small>
+          <h3>A gente te chama no WhatsApp</h3>
+          <p>Conversamos para entender a ideia e pedimos as suas referências: a marca da empresa e sites ou apps que você gosta.</p>
+        </div>
+      </li>
+      <li class="v8-passo" data-cor="ambar">
+        <span class="v8-n">03</span>
+        <div class="v8-card">
+          <small class="v8-quando">até o dia 3</small>
+          <h3>Você recebe o acesso ao app da Nó</h3>
+          <p>Lá estão o plano, o protótipo para clicar e as 3 opções, cada uma com o que entra, prazo e valor.</p>
+        </div>
+      </li>
+      <li class="v8-passo v8-decisao" data-cor="verde">
+        <span class="v8-n">04</span>
+        <div class="v8-card">
+          <small class="v8-quando">15 dias para decidir</small>
+          <h3>Você escolhe qual opção seguir</h3>
+          <p>Teste o protótipo com calma, mostre para quem trabalha com você e escolha uma das 3 opções.</p>
+          <div class="v8-opcoes" aria-label="As 3 opções">
+            <span style="--c:var(--blue)">Básico</span><span style="--c:var(--yellow)">Essencial</span><span style="--c:var(--green)">Completo</span>
           </div>
-          <aside class="hs-ed-insp" aria-label="Ajustes">
-            <small>título</small>
-            <label class="hs-ed-ctl">tamanho <output id="edTamOut">22</output>
-              <input type="range" id="edTam" min="16" max="30" step="1" value="22">
-            </label>
-            <div class="hs-ed-ctl">cor do botão
-              <div class="hs-ed-cores" role="radiogroup" aria-label="Cor do botão">
-                <button type="button" role="radio" aria-checked="true" data-cor="#141414" style="--c:#141414" aria-label="preto"></button>
-                <button type="button" role="radio" aria-checked="false" data-cor="#EDA33B" style="--c:#EDA33B" aria-label="âmbar"></button>
-                <button type="button" role="radio" aria-checked="false" data-cor="#30A46C" style="--c:#30A46C" aria-label="verde"></button>
-              </div>
-            </div>
-            <small>aprovação</small>
-            <ul class="hs-ed-check" id="edCheck">
-              <li data-k="fluxo">fluxo navegado</li>
-              <li data-k="texto">textos ajustados</li>
-              <li data-k="direcao">direção visual</li>
-              <li data-k="arq">arquitetura</li>
-            </ul>
-            <button type="button" class="hs-ed-aprovar" id="edAprovar">aprovar protótipo</button>
-          </aside>
+          <p class="v8-nota">Se decidir não seguir, o plano e o protótipo continuam seus.</p>
         </div>
-        <div class="hs-ed-carimbo" id="edCarimbo" hidden><b>aprovado</b><span>pode construir</span></div>
-        <div class="hs-cursor" aria-hidden="true"></div>
-      </div>
-      <figcaption class="hs-legenda">Os ajustes feitos aqui voltam pra nó antes de qualquer linha de produção</figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- 04 · SISTEMA — cena 3D: construção, ferramentas conectadas e revisão -->
-<section id="sistema" class="fx-sec hs-cap hs-tom-bege" data-etapa="sistema">
-  <div class="hs-split hs-rev">
-    <figure class="hs-palco hs-palco-3d reveal reveal-d1" id="cenaSistema" aria-label="Cena 3D: módulos do sistema sendo conectados e verificados">
-      <div class="hs-cena"><canvas class="hs-canvas" aria-hidden="true"></canvas></div>
-      <div class="hs-palco-rot"><i></i>primeira versão em construção</div>
-      <ol class="hs-qa" id="hsQa" aria-label="Verificações">
-        <li data-i="0">arquitetura desenhada</li>
-        <li data-i="1">ferramentas conectadas</li>
-        <li data-i="2">testes automáticos</li>
-        <li data-i="3">dados conferidos</li>
-        <li data-i="4" class="is-humano">testes em produção</li>
-      </ol>
-    </figure>
-    <div class="hs-col">
-      <div class="hs-num reveal"><b>04</b><span>sistema · 15 e 30 dias</span></div>
-      <h3 class="fx-h2 reveal reveal-d1">Protótipo aprovado. <span class="fx-mark">Construção em andamento.</span></h3>
-      <p class="hs-prazo reveal reveal-d3"><b>15 dias</b> para a primeira versão. <b>30 dias</b> para o sistema completo, conforme o escopo.</p>
-      <div class="hs-entrega reveal reveal-d4">
-        <span>entrega</span>
-        <p>Arquitetura + ferramentas conectadas + primeira versão funcionando.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 05 · RESULTADO — painel da operação + o porquê de começar pelo protótipo -->
-<section id="resultado" class="fx-sec hs-cap hs-tom-branco" data-etapa="resultado">
-  <div class="hs-split">
-    <div class="hs-col">
-      <div class="hs-num reveal"><b>05</b><span>progresso</span></div>
-      <h3 class="fx-h2 reveal reveal-d1">Sistema no ar. <span class="fx-mark">Evolução à vista.</span></h3>
-      <p class="hs-prazo reveal reveal-d2">Você acompanha semanalmente nossa distribuição de tarefas e o andamento do desenvolvimento.</p>
-      <div class="hs-entrega reveal reveal-d3">
-        <span>entrega</span>
-        <p>Roadmap de evolução acompanhada.</p>
-      </div>
-    </div>
-    <figure class="hs-palco hs-palco-ui reveal reveal-d1" aria-label="Painel da operação com pedidos, responsáveis e status">
-      <div class="hs-op" id="hsPainel">
-        <div class="hs-janela-bar">
-          <i></i><i></i><i></i>
-          <span class="hs-url">operação · pedidos da equipe</span>
-          <span class="hs-op-ar"><i></i>no ar</span>
+      </li>
+      <li class="v8-passo" data-cor="azul">
+        <span class="v8-n">05</span>
+        <div class="v8-card">
+          <small class="v8-quando">30 dias</small>
+          <h3>A gente divide o trabalho e constrói</h3>
+          <p>A opção escolhida vira uma lista de tarefas com datas. Você vê no app o que está pronto, o que está sendo feito e o que vem depois.</p>
         </div>
-        <div class="hs-op-corpo">
-          <div class="hs-op-quadro" id="opQuadro">
-            <div class="hs-op-col" data-col="0"><small>novos <em>0</em></small><div class="hs-op-lista"></div></div>
-            <div class="hs-op-col" data-col="1"><small>em andamento <em>0</em></small><div class="hs-op-lista"></div></div>
-            <div class="hs-op-col" data-col="2"><small>revisão <em>0</em></small><div class="hs-op-lista"></div></div>
-            <div class="hs-op-col" data-col="3"><small>entregues <em>0</em></small><div class="hs-op-lista"></div></div>
-          </div>
-          <aside class="hs-op-lado">
-            <small>integrações</small>
-            <ul class="hs-op-int">
-              <li><i></i>WhatsApp<span>entrada</span></li>
-              <li><i></i>Planilha<span>sincronizada</span></li>
-              <li><i></i>E-mail<span>avisos</span></li>
-            </ul>
-            <small>atividade</small>
-            <ul class="hs-op-log" id="opLog" aria-live="off"></ul>
-            <div class="hs-op-prox">
-              <small>próximo passo · v1.1</small>
-              <b>aviso automático pro cliente quando o pedido sai</b>
-            </div>
-          </aside>
+      </li>
+      <li class="v8-passo" data-cor="vermelho">
+        <span class="v8-n">06</span>
+        <div class="v8-card">
+          <small class="v8-quando">primeira versão pronta</small>
+          <h3>O editor é liberado para você</h3>
+          <p>Com a primeira versão no ar, você mesmo muda textos, cores e tamanhos, e manda os ajustes para a Nó aplicar.</p>
         </div>
-      </div>
-      <figcaption class="hs-legenda">Painel ilustrativo de uma operação de pedidos · sem dados de cliente</figcaption>
-    </figure>
-  </div>
-
-</section>
-
-<!-- ENTREGA — a seção de conversão (14/09). Não é etapa 06: é o resumo de
-     tudo o que as cinco etapas prometeram, num lugar só, com os CTAs que
-     abrem o diagnóstico direto (sem passar pelo CTA final). -->
-<section id="entrega" class="fx-sec hs-cap hs-tom-bege" data-etapa="entrega">
-  <div class="hs-entg-topo reveal">
-    <div class="fx-lbl" style="color:var(--yellow)">// a entrega<i class="fx-caret" aria-hidden="true"></i></div>
-    <h2 class="hs-entg-h">Da ideia ao sistema funcionando, <span class="fx-mark">tudo por escrito e com prazo.</span></h2>
-    <p class="hs-entg-p">Cinco etapas, cada uma com uma entrega que você vê, testa e aprova antes de seguir. Esse é o projeto inteiro — do primeiro briefing ao sistema rodando na sua operação.</p>
-    <div class="hs-entg-acoes">
-      <a href="#diagnostico" class="pill-cta hs-cta" data-cta="entrega_topo" onclick="abrirDiagnostico({origem:'entrega'});return false">Começar meu projeto
-        <span class="pill-cta-circle" aria-hidden="true">→</span>
-      </a>
-      <!-- abre/recolhe o resumo das etapas em qualquer tamanho de tela -->
-      <button type="button" class="hs-entg-abrir" id="entgAbrir" aria-expanded="false" aria-controls="entgDetalhes">
-        <span class="hs-entg-abrir-txt">ver as etapas</span><i aria-hidden="true">↓</i>
-      </button>
-    </div>
-  </div>
-
-  <div class="hs-entg-detalhes" id="entgDetalhes"><div class="hs-entg-detalhes-in">
-  <div class="hs-entg-janela reveal reveal-d1" aria-label="Resumo do que você recebe em cada etapa">
-    <div class="hs-janela-bar">
-      <i></i><i></i><i></i>
-      <span class="hs-url">seu-projeto / o que você recebe</span>
-      <span class="hs-dia">5 etapas</span>
-    </div>
-    <ol class="hs-entg-grade">
-      <li class="hs-entg-etapa">
-        <span class="hs-entg-n">01</span>
-        <b>ideia</b>
-        <small>ponto de partida</small>
-        <ul><li>briefing objetivo</li><li>prioridades definidas</li><li>custos discriminados</li></ul>
       </li>
-      <li class="hs-entg-etapa">
-        <span class="hs-entg-n">02</span>
-        <b>plano</b>
-        <small>até 3 dias</small>
-        <ul><li>protótipo navegável</li><li>roadmap: agora e depois</li><li>cronograma em semanas</li></ul>
-      </li>
-      <li class="hs-entg-etapa">
-        <span class="hs-entg-n">03</span>
-        <b>protótipo</b>
-        <small>com a sua aprovação</small>
-        <ul><li>telas testadas por você</li><li>ajustes corrigidos pela nó</li><li>layout e arquitetura aprovados</li></ul>
-      </li>
-      <li class="hs-entg-etapa">
-        <span class="hs-entg-n">04</span>
-        <b>sistema</b>
-        <small>1ª versão em 15 dias · completo em 30</small>
-        <ul><li>arquitetura e banco de dados</li><li>ferramentas conectadas</li><li>testes em produção</li><li>sistema completo em 30 dias</li></ul>
-      </li>
-      <li class="hs-entg-etapa">
-        <span class="hs-entg-n">05</span>
-        <b>progresso</b>
-        <small>toda semana</small>
-        <ul><li>pedidos de alteração no sistema</li><li>acompanhamento semanal</li><li>roadmap de evolução</li></ul>
+      <li class="v8-passo v8-fim" data-cor="ambar">
+        <span class="v8-n">07</span>
+        <div class="v8-card">
+          <small class="v8-quando">fim dos 30 dias</small>
+          <h3>Entrega</h3>
+          <p>O sistema fica pronto, funcionando e no nome da sua empresa.</p>
+        </div>
       </li>
     </ol>
   </div>
 
-  <ul class="hs-entg-comp reveal reveal-d2">
-    <li><b>Nada é construído sem o seu sim.</b><span>Layout e arquitetura aprovados antes da obra.</span></li>
-    <li><b>Custos claros desde o briefing.</b><span>O que é implementação e o que vira mensalidade de plataforma.</span></li>
-    <li><b>Você vê o andamento.</b><span>Acompanhamento semanal e roadmap de evolução.</span></li>
-  </ul>
-
-  </div></div><!-- /#entgDetalhes -->
-
-  <div class="hs-entg-final reveal reveal-d2">
-    <div>
-      <h3>Vamos tirar a sua ideia do papel?</h3>
-      <p>Você responde algumas perguntas no nosso terminal e a gente volta com o próximo passo.</p>
-    </div>
-    <a href="#diagnostico" class="pill-cta hs-cta" data-cta="entrega_final" onclick="abrirDiagnostico({origem:'entrega'});return false">Começar meu projeto
+  <div class="v8-in v8-cta-linha reveal">
+    <a href="#diagnostico" class="pill-cta hs-cta v8-cta-cinza" data-cta="como_funciona" onclick="abrirDiagnostico({origem:'como_funciona'});return false">Começar pelo diagnóstico
       <span class="pill-cta-circle" aria-hidden="true">→</span>
     </a>
   </div>
 </section>
 
-</div><!-- /#fluxo -->
-
-<!-- ══ SEÇÃO 4 · FERRAMENTAS — a esteira de logos/plataformas da v5.
-     Subiu pra CÁ em 14/08 (antes era a última, depois do "Senta aí"). Agora
-     ela é a última coisa antes do convite: quem chega no "vamos conversar?"
-     acabou de passar os olhos pelo que a gente já rodou. ══ -->
-<section id="platforms" class="sec-studio" style="padding:80px 0">
-  <div class="plat-hdr reveal">
-    <div class="section-label label-yellow" style="justify-content:center">Ferramentas</div>
-    <h2 class="section-title" style="text-align:center">Stacks que já trabalhamos em outros projetos</h2>
-    <p class="section-sub" style="text-align:center;margin:0 auto 48px">Selecionamos e conectamos as plataformas de sua preferência para a sua operação.</p>
+<!-- 05 · O APP — réplica do painel do cliente (app.notechstack.com.br) -->
+<section id="app" class="fx-sec v8-sec v8-claro" data-etapa="app">
+  <div class="v8-in v8-split v8-split-largo">
+    <div class="v8-col">
+      <p class="v8-k reveal">o app da nó</p>
+      <h2 class="v8-h reveal reveal-d1">Tudo do seu projeto num lugar só.</h2>
+      <p class="v8-p reveal reveal-d2">Ao comprar o diagnóstico, você ganha um acesso próprio ao app da Nó. É por ele que você recebe as entregas e acompanha o andamento. Ao lado, o exemplo de uma loja online.</p>
+      <ul class="v8-abas-lista reveal reveal-d3" id="v8AppLista">
+        <li><button type="button" data-aba="0" aria-pressed="true"><b>Como funciona</b><span>As 3 opções, do Básico ao Completo: o que cada uma entrega, as ferramentas usadas, o valor da implementação e a mensalidade.</span></button></li>
+        <li><button type="button" data-aba="1" aria-pressed="false"><b>Protótipo</b><span>Uma versão de teste do seu sistema. Dá para clicar e navegar como se já estivesse pronto.</span></button></li>
+        <li><button type="button" data-aba="2" aria-pressed="false"><b>Etapas</b><span>As tarefas do projeto em três colunas: a fazer, em andamento e concluído.</span></button></li>
+      </ul>
+      <p class="v8-nota-clara reveal reveal-d4">A mensalidade cobre o suporte da Nó e o custo das plataformas que o sistema usa, como hospedagem, inteligência artificial e anúncios.</p>
+    </div>
+    <figure class="hs-palco hs-palco-ui v8-palco-app reveal reveal-d1" aria-label="Demonstração do app da Nó com o caso de uma loja online">
+      <div class="v8-app" id="v8App">
+        <div class="v8-app-faixa" aria-hidden="true"></div>
+        <aside class="v8-app-lado" aria-hidden="true">
+          <img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="" width="7060" height="964">
+          <small>projeto</small>
+          <b class="v8-app-proj">Loiê · e-commerce</b>
+          <ol class="v8-app-menu">
+            <li class="on" data-aba="0"><em>01</em>Como funciona</li>
+            <li data-aba="1"><em>02</em>Protótipo</li>
+            <li data-aba="2"><em>03</em>Etapas</li>
+            <li class="trava"><em>04</em>Editor</li>
+            <li class="trava"><em>05</em>Versões</li>
+            <li class="trava"><em>06</em>Marca & arquivos</li>
+          </ol>
+          <p class="v8-app-janela">acesso de análise · <b>12 dias</b> restantes</p>
+        </aside>
+        <div class="v8-app-tela">
+          <!-- aba 0 · como funciona: 3 opções (ordem fixa: Básico → Essencial → Completo) -->
+          <div class="v8-app-pan" data-pan="0">
+            <small class="v8-app-k">01 · como funciona</small>
+            <h4>Escolha como construir a sua loja.</h4>
+            <div class="v8-tiers">
+              <div class="v8-tier" style="--c:var(--blue)" data-g="61,99,219">
+                <b>Básico</b>
+                <ul class="v8-tier-itens"><li>Página de vendas da loja</li><li>Perfil no Google Meu Negócio</li></ul>
+                <div class="v8-tier-stack" data-stack="vercel,google"></div>
+                <dl class="v8-tier-valor"><div><dt>implementação</dt><dd>R$ 1.000</dd></div><div><dt>mensalidade</dt><dd>R$ 200<small>/mês</small></dd></div></dl>
+                <button type="button" tabindex="-1" aria-expanded="false">quero este</button>
+                <div class="v8-tier-zap" hidden><p>Quer seguir com o <b>Básico</b>? Fale com a equipe da Nó.</p><a href="https://wa.me/5511939289413?text=Ol%C3%A1%21%20Vi%20o%20exemplo%20da%20loja%20no%20site%20da%20N%C3%B3%20e%20quero%20conversar%20sobre%20o%20plano%20B%C3%A1sico." target="_blank" rel="noopener noreferrer">chamar no WhatsApp ↗</a></div>
+              </div>
+              <div class="v8-tier" style="--c:var(--yellow)" data-g="237,163,59" data-alvo="tier">
+                <b>Essencial</b>
+                <ul class="v8-tier-itens"><li class="mais">tudo do Básico</li><li>Meta Business Manager: loja no Instagram e no Facebook</li><li>Animações em 3D no site</li></ul>
+                <div class="v8-tier-stack" data-stack="vercel,google,meta,threedotjs"></div>
+                <dl class="v8-tier-valor"><div><dt>implementação</dt><dd>R$ 3.000</dd></div><div><dt>mensalidade</dt><dd>R$ 500<small>/mês</small></dd></div></dl>
+                <button type="button" tabindex="-1" aria-expanded="false">quero este</button>
+                <div class="v8-tier-zap" hidden><p>Quer seguir com o <b>Essencial</b>? Fale com a equipe da Nó.</p><a href="https://wa.me/5511939289413?text=Ol%C3%A1%21%20Vi%20o%20exemplo%20da%20loja%20no%20site%20da%20N%C3%B3%20e%20quero%20conversar%20sobre%20o%20plano%20Essencial." target="_blank" rel="noopener noreferrer">chamar no WhatsApp ↗</a></div>
+              </div>
+              <div class="v8-tier" style="--c:var(--green)" data-g="48,164,108">
+                <b>Completo</b>
+                <ul class="v8-tier-itens"><li class="mais">tudo do Essencial</li><li>Agente de chat que atende no WhatsApp</li><li>Inteligência artificial treinada com os dados da loja</li><li>Painel para programar posts e anúncios</li></ul>
+                <div class="v8-tier-stack" data-stack="vercel,google,meta,threedotjs,whatsapp,anthropic,supabase,googleads"></div>
+                <dl class="v8-tier-valor"><div><dt>implementação</dt><dd>R$ 7.500</dd></div><div><dt>mensalidade</dt><dd>R$ 1.500<small>/mês</small></dd></div></dl>
+                <button type="button" tabindex="-1" aria-expanded="false">quero este</button>
+                <div class="v8-tier-zap" hidden><p>Quer seguir com o <b>Completo</b>? Fale com a equipe da Nó.</p><a href="https://wa.me/5511939289413?text=Ol%C3%A1%21%20Vi%20o%20exemplo%20da%20loja%20no%20site%20da%20N%C3%B3%20e%20quero%20conversar%20sobre%20o%20plano%20Completo." target="_blank" rel="noopener noreferrer">chamar no WhatsApp ↗</a></div>
+              </div>
+            </div>
+            <p class="v8-app-ok" hidden>✓ preferência registrada: <b>Essencial</b></p>
+          </div>
+          <!-- aba 1 · protótipo da loja em moldura de celular -->
+          <div class="v8-app-pan" data-pan="1" hidden>
+            <div class="v8-proto-topo">
+              <div><small class="v8-app-k">02 · protótipo</small><h4>Navegue pela loja.</h4></div>
+              <div class="v8-disp" role="radiogroup" aria-label="Ver o protótipo no">
+                <button type="button" role="radio" data-disp="cel" aria-checked="true">celular</button>
+                <button type="button" role="radio" data-disp="pc" aria-checked="false">computador</button>
+              </div>
+            </div>
+            <div class="v8-loie modo-cel" id="v8Loie">
+              <div class="v8-loie-barra" aria-hidden="true"><i></i><i></i><i></i><span>loie.com.br<em>/</em></span></div>
+              <div class="v8-loie-tela">
+                <header class="v8-lo-nav">
+                  <span class="v8-lo-links"><b>velas</b><b>borrifadores</b></span>
+                  <button type="button" class="v8-lo-logo" data-ir="home" aria-label="Loiê, página inicial"></button>
+                  <span class="v8-lo-links v8-lo-dir"><b>mais</b><b>sobre</b><i class="v8-lo-sacola">0</i></span>
+                </header>
+                <div class="v8-lo-pag" data-pag="home">
+                  <section class="v8-lo-hero">
+                    <p>criamos rituais que respiram junto com você — traduzindo fragrâncias em presença, design em sensação.</p>
+                    <div class="v8-lo-3"><span>sensorial</span><i></i><span>poética</span><i></i><span>atemporal</span></div>
+                    <div class="v8-lo-bts"><span>navegar</span><span>nossa história</span></div>
+                  </section>
+                  <div class="v8-lo-cats"><span>cítricos &amp; frescos</span><span>verdes &amp; herbais</span><span>florais</span><span>amadeirados</span><span>especiados &amp; quentes</span><span>gourmand &amp; conforto</span></div>
+                  <section class="v8-lo-best">
+                    <small>bestsellers</small><h5>mais pedidos</h5>
+                    <div class="v8-lo-grade">
+                      <button type="button" class="v8-lo-prod" data-ir="produto" data-alvo="prod"><img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo.webp" alt="" loading="lazy"><b>Caramelo</b><span>R$ 150,00</span></button>
+                      <div class="v8-lo-prod"><img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo-emb.webp" alt="" loading="lazy"><b>Caramelo</b><span>R$ 260,00</span></div>
+                      <div class="v8-lo-prod"><img src="/lp-narrador/cenas-lp/historia/img/loie/bosque.webp" alt="" loading="lazy"><b>Bosque</b><span>R$ 260,00</span></div>
+                      <div class="v8-lo-prod"><img src="/lp-narrador/cenas-lp/historia/img/loie/campos.webp" alt="" loading="lazy"><b>Campos</b><span>R$ 174,90</span></div>
+                    </div>
+                  </section>
+                </div>
+                <div class="v8-lo-pag" data-pag="produto" hidden>
+                  <p class="v8-lo-trilha"><button type="button" data-ir="home">gourmand &amp; conforto</button> · Dulce · <b>Caramelo</b> · Gin · Tabaco</p>
+                  <div class="v8-lo-pdp">
+                    <img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo.webp" alt="" loading="lazy">
+                    <div class="v8-lo-info">
+                      <h5>Caramelo</h5>
+                      <p class="v8-lo-est">☆☆☆☆☆ 0 (0 avaliações)</p>
+                      <p class="v8-lo-preco">R$ 150,00</p>
+                      <p class="v8-lo-fam">chipre frutado — patchouli</p>
+                      <p class="v8-lo-desc">acorde aromático gourmand cremoso ambarado. notas adocicadas e tostadas com nuances cremosas e um fundo ambarado macio.</p>
+                      <button type="button" class="v8-lo-add">adicionar ao carrinho</button>
+                      <ul class="v8-lo-acc"><li>o aroma<i>+</i></li><li>onde usar<i>+</i></li><li>composição<i>+</i></li></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="v8-lo-toast" hidden>Caramelo adicionado à sacola ✓</div>
+            </div>
+          </div>
+          <!-- aba 2 · etapas: kanban -->
+          <div class="v8-app-pan" data-pan="2" hidden>
+            <small class="v8-app-k">03 · etapas do plano</small>
+            <h4>O que já foi feito e o que falta.</h4>
+            <div class="v8-prog"><i style="width:40%"></i><span>40% concluído</span></div>
+            <ul class="v8-tipos" aria-label="Tipos de tarefa">
+              <li data-t="negocio"><b>negócio</b>decisões e contas da loja</li>
+              <li data-t="frontend"><b>frontend</b>o que o cliente vê</li>
+              <li data-t="backend"><b>backend</b>o que funciona por trás</li>
+            </ul>
+            <div class="v8-kanban">
+              <div class="v8-kcol" data-col="0"><small>a fazer</small></div>
+              <div class="v8-kcol" data-col="1"><small>em andamento</small></div>
+              <div class="v8-kcol" data-col="2"><small>concluído</small></div>
+            </div>
+          </div>
+        </div>
+        <div class="hs-cursor" aria-hidden="true"></div>
+      </div>
+      <figcaption class="hs-legenda">Caso fictício de uma loja online · o app real fica em app.notechstack.com.br</figcaption>
+    </figure>
   </div>
-  <div class="marquee-wrap reveal"><div class="marquee-row"><div class="marquee-inner" id="mq1a"></div><div class="marquee-inner" id="mq1b"></div></div></div>
-  <div class="marquee-wrap reveal" style="margin-top:12px"><div class="marquee-row"><div class="marquee-inner rev" id="mq2a"></div><div class="marquee-inner rev" id="mq2b"></div></div></div>
 </section>
 
-<!-- ÂNCORA #ctafinal — altura zero, logo antes do diagnóstico: os botões
-     goTo('ctafinal') caem aqui e a queda do mascote termina aqui (fallEndEl) -->
+<!-- 06 · O EDITOR — o mockup do editor da v7 (historia.js · editor) -->
+<section id="editor" class="fx-sec v8-sec v8-branco" data-etapa="editor">
+  <div class="v8-in v8-split v8-split-largo v8-rev">
+    <div class="v8-col">
+      <p class="v8-k reveal">o editor</p>
+      <h2 class="v8-h reveal reveal-d1">Você ajusta o sistema sem precisar pedir.</h2>
+      <p class="v8-p reveal reveal-d2">Quando a primeira versão fica pronta, o app libera o editor. Ele abre no navegador, com o seu site do lado. Você clica no que quer mudar e ajusta. Os ajustes vão para a Nó, que aplica na versão seguinte.</p>
+      <ol class="v8-lista-num reveal reveal-d3">
+        <li>Clique na logo, no texto ou no botão.</li>
+        <li>Mude o tamanho e a cor.</li>
+        <li>Veja o resultado na hora, no próprio site.</li>
+        <li>Envie. Cada envio vira uma versão nova, com histórico.</li>
+      </ol>
+      <p class="hs-dica reveal reveal-d4">Experimente ao lado: clique num elemento do site e mexa nos controles.</p>
+    </div>
+    <figure class="hs-palco hs-palco-ui v8-palco-safari reveal reveal-d1" aria-label="Demonstração do editor aberto no navegador Safari">
+      <div class="v8-safari" id="v8Editor">
+        <div class="v8-sf-bar">
+          <span class="v8-sf-luzes" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="v8-sf-ico" aria-hidden="true"><svg viewBox="0 0 20 20"><rect x="2.5" y="4" width="15" height="12" rx="2.5"/><path d="M8 4v12"/></svg></span>
+          <span class="v8-sf-nav" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg><svg viewBox="0 0 20 20" class="off"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg></span>
+          <div class="v8-sf-url"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="9" width="10" height="7.5" rx="1.6"/><path d="M7.2 9V7a2.8 2.8 0 0 1 5.6 0v2"/></svg><span>app.notechstack.com.br</span><svg class="v8-sf-rec" viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 10a5.5 5.5 0 1 1-1.6-3.9M15.5 4v3h-3"/></svg></div>
+          <span class="v8-sf-acoes" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 3v9M6.5 6.5 10 3l3.5 3.5M5.5 9.5H4.5v7h11v-7h-1"/></svg><svg viewBox="0 0 20 20"><path d="M10 4v12M4 10h12"/></svg><svg viewBox="0 0 20 20"><rect x="3" y="6" width="10" height="10" rx="2"/><path d="M7 3.5h8a2 2 0 0 1 2 2v8"/></svg></span>
+        </div>
+        <div class="v8-sf-abas" aria-hidden="true"><span class="on"><i></i>Editor · Loiê</span><span><i class="v"></i>loie.com.br</span></div>
+        <div class="v8-ed">
+          <div class="v8-ed-canvas">
+            <div class="v8-site v8-site-loie">
+              <header class="v8-site-top">
+                <span class="v8-lo-mini" aria-hidden="true">velas · borrifadores</span>
+                <span class="v8-el v8-site-logo" data-el="logo" tabindex="0" role="button" aria-label="logo da Loiê"></span>
+                <span class="v8-lo-mini" aria-hidden="true">sacola</span>
+              </header>
+              <div class="v8-site-hero">
+                <div>
+                  <small>gourmand &amp; conforto</small>
+                  <h4 class="v8-el" data-el="texto" tabindex="0">Caramelo</h4>
+                  <p>acorde gourmand cremoso ambarado. R$ 150,00</p>
+                  <span class="v8-el v8-site-bt" data-el="botao" tabindex="0">adicionar ao carrinho</span>
+                </div>
+                <img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo.webp" alt="" loading="lazy">
+              </div>
+            </div>
+          </div>
+          <aside class="v8-ed-insp" aria-label="Ajustes do elemento">
+            <small>editando</small>
+            <div class="v8-ed-alvos" role="radiogroup" aria-label="Elemento">
+              <button type="button" role="radio" data-alvo="logo" aria-checked="true">logo</button>
+              <button type="button" role="radio" data-alvo="texto" aria-checked="false">texto</button>
+              <button type="button" role="radio" data-alvo="botao" aria-checked="false">botão</button>
+            </div>
+            <label class="v8-ed-ctl">tamanho <output id="v8EdTamOut">100%</output>
+              <input type="range" id="v8EdTam" min="70" max="150" step="5" value="100">
+            </label>
+            <div class="v8-ed-ctl">cor
+              <div class="v8-ed-cores" role="radiogroup" aria-label="Cor">
+                <button type="button" role="radio" data-cor="#141414" style="--c:#141414" aria-label="preto"></button>
+                <button type="button" role="radio" data-cor="#3D63DB" style="--c:#3D63DB" aria-label="azul"></button>
+                <button type="button" role="radio" data-cor="#E0543C" style="--c:#E0543C" aria-label="vermelho"></button>
+                <button type="button" role="radio" data-cor="#EDA33B" style="--c:#EDA33B" aria-label="âmbar"></button>
+                <button type="button" role="radio" data-cor="#30A46C" style="--c:#30A46C" aria-label="verde"></button>
+                <button type="button" role="radio" data-cor="#B0567E" style="--c:#B0567E" aria-label="rosa"></button>
+              </div>
+            </div>
+            <small>ajustes <em id="v8EdConta">0</em></small>
+            <ul class="v8-ed-log" id="v8EdLog" aria-live="polite"></ul>
+            <button type="button" class="v8-ed-enviar" id="v8EdEnviar">enviar ajustes</button>
+          </aside>
+        </div>
+        <div class="v8-ed-carimbo" id="v8EdCarimbo" hidden><b>enviado</b><span>vira a versão 2</span></div>
+        <div class="hs-cursor" aria-hidden="true"></div>
+      </div>
+      <figcaption class="hs-legenda">Demonstração · no app, o editor abre com as telas do seu sistema</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 07 · CRONOGRAMA — acompanhamento semanal -->
+<section id="cronograma" class="fx-sec v8-sec v8-claro" data-etapa="cronograma">
+  <div class="v8-in v8-split v8-split-largo">
+    <div class="v8-col">
+      <p class="v8-k reveal">acompanhamento semanal</p>
+      <h2 class="v8-h reveal reveal-d1">Toda semana você sabe em que pé está.</h2>
+      <p class="v8-p reveal reveal-d2">Os 30 dias de construção ficam numa aba do app chamada cronograma. Cada tarefa tem data e versão. A cada semana você vê o que foi entregue, o que está sendo feito e o que vem depois.</p>
+      <ul class="v8-marcos reveal reveal-d3">
+        <li><b>dia 15</b><span>primeira versão pronta e editor liberado</span></li>
+        <li><b>dia 22</b><span>segunda versão, com os seus ajustes</span></li>
+        <li><b>dia 29</b><span>versão final, revisada para a entrega</span></li>
+      </ul>
+    </div>
+    <figure class="hs-palco hs-palco-ui v8-palco-app reveal reveal-d1" aria-label="Demonstração da aba cronograma do app">
+      <div class="v8-app v8-kb" id="v8Crono">
+        <div class="v8-app-faixa" aria-hidden="true"></div>
+        <aside class="v8-app-lado" aria-hidden="true">
+          <b class="v8-kb-marca">oi, amiga<i>!</i></b>
+          <small>projeto</small>
+          <b class="v8-app-proj">App da comunidade</b>
+          <ol class="v8-app-menu">
+            <li><em>01</em>Como funciona</li>
+            <li><em>02</em>Protótipo</li>
+            <li class="on"><em>03</em>Cronograma</li>
+            <li><em>04</em>Editor</li>
+            <li><em>05</em>Versões</li>
+            <li><em>06</em>Marca & arquivos</li>
+          </ol>
+          <p class="v8-app-janela">construção · <b id="v8KbSemana">semana 1</b> de 4</p>
+        </aside>
+        <div class="v8-app-tela">
+          <small class="v8-app-k v8-kb-k">progresso do projeto</small>
+          <div class="v8-kb-topo">
+            <h4><span id="v8KbPct">0</span>% concluído</h4>
+            <span class="v8-kb-dia" id="v8KbDia">dia 1</span>
+          </div>
+          <p class="v8-kb-sub"><b id="v8KbFeitos">0</b> de <b id="v8KbTotal">0</b> itens entregues. A equipe da Nó move os cartões; você acompanha por aqui.</p>
+          <div class="v8-kb-barra" aria-hidden="true"><span class="feito" id="v8KbBarraF"></span><span class="andando" id="v8KbBarraA"></span></div>
+          <div class="v8-kb-marcos" aria-hidden="true"><span style="left:50%">V1 · dia 15</span><span style="left:73.3%">V2 · dia 22</span><span style="left:96.6%">V3</span></div>
+          <div class="v8-kb-grade">
+            <section class="v8-kb-col" data-col="a_fazer"><header><h5>A fazer</h5><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="em_andamento"><header><h5>Em andamento</h5><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="concluido"><header><h5>Concluído</h5><span>0</span></header><div class="v8-kb-lista"></div></section>
+          </div>
+        </div>
+      </div>
+      <figcaption class="hs-legenda">Réplica do quadro de etapas do app · marca e projeto fictícios</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 08 · CLIENTES — galeria curva de 1 linha -->
+<section id="clientes" class="fx-sec v8-sec v8-branco v8-sec-galeria" data-etapa="clientes">
+  <div class="v8-in v8-topo-centro">
+    <p class="v8-k reveal">quem já trabalhou com a gente</p>
+    <h2 class="v8-h reveal reveal-d1">Empresas que já têm um sistema da Nó.</h2>
+  </div>
+  <div class="v8-galeria v8-galeria-logos reveal reveal-d2" data-galeria="clientes" data-curva="1" aria-label="Logos de clientes"></div>
+</section>
+
+</div><!-- /#fluxo -->
+
+<!-- ÂNCORA #ctafinal — fim da queda do mascote e alvo do goTo('ctafinal') -->
 <div id="ctafinal" class="hs-ancora-crt" aria-hidden="true"></div>
 
-<!-- ══ DIAGNÓSTICO · "Senta aí" (14/09, refeito a partir da referência) ══
-     Uma foto (paisagem no desktop, retrato no celular) e o terminal do
-     briefing encaixado no vidro do monitor. Quem posiciona a foto e o vidro
-     é o historia/diagnostico.js: a foto é escalada pra que o monitor caia
-     no centro da .dg-vaga, e o terminal é projetado nos quatro cantos do
-     vidro medidos na imagem. -->
-<section id="diagnostico" class="dg" aria-labelledby="dgTitulo">
+<!-- 09 · FORMULÁRIO — o mesmo diagnóstico/checkout (diagnostico.js), sem o CRT -->
+<section id="diagnostico" class="dg dg-v8" aria-labelledby="dgTitulo">
   <div class="dg-palco">
-    <div class="dg-foto" aria-hidden="true">
-      <picture>
-        <source media="(max-width:760px)" srcset="/lp-narrador/cenas-lp/historia/diagnostico/senta-ai-mobile-frontal.webp" width="1024" height="1536">
-        <img src="/lp-narrador/cenas-lp/historia/diagnostico/senta-ai-desktop-v2.png" alt="" width="1672" height="941" decoding="async">
-      </picture>
-    </div>
-
     <div class="dg-conteudo">
       <div class="dg-texto">
-        <p class="dg-rot">Diagnóstico</p>
-        <h2 class="dg-h" id="dgTitulo">Senta aí</h2>
-        <p class="dg-sub">Vamos entender a melhor solução para sua dor de cabeça.</p>
-        <ul class="dg-lista">
-          <li><i class="dg-ico" data-icone="raio" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>
-            <div><b>Rápido</b><span>5 perguntas</span></div></li>
-          <li><i class="dg-ico" data-icone="personalizado" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 20v-6M12 20V9M19 20V4"/></svg></i>
-            <div><b>Personalizado</b><span>Com base no seu momento</span></div></li>
-          <li><i class="dg-ico" data-icone="livre" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 8a4 4 0 0 1 4-4h3v2H7a2 2 0 0 0 0 4h3v2H7a4 4 0 0 1-4-4Zm18 8a4 4 0 0 1-4 4h-3v-2h3a2 2 0 0 0 0-4h-3v-2h3a4 4 0 0 1 4 4Z"/></svg></i>
-            <div><b>Sem compromisso</b><span>Só estratégia, sem spam</span></div></li>
+        <p class="v8-k">diagnóstico da ideia</p>
+        <h2 class="dg-h" id="dgTitulo">Conte a sua ideia. <span>R$ 149,90.</span></h2>
+        <p class="dg-sub">São 5 perguntas rápidas. No fim, você paga por Pix ou cartão. No dia seguinte, a Nó te chama no WhatsApp.</p>
+        <ul class="dg-lista v8-dg-lista">
+          <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>
+            <div><b>Até o dia 3</b><span>acesso ao app com plano, protótipo e 3 opções</span></div></li>
+          <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M12 14h2M16 14h.01M8 17h2M12 17h2"/></svg></i>
+            <div><b>15 dias</b><span>para testar e decidir como continuar</span></div></li>
+          <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12.5 3 3 5.5-6"/></svg></i>
+            <div><b>Sem obrigação</b><span>se não seguir, o plano e o protótipo são seus</span></div></li>
         </ul>
-        <p class="dg-lema" aria-hidden="true">ideias<br>viram<br>sistemas.</p>
+        <p class="v8-dg-nota" aria-hidden="true">Da sua ideia<br>a um sistema real.
+          <svg viewBox="0 0 120 40"><path d="M4 30 C 40 38, 80 30, 112 12"/><path d="M100 10 L113 11 L108 23"/></svg>
+        </p>
       </div>
-      <!-- lugar do monitor: a foto é alinhada pra que o vidro caia no centro daqui -->
-      <div class="dg-vaga" aria-hidden="true"></div>
     </div>
 
-    <!-- o terminal: filho do palco, projetado no vidro (transform calculado) -->
-    <div class="dg-tela" role="region" aria-label="Briefing do protótipo em cinco etapas">
+    <div class="dg-tela" role="region" aria-label="Formulário do diagnóstico em cinco etapas">
       <div class="dg-nav">
-        <button type="button" data-nav="voltar">← voltar</button>
-        <span class="dg-fase" aria-live="polite">00 / 05</span>
+        <button type="button" data-nav="voltar">‹ voltar</button>
+        <span class="dg-fase" aria-live="polite">01 / 05</span>
+        <span class="dg-barra" aria-hidden="true"><i></i></span>
         <button type="button" data-nav="proximo">próximo →</button>
       </div>
       <form class="dg-corpo" novalidate autocomplete="on"></form>
+      <!-- vai para a primeira tela do formulário, entre o título e o campo do nome: diagnostico.js -->
+      <figure class="hs-palco hs-palco-3d dg-oferta-cena" id="cenaSistema" hidden aria-label="Animação: as partes do seu sistema sendo encaixadas e conferidas">
+        <div class="hs-cena"><canvas class="hs-canvas" aria-hidden="true"></canvas></div>
+        <div class="hs-palco-rot" data-fases="em apenas 5 minutos|em apenas 5 minutos|em apenas 5 minutos"><i></i>em apenas 5 minutos</div>
+        <ol class="hs-qa" id="hsQa" aria-hidden="true"><li data-i="0"></li><li data-i="1"></li><li data-i="2"></li><li data-i="3"></li><li data-i="4"></li></ol>
+      </figure>
       <div class="dg-pe">
         <span class="dg-dica">↵ enter avança</span>
-        <button type="button" class="dg-bt" data-nav="acao">próximo →</button>
+        <span class="v8-seguro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.3 3 7.8 7 9.5 4-1.7 7-5.2 7-9.5V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>pagamento seguro<br>pix ou cartão</span>
+        <button type="button" class="dg-bt" data-nav="acao">avançar →</button>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ — vem depois do diagnóstico para não atrasar a conversão principal. -->
-<section id="faq" class="hs-faq" aria-labelledby="faqTitulo">
-  <div class="hs-faq-in">
-    <header class="hs-faq-topo reveal">
-      <h2 id="faqTitulo">Perguntas frequentes.</h2>
-      <p>Respostas diretas sobre o projeto, os custos e o que acontece depois.</p>
-    </header>
-
-    <div class="hs-faq-lista reveal reveal-d1">
-      <details class="hs-faq-item" open>
-        <summary><span class="hs-faq-n">01</span><span>Como o projeto começa?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Você preenche o diagnóstico e contrata o primeiro entregável. Em até 3 dias, recebe um plano navegável com protótipo, tech stack, funções por etapa, prazo e próximos passos.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">02</span><span>Sou obrigado a continuar depois do plano?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Não. O plano é seu. Você pode construir com a nó, levar o roadmap para outra equipe ou aplicar tudo na plataforma que preferir.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">03</span><span>Por que contratar a nó em vez de usar Lovable ou WordPress?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Você pode usar essas plataformas. A diferença é que a nó organiza o fluxo, escolhe a arquitetura e transforma a ideia em um sistema integrado. Se quiser parar depois do plano, você leva o norte e executa onde preferir.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">04</span><span>Quanto custa construir o sistema completo?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Depende do escopo. O valor é definido depois do primeiro entregável, com funções, etapas e custos discriminados. Nada entra em produção sem sua aprovação.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">05</span><span>Quais custos mensais eu vou ter?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Podem existir mensalidades de hospedagem, banco de dados, APIs e outras ferramentas escolhidas. Tudo aparece no plano antes da construção. O acompanhamento mensal da nó é opcional.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">06</span><span>Quanto tempo leva?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>O plano chega em até 3 dias. Com o escopo aprovado, a primeira versão fica pronta em até 15 dias e o sistema completo em até 30 dias, conforme o projeto definido.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">07</span><span>Posso pedir ajustes durante o desenvolvimento?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Sim. Você testa o protótipo e aprova textos, cores, tamanhos, disposição e arquitetura antes da construção. Mudanças de escopo são registradas com impacto em prazo e custo antes de serem feitas.</p></div>
-      </details>
-
-      <details class="hs-faq-item">
-        <summary><span class="hs-faq-n">08</span><span>Como funciona o suporte depois da entrega?</span><i aria-hidden="true"></i></summary>
-        <div class="hs-faq-r"><p>Você recebe 1 mês de suporte gratuito para dúvidas e ajustes do escopo entregue. Depois disso, se quiser acompanhamento contínuo, a nó oferece um serviço mensal opcional.</p></div>
-      </details>
     </div>
   </div>
 </section>
@@ -3122,7 +3051,12 @@ const brinca = (() => {
   let pid = null, ox = 0, oy = 0;
   let amostras = [];            // [t, x, y] pra estimar a velocidade do gesto
 
-  const podeBrincar = () => ehMobile() && !R && caixa;
+  /* 18/09: também no desktop, com o mouse. Lá o mascote cai POR TRÁS do
+     conteúdo (z 60 contra 61), então o clique só vira brincadeira quando não
+     cai num botão, link, campo ou mockup — esses continuam sendo da página. */
+  const podeBrincar = () => !R && caixa;
+  const INTERATIVO = 'a,button,input,textarea,select,label,summary,[role="button"],[role="radio"],[role="tab"],[contenteditable],.hs-palco,.v8-galeria,.dg-tela,#calibPanel';
+  const livre = e => !(e.target && e.target.closest && e.target.closest(INTERATIVO));
 
   function registraCaixa(left, top, w, h){ caixa = {left, top, w, h}; }
   function some(){ if (modo !== 'queda'){ modo = 'queda'; pid = null; } caixa = null; }
@@ -3221,10 +3155,20 @@ const brinca = (() => {
   addEventListener('pointerdown', e => {
     if (!podeBrincar() || modo === 'preso') return;
     if (!dentro(e.clientX, e.clientY)) return;
+    if (e.pointerType === 'mouse'){
+      if (e.button !== 0 || !livre(e)) return;
+      e.preventDefault();          // sem seleção de texto nem arrasto nativo de imagem
+    }
     pega(e.clientX, e.clientY, e.pointerId);
-  }, {passive:true});
+  });
 
+  /* mouse: a mãozinha aparece quando o ponteiro está em cima dele */
+  let mira = false;
   addEventListener('pointermove', e => {
+    if (e.pointerType === 'mouse' && modo !== 'preso'){
+      const m = podeBrincar() && dentro(e.clientX, e.clientY) && livre(e);
+      if (m !== mira){ mira = m; document.documentElement.classList.toggle('mascote-mira', m); }
+    }
     if (modo !== 'preso' || e.pointerId !== pid) return;
     move(e.clientX, e.clientY);
   }, {passive:true});
@@ -4226,10 +4170,10 @@ requestAnimationFrame(frame);
 <script src="/shared/glow-cursor.js?v=1" defer></script>
 </body>
 </html>
-<!-- v7 · a história: mockups vivos e cenas 3D (historia/) -->
-<script src="/lp-narrador/cenas-lp/historia/historia.js?v=48" defer></script>
-<script type="module" src="/lp-narrador/cenas-lp/historia/cenas3d.js?v=48"></script>
+<!-- v8 · editor (historia.js), cenas 3D, galerias/fluxograma/app/cronograma (v8.js) e o diagnóstico -->
+<script src="/lp-narrador/cenas-lp/historia/historia.js?v=49" defer></script>
+<script type="module" src="/lp-narrador/cenas-lp/historia/cenas3d.js?v=50"></script>
+<script src="/lp-narrador/cenas-lp/historia/v8.js?v=5" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/pagarme-public-config.js?v=1" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/roadmap-checkout.js?v=4" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/diagnostico.js?v=69" defer></script>
-<script type="module" src="/lp-narrador/cenas-lp/historia/diagnostico-icones.js?v=1"></script>

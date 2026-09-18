@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/", "destination": "/lp-narrador/cenas-lp/lp-v7.html" }
+    { "source": "/", "destination": "/lp-narrador/cenas-lp/lp-v8.html" }
   ]
 }
