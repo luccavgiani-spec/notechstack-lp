@@ -184,6 +184,12 @@ Deno.serve(async (request) => {
     const gatewayPayload = {
       answers,
       gateway: { checkoutStatus, ...(pix ? { pix } : {}) },
+      // navegador de quem pagou: a Meta exige user-agent no Purchase de site
+      // enviado pela CAPI, e o webhook (que confirma o pagamento) não o tem.
+      client: {
+        ua: (request.headers.get("user-agent") || "").slice(0, 400) || null,
+        ip: (request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || null,
+      },
     };
     const updated = await sb.from("payments").update({
       gateway_order_id: String(orderResult.data.id),

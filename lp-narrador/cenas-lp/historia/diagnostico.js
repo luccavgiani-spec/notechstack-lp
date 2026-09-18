@@ -10,6 +10,8 @@
   const form = sec.querySelector('.dg-corpo');
   const dica = sec.querySelector('.dg-dica');
   const media = matchMedia('(max-width:760px)');
+  // lp-v8: primeira tela com título + animação + nome; avançar só com o nome preenchido.
+  const V8 = sec.classList.contains('dg-v8');
   const reduz = matchMedia('(prefers-reduced-motion: reduce)');
   const IMG = {
     desktop: { w:1672, h:941, q:[[957,115],[1291,103],[1300,365],[968,378]] },
@@ -18,6 +20,8 @@
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   let ultimaMedida = '';
   function posiciona(){
+    // Sem a foto do monitor (lp-v8), o terminal é um cartão comum: o CSS manda.
+    if (!foto || !vaga) return;
     const pr = palco.getBoundingClientRect(), vr = vaga.getBoundingClientRect();
     const W = pr.width, H = pr.height;
     if (!W || !H || !vr.width || !vr.height) return;
@@ -68,7 +72,8 @@
     palco.classList.add('pronto');
   }
   new ResizeObserver(posiciona).observe(palco);
-  new ResizeObserver(posiciona).observe(vaga);
+  if (vaga) new ResizeObserver(posiciona).observe(vaga);
+  if (!foto) palco.classList.add('pronto');
   // Um scrollIntoView/foco pode rolar um ancestral com overflow:hidden e cortar o título.
   palco.addEventListener('scroll',()=>{ if (palco.scrollTop||palco.scrollLeft) palco.scrollTo(0,0); },{passive:true});
   media.addEventListener('change', posiciona);
@@ -86,7 +91,8 @@
     '<p class="dg-erro" role="alert" hidden></p></section>';
   form.innerHTML =
     '<section class="dg-passo dg-inicio" data-passo="0" aria-label="Iniciar diagnóstico">'+
-      '<p class="dg-abertura">5 etapas e começamos seu projeto<span class="dg-cursor" aria-hidden="true">_</span></p>'+
+      (V8 ? '<p class="dg-k">seu roadmap + protótipo</p><h4 class="dg-q dg-q-inicio">Transforme sua ideia em um plano que dá para executar.</h4><div class="dg-cena-vaga"></div>'
+          : '<p class="dg-abertura">5 etapas e começamos seu projeto<span class="dg-cursor" aria-hidden="true">_</span></p>')+
       '<label class="dg-campo"><span>qual é o seu nome?</span><input name="nome" type="text" maxlength="80" autocomplete="name" placeholder="seu nome"></label>'+
       '<p class="dg-erro" role="alert" hidden></p><button type="button" class="dg-comecar" data-nav="comecar">iniciar →</button></section>'+
     passo(1,'o que você quer fazer?',
@@ -105,6 +111,8 @@
     '<section class="dg-passo" data-passo="7" hidden aria-labelledby="dgQ7"></section>'+
     '<section class="dg-passo" data-passo="8" hidden aria-labelledby="dgQ8"></section>'+
     '<section class="dg-passo" data-passo="9" hidden aria-labelledby="dgQ9"></section>';
+  const cenaInicio = V8 && sec.querySelector('.dg-oferta-cena');
+  if (cenaInicio){ form.querySelector('.dg-cena-vaga').replaceWith(cenaInicio); cenaInicio.hidden=false; }
   const passos = Array.from(form.querySelectorAll('.dg-passo'));
   const telaPasso = n => form.querySelector(`.dg-passo[data-passo="${n}"]`);
   const campo = n => form.elements[n];
@@ -159,13 +167,15 @@
     if (telaFinalCriada) return;
     telaFinalCriada=true;
     telaPasso(7).innerHTML='<p class="dg-k">seu roadmap + protótipo</p><h4 class="dg-q" id="dgQ7" tabindex="-1">Transforme sua ideia em um plano que dá para executar.</h4>'+
-      '<div class="dg-preco"><p class="dg-preco-rot">Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara uma primeira direção de protótipo e mostra caminhos reais para colocar o produto no ar.</p>'+
+      '<div class="dg-preco"><p class="dg-preco-rot">Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara um protótipo que você pode testar e mostra 3 opções para colocar o produto no ar, cada uma com o que entra, prazo e valor.</p>'+
       '<p class="dg-preco-por">R$ 149,90</p>'+
       '<p class="dg-preco-nota">Seu material fica pronto em até 3 dias após a confirmação do pagamento.</p></div>'+
       '<ol class="dg-prazo"><li><b>Dia 1 — referências</b><span>contato para referências, marca e contexto complementar.</span></li>'+
       '<li><b>Dias 2 e 3 — organização</b><span>plano, protótipo e caminhos de construção.</span></li>'+
-      '<li><b>Entrega — seu dashboard</b><span>acesso próprio para navegar e decidir como continuar.</span></li></ol>'+
+      '<li><b>Dia 3 — acesso ao app</b><span>plano, protótipo e as 3 opções num acesso só seu. Você tem 15 dias para decidir como continuar.</span></li></ol>'+
       '<p class="dg-erro" role="alert" hidden></p>';
+    // lp-v8: sem o texto do preço (o valor segue no botão).
+    if (V8) telaPasso(7).querySelector('.dg-preco').remove();
     telaPasso(8).innerHTML='<p class="dg-k">pagamento</p><h4 class="dg-q" id="dgQ8" tabindex="-1">como você quer pagar?</h4>'+
       '<div class="dg-metodos" role="group" aria-label="Escolha a forma de pagamento">'+
       '<button type="button" data-pagamento="pix"><b>Pix</b><span>QR Code ou copia e cola</span></button>'+
@@ -275,14 +285,25 @@
     requestAnimationFrame(marcaMais);
     if (focar){ const alvo=n===0?campo('nome'):telaPasso(n).querySelector('.dg-q'); alvo?.focus({preventScroll:true}); }
   }
+  /* rastreio do funil (dataLayer → GTM-NK87FH8W): form_etapa vai pro GA4;
+     lead_submit dispara Lead da Meta (eventID = sessão, deduplica com a CAPI
+     do send-lead-email), conversão do Google Ads e generate_lead do GA4;
+     form_contato dispara InitiateCheckout. */
+  const rastreia = (nome,params,chave) => { if (typeof window.track==='function') window.track(nome,params,chave); };
   function proximo(){
     if (atual>=0&&atual<=5){
       if (!valida(atual)) return;
+      if (atual>=1) rastreia('form_etapa',{etapa:atual,passo:atual},String(atual));
+      if (atual===5){
+        rastreia('lead_submit',{etapa:5,valor:149.9,modo:'diagnostico'},'1');
+        if (window.NoRoadmapCheckout&&window.NoRoadmapCheckout.saveLead)
+          window.NoRoadmapCheckout.saveLead(contato(),respostas()).catch(()=>{});
+      }
       vai(atual===5?7:atual+1);
     }
   }
   async function pagar(){
-    if (atual===7){ vai(8); return; }
+    if (atual===7){ rastreia('form_contato',{etapa:6,valor:149.9},'1'); vai(8); return; }
     if (atual!==9||pagamentoEmCurso||pagamentoConcluido) return;
     if (!window.NoRoadmapCheckout){ mostraErro(telaPasso(9),'› pagamento indisponível. Recarregue a página e tente novamente.'); return; }
     if (!window.NoRoadmapCheckout.normalizePayerCpf(valor('pagador_documento'))){ mostraErro(telaPasso(9),'› confira o CPF do pagador.',campo('pagador_documento')); return; }
@@ -297,9 +318,9 @@
         card:metodoPagamento==='cartao'?cartao():undefined
       });
       if (metodoPagamento==='cartao') ['cartao_numero','cartao_validade','cartao_cvv'].forEach(n=>{ const el=campo(n); if(el) el.value=''; });
-      if (dados.status==='approved') mostraAprovado();
+      if (dados.status==='approved'){ mostraAprovado(); rastreia('diag_pagamento',{status:'aprovado',modo:metodoPagamento,valor:149.9,transaction_id:String(dados.paymentId||'')},'aprovado'); }
       else if (dados.status==='failed') mostraErro(telaPasso(9),'› pagamento recusado. Confira os dados e tente de novo.',campo('cartao_numero'));
-      else if (metodoPagamento==='pix'&&dados.pix) mostraPix(dados);
+      else if (metodoPagamento==='pix'&&dados.pix){ mostraPix(dados); rastreia('diag_pix_gerado',{modo:'pix',valor:149.9},'pix'); }
       else mostraErro(telaPasso(9),'› pedido criado, mas o gateway não devolveu os dados do pagamento. Tente novamente.');
     }catch(e){
       if (e&&e.code==='PAGARME_PUBLIC_KEY_MISSING'){ mostraErro(telaPasso(9),'› cartão ainda indisponível. A configuração da Nó precisa ser concluída; seus dados não foram enviados ao gateway.'); return; }
@@ -314,11 +335,13 @@
     tela.classList.toggle('em-oferta',atual===7);
     tela.classList.toggle('em-escolha-pagamento',atual===8);
     tela.querySelector('[data-nav="voltar"]').disabled=atual===0;
-    tela.querySelector('.dg-fase').textContent=String(Math.min(atual,5)).padStart(2,'0')+' / 05';
+    tela.querySelector('.dg-fase').textContent=String(V8?Math.max(1,Math.min(atual,5)):Math.min(atual,5)).padStart(2,'0')+' / 05';
+    const barra=tela.querySelector('.dg-barra i');
+    if (barra) barra.style.width=(atual>=7?100:Math.min(atual+1,6)/6*100)+'%';
     const nx=tela.querySelector('[data-nav="proximo"]'), acao=tela.querySelector('[data-nav="acao"]');
-    nx.disabled=atual===0||pagamentoEmCurso;
+    nx.disabled=(atual===0&&(!V8||valor('nome').length<2))||pagamentoEmCurso;
     nx.hidden=pagamentoConcluido;
-    nx.textContent=pagamentoEmCurso?'processando…':atual===5?'continuar →':atual===7?'Quero meu roadmap + protótipo — R$ 149,90':atual===9?(metodoPagamento==='pix'?'gerar Pix →':'pagar →'):'próximo →';
+    nx.textContent=pagamentoEmCurso?'processando…':atual===0?'avançar →':atual===5?'continuar →':atual===7?'Quero meu roadmap + protótipo — R$ 149,90':atual===9?(metodoPagamento==='pix'?'gerar Pix →':'pagar →'):'próximo →';
     acao.textContent=nx.textContent;
     acao.disabled=nx.disabled;
     acao.hidden=nx.hidden;
@@ -341,6 +364,7 @@
   form.addEventListener('input',e=>{
     const s=e.target.closest('.dg-passo'), p=s&&s.querySelector('.dg-erro');
     if (p){ p.hidden=true; p.textContent=''; }
+    if (V8&&atual===0) atualizaNav();
   });
   atualizaNav(); requestAnimationFrame(marcaMais);
 
@@ -352,7 +376,7 @@
   }
   window.abrirDiagnostico=function(opts){
     marcaEntrada(opts&&opts.origem||'cta');
-    const alvo=media.matches?vaga:palco;
+    const alvo=vaga?(media.matches?vaga:palco):tela;
     palco.scrollTo(0,0);
     const r=alvo.getBoundingClientRect();
     window.scrollTo({top:window.scrollY+r.top+r.height/2-innerHeight/2,behavior:reduz.matches?'instant':'smooth'});

@@ -208,11 +208,11 @@
       titulo.textContent = ORIGINAL.titulo; aplicaTam(ORIGINAL.tam); aplicaCor(ORIGINAL.cor);
       alvo.classList.remove('sel'); pino.hidden = true; carimbo.hidden = true;
       check.forEach(li => li.classList.remove('ok'));
-      aprovar.classList.remove('feito'); aprovar.textContent = 'aprovar protótipo';
+      aprovar.classList.remove('feito'); aprovar.textContent = aprovar.dataset.rotulo || 'aprovar protótipo';
     }
     function aprova(){
       ['fluxo','texto','direcao','arq'].forEach(marca);
-      aprovar.classList.add('feito'); aprovar.textContent = '✓ aprovado';
+      aprovar.classList.add('feito'); aprovar.textContent = aprovar.dataset.feito || '✓ aprovado';
       alvo.classList.remove('sel');
       carimbo.hidden = false;
     }

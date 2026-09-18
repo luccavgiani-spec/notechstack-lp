@@ -55,6 +55,75 @@ function safeEnvelope(
   };
 }
 
+/* ── Meta CAPI: Purchase quando o pagamento vira "approved" ──────────────────
+   Dispara uma vez só: o RPC devolve applied=true apenas na transição para
+   aprovado (eventos repetidos voltam idempotent). event_id = "purchase-<id do
+   pagamento>", o mesmo que o navegador usa no fbq('track','Purchase') do cartão
+   — a Meta deduplica. Só value + currency no custom_data (sem content_*).
+   Falha aqui nunca derruba o webhook: o pagamento já foi aplicado. */
+const PIXEL_ID = "1753619075655271";
+const GRAPH = "https://graph.facebook.com/v21.0";
+
+async function sha256(value: string): Promise<string> {
+  const bytes = await digest(value);
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function phoneE164(raw: string): string {
+  let digits = raw.replace(/\D/g, "");
+  if (digits.length === 10 || digits.length === 11) digits = `55${digits}`;
+  return digits.length >= 12 ? digits : "";
+}
+
+// deno-lint-ignore no-explicit-any
+async function sendPurchase(sb: any, orderId: string): Promise<string> {
+  const token = Deno.env.get("META_ACCESS_TOKEN") || "";
+  if (!token) return "sem_token";
+  const { data: payment } = await sb.from("payments")
+    .select("id,amount_cents,lead_id,payload")
+    .eq("gateway_order_id", orderId).maybeSingle();
+  if (!payment) return "sem_pagamento";
+  const { data: lead } = await sb.from("leads")
+    .select("email,whatsapp,fbp,fbc,sid").eq("id", payment.lead_id).maybeSingle();
+  const client = (payment.payload && typeof payment.payload === "object" && payment.payload.client) || {};
+
+  const userData: Record<string, unknown> = {};
+  if (lead?.email) userData.em = [await sha256(String(lead.email).trim().toLowerCase())];
+  const phone = phoneE164(String(lead?.whatsapp || ""));
+  if (phone) userData.ph = [await sha256(phone)];
+  if (lead?.fbp) userData.fbp = lead.fbp;
+  if (lead?.fbc) userData.fbc = lead.fbc;
+  if (lead?.sid) userData.external_id = [await sha256(String(lead.sid))];
+  if (client.ua) userData.client_user_agent = client.ua;
+  if (client.ip) userData.client_ip_address = client.ip;
+
+  try {
+    const response = await fetch(`${GRAPH}/${PIXEL_ID}/events?access_token=${token}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        data: [{
+          event_name: "Purchase",
+          event_time: Math.floor(Date.now() / 1000),
+          event_id: `purchase-${payment.id}`,
+          event_source_url: "https://www.notechstack.com.br/",
+          action_source: "website",
+          user_data: userData,
+          custom_data: { value: (payment.amount_cents || 0) / 100, currency: "BRL", order_id: String(payment.id) },
+        }],
+      }),
+    });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      log("error", "meta_capi_purchase_rejected", { status: response.status, code: body?.error?.code ?? null });
+      return `erro_${response.status}`;
+    }
+    return `ok_${body?.events_received ?? 0}`;
+  } catch (_error) {
+    return "erro_rede";
+  }
+}
+
 Deno.serve(async (request) => {
   if (request.method !== "POST") return json(405, { error_code: "METHOD_NOT_ALLOWED" });
   if (!(await authorized(request))) return json(401, { error_code: "UNAUTHORIZED" });
@@ -104,11 +173,15 @@ Deno.serve(async (request) => {
       return json(500, { error_code: "PAYMENT_EVENT_FAILED" });
     }
 
+    const capi = result?.applied && result?.status === "approved"
+      ? await sendPurchase(sb, orderId)
+      : "nao_aplicavel";
     log("info", "pagarme_webhook_processed", {
       gateway_event_id: eventId,
       type,
       status: confirmedStatus,
       applied: Boolean(result?.applied),
+      capi_purchase: capi,
     });
     return json(200, { ok: true, ...result });
   } catch (error) {

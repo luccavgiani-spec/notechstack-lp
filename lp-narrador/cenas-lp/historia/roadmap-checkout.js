@@ -39,6 +39,11 @@
     return data;
   }
 
+  function cookie(nome) {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + nome + '=([^;]+)'));
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
   function leadPayload(lead, answers) {
     return {
       nome: lead.nome,
@@ -55,6 +60,13 @@
       ].join('\n'),
       valor: 149.9,
       event_source_url: location.href,
+      site: location.hostname,
+      /* atribuição: utm/gclid/fbclid/referrer da 1ª página da sessão e os
+         cookies da Meta — sem isso o lead chega sem campanha e o Lead da CAPI
+         casa pior com o do pixel */
+      origem: window.leadOrig || {},
+      fbp: cookie('_fbp'),
+      fbc: cookie('_fbc'),
     };
   }
 
@@ -144,6 +156,9 @@
 
   window.NoRoadmapCheckout = {
     checkout,
+    /* grava o contato assim que a pessoa passa da etapa 5 — quem desiste no
+       pagamento continua sendo um lead. O checkout reaproveita o mesmo id. */
+    saveLead: ensureLead,
     tokenizeCard,
     normalizePayerCpf,
     normalizeBillingAddress,
