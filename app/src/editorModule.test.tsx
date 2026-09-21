@@ -29,6 +29,31 @@ const config = {
   bridgeEnabled: true,
 }
 
+async function selectInPreview(
+  user: ReturnType<typeof userEvent.setup>,
+  componentId: string,
+) {
+  const modeButton = await screen.findByRole('button', { name: /Modo editor/ })
+  if (modeButton.getAttribute('aria-pressed') !== 'true') await user.click(modeButton)
+  const frame = screen.getByTitle<HTMLIFrameElement>('Preview controlado V1')
+  if (!frame.contentWindow) throw new Error('Preview window is unavailable')
+  fireEvent(
+    window,
+    new MessageEvent('message', {
+      origin: 'https://preview.example.test',
+      source: frame.contentWindow,
+      data: {
+        source: 'no-editor-preview',
+        type: 'NO_EDITOR_SELECT',
+        version: 1,
+        projectId: 'project-1',
+        baseVersionId: 'version-1',
+        componentId,
+      },
+    }),
+  )
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
   localStorage.clear()
@@ -47,6 +72,7 @@ describe('F2-10 Editor', () => {
   it('C1/C2 restaura os quatro campos e oculta controles fora da allowlist', async () => {
     const user = userEvent.setup()
     const view = render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
     await user.type(await screen.findByLabelText('Texto hero'), 'Título novo')
     fireEvent.change(screen.getByLabelText('Tamanho hero'), { target: { value: '32' } })
     fireEvent.change(screen.getByLabelText('Cor hero'), { target: { value: '#123456' } })
@@ -56,6 +82,7 @@ describe('F2-10 Editor', () => {
     view.unmount()
 
     render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
     expect(await screen.findByLabelText('Texto hero')).toHaveValue('Título novo')
     expect(screen.getByLabelText('Tamanho hero')).toHaveValue('32')
     expect(screen.getByLabelText('Cor hero')).toHaveValue('#123456')
@@ -65,6 +92,7 @@ describe('F2-10 Editor', () => {
   it('C3/C4 usa preview controlado e envia exatamente quatro arquivos', async () => {
     const user = userEvent.setup()
     render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
     await user.type(await screen.findByLabelText('Texto hero'), 'Título')
     const frame = screen.getByTitle<HTMLIFrameElement>('Preview controlado V1')
     if (!frame.contentWindow) throw new Error('Preview window is unavailable')
@@ -85,6 +113,7 @@ describe('F2-10 Editor', () => {
     mocks.submitEditorExport.mockRejectedValue(new Error('offline'))
     const user = userEvent.setup()
     render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
     await user.type(await screen.findByLabelText('Texto hero'), 'Não perder')
     await user.click(screen.getByRole('button', { name: 'Salvar ajustes' }))
     await user.click(screen.getByRole('button', { name: 'Enviar para análise' }))
@@ -94,18 +123,20 @@ describe('F2-10 Editor', () => {
   it('troca de componente respeita a allowlist e preserva o rascunho', async () => {
     const user = userEvent.setup()
     render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
     await user.type(await screen.findByLabelText('Texto hero'), 'Título mantido')
-    await user.click(screen.getByRole('button', { name: /CTA/ }))
+    await selectInPreview(user, 'cta')
     expect(screen.getByLabelText('Texto cta')).toBeVisible()
     expect(screen.queryByLabelText('Tamanho cta')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Cor cta')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /Hero/ }))
+    await selectInPreview(user, 'hero')
     expect(screen.getByLabelText('Texto hero')).toHaveValue('Título mantido')
   })
 
   it('descarte exige confirmação e recarrega a prévia original', async () => {
     const user = userEvent.setup()
     render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
     await user.type(await screen.findByLabelText('Texto hero'), 'Temporário')
     await user.click(screen.getByRole('button', { name: 'Salvar ajustes' }))
     const previousFrame = screen.getByTitle('Preview controlado V1')
@@ -115,6 +146,36 @@ describe('F2-10 Editor', () => {
     expect(screen.getByLabelText('Texto hero')).toHaveValue('')
     expect(localStorage.getItem('no_editor:project-1:version-1')).toBeNull()
     expect(screen.getByTitle('Preview controlado V1')).not.toBe(previousFrame)
+  })
+
+  it('alterar apenas o tamanho não apaga o texto e exibe uma única página', async () => {
+    mocks.loadEditorConfig.mockResolvedValue({
+      ...config,
+      allowedComponents: [
+        { ...config.allowedComponents[0], screen: 'Abertura' },
+        { ...config.allowedComponents[1], screen: 'Honorários' },
+      ],
+    })
+    const user = userEvent.setup()
+    render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
+    const frame = screen.getByTitle<HTMLIFrameElement>('Preview controlado V1')
+    if (!frame.contentWindow) throw new Error('Preview window is unavailable')
+    const postMessage = vi.spyOn(frame.contentWindow, 'postMessage')
+
+    fireEvent.change(screen.getByLabelText('Tamanho hero'), {
+      target: { value: '36' },
+    })
+
+    await waitFor(() =>
+      expect(postMessage).toHaveBeenCalledWith(
+        expect.objectContaining({ changes: { hero: { size: '36' } } }),
+        'https://preview.example.test',
+      ),
+    )
+    expect(screen.getByRole('button', { name: 'Página única' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Abertura' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Honorários' })).not.toBeInTheDocument()
   })
 
 })

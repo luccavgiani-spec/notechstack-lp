@@ -105,6 +105,7 @@ function renderDashboard(module: ModuleKey, data = dashboardData()) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  window.localStorage.clear()
   mocks.savePreferredTier.mockImplementation(async (_projectId: string, tier: TierKey) => ({
     preferred_tier: tier,
     changed: true,
@@ -121,31 +122,31 @@ describe('dashboard do cliente', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Carregando dados…')
     expect(await screen.findByRole('heading', { name: 'Não foi possível carregar o projeto.' })).toBeVisible()
     await userEvent.click(screen.getByRole('button', { name: 'Tentar de novo' }))
-    expect(await screen.findByRole('heading', { name: 'Projeto Alfa' })).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'Da ideia a um sistema real, sem complicação.' })).toBeVisible()
     expect(mocks.loadClientDashboard).toHaveBeenCalledTimes(2)
   })
 
-  it('C1 shell inicial e ordem dos seis módulos', async () => {
+  it('C1 shell inicial e ordem dos cinco módulos visíveis', async () => {
     renderDashboard('como_funciona')
-    expect(await screen.findByRole('heading', { name: 'Projeto Alfa' })).toBeVisible()
-    expect(screen.getByText('Equipe nó')).toBeVisible()
+    expect(await screen.findByRole('heading', { name: 'Da ideia a um sistema real, sem complicação.' })).toBeVisible()
+    expect(screen.getByText('Projeto Alfa')).toBeVisible()
     const nav = screen.getByRole('navigation', { name: 'Módulos do projeto' })
     expect(within(nav).getAllByRole('link').map((link) => link.textContent)).toEqual([
-      '01Como funciona', '02Protótipo', '03Etapas do plano', '04Editor', '05Versões', '06Marca & arquivos',
+      '01Como funciona', '02Protótipo', '03Etapas do plano', '04Editor', '05Versões',
     ])
   })
 
   it('C2 aviso de quinze dias', async () => {
     renderDashboard('como_funciona')
     expect(await screen.findByText('Seu acesso de análise fica disponível por 15 dias.')).toBeVisible()
-    expect(screen.getByText('Se você decidir seguir com a Nó, o acesso deixa de expirar e acompanha o projeto até a entrega.')).toBeVisible()
+    expect(screen.getByText(/dias restantes/)).toBeVisible()
   })
 
   it('C3 acesso ativo omite aviso', async () => {
     const data = dashboardData()
     data.shell!.effective_access_status = 'ATIVO_ATE_FIM_DO_PROJETO'
     renderDashboard('como_funciona', data)
-    await screen.findByRole('heading', { name: 'Projeto Alfa' })
+    await screen.findByRole('heading', { name: 'Da ideia a um sistema real, sem complicação.' })
     expect(screen.queryByText('Seu acesso de análise fica disponível por 15 dias.')).not.toBeInTheDocument()
   })
 
@@ -160,62 +161,75 @@ describe('dashboard do cliente', () => {
 
   it('C6 conteúdo publicado e três caminhos', async () => {
     renderDashboard('como_funciona')
-    expect(await screen.findByText('React')).toBeVisible()
-    expect(screen.getByText('Hospedagem')).toBeVisible()
-    expect(screen.getByText('Validar protótipo')).toBeVisible()
-    expect(screen.getByText('Referência editorial')).toBeVisible()
+    expect(await screen.findByRole('link', { name: /Interface do site e hub React/ })).toHaveAttribute('href', 'https://react.dev')
+    expect(screen.getByRole('link', { name: /Build e publicação Vite/ })).toHaveAttribute('href', 'https://vite.dev')
+    expect(screen.getByRole('link', { name: /Banco de dados Supabase Dados/ })).toHaveAttribute('href', 'https://supabase.com/database')
+    expect(screen.getByText('Quanto custa manter sua plataforma?')).toBeVisible()
+    expect(screen.getByLabelText('Número de usuários')).toBeVisible()
     expect(screen.getByRole('heading', { name: 'Três profundidades para a mesma base.' })).toBeVisible()
-    expect(screen.getByText('Você só sinaliza o caminho. Nada é contratado aqui — a conversa segue com seu gerente de projeto.')).toBeVisible()
+    expect(screen.getByText(/Escolha o plano ideal para o seu momento/)).toBeVisible()
   })
 
   it('C7 três tiers campos e nulidade de preço', async () => {
     renderDashboard('como_funciona')
     await screen.findByRole('heading', { name: 'Essencial' })
     const options = screen.getByLabelText('Opções de execução')
-    expect(within(options).getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)).toEqual(['Essencial', 'Básico', 'Completo'])
-    expect(screen.getByText('R$ 4.500,00')).toBeVisible()
-    expect(screen.getByText('Sob proposta')).toBeVisible()
-    expect(within(options).getAllByText('Prazo')).toHaveLength(3)
-    expect(within(options).getAllByText('Escopo')).toHaveLength(3)
+    expect(within(options).getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)).toEqual(['Básico', 'Essencial', 'Completo'])
+    expect(screen.getByText(/4\.500/)).toBeVisible()
+    expect(screen.getAllByText('Sob proposta')).toHaveLength(2)
+    expect(within(options).getAllByText('Implementação')).toHaveLength(3)
+    expect(within(options).getAllByText('Mensalidade')).toHaveLength(3)
   })
 
   it('C8 primeira preferência fica marcada', async () => {
     renderDashboard('como_funciona')
-    await userEvent.click(await screen.findByRole('button', { name: 'Quero conversar sobre o Essencial' }))
+    const essential = (await screen.findByRole('heading', { name: 'Essencial' })).closest('article')!
+    await userEvent.click(within(essential).getByRole('button', { name: 'Quero este plano' }))
     expect(mocks.savePreferredTier).toHaveBeenCalledWith('projeto-a', 'essencial')
-    expect(await screen.findByRole('button', { name: 'Interesse registrado' })).toBeDisabled()
+    expect(await screen.findByRole('button', { name: 'Contratado' })).toBeDisabled()
   })
 
   it('C9 seleção exclusiva troca de tier', async () => {
     const data = dashboardData()
     data.roadmap!.preferred_tier = 'essencial'
     renderDashboard('como_funciona', data)
-    await userEvent.click(await screen.findByRole('button', { name: 'Quero conversar sobre o Básico' }))
-    expect(screen.getByRole('button', { name: 'Quero conversar sobre o Essencial' })).toBeEnabled()
-    expect(screen.getAllByText('Seu interesse registrado')).toHaveLength(1)
+    const basic = (await screen.findByRole('heading', { name: 'Básico' })).closest('article')!
+    const essential = screen.getByRole('heading', { name: 'Essencial' }).closest('article')!
+    await userEvent.click(within(basic).getByRole('button', { name: 'Quero este plano' }))
+    expect(within(essential).getByRole('button', { name: 'Quero este plano' })).toBeEnabled()
+    expect(screen.getAllByRole('button', { name: 'Contratado' })).toHaveLength(1)
     expect(mocks.savePreferredTier).toHaveBeenCalledTimes(1)
   })
 
   it('C10 protótipo usa iframe em mockup e link externo', async () => {
-    renderDashboard('prototipo')
+    const { container } = renderDashboard('prototipo')
     expect(await screen.findByTitle('Protótipo navegável do projeto')).toHaveAttribute('src', 'https://example.test/prototipo')
     expect(screen.getByRole('link', { name: /Abrir protótipo em nova aba/ })).toHaveAttribute('target', '_blank')
+    expect(screen.getByRole('button', { name: /Desktop/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(container.querySelector('.prototype-phone')).toHaveClass('desktop')
+
+    await userEvent.click(screen.getByRole('button', { name: /Celular/ }))
+
+    expect(screen.getByRole('button', { name: /Celular/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(container.querySelector('.prototype-phone')).toHaveClass('mobile')
   })
 
-  it('C11 Kanban leitura ordem campos e progresso', async () => {
+  it('C11 etapas por fase mantêm progresso real, datas e versões', async () => {
     const items = Array.from({ length: 27 }, (_, index) => kanbanItem(index + 1, index < 17 ? 'concluido' : index < 22 ? 'em_andamento' : 'a_fazer'))
     renderDashboard('etapas', dashboardData({ kanban: items }))
     expect(await screen.findByRole('heading', { name: '63% concluído' })).toBeVisible()
-    expect(screen.getAllByRole('heading', { level: 3, name: /^(A fazer|Em andamento|Concluído)$/ }).map((heading) => heading.textContent)).toEqual(['A fazer', 'Em andamento', 'Concluído'])
-    expect(screen.getAllByText('Fase 1').length).toBeGreaterThan(0)
-    expect(screen.getAllByText('V1').length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('heading', { level: 3, name: /^(A ideia|O plano|O protótipo|O sistema|Progresso)$/ }).map((heading) => heading.textContent)).toEqual(['A ideia', 'O plano', 'O protótipo', 'O sistema', 'Progresso'])
+    expect(screen.getByRole('progressbar', { name: 'Progresso total do projeto' })).toHaveAttribute('aria-valuenow', '63')
+    expect(screen.getAllByText(/V1/).length).toBeGreaterThan(0)
     expect(screen.getAllByText('20/09/2026').length).toBeGreaterThan(0)
   })
 
   it('C12 Kanban do cliente é somente leitura', async () => {
-    renderDashboard('etapas')
-    await screen.findByText('Acompanhamento somente leitura')
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    const { container } = renderDashboard('etapas')
+    await screen.findByText(/Acompanhamento somente leitura/)
+    const content = container.querySelector('.client-content') as HTMLElement
+    expect(within(content).queryByRole('checkbox')).not.toBeInTheDocument()
+    expect(within(content).queryByRole('button', { name: /salvar|editar|mover/i })).not.toBeInTheDocument()
     expect(screen.queryByText(/mover|concluir/i)).not.toBeInTheDocument()
   })
 
@@ -251,10 +265,22 @@ describe('dashboard do cliente', () => {
   })
 
   it('C15 Marca e arquivos permanece bloqueado', async () => {
-    renderDashboard('marca')
+    const { container } = renderDashboard('marca')
     expect(await screen.findByRole('heading', { name: 'Marca & arquivos', level: 2 })).toBeVisible()
     expect(screen.getByText('Texto provisório · revisar copy')).toBeVisible()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+    const content = container.querySelector('.client-content') as HTMLElement
+    expect(within(content).queryByRole('button')).not.toBeInTheDocument()
+  })
+
+  it('tema claro é padrão e o seletor persiste o tema escuro', async () => {
+    renderDashboard('como_funciona')
+    const dashboard = await screen.findByRole('main')
+    expect(dashboard).toHaveAttribute('data-theme', 'light')
+
+    await userEvent.click(screen.getByRole('button', { name: /Escuro/ }))
+
+    expect(dashboard).toHaveAttribute('data-theme', 'dark')
+    expect(window.localStorage.getItem('no-client-dashboard-theme')).toBe('dark')
   })
 
   it.each([
@@ -266,6 +292,23 @@ describe('dashboard do cliente', () => {
     renderDashboard(module, data)
     expect(await screen.findByText(copy)).toBeVisible()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('keeps dashboard data mounted across tab changes without refetching', async () => {
+    mocks.loadClientDashboard.mockResolvedValue(dashboardData())
+    render(<MemoryRouter initialEntries={['/p/projeto-a/como-funciona']}>
+      <Routes>
+        <Route path="/p/:projectId/como-funciona" element={<ClientDashboardPage module="como_funciona" />} />
+        <Route path="/p/:projectId/etapas" element={<ClientDashboardPage module="etapas" />} />
+      </Routes>
+    </MemoryRouter>)
+    await screen.findByText('Tecnologia moderna e integrada.')
+    const initialLoads = mocks.loadClientDashboard.mock.calls.length
+    await userEvent.click(screen.getByRole('link', { name: /03\s*Etapas do plano/ }))
+    expect(await screen.findByRole('heading', { name: /Do planejamento/ })).toBeVisible()
+    await userEvent.click(screen.getByRole('link', { name: /01\s*Como funciona/ }))
+    expect(await screen.findByText('Tecnologia moderna e integrada.')).toBeVisible()
+    expect(mocks.loadClientDashboard).toHaveBeenCalledTimes(initialLoads)
   })
 
   it('C16 vazio de Kanban', async () => {

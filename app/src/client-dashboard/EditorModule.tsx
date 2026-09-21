@@ -7,16 +7,47 @@ import {
   type EditorConfig,
 } from './client-dashboard-service'
 
-type DraftValue = { text: string; size: string; color: string; logo: string }
-type Draft = Record<string, DraftValue>
+type DraftValue = {
+  text: string
+  size: string
+  color: string
+  logo: string
+  x: string
+  y: string
+  width: string
+  height: string
+}
+type Draft = Record<string, Partial<DraftValue>>
+const contentControls = ['text', 'size', 'color', 'logo'] as const
+const layoutControls = ['x', 'y', 'width', 'height'] as const
 const emptyValue: DraftValue = {
   text: '',
   size: '16',
   color: '#111111',
   logo: '',
+  x: '0',
+  y: '0',
+  width: '',
+  height: '',
 }
 const keyFor = (projectId: string, versionId: string) =>
   `no_editor:${projectId}:${versionId}`
+
+function controlsFor(component: EditorConfig['allowedComponents'][number]) {
+  return [...new Set([...(component.controls ?? contentControls), ...layoutControls])]
+}
+
+function exportControlsFor(component: EditorConfig['allowedComponents'][number]) {
+  return component.controls ?? contentControls
+}
+
+function validLayoutValue(field: string, value: string) {
+  if (value === '' && (field === 'width' || field === 'height')) return true
+  if (!/^-?\d+(\.\d+)?$/.test(value)) return false
+  const numeric = Number(value)
+  if (field === 'x' || field === 'y') return numeric >= -2000 && numeric <= 2000
+  return numeric >= 20 && numeric <= 4000
+}
 
 function readDraft(projectId: string, config: EditorConfig): Draft {
   try {
@@ -36,24 +67,36 @@ function readDraft(projectId: string, config: EditorConfig): Draft {
       )
         continue
       const fields = candidate as Record<string, unknown>
-      result[component.id] = { ...emptyValue }
-      for (const field of ['text', 'size', 'color', 'logo'] as const) {
-        if (
-          (component.controls ?? ['text', 'size', 'color', 'logo']).includes(
-            field,
-          ) &&
-          typeof fields[field] === 'string'
-        )
-          result[component.id][field] = fields[field]
-      }
-      if (!/^#[0-9a-f]{6}$/i.test(result[component.id].color))
-        result[component.id].color = emptyValue.color
-      if (
-        !Number.isFinite(Number(result[component.id].size)) ||
-        Number(result[component.id].size) < 8 ||
-        Number(result[component.id].size) > 160
+      const legacyFullDraft = [...contentControls, ...layoutControls].every(
+        (field) => typeof fields[field] === 'string',
       )
-        result[component.id].size = emptyValue.size
+      const nextValue: Partial<DraftValue> = {}
+      for (const field of [...contentControls, ...layoutControls] as const) {
+        if (
+          controlsFor(component).includes(field) &&
+          typeof fields[field] === 'string' &&
+          (!legacyFullDraft || fields[field] !== emptyValue[field])
+        )
+          nextValue[field] = fields[field]
+      }
+      if (
+        nextValue.color !== undefined &&
+        !/^#[0-9a-f]{6}$/i.test(nextValue.color)
+      )
+        delete nextValue.color
+      if (
+        nextValue.size !== undefined &&
+        (!Number.isFinite(Number(nextValue.size)) ||
+          Number(nextValue.size) < 8 ||
+          Number(nextValue.size) > 160)
+      )
+        delete nextValue.size
+      for (const field of layoutControls) {
+        const fieldValue = nextValue[field]
+        if (fieldValue !== undefined && !validLayoutValue(field, fieldValue))
+          delete nextValue[field]
+      }
+      if (Object.keys(nextValue).length) result[component.id] = nextValue
     }
     return result
   } catch {
@@ -78,7 +121,17 @@ function previewUrl(config: EditorConfig | null) {
   if (!config?.bridgeEnabled) return null
   try {
     const url = new URL(config.buildReference)
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url : null
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+    if (
+      window.location.hostname === 'localhost' &&
+      url.pathname.startsWith('/prototipos/')
+    ) {
+      const localPath = url.pathname.endsWith('/')
+        ? `${url.pathname}index.html`
+        : url.pathname
+      return new URL(`${localPath}${url.search}${url.hash}`, window.location.origin)
+    }
+    return url
   } catch {
     return null
   }
@@ -86,17 +139,29 @@ function previewUrl(config: EditorConfig | null) {
 
 export function EditorModule({ projectId }: { projectId: string }) {
   const [previewRevision, setPreviewRevision] = useState(0)
-  const [selectedScreen, setSelectedScreen] = useState('')
   const [selectedComponent, setSelectedComponent] = useState('')
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop')
+  const [editorMode, setEditorMode] = useState(false)
   const [config, setConfig] = useState<EditorConfig | null>(null)
   const [draft, setDraft] = useState<Draft>({})
+  const [previewValues, setPreviewValues] = useState<Draft>({})
   const [loading, setLoading] = useState(true)
   const [loadFailed, setLoadFailed] = useState(false)
   const [sending, setSending] = useState(false)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [message, setMessage] = useState('')
   const frameRef = useRef<HTMLIFrameElement>(null)
+
+  const change = useCallback(
+    (id: string, field: keyof DraftValue, value: string) => {
+      setConfirmDiscard(false)
+      setDraft((old) => ({
+        ...old,
+        [id]: { ...old[id], [field]: value },
+      }))
+    },
+    [],
+  )
 
   const load = useCallback(() => {
     setLoading(true)
@@ -139,11 +204,84 @@ export function EditorModule({ projectId }: { projectId: string }) {
         projectId,
         baseVersionId: config.versionId,
         changes: draft,
+        selectedComponent,
+        editorMode,
       },
       target.origin,
     )
-  }, [config, draft, projectId])
+  }, [config, draft, editorMode, projectId, selectedComponent])
   useEffect(() => sendPreview(), [sendPreview])
+
+  useEffect(() => {
+    const receivePreview = (event: MessageEvent) => {
+      const target = previewUrl(config)
+      const payload: unknown = event.data
+      if (
+        !editorMode ||
+        !target ||
+        !config ||
+        event.origin !== target.origin ||
+        event.source !== frameRef.current?.contentWindow ||
+        !payload ||
+        typeof payload !== 'object'
+      )
+        return
+      const message = payload as Record<string, unknown>
+      if (
+        message.source !== 'no-editor-preview' ||
+        message.version !== 1 ||
+        message.projectId !== projectId ||
+        message.baseVersionId !== config.versionId ||
+        typeof message.componentId !== 'string'
+      )
+        return
+      const component = config.allowedComponents.find(
+        (item) => item.id === message.componentId,
+      )
+      if (!component) return
+      setSelectedComponent(component.id)
+      if (
+        message.values &&
+        typeof message.values === 'object' &&
+        !Array.isArray(message.values)
+      ) {
+        const nextValue: Partial<DraftValue> = {}
+        for (const [field, next] of Object.entries(message.values)) {
+          if (
+            (controlsFor(component) as readonly string[]).includes(field) &&
+            typeof next === 'string' &&
+            (!layoutControls.includes(field as (typeof layoutControls)[number]) ||
+              validLayoutValue(field, next))
+          )
+            nextValue[field as keyof DraftValue] = next
+        }
+        setPreviewValues((current) => ({
+          ...current,
+          [component.id]: nextValue,
+        }))
+      }
+      if (message.type !== 'NO_EDITOR_CHANGE') return
+      if (
+        !message.changes ||
+        typeof message.changes !== 'object' ||
+        Array.isArray(message.changes)
+      )
+        return
+      const allowedControls = controlsFor(component)
+      for (const [field, nextValue] of Object.entries(message.changes)) {
+        if (
+          !allowedControls.includes(field) ||
+          typeof nextValue !== 'string' ||
+          (layoutControls.includes(field as (typeof layoutControls)[number]) &&
+            !validLayoutValue(field, nextValue))
+        )
+          continue
+        change(component.id, field as keyof DraftValue, nextValue)
+      }
+    }
+    window.addEventListener('message', receivePreview)
+    return () => window.removeEventListener('message', receivePreview)
+  }, [change, config, editorMode, projectId])
 
   if (loading)
     return (
@@ -178,13 +316,6 @@ export function EditorModule({ projectId }: { projectId: string }) {
     )
 
   const target = previewUrl(config)
-  const change = (id: string, field: keyof DraftValue, value: string) => {
-    setConfirmDiscard(false)
-    setDraft((old) => ({
-      ...old,
-      [id]: { ...emptyValue, ...old[id], [field]: value },
-    }))
-  }
   const save = () => {
     try {
       localStorage.setItem(
@@ -206,23 +337,25 @@ export function EditorModule({ projectId }: { projectId: string }) {
     setMessage('Rascunho descartado.')
   }
   const send = async () => {
-    const changes = Object.entries(draft).map(([component, value]) => {
+    const changes = Object.entries(draft).flatMap(([component, value]) => {
       const allowed = config.allowedComponents.find(
         (item) => item.id === component,
       )
       const after = Object.fromEntries(
         Object.entries(value).filter(([field]) =>
-          (allowed?.controls ?? ['text', 'size', 'color', 'logo']).includes(
-            field,
-          ),
+          allowed
+            ? (exportControlsFor(allowed) as readonly string[]).includes(field)
+            : false,
         ),
       )
-      return {
-        screen: allowed?.screen ?? 'geral',
-        component,
-        before: {},
-        after,
-      }
+      return Object.keys(after).length
+        ? [{
+            screen: allowed?.screen ?? 'geral',
+            component,
+            before: {},
+            after,
+          }]
+        : []
     })
     if (changes.length === 0) {
       setMessage('Faça ao menos um ajuste antes de enviar.')
@@ -239,10 +372,23 @@ export function EditorModule({ projectId }: { projectId: string }) {
         'editor.md': `# Ajustes ${config.label}\n\n${changes.map((item) => `## ${item.screen} / ${item.component}\n\n${JSON.stringify(item.after, null, 2)}`).join('\n\n')}`,
         'editor.cfg': JSON.stringify(draft, null, 2),
         'editor.css': Object.entries(draft)
-          .map(
-            ([id, value]) =>
-              `[data-editor="${id}"] { font-size: ${value.size}px; color: ${value.color}; }`,
-          )
+          .map(([id, value]) => {
+            const declarations = [
+              value.size ? `font-size: ${value.size}px` : '',
+              value.color ? `color: ${value.color}` : '',
+              value.x !== undefined || value.y !== undefined
+                ? 'position: relative'
+                : '',
+              value.x !== undefined ? `left: ${value.x}px` : '',
+              value.y !== undefined ? `top: ${value.y}px` : '',
+              value.width ? `width: ${value.width}px` : '',
+              value.height ? `height: ${value.height}px` : '',
+            ].filter(Boolean)
+            return declarations.length
+              ? `[data-editor="${id}"] { ${declarations.join('; ')}; }`
+              : ''
+          })
+          .filter(Boolean)
           .join('\n'),
       }
       const baseManifest = {
@@ -289,33 +435,25 @@ export function EditorModule({ projectId }: { projectId: string }) {
     }
   }
 
-  const screens = [
-    ...new Set(config.allowedComponents.map((item) => item.screen ?? 'geral')),
-  ]
-  const screen = screens.includes(selectedScreen) ? selectedScreen : screens[0]
-  const components = config.allowedComponents.filter(
-    (item) => (item.screen ?? 'geral') === screen,
+  const screen = 'Página única'
+  const component = config.allowedComponents.find(
+    (item) => item.id === selectedComponent,
   )
-  const component =
-    components.find((item) => item.id === selectedComponent) ?? components[0]
-  const controls = component?.controls ?? ['text', 'size', 'color', 'logo']
-  const value = component ? (draft[component.id] ?? emptyValue) : emptyValue
+  const controls = component ? controlsFor(component) : []
+  const value = component
+    ? {
+        ...emptyValue,
+        ...previewValues[component.id],
+        ...draft[component.id],
+      }
+    : emptyValue
   return (
     <section className="editor-workspace">
       <aside className="editor-screens">
-        <p className="eyebrow">Telas</p>
-        {screens.map((name) => (
-          <button
-            key={name}
-            className={screen === name ? 'selected' : ''}
-            onClick={() => {
-              setSelectedScreen(name)
-              setSelectedComponent('')
-            }}
-          >
-            {name}
-          </button>
-        ))}
+        <p className="eyebrow">Página</p>
+        <button type="button" className="selected" aria-current="page">
+          {screen}
+        </button>
         <div className="editor-base">
           <p className="eyebrow">Versão base</p>
           <h2>Editor · {config.label}</h2>
@@ -325,23 +463,35 @@ export function EditorModule({ projectId }: { projectId: string }) {
       <div className="editor-canvas">
         <header>
           <span>Pré-visualização</span>
-          <div className="device-toggle">
+          <div className="editor-toolbar">
+            <div className="device-toggle">
+              <button
+                aria-pressed={device === 'desktop'}
+                onClick={() => setDevice('desktop')}
+              >
+                ▱ Desktop
+              </button>
+              <button
+                aria-pressed={device === 'mobile'}
+                onClick={() => setDevice('mobile')}
+              >
+                ▯ Celular
+              </button>
+            </div>
             <button
-              aria-pressed={device === 'desktop'}
-              onClick={() => setDevice('desktop')}
+              type="button"
+              className="editor-mode-toggle"
+              aria-pressed={editorMode}
+              onClick={() => setEditorMode((active) => !active)}
             >
-              ▱ Desktop
-            </button>
-            <button
-              aria-pressed={device === 'mobile'}
-              onClick={() => setDevice('mobile')}
-            >
-              ▯ Celular
+              {editorMode ? '✓ Modo editor' : '✦ Modo editor'}
             </button>
           </div>
           <small>{target ? 'Preview controlado' : 'Ajustes locais'}</small>
         </header>
-        <div className={`editor-preview ${device}`}>
+        <div
+          className={`editor-preview ${device}${editorMode ? ' is-editing' : ''}`}
+        >
           {target ? (
             <iframe
               key={previewRevision}
@@ -375,31 +525,22 @@ export function EditorModule({ projectId }: { projectId: string }) {
         </div>
       </div>
       <aside className="editor-inspector">
-        <p className="eyebrow">Componentes liberados</p>
-        <div className="component-list">
-          {components.map((item) => (
-            <button
-              key={item.id}
-              className={component?.id === item.id ? 'selected' : ''}
-              onClick={() => setSelectedComponent(item.id)}
-            >
-              <span>{item.label ?? item.id}</span>
-              <small>
-                {(item.controls ?? ['text', 'size', 'color', 'logo'])
-                  .map(
-                    (control) =>
-                      ({
-                        text: 'texto',
-                        size: 'tam',
-                        color: 'cor',
-                        logo: 'logo',
-                      })[control] ?? control,
-                  )
-                  .join(' · ')}
-              </small>
-            </button>
-          ))}
-        </div>
+        <p className="eyebrow">Elemento selecionado</p>
+        {component ? (
+          <div className="selected-component-card">
+            <strong>{component.label ?? component.id}</strong>
+            <small>{component.screen ?? 'geral'}</small>
+          </div>
+        ) : (
+          <div className="selection-empty">
+            <span aria-hidden="true">{editorMode ? '↖' : '✦'}</span>
+            <p>
+              {editorMode
+                ? 'Selecione um texto, botão ou imagem diretamente no preview.'
+                : 'Ative o Modo editor para selecionar e ajustar um elemento no preview.'}
+            </p>
+          </div>
+        )}
         {component ? (
           <fieldset className="component-controls" disabled={sending}>
             <legend>{component.label ?? component.id}</legend>
@@ -469,11 +610,29 @@ export function EditorModule({ projectId }: { projectId: string }) {
                 />
               </label>
             ) : null}
+            <div className="layout-readout">
+              <span>Posição</span>
+              <strong>{value.x}, {value.y}</strong>
+              <span>Tamanho</span>
+              <strong>{value.width || 'auto'} × {value.height || 'auto'}</strong>
+              <button
+                type="button"
+                onClick={() => {
+                  change(component.id, 'x', '0')
+                  change(component.id, 'y', '0')
+                  change(component.id, 'width', '')
+                  change(component.id, 'height', '')
+                }}
+              >
+                Redefinir posição e tamanho
+              </button>
+            </div>
           </fieldset>
         ) : null}
         <p className="editor-help">
-          Nada aqui altera o sistema. “Salvar” guarda o rascunho neste
-          navegador; “Enviar para análise” manda um pacote privado para a nó.
+          No Modo editor, clique para selecionar, arraste para mover, use as
+          alças para redimensionar e dê duplo clique em textos para editar.
+          “Salvar” guarda o rascunho neste navegador.
         </p>
         <div className="editor-actions">
           <p className="eyebrow">

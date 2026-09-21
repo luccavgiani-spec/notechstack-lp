@@ -1,0 +1,1 @@
+Logos baixadas do catálogo público Simple Icons (https://simpleicons.org/) via https://cdn.simpleicons.org/ em 21/09/2026. Ícones CC0; as marcas permanecem propriedade de seus respectivos titulares. Usadas para identificação e link aos produtos. React, Vite, Supabase, Vercel, WhatsApp e Resend.
