@@ -1,13 +1,10 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, NavLink, useParams } from 'react-router-dom'
 import {
-  calculateProgress,
   loadClientDashboard,
   savePreferredTier,
   type DashboardData,
   type JsonValue,
-  type KanbanItem,
-  type KanbanStatus,
   type ModuleKey,
   type ProjectVersion,
   type Roadmap,
@@ -15,7 +12,10 @@ import {
   type TierKey,
 } from './client-dashboard-service'
 import { EditorModule } from './EditorModule'
+import { StagesModule } from './StagesModule'
 import './client-dashboard.css'
+import { ProjectArchitecture, ProjectCostCalculator } from './ProjectInfrastructure'
+import './project-infrastructure.css'
 
 const MODULES: Array<{
   key: ModuleKey
@@ -33,27 +33,26 @@ const MODULES: Array<{
   { key: 'etapas', number: '03', label: 'Etapas do plano', path: 'etapas' },
   { key: 'editor', number: '04', label: 'Editor', path: 'editor' },
   { key: 'versoes', number: '05', label: 'Versões', path: 'versoes' },
-  { key: 'marca', number: '06', label: 'Marca & arquivos', path: 'marca' },
 ]
 
 const TIER_ORDER: Array<{ key: TierKey; label: string; color: string }> = [
-  { key: 'essencial', label: 'Essencial', color: 'border-azul' },
-  { key: 'basico', label: 'Básico', color: 'border-ambar' },
+  { key: 'basico', label: 'Básico', color: 'border-azul' },
+  { key: 'essencial', label: 'Essencial', color: 'border-ambar' },
   { key: 'completo', label: 'Completo', color: 'border-verde' },
 ]
 
-const KANBAN_COLUMNS: Array<{
-  key: KanbanStatus
-  label: string
-  color: string
-}> = [
-  { key: 'a_fazer', label: 'A fazer', color: 'bg-azul' },
-  { key: 'em_andamento', label: 'Em andamento', color: 'bg-ambar' },
-  { key: 'concluido', label: 'Concluído', color: 'bg-verde' },
-]
 
 type ClientDashboardPageProps = {
   module: ModuleKey
+}
+
+type DashboardTheme = 'light' | 'dark'
+
+const THEME_STORAGE_KEY = 'no-client-dashboard-theme'
+
+function getInitialTheme(): DashboardTheme {
+  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
+  return storedTheme === 'dark' ? 'dark' : 'light'
 }
 
 function toDisplayItems(value: JsonValue): string[] {
@@ -70,47 +69,6 @@ function toDisplayItems(value: JsonValue): string[] {
   }
 
   return value === null || value === '' ? [] : [String(value)]
-}
-
-function DataList({ title, value }: { title: string; value: JsonValue }) {
-  const items = toDisplayItems(value)
-
-  return (
-    <section className="rounded-2xl border border-borda bg-white p-5">
-      <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-cinza">
-        {title}
-      </h3>
-      {items.length === 0 ? (
-        <p className="mt-3 text-sm text-cinza">Nenhum item publicado.</p>
-      ) : (
-        <ul className="mt-4 space-y-2 text-sm leading-6">
-          {items.map((item, index) => (
-            <li className="flex gap-2" key={`${item}-${index}`}>
-              <span
-                aria-hidden="true"
-                className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-azul"
-              />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  )
-}
-
-function TierField({ label, value }: { label: string; value: JsonValue }) {
-  const items = toDisplayItems(value)
-  return (
-    <div>
-      <dt className="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-cinza">
-        {label}
-      </dt>
-      <dd className="mt-1 text-sm leading-6">
-        {items.length > 0 ? items.join(' · ') : '—'}
-      </dd>
-    </div>
-  )
 }
 
 function TierCard({
@@ -130,6 +88,10 @@ function TierCard({
   saving: boolean
   onSelect: (tier: TierKey) => void
 }) {
+  const features = toDisplayItems(tier.escopo)
+  const monthlyMatch = String(tier.faixa ?? '').match(/R\$\s*([\d.]+(?:,\d+)?)\s*\/mês/i)
+  const monthlyPrice = monthlyMatch ? `R$ ${monthlyMatch[1]}/mês` : 'Sob consulta'
+
   return (
     <article
       className={`flex h-full flex-col rounded-2xl border-t-4 bg-white p-5 shadow-card ${color} ${
@@ -139,34 +101,41 @@ function TierCard({
       }`}
       data-tier={tierKey}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="tier-card-heading">
         <h3 className="text-xl font-extrabold uppercase tracking-[-0.03em]">
           {label}
         </h3>
-        {selected ? (
-          <span className="rounded-full bg-azul-tint px-2 py-1 font-mono text-[0.625rem] uppercase tracking-[0.1em] text-azul">
-            Seu interesse registrado
+        {tierKey === 'essencial' ? (
+          <span className="tier-recommended">
+            Mais escolhido
           </span>
         ) : null}
       </div>
-      <dl className="mt-5 flex-1 space-y-4">
-        <TierField label="Escopo" value={tier.escopo} />
-        <TierField label="Profundidade" value={tier.profundidade} />
-        <TierField label="Exclusões" value={tier.exclusoes} />
-        <TierField label="Complexidade" value={tier.complexidade} />
-        <TierField label="Prazo" value={`${tier.prazo_dias} dias`} />
-        {tier.valor_centavos != null ? (
-          <TierField
-            label="Valor"
-            value={new Intl.NumberFormat('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            }).format(tier.valor_centavos / 100)}
-          />
-        ) : null}
-        {tier.faixa != null ? (
-          <TierField label="Faixa" value={tier.faixa} />
-        ) : null}
+      <ul className="tier-features">
+        {features.map((feature) => (
+          <li key={feature}>
+            <span aria-hidden="true">✓</span>
+            {feature}
+          </li>
+        ))}
+      </ul>
+      <dl className="tier-pricing">
+        <div>
+          <dt>Implementação</dt>
+          <dd>
+            {tier.valor_centavos != null
+              ? new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                  maximumFractionDigits: 0,
+                }).format(tier.valor_centavos / 100)
+              : 'Sob proposta'}
+          </dd>
+        </div>
+        <div>
+          <dt>Mensalidade</dt>
+          <dd>{monthlyPrice}</dd>
+        </div>
       </dl>
       <button
         type="button"
@@ -177,8 +146,8 @@ function TierCard({
         {saving
           ? 'Salvando…'
           : selected
-            ? 'Interesse registrado'
-            : `Quero conversar sobre o ${label}`}
+            ? 'Contratado'
+            : 'Quero este plano'}
       </button>
     </article>
   )
@@ -242,16 +211,16 @@ function OverviewModule({
 
   return (
     <div className="overview-details">
-      <section>
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-azul">
-          Caminhos de execução
-        </p>
+      <ProjectArchitecture />
+      <ProjectCostCalculator />
+
+      <section className="overview-tiers">
+        <p className="eyebrow">Caminhos de execução</p>
         <h2 className="mt-3 max-w-3xl text-3xl font-extrabold tracking-[-0.04em] sm:text-4xl">
           Três profundidades para a mesma base.
         </h2>
         <p className="mt-4 max-w-3xl font-light leading-7 text-cinza">
-          Você só sinaliza o caminho. Nada é contratado aqui — a conversa segue
-          com seu gerente de projeto.
+          Escolha o plano ideal para o seu momento. Todos incluem acompanhamento da nossa equipe e podem ser ajustados conforme a evolução do projeto.
         </p>
         {saveError ? (
           <p
@@ -282,11 +251,26 @@ function OverviewModule({
           })}
         </div>
       </section>
-      <div className="project-facts">
-        <DataList title="Stack" value={roadmap.stack} />
-        <DataList title="Custos" value={roadmap.costs} />
-        <DataList title="Próximos passos" value={roadmap.next_steps} />
-        <DataList title="Referências" value={roadmap.references} />
+      <div className="overview-benefits">
+        {[
+          ['calendar-clock', 'Prazo de entrega', 'De 30 a 45 dias', 'conforme o escopo'],
+          ['headphones', 'Suporte e manutenção', 'Acompanhamento contínuo', 'da nossa equipe'],
+          ['credit-card', 'Pagamentos', 'Parcelamento via Pagar.me', ''],
+        ].map(([icon, title, line, detail]) => (
+          <div key={title}>
+            <span><img src={`/icons/lucide/${icon}.svg`} alt="" /></span>
+            <p><strong>{title}</strong>{line}<small>{detail}</small></p>
+          </div>
+        ))}
+        <a
+          className="overview-whatsapp-card"
+          href="https://wa.me/5511939289413"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span><img src="/icons/brands/whatsapp.svg" alt="" /></span>
+          <p><strong>Pronto para começar?</strong>Fale com a gente e vamos dar o próximo passo.</p>
+        </a>
       </div>
     </div>
   )
@@ -294,6 +278,7 @@ function OverviewModule({
 
 function PrototypeModule({ roadmap }: { roadmap: Roadmap | null }) {
   const [expanded, setExpanded] = useState(false)
+  const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop')
   useEffect(() => {
     const close = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setExpanded(false)
@@ -317,7 +302,27 @@ function PrototypeModule({ roadmap }: { roadmap: Roadmap | null }) {
             Fechar tela cheia ×
           </button>
         ) : null}
-        <div className="prototype-phone">
+        <div
+          className="prototype-device-toggle"
+          role="group"
+          aria-label="Formato do protótipo"
+        >
+          <button
+            type="button"
+            aria-pressed={device === 'desktop'}
+            onClick={() => setDevice('desktop')}
+          >
+            ▱ Desktop
+          </button>
+          <button
+            type="button"
+            aria-pressed={device === 'mobile'}
+            onClick={() => setDevice('mobile')}
+          >
+            ▯ Celular
+          </button>
+        </div>
+        <div className={`prototype-phone ${device}`}>
           <div className="phone-status">
             <span>9:41</span>
             <i />
@@ -380,100 +385,6 @@ function formatDate(value: string) {
   }).format(new Date(value))
 }
 
-function KanbanCard({ item }: { item: KanbanItem }) {
-  return (
-    <article className="rounded-xl border border-borda bg-white p-4 shadow-sm">
-      <h3 className="font-semibold leading-6">{item.title}</h3>
-      <dl className="mt-4 grid grid-cols-2 gap-3 text-xs">
-        <div>
-          <dt className="text-cinza">Fase</dt>
-          <dd className="mt-1 font-medium">{item.phase ?? '—'}</dd>
-        </div>
-        <div>
-          <dt className="text-cinza">Macroversão</dt>
-          <dd className="mt-1 font-medium">{item.macro_version ?? '—'}</dd>
-        </div>
-        <div className="col-span-2">
-          <dt className="text-cinza">Data planejada</dt>
-          <dd className="mt-1 font-medium">
-            {item.scheduled_date
-              ? new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(
-                  new Date(`${item.scheduled_date}T00:00:00Z`),
-                )
-              : '—'}
-          </dd>
-        </div>
-      </dl>
-    </article>
-  )
-}
-
-function StagesModule({ items }: { items: KanbanItem[] }) {
-  if (items.length === 0) {
-    return (
-      <EmptyState>
-        As etapas entram aqui assim que o plano de execução for organizado.
-      </EmptyState>
-    )
-  }
-
-  const progress = calculateProgress(items)
-  return (
-    <section className="stages-module">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-azul">
-            Progresso do projeto
-          </p>
-          <h2 className="mt-2 text-4xl font-extrabold tracking-[-0.04em]">
-            {progress}% concluído
-          </h2>
-        </div>
-        <p className="text-sm text-cinza">Acompanhamento somente leitura</p>
-      </div>
-      <p className="stage-description">
-        {items.filter((item) => item.status === 'concluido').length} de{' '}
-        {items.length} itens entregues. A equipe da nó move os cartões; você
-        acompanha por aqui.
-      </p>
-      <div className="progress-track" aria-label={`${progress}% concluído`}>
-        <span style={{ width: `${progress}%` }} />
-        <i
-          style={{
-            width: `${(items.filter((item) => item.status === 'em_andamento').length / items.length) * 100}%`,
-          }}
-        />
-      </div>
-      <div className="kanban-grid">
-        {KANBAN_COLUMNS.map((column) => {
-          const columnItems = items.filter((item) => item.status === column.key)
-          return (
-            <section className={`kanban-column ${column.key}`} key={column.key}>
-              <header className="flex items-center justify-between gap-3">
-                <h3 className="font-bold">{column.label}</h3>
-                <span
-                  className={`min-w-7 rounded-full px-2 py-1 text-center font-mono text-xs text-white ${column.color}`}
-                >
-                  {columnItems.length}
-                </span>
-              </header>
-              <div className="mt-4 space-y-3">
-                {columnItems.length === 0 ? (
-                  <p className="py-5 text-center text-sm text-cinza">
-                    Nenhum item.
-                  </p>
-                ) : null}
-                {columnItems.map((item) => (
-                  <KanbanCard key={item.id} item={item} />
-                ))}
-              </div>
-            </section>
-          )
-        })}
-      </div>
-    </section>
-  )
-}
 
 function VersionsModule({ versions }: { versions: ProjectVersion[] }) {
   if (versions.length === 0) {
@@ -640,7 +551,7 @@ function DashboardModule({
     return <PrototypeModule roadmap={data.roadmap} />
   }
   if (module === 'etapas') {
-    return <StagesModule items={data.kanban} />
+    return <StagesModule items={data.kanban} versions={data.versions} roadmap={data.roadmap} />
   }
   if (module === 'editor') {
     return (
@@ -717,6 +628,7 @@ function ProjectNavigation({
 export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
   const { projectId = '' } = useParams()
   const [now] = useState(() => Date.now())
+  const [theme, setTheme] = useState<DashboardTheme>(getInitialTheme)
   const [data, setData] = useState<DashboardData | null>(null)
   const [loadedProjectId, setLoadedProjectId] = useState<string | null>(null)
   const [loadErrorProjectId, setLoadErrorProjectId] = useState<string | null>(
@@ -840,22 +752,6 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
 
   const shell = data.shell
   const showTrialNotice = shell.effective_access_status === 'INICIAL_15_DIAS'
-  const progress = calculateProgress(data.kanban)
-  const current = data.versions?.find((version) => version.is_current)
-  const status =
-    shell.modules[module] !== 'ativo'
-      ? 'Aguardando liberação'
-      : module === 'prototipo'
-        ? data.roadmap?.prototype_url
-          ? 'Publicado'
-          : 'Em preparação'
-        : module === 'versoes'
-          ? 'Histórico publicado'
-          : module === 'editor'
-            ? 'Editando rascunho'
-            : progress === 100
-              ? 'Concluído'
-              : 'Em andamento'
   const remaining = shell.access_released_at
     ? Math.max(
         0,
@@ -865,30 +761,23 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
         ),
       )
     : null
-  const phases = [
-    ...new Set(
-      [...data.kanban]
-        .sort((a, b) =>
-          (a.scheduled_date ?? '9999').localeCompare(
-            b.scheduled_date ?? '9999',
-          ),
-        )
-        .map((item) => item.phase)
-        .filter(Boolean),
-    ),
-  ]
   return (
-    <main className={`client-dashboard module-${module}`}>
+    <main className={`client-dashboard module-${module}`} data-theme={theme}>
       <div className="brand-stripe" />
       <aside className="client-sidebar">
         <Link to="/p/projetos" aria-label="Voltar aos projetos">
           <img
             className="client-logo"
-            src="/no-tech-stack-branca-ponto-ambar.svg"
+            src={
+              theme === 'light'
+                ? '/no-tech-stack-tinta-ponto-ambar.svg'
+                : '/no-tech-stack-branca-ponto-ambar.svg'
+            }
             alt="nó tech stack"
           />
         </Link>
         <p className="sidebar-label">Projeto</p>
+        <strong className="sidebar-project-name">{shell.project_name}</strong>
         <ProjectNavigation
           projectId={projectId}
           currentModule={module}
@@ -896,143 +785,60 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
         />
         <div className="sidebar-bottom">
           <Link to="/p/projetos">← Meus projetos</Link>
-          <div className="brand-dots">
-            <i />
-            <i />
-            <i />
-            <i />
+          <div className="theme-switch" role="group" aria-label="Tema do painel">
+            <button
+              type="button"
+              aria-pressed={theme === 'light'}
+              onClick={() => {
+                setTheme('light')
+                window.localStorage.setItem(THEME_STORAGE_KEY, 'light')
+              }}
+            >
+              <span aria-hidden="true">☼</span>
+              Claro
+            </button>
+            <button
+              type="button"
+              aria-pressed={theme === 'dark'}
+              onClick={() => {
+                setTheme('dark')
+                window.localStorage.setItem(THEME_STORAGE_KEY, 'dark')
+              }}
+            >
+              <span aria-hidden="true">◐</span>
+              Escuro
+            </button>
           </div>
         </div>
       </aside>
-      <div className="client-main">
-        <header className="client-topbar">
-          <div>
-            <p>Projeto · {shell.project_name}</p>
-            <h1>
-              {MODULES.find((item) => item.key === module)?.label}
-              {module === 'editor' && current ? ` · ${current.label}` : ''}
-            </h1>
-          </div>
-          <div className="project-state">
-            <span>Estado</span>
-            <strong>{status}</strong>
-          </div>
-        </header>
+      <div className={`client-main${module === 'editor' ? ' editor-main' : ''}`}>
         {module === 'como_funciona' ? (
           <>
             <section className="project-hero">
-              <div>
-                <p className="eyebrow">
-                  {progress === 100 ? 'Entregas concluídas' : 'Em construção'} ·{' '}
-                  {progress}% concluído
-                </p>
-                <h2>{shell.project_name}</h2>
+              <div className="home-hero-art" role="img" aria-label="Mascotes da Nó transformando uma ideia em um sistema" />
+              <div className="project-hero-copy">
+                <p className="hero-kicker">01 · Como funciona</p>
+                <h2>Da ideia a um sistema real, sem complicação.</h2>
                 <p className="hero-description">
-                  {data.kanban.find((item) => item.status === 'em_andamento')
-                    ?.title ??
-                    (data.roadmap?.published_at
-                      ? 'Seu primeiro plano está pronto.'
-                      : 'Estamos preparando a direção do seu produto.')}
+                  Um processo organizado, com tecnologia moderna e suporte da nossa equipe,
+                  para você tirar sua ideia do papel e colocar no ar em 30 ou 45 dias.
                 </p>
-                <dl className="hero-facts">
-                  <div>
-                    <dt>Plano publicado</dt>
-                    <dd>
-                      {data.roadmap?.published_at
-                        ? formatDate(data.roadmap.published_at)
-                        : 'Em preparação'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Versão atual</dt>
-                    <dd>{current?.label ?? 'Em preparação'}</dd>
-                  </div>
-                  <div>
-                    <dt>Responsável</dt>
-                    <dd>Equipe nó</dd>
-                  </div>
-                </dl>
+                <div className="hero-actions">
+                  <Link
+                    className="hero-primary-action"
+                    to={`/p/${encodeURIComponent(projectId)}/etapas`}
+                  >
+                    Falar com a equipe da Nó <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
               </div>
-              <img src="/mascote-cliente.png" alt="Mascote da nó tech stack" />
             </section>
-            {phases.length ? (
-              <div className="phase-strip">
-                {phases.map((phase, index) => {
-                  const items = data.kanban.filter(
-                    (item) => item.phase === phase,
-                  )
-                  const done = calculateProgress(items)
-                  return (
-                    <Link
-                      to={`/p/${encodeURIComponent(projectId)}/etapas`}
-                      key={phase}
-                      className={
-                        done === 100
-                          ? 'done'
-                          : items.some((item) => item.status === 'em_andamento')
-                            ? 'active'
-                            : ''
-                      }
-                    >
-                      <div className="phase-line">
-                        <i style={{ width: `${done}%` }} />
-                      </div>
-                      <small>{String(index + 1).padStart(2, '0')}</small>
-                      <strong>{phase}</strong>
-                      <span>
-                        {done === 100 ? 'Concluída' : `${done}% concluído`}
-                      </span>
-                    </Link>
-                  )
-                })}
-              </div>
+            {showTrialNotice ? (
+              <aside className="trial-notice home-trial-notice">
+                <div><strong>Seu acesso de análise fica disponível por 15 dias.</strong></div>
+                {remaining !== null ? <span>{remaining} dias restantes</span> : null}
+              </aside>
             ) : null}
-            <div className="overview-intro">
-              <div className="activity-summary">
-                {[
-                  { status: 'concluido', label: 'Aconteceu' },
-                  { status: 'em_andamento', label: 'Acontecendo agora' },
-                  { status: 'a_fazer', label: 'Depois' },
-                ].map(({ status, label }) => (
-                  <section key={status}>
-                    <p className="eyebrow">{label}</p>
-                    <h3>
-                      {data.kanban.find((item) => item.status === status)
-                        ?.title ?? 'Aguardando novas etapas'}
-                    </h3>
-                    <p>
-                      {
-                        data.kanban.filter((item) => item.status === status)
-                          .length
-                      }{' '}
-                      itens{' '}
-                      {status === 'concluido'
-                        ? 'entregues'
-                        : status === 'em_andamento'
-                          ? 'em andamento'
-                          : 'planejados'}
-                      .
-                    </p>
-                  </section>
-                ))}
-              </div>
-              {showTrialNotice ? (
-                <aside className="trial-notice">
-                  <div>
-                    <strong>
-                      Seu acesso de análise fica disponível por 15 dias.
-                    </strong>
-                    <p>
-                      Se você decidir seguir com a Nó, o acesso deixa de expirar
-                      e acompanha o projeto até a entrega.
-                    </p>
-                  </div>
-                  {remaining !== null ? (
-                    <span>{remaining} dias restantes</span>
-                  ) : null}
-                </aside>
-              ) : null}
-            </div>
           </>
         ) : null}
         <div className="client-content">
@@ -1060,7 +866,7 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
             >
               {module === 'versoes' && shell.modules.editor === 'ativo'
                 ? 'Abrir o Editor →'
-                : 'Visão geral do projeto →'}
+                : module === 'etapas' ? 'Voltar para como funciona →' : 'Visão geral do projeto →'}
             </Link>
           </footer>
         ) : null}
