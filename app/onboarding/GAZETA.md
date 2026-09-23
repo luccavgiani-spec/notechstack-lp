@@ -47,3 +47,24 @@ Console Maisis: projeção autorizada inclui início, janela acordada e estado d
 (migration 20260923203346_agency_project_schedule.sql). Não cria versão publicada fictícia.
 Validação da consolidação: build, lint, 58 testes do aplicativo e 21 verificações SQL
 de isolamento. Conta Maisis criada manualmente no Supabase; papel e vínculo configurados via MCP.
+
+## Histórico de entregas informado em 23/09/2026
+
+- 13/07/2026 — V1: protótipo navegável.
+- 18/08/2026 — V2: painel editorial (Painel da Redação).
+- 02/09/2026 — V3: final, entrega mais recente, ainda em análise.
+
+Datas fornecidas diretamente pelo Lucca; descrições contextualizadas pela nota
+Gazeta Bragantina do vault. Esses marcos históricos são independentes da data
+administrativa de início de 22/07/2026 e não foram deslocados para conciliá-las.
+Fonte: gazeta-delivery-history.json. Importação transacional e idempotente:
+gazeta-delivery-history.sql, aplicada ao Supabase da Nó em produção. Status das
+três linhas: entregue; V3 é a atual. Status do projeto, módulos, Editor, vínculos
+e permissões preservados. build_reference registra a origem informada, sem
+inventar links de builds antigos. Meio-dia em São Paulo é apenas um horário
+técnico para preservar a data; não representa hora real de entrega.
+
+Verificação: transação com rollback antes da gravação e leitura posterior pela
+RPC do console com papel authenticated/AGENCY_ADMIN e membership existente.
+Isso valida a projeção autorizada, sem representar novo teste de login real.
+Prévia local atualizada com os mesmos registros, exclusivamente em desenvolvimento.
