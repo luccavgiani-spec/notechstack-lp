@@ -1,0 +1,4 @@
+interface:
+  display_name: "Criar cliente · nó"
+  short_description: "Cadastre clientes e projetos no portal da nó"
+  default_prompt: "Use $no-criar-cliente para cadastrar um cliente e seu projeto no portal da nó, vinculando à agência indicada sem duplicar registros."

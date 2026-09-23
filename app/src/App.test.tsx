@@ -176,6 +176,27 @@ describe('criterion 11 — destinos pós-login', () => {
     expect(await screen.findByRole('heading', { name: 'Todos os projetos.' })).toBeVisible()
     expect(mocks.from).not.toHaveBeenCalled()
   })
+
+  it('leva AGENCY_ADMIN para seu console sem abrir a operação global', async () => {
+    const session = buildSession('CLIENT')
+    session.user.app_metadata = { role: 'AGENCY_ADMIN' }
+    mocks.signInWithPassword.mockResolvedValue({ data: { user: session.user, session }, error: null })
+    renderAt('/login')
+    await submitLogin()
+    await waitFor(() => expect(window.location.pathname).toBe('/agencia'))
+    expect(await screen.findByText(/Nenhuma agência vinculada à sua conta/)).toBeVisible()
+    expect(mocks.from).toHaveBeenCalledWith('agencies')
+    expect(mocks.from).not.toHaveBeenCalledWith('projects')
+  })
+
+  it('bloqueia AGENCY_ADMIN na gestão de agências da nó', async () => {
+    const session = buildSession('CLIENT')
+    session.user.app_metadata = { role: 'AGENCY_ADMIN' }
+    mocks.getSession.mockResolvedValue({ data: { session }, error: null })
+    renderAt('/no/agencias')
+    await waitFor(() => expect(window.location.pathname).toBe('/nao-autorizado'))
+    expect(mocks.from).not.toHaveBeenCalled()
+  })
 })
 
 describe('criterion 12 — falha de login', () => {

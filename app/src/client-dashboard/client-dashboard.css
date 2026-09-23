@@ -2464,3 +2464,32 @@
 @media (max-width: 900px) {
   .overview-benefits { grid-template-columns: 1fr 1fr; }
 }
+
+/* Agency identity follows the project; nó remains the technology signature. */
+.client-agency-logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 72px;
+  object-fit: contain;
+  object-position: left;
+  margin-bottom: 28px;
+}
+.client-agency-name {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 28px;
+  overflow-wrap: anywhere;
+}
+.agency-powered-by { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px; }
+.agency-powered-by p { font-size: 8px; letter-spacing: .08em; margin-bottom: 10px; }
+.agency-powered-by img { width: 128px; height: auto; }
+.agency-preview-notice { padding: 12px 24px; font-size: 12px; background: #eda33b20; }
+@media (max-width: 680px) {
+  .client-sidebar .sidebar-bottom { display: block; padding-bottom: 16px; }
+  .client-sidebar .sidebar-bottom > a, .client-sidebar .theme-switch { display: none; }
+  .agency-powered-by { margin-top: 0; }
+  .client-agency-logo { max-height: 56px; }
+}
