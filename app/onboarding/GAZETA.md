@@ -46,5 +46,4 @@ Deploy das datas e navegação: dpl_Acv9pAoKR1eLaX4Jx8PREgP8Qr2e. Build, lint e 
 Console Maisis: projeção autorizada inclui início, janela acordada e estado da revisão
 (migration 20260923203346_agency_project_schedule.sql). Não cria versão publicada fictícia.
 Validação da consolidação: build, lint, 58 testes do aplicativo e 21 verificações SQL
-de isolamento. Provisionamento do operador aguarda renovação da autenticação administrativa
-da CLI Supabase; conexão de banco via MCP permanece disponível.
+de isolamento. Conta Maisis criada manualmente no Supabase; papel e vínculo configurados via MCP.
