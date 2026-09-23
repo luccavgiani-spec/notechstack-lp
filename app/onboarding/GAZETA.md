@@ -5,7 +5,7 @@ Produção: https://app.notechstack.com.br/p/fa681812-5c4a-4868-bf9d-699442ec7c5
 Cliente e projeto cadastrados em 23/09/2026, vinculados à Maisis Publicidade.
 Papel CLIENT, acesso ativo até o fim do projeto. Login real validado; vê somente
 Portal Gazeta Bragantina e nenhum projeto administrativo. Senha não armazenada.
-Operador Maisis ainda não provisionado em produção.
+Operador Maisis provisionado em produção pelo usuário e vinculado à agência com papel AGENCY_ADMIN. Login real, carteira, busca e histórico validados em produção.
 
 O dashboard é o mesmo componente/layout usado pelo Espaço Saúde Mental. Conteúdo
 específico vem de roadmaps.stack.architecture e next_steps.presentation/task_details.
