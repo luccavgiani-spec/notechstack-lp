@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Política | Gazeta Bragantina</title>
+<meta name="description" content="Cobertura da Câmara, da Prefeitura e da política regional de Bragança Paulista.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16161A">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..800;1,400..600&family=Libre+Franklin:ital,wght@0,400..800;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..700&display=swap">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/componentes.css">
+<link rel="stylesheet" href="assets/css/artigo.css">
+</head>
+<body>
+
+<a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<div class="topbar">
+  <div class="container topbar__interno">
+    <p class="topbar__data">Terça, 28 de julho de 2026 · Bragança Paulista, SP</p>
+    <div class="topbar__acoes">
+      <button type="button" class="topbar__acao" data-abre-busca aria-expanded="false" aria-controls="busca">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        Buscar
+      </button>
+      <a class="topbar__acao topbar__acao--destaque" href="#" data-rota="/newsletter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        Receber notícias
+      </a>
+      <a class="topbar__acao" href="#" data-rota="/entrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c.6-3.9 3.6-6 7.2-6s6.6 2.1 7.2 6"/></svg>
+        Entrar
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="barra-mobile" data-barra-mobile>
+  <button type="button" class="barra-icone" data-abre-drawer aria-expanded="false" aria-controls="drawer" aria-label="Abrir o menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a class="barra-mobile__logo" href="index.html"><img src="assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34"></a>
+  <span class="barra-mobile__espaco"></span>
+  <button type="button" class="barra-icone" data-abre-busca aria-expanded="false" aria-controls="busca" aria-label="Buscar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+  </button>
+</div>
+
+<header class="masthead masthead--interna">
+  <div class="container masthead__interno">
+    <p class="masthead__marca"><a href="index.html"><img class="masthead__logo" src="assets/img/logo-gazeta.svg" alt="Gazeta Bragantina" width="760" height="104"></a></p>
+    <p class="masthead__tagline">Notícias de Bragança Paulista e região</p>
+  </div>
+</header>
+
+<div class="nav-editorias" data-nav-sticky>
+  <div class="container nav-editorias__interno">
+    <a class="nav-editorias__logo" href="index.html"><img src="assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34"></a>
+    <nav class="nav-editorias__lista" aria-label="Editorias">
+      <ul>
+        <li><a class="nav-editorias__link" href="#" data-rota="/ultimas">Últimas</a></li>
+        <li data-editoria="cidade"><a class="nav-editorias__link" href="editoria.html">Cidade</a></li>
+        <li data-editoria="regiao"><a class="nav-editorias__link" href="editoria.html">Região</a></li>
+        <li data-editoria="politica"><a class="nav-editorias__link" href="editoria.html" aria-current="page">Política</a></li>
+        <li data-editoria="economia"><a class="nav-editorias__link" href="editoria.html">Economia</a></li>
+        <li data-editoria="bragantino"><a class="nav-editorias__link" href="editoria.html">Bragantino</a></li>
+        <li data-editoria="esportes"><a class="nav-editorias__link" href="editoria.html">Esportes</a></li>
+        <li data-editoria="cultura"><a class="nav-editorias__link" href="editoria.html">Cultura</a></li>
+        <li data-editoria="policia"><a class="nav-editorias__link" href="editoria.html">Polícia</a></li>
+        <li data-editoria="colunas"><a class="nav-editorias__link" href="coluna.html">Colunas</a></li>
+        <li data-editoria="opiniao"><a class="nav-editorias__link" href="coluna.html">Opinião</a></li>
+      </ul>
+    </nav>
+    <span class="nav-editorias__divisor" aria-hidden="true"></span>
+    <div class="nav-editorias__extras">
+      <a class="nav-editorias__extra" href="gbnorte.html" data-parceiro="gbnorte">GB Norte</a>
+      <a class="nav-editorias__extra" href="sindicato.html" data-parceiro="sindicato">Sindicato</a>
+    </div>
+  </div>
+</div>
+
+<main id="conteudo" data-editoria="politica">
+
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Você está em">
+      <ol>
+        <li><a href="index.html">Home</a></li>
+        <li><span aria-current="page">Política</span></li>
+      </ol>
+    </nav>
+
+    <header class="cabeca-secao">
+      <div class="cabeca-secao__fio" aria-hidden="true"></div>
+      <h1 class="cabeca-secao__titulo">Política</h1>
+      <p class="cabeca-secao__descricao">Cobertura da Câmara, da Prefeitura e da política das cidades da microrregião. Sessões, orçamento, contas públicas e bastidores.</p>
+      <div class="filtros-cidade">
+        <a class="chip" href="#" data-rota="/assunto/ldo-2027">LDO 2027</a>
+        <a class="chip" href="#" data-rota="/assunto/cpi-transporte-escolar">CPI do transporte escolar</a>
+        <a class="chip" href="#" data-rota="/assunto/hospital-regional">Hospital Regional</a>
+        <a class="chip" href="#" data-rota="/assunto/plano-de-mobilidade">Plano de mobilidade</a>
+        <a class="chip" href="#" data-rota="/assunto/eleicoes-2026">Eleições 2026</a>
+      </div>
+    </header>
+  </div>
+
+  <div class="container espaco-topo-m">
+    <div class="ad-bloco ad--billboard">
+      <p class="ad-bloco__rotulo">Publicidade</p>
+      <div class="ad-slot ad-slot--dcm">
+        <img src="assets/img/parceiro-vistadaserra-billboard.svg" alt="Anúncio ilustrativo" width="970" height="250" loading="lazy"><!-- demonstração: a tag DCM real deste formato está em ANUNCIOS-DCM.md -->
+      </div>
+    </div>
+  </div>
+
+  <div class="container espaco-topo-m">
+    <div class="corpo-com-lateral">
+
+      <div class="corpo-principal">
+
+        <!-- DESTAQUE DA EDITORIA -->
+        <section class="ordem-1" aria-labelledby="tit-destaque">
+          <h2 class="apenas-leitor" id="tit-destaque">Destaque de Política</h2>
+          <article class="card card--destaque">
+            <a class="card__link" href="noticia.html">
+              <div class="card__midia ar-16x9"><img src="assets/img/foto-camara-plenario.jpg" alt="Painel eletrônico de votação da Câmara Municipal exibindo o resultado de uma sessão" width="1600" height="900" fetchpriority="high"></div>
+              <div class="card__texto">
+                <p class="chapeu chapeu--grande">Orçamento</p>
+                <h3 class="card__titulo">Câmara aprova LDO de 2027 com R$ 1,3 bilhão e emenda de R$ 12 mi para o Lavapés</h3>
+                <p class="card__resumo">O texto passou em segunda votação por 12 votos a 5. A oposição queria vincular a emenda à construção do piscinão, mas a base do governo derrubou o destaque. O projeto vai à sanção do prefeito até 10 de agosto.</p>
+                <p class="card__meta">Por Camila Nogueira Franco · Centro · 27/07/2026</p>
+              </div>
+            </a>
+          </article>
+        </section>
+
+        <!-- GRADE -->
+        <section class="ordem-2" aria-labelledby="tit-grade">
+          <div class="linha linha--entre espaco-base-g">
+            <h2 class="bloco-lateral__titulo" id="tit-grade" data-pagina-rotulo>Página 1 de 4</h2>
+            <button type="button" class="botao botao--contorno" data-carregar-mais>Carregar mais matérias (3 páginas restantes)</button>
+          </div>
+
+          <div class="grade grade--3" data-lista-materias>
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-onibus-escolar.jpg" alt="Ônibus escolar amarelo estacionado em pátio de escola rural" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Câmara</p><h3 class="card__titulo">Oposição protocola pedido de CPI do transporte escolar com sete assinaturas</h3><p class="card__resumo">Faltam duas assinaturas para instalar a comissão. O requerimento cita contratos emergenciais renovados quatro vezes desde 2024.</p><p class="card__meta">27/07/2026 · 5 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-prefeitura.jpg" alt="Fachada do prédio da Prefeitura com bandeiras hasteadas" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Prefeitura</p><h3 class="card__titulo">Decreto reorganiza secretarias, extingue duas pastas e cria a de Projetos</h3><p class="card__resumo">Mudança entra em vigor em 1º de agosto e afeta 62 cargos comissionados. Governo diz que a economia será de R$ 4,1 milhões por ano.</p><p class="card__meta">27/07/2026 · 4 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-saguao-camara.jpg" alt="Servidores municipais reunidos no saguão da Câmara" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Servidores</p><h3 class="card__titulo">Vereadores aprovam reajuste de 4,1% para servidores em votação única</h3><p class="card__resumo">Índice ficou abaixo da inflação do período e foi criticado pelo sindicato, que já convocou assembleia para o dia 8 de agosto.</p><p class="card__meta">26/07/2026 · 3 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-audiencia-publica.jpg" alt="Auditório lotado durante audiência pública sobre mobilidade urbana" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Mobilidade</p><h3 class="card__titulo">Audiência do plano de mobilidade tem 40 inscritos e três horas de fala</h3><p class="card__resumo">Ciclovia da Avenida dos Imigrantes e a nova zona azul concentraram as críticas. O texto final vai à Câmara em setembro.</p><p class="card__meta">26/07/2026 · 6 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-documentos-mesa.jpg" alt="Pilhas de processos sobre mesa de trabalho em repartição pública" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Contas públicas</p><h3 class="card__titulo">Tribunal de Contas aponta 11 falhas na prestação de contas de 2024</h3><p class="card__resumo">Relatório cita pagamento sem empenho prévio e ausência de justificativa em três dispensas de licitação. Prefeitura tem 30 dias para responder.</p><p class="card__meta">25/07/2026 · 7 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-obra-parada.jpg" alt="Obra paralisada com tapumes e maquinário parado" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Emendas</p><h3 class="card__titulo">Prefeitura devolve R$ 3,8 milhões de emenda federal por atraso em projeto</h3><p class="card__resumo">Recurso era destinado à reforma de quatro escolas. A secretaria diz que vai reapresentar o pedido no próximo exercício.</p><p class="card__meta">25/07/2026 · 5 min</p></div></a></article>
+          </div>
+
+          <div class="ad-bloco ad--leaderboard espaco-topo-m espaco-base-g">
+            <p class="ad-bloco__rotulo">Publicidade</p>
+            <div class="ad-slot ad-slot--dcm">
+              <img src="assets/img/parceiro-autorota-leaderboard.svg" alt="Anúncio ilustrativo" width="728" height="90" loading="lazy"><!-- demonstração: a tag DCM real deste formato está em ANUNCIOS-DCM.md -->
+            </div>
+          </div>
+
+          <div class="grade grade--3">
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/ph-16x9-d.svg" alt="Calculadora e planilhas impressas sobre mesa de comissão" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Tributos</p><h3 class="card__titulo">Câmara instala comissão para revisar o Código Tributário do município</h3><p class="card__resumo">Grupo de cinco vereadores tem 90 dias para propor mudanças no ISS e na planta genérica de valores.</p><p class="card__meta">24/07/2026 · 4 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-coletiva-imprensa.jpg" alt="Prefeitos da região reunidos em mesa de assinatura de convênio" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Região</p><h3 class="card__titulo">Consórcio regional elege nova diretoria e Bragança assume a vice</h3><p class="card__resumo">As nove cidades vão dividir a compra de medicamentos e a manutenção de estradas vicinais a partir de setembro.</p><p class="card__meta">24/07/2026 · 3 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-lavapes-enchente.jpg" alt="Rua do Lavapés com marcas de água nas paredes das casas" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Lavapés</p><h3 class="card__titulo">Projeto que cria a Semana da Memória do Lavapés passa em primeira votação</h3><p class="card__resumo">Data marcaria o aniversário da enchente de janeiro. Autor diz que a proposta é sobre prevenção, não sobre luto.</p><p class="card__meta">23/07/2026 · 3 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/ph-16x9-g.svg" alt="Intérprete de Libras ao lado de tribuna durante sessão" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Acessibilidade</p><h3 class="card__titulo">Vereadora apresenta projeto para transmitir todas as sessões em Libras</h3><p class="card__resumo">Custo estimado é de R$ 96 mil por ano. Hoje só as sessões solenes têm interpretação.</p><p class="card__meta">23/07/2026 · 3 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-estacionamento.jpg" alt="Vagas de estacionamento demarcadas em rua do Centro" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Centro</p><h3 class="card__titulo">Prefeitura abre consulta pública sobre a nova zona azul do Centro</h3><p class="card__resumo">Proposta amplia de 480 para 1.100 as vagas rotativas e muda o valor da hora. Contribuições até 20 de agosto.</p><p class="card__meta">22/07/2026 · 4 min</p></div></a></article>
+
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/ph-16x9-i.svg" alt="Documentos do Plano Plurianual sobre mesa de comissão" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Finanças</p><h3 class="card__titulo">Comissão de Finanças pede 15 dias a mais para analisar o Plano Plurianual</h3><p class="card__resumo">Relator alega que a Prefeitura entregou os anexos com atraso. Prazo regimental terminaria nesta sexta.</p><p class="card__meta">22/07/2026 · 3 min</p></div></a></article>
+          </div>
+
+          <!-- Conteúdo servido pelo "Carregar mais" — mesmo DTO, mesma variante de card -->
+          <template id="maisMaterias">
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-plenario-vazio.jpg" alt="Plenário vazio da Câmara antes do início da sessão" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Partidos</p><h3 class="card__titulo">Base do governo perde uma cadeira com saída de vereador para outro partido</h3><p class="card__resumo">Com a troca, o governo passa a depender de dois votos da oposição para aprovar projetos de maioria qualificada.</p><p class="card__meta">21/07/2026 · 4 min</p></div></a></article>
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-auditorio-vazio.jpg" alt="Cadeiras vazias em auditório com cartaz de audiência pública" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Saúde</p><h3 class="card__titulo">Audiência do orçamento da saúde é adiada pela segunda vez em um mês</h3><p class="card__resumo">Conselho Municipal de Saúde cobra explicação por escrito e ameaça acionar o Ministério Público.</p><p class="card__meta">21/07/2026 · 3 min</p></div></a></article>
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-tela-computador.jpg" alt="Tela de computador com portal da transparência aberto" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Transparência</p><h3 class="card__titulo">Câmara gasta R$ 210 mil com diárias no primeiro semestre, aponta portal</h3><p class="card__resumo">Valor é 32% maior que no mesmo período de 2025. Mesa diretora diz que houve mais viagens a Brasília por causa de emendas.</p><p class="card__meta">20/07/2026 · 5 min</p></div></a></article>
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-luminaria-led.jpg" alt="Poste de iluminação pública com luminária de LED ao entardecer" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Concessão</p><h3 class="card__titulo">Prefeitura publica edital de concessão da iluminação pública por 20 anos</h3><p class="card__resumo">Contrato prevê a troca de 21 mil pontos por LED em quatro anos. Sessão pública de abertura em 3 de setembro.</p><p class="card__meta">20/07/2026 · 6 min</p></div></a></article>
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/ph-16x9-d.svg" alt="Bandeiras de partidos em evento político" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Eleições 2026</p><h3 class="card__titulo">Partidos começam a discutir pré-candidaturas ao governo do estado em Bragança</h3><p class="card__resumo">Quatro legendas já marcaram encontros regionais para agosto. Nenhuma confirmou nome até agora.</p><p class="card__meta">19/07/2026 · 4 min</p></div></a></article>
+            <article class="card"><a class="card__link" href="noticia.html"><div class="card__midia ar-16x9"><img src="assets/img/foto-assembleia.jpg" alt="Trabalhadores levantam a mão durante assembleia sindical" width="1600" height="900" loading="lazy"></div><div class="card__texto"><p class="chapeu">Sindicato</p><h3 class="card__titulo">Servidores aprovam pauta de reivindicações e marcam assembleia para o dia 8</h3><p class="card__resumo">Além do reajuste, a categoria cobra plano de carreira e revisão do vale-alimentação.</p><p class="card__meta">19/07/2026 · 3 min</p></div></a></article>
+          </template>
+
+          <!-- Paginação real: links indexáveis, com "Carregar mais" por cima -->
+          <nav class="paginacao espaco-topo-m" aria-label="Paginação de Política" data-paginacao>
+            <a class="paginacao__item" href="editoria.html?pagina=1" aria-label="Página anterior" aria-disabled="true">←</a>
+            <a class="paginacao__item" href="editoria.html?pagina=1" data-pagina="1" aria-current="page">1</a>
+            <a class="paginacao__item" href="editoria.html?pagina=2" data-pagina="2">2</a>
+            <a class="paginacao__item" href="editoria.html?pagina=3" data-pagina="3">3</a>
+            <a class="paginacao__item" href="editoria.html?pagina=4" data-pagina="4">4</a>
+            <a class="paginacao__item" href="editoria.html?pagina=2" aria-label="Próxima página">→</a>
+          </nav>
+        </section>
+
+      </div>
+
+      <aside class="corpo-lateral" aria-label="Mais lidas de Política, newsletter e colunistas">
+        <div class="lateral-pilha">
+
+          <section class="ordem-3" aria-labelledby="tit-lidas-editoria">
+            <header class="bloco-lateral__cabeca"><h2 class="bloco-lateral__titulo" id="tit-lidas-editoria">Mais lidas em Política</h2></header>
+            <div class="pilha pilha--densa">
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">1</span><div class="card__texto"><h3 class="card__titulo">Câmara arquiva projeto que mudava o transporte escolar da zona rural</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">2</span><div class="card__texto"><h3 class="card__titulo">Tribunal de Contas aponta 11 falhas na prestação de contas de 2024</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">3</span><div class="card__texto"><h3 class="card__titulo">Prefeitura devolve R$ 3,8 milhões de emenda federal por atraso</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">4</span><div class="card__texto"><h3 class="card__titulo">Decreto extingue duas secretarias e afeta 62 cargos comissionados</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">5</span><div class="card__texto"><h3 class="card__titulo">Consulta pública sobre a nova zona azul do Centro vai até 20 de agosto</h3></div></a></article>
+            </div>
+          </section>
+
+          <div class="ad-bloco ad--retangulo ordem-4">
+            <p class="ad-bloco__rotulo">Publicidade</p>
+            <div class="ad-slot ad-slot--dcm">
+              <img src="assets/img/parceiro-sorrir-retangulo.svg" alt="Anúncio ilustrativo" width="300" height="250" loading="lazy"><!-- demonstração: a tag DCM real deste formato está em ANUNCIOS-DCM.md -->
+            </div>
+          </div>
+
+          <section class="newsletter ordem-5" aria-labelledby="tit-nl-editoria">
+            <h2 class="newsletter__titulo" id="tit-nl-editoria">Acompanhe a Câmara de perto</h2>
+            <p class="newsletter__texto">Um resumo das sessões, das votações e do que muda na sua vida. Toda sexta-feira.</p>
+            <form class="newsletter__form" data-form-newsletter novalidate>
+              <label class="apenas-leitor" for="nl-editoria">Seu e-mail</label>
+              <input class="campo" id="nl-editoria" name="email" type="email" placeholder="seu@email.com.br" required autocomplete="email">
+              <button class="botao botao--primario botao--bloco" type="submit">Quero receber</button>
+              <p class="form-nota">Ao assinar você concorda com a <a href="#" data-rota="/privacidade">política de privacidade</a>.</p>
+            </form>
+          </section>
+
+          <section class="ordem-6" data-editoria="colunas" aria-labelledby="tit-colunistas-editoria">
+            <header class="bloco-lateral__cabeca"><h2 class="bloco-lateral__titulo" id="tit-colunistas-editoria">Colunistas de política</h2></header>
+            <div class="pilha pilha--densa">
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-09.jpg" alt="Retrato de Sérgio Bittencourt Mattos" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Sérgio B. Mattos</p><h3 class="card__titulo">A política da semana em Bragança</h3></div></a></article>
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-12.jpg" alt="Retrato de Marta Iglesias Pontes" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Marta I. Pontes</p><h3 class="card__titulo">A escola que sobrou depois da enchente</h3></div></a></article>
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-11.jpg" alt="Retrato de Vinícius Aragão Tavares" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Vinícius A. Tavares</p><h3 class="card__titulo">Por que o comércio do Centro não reage</h3></div></a></article>
+            </div>
+          </section>
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-rodape superficie-escura">
+  <div class="container">
+    <div class="site-rodape__topo">
+      <div class="site-rodape__marca">
+        <img src="assets/img/logo-gazeta-branco.svg" alt="Gazeta Bragantina" width="760" height="104">
+        <p class="site-rodape__tagline">Jornalismo local de Bragança Paulista e da microrregião.</p>
+      </div>
+      <nav aria-labelledby="rod-editorias"><h2 class="site-rodape__titulo" id="rod-editorias">Editorias</h2>
+        <ul class="site-rodape__lista">
+          <li><a href="editoria.html">Cidade</a></li><li><a href="editoria.html">Região</a></li><li><a href="editoria.html">Política</a></li>
+          <li><a href="editoria.html">Economia</a></li><li><a href="editoria.html">Bragantino</a></li><li><a href="coluna.html">Colunas e Opinião</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="rod-secoes"><h2 class="site-rodape__titulo" id="rod-secoes">Seções especiais</h2>
+        <ul class="site-rodape__lista">
+          <li><a href="gbnorte.html">GB Norte</a></li><li><a href="sindicato.html">Sindicato</a></li>
+          <li><a href="especial.html">Reportagens especiais</a></li><li><a href="foto-reportagem.html">Foto-reportagens</a></li>
+          <li><a href="#" data-rota="/anuncie">Anuncie</a></li>
+        </ul>
+      </nav>
+      <nav aria-labelledby="rod-institucional"><h2 class="site-rodape__titulo" id="rod-institucional">Institucional</h2>
+        <ul class="site-rodape__lista">
+          <li><a href="#" data-rota="/sobre">Sobre a Gazeta</a></li><li><a href="#" data-rota="/expediente">Expediente</a></li>
+          <li><a href="#" data-rota="/principios-editoriais">Princípios editoriais</a></li><li><a href="#" data-rota="/correcoes">Correções</a></li>
+          <li><a href="404.html">Página 404</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="site-rodape__base">
+      <p>Gazeta Bragantina · Bragança Paulista, SP · Protótipo de validação visual — conteúdo e nomes de pessoas são fictícios.</p>
+      <ul class="site-rodape__legal">
+        <li><a href="#" data-rota="/privacidade">Privacidade</a></li><li><a href="#" data-rota="/termos">Termos</a></li><li><a href="#" data-rota="/cookies">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<div class="rodape-fixo-mobile">
+  <a class="ad-slot ad-slot--dcm" href="#" data-rota="/anuncie"><img src="assets/img/parceiro-sorrir-mobile.svg" alt="Anúncio ilustrativo" width="320" height="50"></a>
+</div>
+
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu de navegação">
+  <div class="drawer__fundo" data-fecha-drawer></div>
+  <div class="drawer__painel">
+    <div class="drawer__topo">
+      <img src="assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34">
+      <button type="button" class="barra-icone" data-fecha-drawer aria-label="Fechar o menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+    </div>
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Editorias</p>
+      <div class="drawer__lista">
+        <a class="drawer__link" href="#" data-rota="/ultimas" data-editoria="policia">Últimas</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="cidade">Cidade</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="regiao">Região</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="politica">Política</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="economia">Economia</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="bragantino">Bragantino</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="esportes">Esportes</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="cultura">Cultura</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="policia">Polícia</a>
+        <a class="drawer__link" href="coluna.html" data-editoria="colunas">Colunas</a>
+        <a class="drawer__link" href="coluna.html" data-editoria="opiniao">Opinião</a>
+      </div>
+    </div>
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Seções especiais</p>
+      <div class="drawer__lista">
+        <a class="drawer__link" href="gbnorte.html" data-parceiro="gbnorte">GB Norte</a>
+        <a class="drawer__link" href="sindicato.html" data-parceiro="sindicato">Sindicato dos Trabalhadores</a>
+      </div>
+    </div>
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Institucional</p>
+      <div class="drawer__lista">
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/entrar">Entrar ou criar conta</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/newsletter">Receber notícias por e-mail</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/anuncie">Anuncie</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/contato">Contato</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="busca" id="busca" role="dialog" aria-modal="true" aria-label="Buscar no site">
+  <div class="busca__fundo" data-fecha-busca></div>
+  <div class="busca__painel">
+    <div class="container">
+      <form class="busca__form" data-form-busca role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <label class="apenas-leitor" for="campoBusca">Buscar matérias</label>
+        <input class="busca__campo" id="campoBusca" type="search" name="q" placeholder="Buscar em toda a Gazeta…" autocomplete="off">
+        <button type="button" class="barra-icone" data-fecha-busca aria-label="Fechar a busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+      </form>
+      <div class="busca__sugestoes">
+        <div>
+          <p class="drawer__rotulo">Assuntos em alta</p>
+          <div class="chips">
+            <a class="chip" href="#" data-rota="/assunto/hospital-regional">Hospital Regional</a>
+            <a class="chip" href="#" data-rota="/assunto/enchente-do-lavapes">Enchente do Lavapés</a>
+            <a class="chip" href="#" data-rota="/assunto/ldo-2027">LDO 2027</a>
+            <a class="chip" href="#" data-rota="/assunto/festa-do-divino">Festa do Divino</a>
+          </div>
+        </div>
+        <div>
+          <p class="drawer__rotulo">Buscas recentes</p>
+          <div class="chips">
+            <a class="chip" href="#" data-rota="/busca?q=cpi">CPI do transporte</a>
+            <a class="chip" href="#" data-rota="/busca?q=zona-azul">Zona azul</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/prototipo.js" defer></script>
+<script src="assets/js/logo-opcoes.js" defer></script>
+</body>
+</html>

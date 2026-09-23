@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 export type Agency = { id: string; name: string; slug: string; active: boolean }
 export type AgencyProject = {
   id: string; name: string; clientId: string; clientName: string; status: string
+  startedOn?: string | null; deliveryFrom?: string | null; deliveryTo?: string | null; deliveryNote?: string | null; reviewLabel?: string | null
   updatedAt: string; totalTasks: number; doneTasks: number; overdueTasks: number; nextDate: string | null
 }
 export type AgencyOverview = { agency: Agency; projects: AgencyProject[] }

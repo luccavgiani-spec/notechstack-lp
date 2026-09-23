@@ -1,0 +1,240 @@
+/* ==========================================================================
+   GAZETA BRAGANTINA · layout.css
+   Container, grid de 12 colunas, sidebar e as redistribuicoes por breakpoint.
+   Breakpoints: 480 / 768 / 1024 / 1280 (mobile-first).
+   ========================================================================== */
+
+.container {
+  width: 100%;
+  max-width: calc(var(--container) + var(--gutter) * 2);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.container--estreito {
+  max-width: calc(var(--container-estreito) + var(--gutter) * 2);
+}
+
+/* Sangria total: quebra o container e ocupa a viewport inteira sem
+   causar scroll horizontal. */
+.full-bleed {
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  max-width: 100vw;
+}
+
+/* --------------------------------------------------------------------------
+   Grid de 12 colunas
+   -------------------------------------------------------------------------- */
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas), minmax(0, 1fr));
+  gap: var(--gutter);
+}
+
+/* --------------------------------------------------------------------------
+   ZONA 1 DA CAPA — manchete + 3 chamadas
+   Mobile: empilhado. >=1024: 8 col + 4 col.
+   -------------------------------------------------------------------------- */
+.zona-capa {
+  display: grid;
+  gap: var(--e-8);
+  padding-block: var(--e-8) var(--e-10);
+}
+
+/* --------------------------------------------------------------------------
+   CORPO DA CAPA — conteudo + sidebar
+   Mobile (<1024): uma coluna so. Os wrappers viram `display: contents` e cada
+   bloco assume sua propria posicao via `order`, porque a §3.1 define a ordem
+   do mobile item a item — a sidebar nao some, ela se redistribui no fluxo.
+   Cada bloco da lateral e uma <section> com heading proprio, entao o
+   `display: contents` no <aside> nao custa rotulacao para leitor de tela.
+   -------------------------------------------------------------------------- */
+.corpo-com-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-10);
+  padding-bottom: var(--e-10);
+}
+
+.corpo-principal,
+.corpo-lateral,
+.lateral-pilha {
+  display: contents;
+}
+
+/* Ordem do mobile — espelha a lista da §3.1 */
+.ordem-1 { order: 1; }
+.ordem-2 { order: 2; }
+.ordem-3 { order: 3; }
+.ordem-4 { order: 4; }
+.ordem-5 { order: 5; }
+.ordem-6 { order: 6; }
+.ordem-7 { order: 7; }
+.ordem-8 { order: 8; }
+.ordem-9 { order: 9; }
+.ordem-10 { order: 10; }
+
+/* --------------------------------------------------------------------------
+   Grades reutilizaveis de cards
+   -------------------------------------------------------------------------- */
+.grade {
+  display: grid;
+  gap: var(--e-8) var(--gutter);
+}
+
+.grade--2 { grid-template-columns: 1fr; }
+.grade--3 { grid-template-columns: 1fr; }
+.grade--4 { grid-template-columns: 1fr; }
+.grade--5 { grid-template-columns: 1fr; }
+
+/* Bloco de editoria: 1 destaque + lista */
+.bloco-editoria__corpo {
+  display: grid;
+  gap: var(--e-6);
+}
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--e-5);
+}
+
+.pilha--densa {
+  gap: var(--e-4);
+}
+
+.pilha--folgada {
+  gap: var(--e-8);
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: var(--e-3);
+  flex-wrap: wrap;
+}
+
+.linha--entre {
+  justify-content: space-between;
+}
+
+/* ==========================================================================
+   >= 480px
+   ========================================================================== */
+@media (min-width: 480px) {
+  .grade--2,
+  .grade--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================================
+   >= 768px  (tablet)
+   ========================================================================== */
+@media (min-width: 768px) {
+  .grade--3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grade--5 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Manchete ganha a imagem grande e as 3 chamadas viram 3 colunas */
+  .zona-capa__chamadas {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gutter);
+  }
+
+  .bloco-editoria__corpo {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: var(--gutter);
+  }
+}
+
+/* ==========================================================================
+   >= 1024px  (desktop — 8 col de conteudo + 4 col de sidebar)
+   ========================================================================== */
+@media (min-width: 1024px) {
+  .zona-capa {
+    grid-template-columns: repeat(var(--colunas), minmax(0, 1fr));
+    gap: var(--gutter);
+    align-items: start;
+  }
+
+  .zona-capa__manchete {
+    grid-column: 1 / span 8;
+  }
+
+  .zona-capa__chamadas {
+    grid-column: 9 / span 4;
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-5);
+  }
+
+  .corpo-com-lateral {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--largura-sidebar);
+    gap: var(--e-10) var(--e-10);
+    align-items: start;
+  }
+
+  .corpo-principal {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-12);
+    grid-column: 1;
+    min-width: 0;
+  }
+
+  .corpo-lateral {
+    display: block;
+    grid-column: 2;
+    min-width: 0;
+  }
+
+  /* A pilha da lateral gruda ao rolar (§3.1). O topo respeita a nav sticky. */
+  .lateral-pilha {
+    display: flex;
+    flex-direction: column;
+    gap: var(--e-8);
+    position: sticky;
+    top: calc(var(--altura-nav) + var(--e-5));
+  }
+
+  /* No desktop a ordem volta a ser a do DOM dentro de cada coluna. */
+  .ordem-1, .ordem-2, .ordem-3, .ordem-4, .ordem-5,
+  .ordem-6, .ordem-7, .ordem-8, .ordem-9, .ordem-10 {
+    order: 0;
+  }
+
+  .grade--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .grade--4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .grade--5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .bloco-editoria__corpo {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: var(--e-10);
+  }
+}
+
+/* ==========================================================================
+   >= 1280px
+   ========================================================================== */
+@media (min-width: 1280px) {
+  .corpo-com-lateral {
+    gap: var(--e-12) var(--e-12);
+  }
+}

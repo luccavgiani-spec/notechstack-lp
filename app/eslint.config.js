@@ -5,7 +5,8 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist'] },
+  // Immutable client approval package; maintained in the Gazeta source repository.
+  { ignores: ['dist', 'public/prototipos/gazeta-bragantina/aprovacao-15-09/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

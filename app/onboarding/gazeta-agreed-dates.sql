@@ -1,0 +1,1 @@
+update public.roadmaps set next_steps=jsonb_set(next_steps,'{presentation}',coalesce(next_steps->'presentation','{}'::jsonb) || '{"hide_project_navigation": true, "started_on": "2026-07-22", "delivery_from": "2026-09-09", "delivery_to": "2026-09-23", "delivery_note": "Prazo combinado: 7–9 semanas desde o início"}'::jsonb) where project_id='fa681812-5c4a-4868-bf9d-699442ec7c52';

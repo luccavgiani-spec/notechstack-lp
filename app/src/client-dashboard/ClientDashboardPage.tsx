@@ -14,6 +14,7 @@ import {
 import { EditorModule } from './EditorModule'
 import { StagesModule } from './StagesModule'
 import './client-dashboard.css'
+import { projectArchitecture, projectPresentation, record, text } from './project-presentation'
 import { ProjectArchitecture, ProjectCostCalculator } from './ProjectInfrastructure'
 import './project-infrastructure.css'
 
@@ -220,6 +221,28 @@ function OverviewModule({
     )
   }
 
+  const architecture = projectArchitecture(roadmap)
+  const presentation = projectPresentation(roadmap)
+  if (architecture) return <div className="overview-details">
+    <ProjectArchitecture architecture={architecture} />
+    <section className="overview-section-heading"><p className="eyebrow">Estado do projeto</p><h2>{text(presentation.review_label)}</h2><p>{text(presentation.review_description)}</p></section>
+    <section className="overview-section-heading">
+      <p className="eyebrow">Infraestrutura e ativação</p>
+      <h2>{text(presentation.infrastructure_title, 'O que já funciona e o que vem a seguir.')}</h2>
+      {Array.isArray(presentation.scope_options) ? <>
+        <div className="scope-comparison">{presentation.scope_options.map((value) => {
+          const option = record(value)
+          return <article key={text(option.label)} className={`scope-option${option.selected === true ? ' scope-option-selected' : ''}`}>
+            <p className="eyebrow">{option.selected === true ? 'Proposta aprovada' : 'Alternativa apresentada'}</p>
+            <h3>{text(option.label)}</h3>
+            <ul>{toDisplayItems(option.features ?? []).map((feature) => <li key={feature}>{feature}</li>)}</ul>
+          </article>
+        })}</div>
+        <p className="infra-caption">{text(presentation.scope_note)}</p>
+      </> : <ul>{toDisplayItems(roadmap.costs).map((item) => <li key={item}>{item}</li>)}</ul>}
+    </section>
+  </div>
+
   return (
     <div className="overview-details">
       <ProjectArchitecture />
@@ -297,6 +320,7 @@ function PrototypeModule({ roadmap }: { roadmap: Roadmap | null }) {
     window.addEventListener('keydown', close)
     return () => window.removeEventListener('keydown', close)
   }, [])
+  const presentation = projectPresentation(roadmap)
   if (!roadmap?.published_at || !roadmap.prototype_url)
     return (
       <EmptyState>
@@ -347,7 +371,7 @@ function PrototypeModule({ roadmap }: { roadmap: Roadmap | null }) {
       </div>
       <aside className="prototype-info">
         <p className="eyebrow">Protótipo navegável</p>
-        <h2>Teste a primeira direção.</h2>
+        <h2>{text(presentation.prototype_title, 'Teste a primeira direção.')}</h2>
         <p>
           Navegue pelo protótipo e explore a direção de fluxo e interface do seu
           produto.
@@ -355,7 +379,7 @@ function PrototypeModule({ roadmap }: { roadmap: Roadmap | null }) {
         <dl className="prototype-meta">
           <div>
             <dt>Estado</dt>
-            <dd>Publicado</dd>
+            <dd>{text(presentation.review_label, 'Publicado')}</dd>
           </div>
           <div>
             <dt>Publicado</dt>
@@ -374,8 +398,7 @@ function PrototypeModule({ roadmap }: { roadmap: Roadmap | null }) {
           Abrir protótipo em nova aba ↗
         </a>
         <p className="prototype-note">
-          Somente visualização. Os ajustes que você quiser pedir entram pelo
-          Editor, quando liberado para o projeto.
+          {text(presentation.editor_lock_reason, 'Somente visualização. Os ajustes que você quiser pedir entram pelo Editor, quando liberado para o projeto.')}
         </p>
         <div className="mascot-note">
           <img src="/mascote-cliente.png" alt="" />
@@ -526,13 +549,12 @@ function DashboardModule({
     return (
       <LockedState title="Editor">
         <p>
-          O Editor é liberado quando a primeira versão do seu projeto fica
-          pronta.
+          {text(projectPresentation(data.roadmap).editor_lock_reason, 'O Editor é liberado quando a primeira versão do seu projeto fica pronta.')}
         </p>
-        <p>
+        {!projectPresentation(data.roadmap).editor_lock_reason ? <p>
           Você poderá testar textos, cores, logos e ajustes visuais antes de nos
           enviar suas preferências para a próxima versão.
-        </p>
+        </p> : null}
       </LockedState>
     )
   }
@@ -779,9 +801,9 @@ export function ClientDashboardPage({ module, previewData }: ClientDashboardPage
     <main className={`client-dashboard module-${module}`} data-theme={theme}>
       <div className="brand-stripe" />
       <aside className="client-sidebar">
-        <Link to="/p/projetos" aria-label="Voltar aos projetos">
-          <ClientBrand agency={data.agency} theme={theme} />
-        </Link>
+        {projectPresentation(data.roadmap).hide_project_navigation === true
+          ? <ClientBrand agency={data.agency} theme={theme} />
+          : <Link to="/p/projetos" aria-label="Voltar aos projetos"><ClientBrand agency={data.agency} theme={theme} /></Link>}
         <p className="sidebar-label">Projeto</p>
         <strong className="sidebar-project-name">{shell.project_name}</strong>
         <ProjectNavigation
@@ -795,7 +817,7 @@ export function ClientDashboardPage({ module, previewData }: ClientDashboardPage
             <p>Tecnologia e desenvolvimento</p>
             <img src={theme === 'light' ? '/no-tech-stack-tinta-ponto-ambar.svg' : '/no-tech-stack-branca-ponto-ambar.svg'} alt="nó tech stack" />
           </div>
-          <Link to="/p/projetos">← Meus projetos</Link>
+          {projectPresentation(data.roadmap).hide_project_navigation !== true ? <Link to="/p/projetos">← Meus projetos</Link> : null}
           <div className="theme-switch" role="group" aria-label="Tema do painel">
             <button
               type="button"
@@ -830,10 +852,9 @@ export function ClientDashboardPage({ module, previewData }: ClientDashboardPage
               <div className="home-hero-art" role="img" aria-label="Mascotes da Nó transformando uma ideia em um sistema" />
               <div className="project-hero-copy">
                 <p className="hero-kicker">01 · Como funciona</p>
-                <h2>Da ideia a um sistema real, sem complicação.</h2>
+                <h2>{text(projectPresentation(data.roadmap).hero_title, 'Da ideia a um sistema real, sem complicação.')}</h2>
                 <p className="hero-description">
-                  Um processo organizado, com tecnologia moderna e suporte da nossa equipe,
-                  para você tirar sua ideia do papel e colocar no ar em 30 ou 45 dias.
+                  {text(projectPresentation(data.roadmap).hero_description, 'Um processo organizado, com tecnologia moderna e suporte da nossa equipe, para você tirar sua ideia do papel e colocar no ar em 30 ou 45 dias.')}
                 </p>
                 <div className="hero-actions">
                   <Link
