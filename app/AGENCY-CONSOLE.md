@@ -102,3 +102,17 @@ As skills `no-criar-agencia` e `no-criar-cliente` estão versionadas em `.agents
 na raiz do repo e instaladas também em `C:/Users/lucca/.codex/skills/` nesta máquina.
 Ao atualizá-las, mantenha as cópias sincronizadas. Elas documentam deduplicação, permissões,
 carteira inicialmente vazia e herança da marca da agência pelo projeto.
+
+## Reformulação do detalhe (23/09/2026)
+
+O detalhe de projeto do operador AGENCY_ADMIN usa a composição da referência aprovada:
+cabeçalho escuro, indicadores, Kanban, histórico de versões e informações lado a lado.
+CSS específico em `src/agency/agency-project-detail.css`, sem mudar o painel CLIENT
+ou a carteira. Mantém três estados reais, acesso somente leitura e os prazos do PR #29.
+Não requer migration nem altera RPCs, vínculos, Auth ou RLS.
+
+A prévia local `/__preview/agencia/projeto` exige DEV +
+`VITE_AGENCY_LOCAL_PREVIEW=true`. O snapshot de tarefas vem do onboarding versionado,
+não representa consulta atual de produção e nunca é gravado no banco. Prévia e fixture
+ficam fora do build de produção. As skills versionadas e instaladas descrevem o novo
+layout, suas rotas e as verificações de onboarding.

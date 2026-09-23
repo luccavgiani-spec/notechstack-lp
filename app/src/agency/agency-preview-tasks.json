@@ -1,0 +1,212 @@
+[
+  {
+    "id": "0dcb4578-2364-40a0-806e-5bc8cbc20149",
+    "title": "Acessos ao ambiente atual (WordPress, DNS, hospedagem, e-mail)",
+    "phase": "Fase 0 · Preparação",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "697a3e06-3004-4754-81b1-4c0c779ed7e0",
+    "title": "Contrato e entrada",
+    "phase": "Fase 0 · Preparação",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "f3e41671-a65c-4fa5-8b1c-0a942fd30215",
+    "title": "Definição de stack — Next.js SSR (Vercel) + Supabase + Cloudflare R2",
+    "phase": "Fase 0 · Preparação",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "07aec48a-1829-4fd7-847c-1a978b70f445",
+    "title": "Estrutura do portal (cabeçalho, rodapé, navegação, grid da capa)",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "2ab4bc05-264a-4263-840b-91dde5d96496",
+    "title": "Modelo A — notícia padrão",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "80ba7346-c7e7-4856-8ca8-c63d2aabc9e9",
+    "title": "Modelo B — coluna / opinião",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "70326fdd-1f3a-4c27-8f0a-40afd60c1e29",
+    "title": "Modelo C — foto-reportagem",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "3d172001-50d4-42ac-8dfc-220dfa6f6970",
+    "title": "Capa por editorias",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "8b5b37df-feed-4c7a-891b-704c8b49567a",
+    "title": "Espaços de anúncio",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "4aee60fa-8e46-42e7-82f0-42b328878221",
+    "title": "LP especial — Sindicato (cara de site próprio)",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "044e7348-02d9-45c9-8904-423edc9d291c",
+    "title": "Modelo D — especial / longform",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "47a30683-48cf-46d0-87c8-30972234c985",
+    "title": "LP especial — Jornal de Bairro (cara de site próprio)",
+    "phase": "Fase 1 · Frontend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "8a01d0bb-d5ad-429c-9c7a-3ff492a0afdf",
+    "title": "Painel editorial conectado (login, rascunho, revisão e publicação)",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "44f32acb-fc2e-40d7-a682-ba1af0baa139",
+    "title": "Organização Supabase Free, banco e tabelas criados",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "9e2d5dcd-bcfd-4ff0-8876-4e293f48a1b3",
+    "title": "Portal Next.js conectado ao acervo e à busca",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "1c912fb5-42dc-4f45-8453-d7f95b2e62b4",
+    "title": "Backend do Painel da Redação (agendamento, mídia e editor rico)",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "7aa19872-5fa1-4ed8-8ad1-cfbdb9ba8b34",
+    "title": "Auditoria de conteúdo (padrão de URLs, volume de posts, amostra de 50 matérias)",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "80b364bd-67f7-49cd-843b-ff2233fc7211",
+    "title": "Backup total do WordPress (banco de dados + mídia + tema)",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "911fd339-0c2d-4da5-8be5-04f7d888b2b7",
+    "title": "Redirects 301 das URLs antigas (preservar SEO)",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "04db7537-4e67-4ac5-b98d-c9b12c829b43",
+    "title": "Script de importação do acervo do WordPress para o novo banco",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "af4ceea8-d787-4e6b-80ce-ae405d70a931",
+    "title": "Tags de anúncio DCM instaladas (SECOM · Saresp e Alfabetiza)",
+    "phase": "Fase 2 · Migração e Backup",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "d657eea0-db99-4051-83f7-14b50d8ba252",
+    "title": "Cadastro de leitores",
+    "phase": "Fase 3 · Editorial e Backend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "ffcd3ca1-a275-4a23-89c6-311544084d2b",
+    "title": "Área personalizada do leitor",
+    "phase": "Fase 3 · Editorial e Backend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "2249885b-b1ab-4e18-8151-abca8632cf95",
+    "title": "Newsletter",
+    "phase": "Fase 3 · Editorial e Backend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "adc20726-60b5-432d-80db-2eccc426c43e",
+    "title": "Avisos de notícia no navegador (push)",
+    "phase": "Fase 3 · Editorial e Backend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "1b3b2198-6413-4092-89d1-e4d55003cb33",
+    "title": "Base técnica para assinatura futura",
+    "phase": "Fase 3 · Editorial e Backend",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "30ca7ec1-f082-4dbf-854f-20461d0cc55e",
+    "title": "SEO técnico e Google Notícias",
+    "phase": "Fase 4 · Go-live",
+    "status": "concluido",
+    "date": null
+  },
+  {
+    "id": "502a6d50-392f-43fb-8b71-97faff0f5061",
+    "title": "Virada de DNS",
+    "phase": "Fase 4 · Go-live",
+    "status": "a_fazer",
+    "date": null
+  },
+  {
+    "id": "70b8d425-32ba-4ff1-844a-a6d5001db1de",
+    "title": "WordPress aposentado",
+    "phase": "Fase 4 · Go-live",
+    "status": "a_fazer",
+    "date": null
+  },
+  {
+    "id": "313f6c2a-bcd2-45c5-8530-bd4c2415822b",
+    "title": "Início dos 60 dias de suporte pós-entrega",
+    "phase": "Fase 4 · Go-live",
+    "status": "a_fazer",
+    "date": null
+  }
+]

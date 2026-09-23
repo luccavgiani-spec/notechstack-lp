@@ -86,6 +86,28 @@ Não amplie RLS nem exponha `agency_private` para disponibilizar a marca.
 Verifique a imagem e o fallback em sessão autorizada; não crie um cliente fictício
 apenas para testar a logo. A prévia local é exclusiva de desenvolvimento.
 
+
+## Detalhe do projeto no console da agência
+
+A rota de acompanhamento é `/agencia/:agencyId/projetos/:projectId`, distinta do
+painel CLIENT em `/p/:projectId/*`. O detalhe usa cabeçalho escuro com cliente,
+progresso calculado, próxima entrega, status e versão; abaixo ficam as abas de
+etapas, versões/entregas e informações, com histórico e prazos combinados.
+
+O Kanban mantém os três estados reais: `a_fazer`, `em_andamento` e `concluido`.
+O status do projeto “Em revisão” não é um quarto estado de tarefa. Não invente
+percentuais, versões publicadas, domínio, arquivos, feedbacks ou botões de edição
+para reproduzir uma referência visual. A agência acompanha em modo somente leitura.
+Preserve `startedOn`, `deliveryFrom`, `deliveryTo`, `deliveryNote` e `reviewLabel`;
+“versão final em análise” não equivale a uma versão publicada.
+
+Valide carteira → detalhe → histórico/informações → voltar aos clientes, em desktop
+e celular, com sessão AGENCY_ADMIN. Confira estados vazios e projetos inacessíveis.
+A prévia `/__preview/agencia/projeto` só existe em desenvolvimento com
+`VITE_AGENCY_LOCAL_PREVIEW=true`; usa snapshot local do onboarding sem escrever no
+banco e não comprova o estado atual nem o isolamento de produção. Não use como seed.
+Leia `app/src/agency/AgencyConsolePage.tsx` e `agency-project-detail.css` para o layout.
+
 ## Resultado
 
 Informe nome/slug, ambiente, e-mail, URL real do console, projetos vinculados (ou nenhum) e o
