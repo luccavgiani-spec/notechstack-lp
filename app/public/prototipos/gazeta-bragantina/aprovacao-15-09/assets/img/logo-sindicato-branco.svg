@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 96" width="640" height="96">
+<circle cx="42" cy="48" r="34" fill="none" stroke="#8FBFF0" stroke-width="6"/>
+<path d="M26 52c6-12 26-12 32 0M42 30v10" stroke="#8FBFF0" stroke-width="6" stroke-linecap="round" fill="none"/>
+<text x="94" y="44" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="1.2" fill="#FFFFFF">SINDICATO DOS</text>
+<text x="94" y="80" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30" font-weight="400" letter-spacing="4.4" fill="#FFFFFF">TRABALHADORES</text>
+</svg>

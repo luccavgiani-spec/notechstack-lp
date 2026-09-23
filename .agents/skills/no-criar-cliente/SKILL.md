@@ -95,11 +95,56 @@ Sem logo ou com falha de imagem, o topo deve mostrar o nome da agência. Valide 
 com sessão autorizada, inclusive o rodapé nó; a RPC não pode revelar a marca de projetos
 inacessíveis. Vínculos distintos de projetos do mesmo cliente podem produzir marcas distintas.
 
+## Conteúdo no dashboard existente
+
+Use o mesmo `ClientDashboardPage` dos demais clientes. O HTML recebido é conteúdo
+navegável da aba Protótipo, não um substituto do layout do aplicativo.
+
+- **Etapas:** importe as fases, tarefas, estados e observações reais. Preserve ressalvas
+  como “código concluído, ativação pendente”; não trate progresso como publicação em produção.
+  Em `next_steps.presentation`, `phase_mode=source` preserva as fases originais;
+  `next_steps.task_details` guarda observações por UUID do item de Kanban.
+- **Stack:** extraia dos documentos e código do cliente. `stack.architecture` configura
+  título, descrição, inputs, core, services e legenda no fluxograma existente. Cada nó
+  usa `id`, `brand`, `title`, `tool`, `detail`, `href`. Diferencie serviços ativos de
+  integrações previstas; não reutilize a stack de outro cliente.
+- **Proposta aprovada:** confirme a opção fechada. O comparativo em
+  `presentation.scope_options` usa `label`, `selected` e `features`, com
+  `infrastructure_title` e `scope_note`. Em painel de agência que pode ser repassado
+  ao cliente final, confirme a política comercial antes de expor valores ou margens.
+  Se pediu apenas escopo, não envie preços ao payload do cliente nem publique o PDF comercial.
+- **Datas:** registre início e janela acordada em `started_on`, `delivery_from`,
+  `delivery_to`, `delivery_note`. Calcule semanas desde a data inicial explicitada;
+  não distribua datas fictícias pelas tarefas. O console de agência também deve mostrar
+  a janela: confira a projeção autorizada de `get_agency_overview` e a migration
+  `20260923203346_agency_project_schedule.sql`.
+- **Revisão final:** mantenha `modules.editor=bloqueado` quando solicitado, mesmo com
+  Protótipo ativo. Use `review_label`, `review_description`, `prototype_title` e
+  `editor_lock_reason` para explicar o estado real; não simule versão publicada.
+- **Projeto único:** quando solicitado, `hide_project_navigation=true` retira “Meus
+  projetos” e o link da marca. Reavalie essa configuração se liberar outro projeto.
+
+Copie o pacote de aprovação completo para uma subpasta versionada de
+`app/public/prototipos/`, preservando links relativos, scripts, imagens e fontes.
+Não copie `.env`, credenciais, backups ou metadados privados. Use `prototype_url`
+com caminho HTTP estável, nunca caminho do computador. Confira navegação dentro do
+iframe e em nova aba. Preserve assets em rewrites de SPA (incluindo `/agencies/`);
+HTTP 200 só vale para imagem quando o Content-Type também está correto.
+
+Confira o contrato implementado em `app/src/client-dashboard/project-presentation.ts`
+e os consumidores antes de gravar JSON. O onboarding da Gazeta em `app/onboarding/`
+é referência de formato, não seed para outros clientes; não reutilize seus UUIDs,
+contato, prazo ou escopo. Sincronize a cópia instalada em
+`C:/Users/lucca/.codex/skills/no-criar-cliente/SKILL.md` ao atualizar esta skill.
+
 ## Conferência final
 
 Reconsulte cliente/projeto e vínculos. Com sessão da agência, confirme que o projeto aparece
 em `get_agency_overview` e abre no console. Se liberou login final, valide também a sessão
-CLIENT e módulos autorizados. Consultar tudo com service_role não comprova isolamento.
+CLIENT e módulos autorizados. Verifique que o cliente só lista seus projetos e que o
+Editor bloqueado não fornece configuração. Valide também carteira, detalhe, filtros,
+versões e datas com sessão AGENCY_ADMIN. Conta local não comprova acesso em produção.
+Consultar tudo com service_role não comprova isolamento.
 Sem credencial/sessão para teste de login, informe essa limitação, não finja validação.
 
 Entregue cliente, projeto, agência, ambiente, links e estado do acesso. Informe o que foi

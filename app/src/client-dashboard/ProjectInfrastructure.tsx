@@ -1,18 +1,24 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import type { Architecture, ArchitectureNode } from './project-presentation'
 import { DEFAULT_SCENARIO, estimateInfrastructure, money, quantity, type CostScenario } from './infrastructure-costs'
 
-const inputs = [
+const defaultInputs = [
   { id: 'react', brand: 'react', title: 'Interface do site e hub', tool: 'React', detail: 'Páginas e componentes', href: 'https://react.dev' },
   { id: 'vite', brand: 'vite', title: 'Build e publicação', tool: 'Vite', detail: 'Compilação do projeto', href: 'https://vite.dev' },
   { id: 'whatsapp', brand: 'whatsapp', title: 'Contato com a clínica', tool: 'WhatsApp', detail: 'Link direto de atendimento', href: 'https://www.whatsapp.com' },
 ]
-const services = [
+const defaultServices = [
   { id: 'database', brand: 'supabase', title: 'Banco de dados', tool: 'Supabase', detail: 'Dados do hub · PostgreSQL', href: 'https://supabase.com/database' },
   { id: 'auth', brand: 'supabase', title: 'Autenticação', tool: 'Supabase Auth', detail: 'Login e controle de acesso', href: 'https://supabase.com/auth' },
   { id: 'storage', brand: 'supabase', title: 'Armazenamento', tool: 'Supabase Storage', detail: 'Arquivos e documentos', href: 'https://supabase.com/storage' },
 ]
 
-export function ProjectArchitecture() {
+const defaultCore = { id: 'core', brand: 'vercel', title: 'Seu sistema na nuvem', tool: 'Vercel', detail: 'Hospedagem · HTTPS · CDN', href: 'https://vercel.com' }
+
+export function ProjectArchitecture({ architecture }: { architecture?: Architecture | null }) {
+  const inputs = architecture?.inputs ?? defaultInputs
+  const services = architecture?.services ?? defaultServices
+  const core = architecture?.core ?? defaultCore
   const container = useRef<HTMLDivElement>(null)
   const [paths, setPaths] = useState<string[]>([])
   const marker = useId().replace(/:/g, '')
@@ -32,11 +38,11 @@ export function ProjectArchitecture() {
         setPaths([
           ...inputs.map((node, index) => {
             const rect = root.querySelector(`[data-flow-node="${node.id}"]`)!.getBoundingClientRect()
-            return curve(rect.right - box.left, rect.top + rect.height / 2 - box.top, core.left - box.left - 2, core.top + core.height * (index + 1) / 4 - box.top)
+            return curve(rect.right - box.left, rect.top + rect.height / 2 - box.top, core.left - box.left - 2, core.top + core.height * (index + 1) / (inputs.length + 1) - box.top)
           }),
           ...services.map((node, index) => {
             const rect = root.querySelector(`[data-flow-node="${node.id}"]`)!.getBoundingClientRect()
-            return curve(core.right - box.left, core.top + core.height * (index + 1) / 4 - box.top, rect.left - box.left - 2, rect.top + rect.height / 2 - box.top)
+            return curve(core.right - box.left, core.top + core.height * (index + 1) / (services.length + 1) - box.top, rect.left - box.left - 2, rect.top + rect.height / 2 - box.top)
           }),
         ])
       })
@@ -47,25 +53,25 @@ export function ProjectArchitecture() {
     window.addEventListener('resize', measure)
     measure()
     return () => { observer?.disconnect(); window.removeEventListener('resize', measure); cancelAnimationFrame(frame) }
-  }, [])
+  }, [inputs, services])
 
-  const card = (node: typeof inputs[number]) => (
+  const card = (node: ArchitectureNode) => (
     <a className="infra-node" data-flow-node={node.id} key={node.id} href={node.href} target="_blank" rel="noreferrer">
-      <span className={`tool-logo brand-${node.brand}`}><img src={`/icons/brands/${node.brand}.svg`} alt="" /></span>
+      <span className={`tool-logo brand-${node.brand}`}>{node.brand ? <img src={`/icons/brands/${node.brand}.svg`} alt="" /> : <b aria-hidden="true">{node.tool.slice(0, 2)}</b>}</span>
       <div><strong>{node.title}</strong><span className="infra-tool">{node.tool} <span aria-hidden="true">↗</span></span><small>{node.detail}</small></div>
     </a>
   )
   return <section className="overview-architecture">
-    <header className="overview-section-heading"><p className="eyebrow">Stack e arquitetura</p><h2>Tecnologia moderna e integrada.</h2><p>A estrutura do Espaço Saúde Mental: site, hub interno e contato com a clínica. Clique nas ferramentas para conhecê-las.</p></header>
+    <header className="overview-section-heading"><p className="eyebrow">Stack e arquitetura</p><h2>{architecture?.title ?? 'Tecnologia moderna e integrada.'}</h2><p>{architecture?.description ?? 'A estrutura do Espaço Saúde Mental: site, hub interno e contato com a clínica. Clique nas ferramentas para conhecê-las.'}</p></header>
     <div className="infra-scroll" role="region" aria-label="Fluxograma da stack; role horizontalmente em telas pequenas" tabIndex={0}>
       <div className="infra-flow" ref={container}>
         <svg className="infra-connectors" aria-hidden="true"><defs><marker id={marker} markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1 L7 4 L1 7" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></marker></defs>{paths.map((path, index) => <path key={index} d={path} fill="none" stroke="currentColor" strokeWidth="1.7" markerEnd={`url(#${marker})`} />)}</svg>
         <div className="infra-column">{inputs.map(card)}</div>
-        <a className="infra-hub" data-flow-node="core" href="https://vercel.com" target="_blank" rel="noreferrer"><img src="/icons/brands/vercel.svg" alt="" /><strong>Seu sistema<br />na nuvem</strong><span>Vercel ↗</span><small>Hospedagem · HTTPS · CDN</small></a>
+        <a className="infra-hub" data-flow-node="core" href={core.href} target="_blank" rel="noreferrer">{core.brand ? <img src={`/icons/brands/${core.brand}.svg`} alt="" /> : null}<strong>{core.title}</strong><span>{core.tool} ↗</span><small>{core.detail}</small></a>
         <div className="infra-column">{services.map(card)}</div>
       </div>
     </div>
-    <p className="infra-caption">Site em React + Vite · Hub com Supabase · Publicação na Vercel. O preview da V1 exibe apenas a página pública.</p>
+    <p className="infra-caption">{architecture?.caption ?? 'Site em React + Vite · Hub com Supabase · Publicação na Vercel. O preview da V1 exibe apenas a página pública.'}</p>
   </section>
 }
 

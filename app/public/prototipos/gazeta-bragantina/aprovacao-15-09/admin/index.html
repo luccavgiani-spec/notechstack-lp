@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel da Redação | Gazeta Bragantina</title>
+<meta name="description" content="Painel administrativo da Gazeta Bragantina — demonstração navegável, sem backend.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16161A">
+<link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..800;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..700&display=swap">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="assets/admin.css">
+</head>
+<body>
+
+<!-- =====================================================================
+     LOGIN (demo) — a autenticação real (Supabase Auth) entra na fase
+     backend; aqui o login serve para demonstrar papéis e permissões.
+     ===================================================================== -->
+<div class="login" id="vista-login" hidden>
+  <div class="login__cartao">
+    <img class="login__logo" src="../assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34">
+    <h1 class="login__titulo">Painel da Redação</h1>
+    <p class="login__sub">Entre com o seu usuário para escrever, revisar e publicar.</p>
+    <div class="login__usuarios" id="login-usuarios"></div>
+    <label class="campo">
+      <span class="campo__rotulo">Senha</span>
+      <input type="password" id="login-senha" class="campo__controle" placeholder="qualquer senha (demonstração)" autocomplete="off">
+    </label>
+    <button type="button" class="btn btn--primario btn--largo" id="login-entrar">Entrar</button>
+    <p class="login__demo">Demonstração navegável — sem servidor. Papéis e permissões são reais na interface; a autenticação de verdade entra com o Supabase Auth.</p>
+  </div>
+</div>
+
+<!-- =====================================================================
+     SHELL DO PAINEL
+     ===================================================================== -->
+<div class="app" id="app" hidden>
+
+  <aside class="sidebar" id="sidebar">
+    <a class="sidebar__logo" href="#/inicio">
+      <img src="../assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34">
+      <span class="sidebar__logo-sub">Painel da Redação</span>
+    </a>
+
+    <nav class="sidebar__nav" id="nav-principal" aria-label="Seções do painel"></nav>
+
+    <div class="sidebar__rodape">
+      <a class="sidebar__ver-site" href="../index.html" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></svg>
+        Ver o site
+      </a>
+      <div class="sidebar__usuario" id="sidebar-usuario"></div>
+      <p class="sidebar__demo">DEMO · sem backend<br>estado salvo neste navegador</p>
+    </div>
+  </aside>
+
+  <div class="principal">
+    <header class="topo-vista" id="topo-vista"></header>
+    <main class="vista" id="vista" tabindex="-1"></main>
+  </div>
+
+</div>
+
+<!-- Modal genérico -->
+<div class="modal" id="modal" hidden>
+  <div class="modal__fundo" data-modal-fecha></div>
+  <div class="modal__caixa" role="dialog" aria-modal="true" id="modal-caixa"></div>
+</div>
+
+<!-- Pré-visualização -->
+<div class="preview" id="preview" hidden>
+  <div class="preview__topo">
+    <div class="preview__esq">
+      <span class="preview__selo">Pré-visualização</span>
+      <span class="preview__nota">nada foi publicado ainda</span>
+    </div>
+    <div class="preview__viewports" id="preview-viewports">
+      <button type="button" class="preview__vp" data-vp="375">Celular</button>
+      <button type="button" class="preview__vp" data-vp="768">Tablet</button>
+      <button type="button" class="preview__vp esta-ativo" data-vp="1280">Computador</button>
+    </div>
+    <div class="preview__dir">
+      <button type="button" class="btn" id="preview-fechar">Voltar a editar</button>
+      <button type="button" class="btn btn--primario" id="preview-publicar">Publicar</button>
+    </div>
+  </div>
+  <div class="preview__palco">
+    <div class="preview__janela" id="preview-janela">
+      <iframe id="preview-iframe" title="Pré-visualização da matéria"></iframe>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<input type="file" id="arquivo-imagem" accept="image/*" hidden>
+<input type="file" id="arquivo-texto" accept=".txt,.md,.doc,.docx,.pdf" hidden>
+<input type="file" id="arquivo-backup" accept="application/json" hidden>
+
+<script src="assets/admin.js"></script>
+<script src="assets/admin-vistas.js"></script>
+<script src="assets/admin-editor.js"></script>
+<script src="../assets/js/logo-opcoes.js"></script>
+</body>
+</html>

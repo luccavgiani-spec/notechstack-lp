@@ -1,3 +1,4 @@
+import gazeta from '../onboarding/gazeta-bragantina.json'
 import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -338,5 +339,55 @@ describe('dashboard do cliente', () => {
     renderDashboard('etapas', dashboardData({ kanban: [] }))
     expect(await screen.findByText('As etapas entram aqui assim que o plano de execução for organizado.')).toBeVisible()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+})
+
+
+describe('Gazeta: conteúdo específico e revisão final', () => {
+  function gazetaData(): DashboardData {
+    const base = dashboardData()
+    return {
+      ...base,
+      roadmap: { ...gazeta.roadmap, published_at: '2026-09-23T20:00:00Z' },
+      kanban: gazeta.tasks.map((item) => ({ ...item, status: item.status as KanbanItem['status'], macro_version: null, scheduled_date: null })),
+    }
+  }
+  it('mostra a stack editorial e as ativações pendentes sem a simulação da clínica', async () => {
+    mocks.loadClientDashboard.mockResolvedValue(gazetaData())
+    renderDashboardRoute('como_funciona')
+    expect(await screen.findByText('A tecnologia por trás da Gazeta.')).toBeInTheDocument()
+    expect(screen.getByText('Next.js + React')).toBeInTheDocument()
+    expect(screen.getByText('Cloudflare R2')).toBeInTheDocument()
+    expect(screen.getByText('Código pronto · chave e domínio pendentes')).toBeInTheDocument()
+    expect(screen.queryByText(/stack da clínica/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Três profundidades para a mesma base.')).not.toBeInTheDocument()
+  })
+  it('preserva as cinco fases, os 30 itens e as ressalvas do roadmap', async () => {
+    mocks.loadClientDashboard.mockResolvedValue(gazetaData())
+    renderDashboardRoute('etapas')
+    expect(await screen.findByText('90% concluído')).toBeInTheDocument()
+    expect(screen.getByText('22/07/2026')).toBeInTheDocument()
+    expect(screen.getByText('09/09/2026 a 23/09/2026')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /Meus projetos/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Voltar aos projetos' })).not.toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Etapa 1: Fase 0 · Preparação' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Etapa 5: Fase 4 · Go-live' })).toBeInTheDocument()
+    expect(screen.getByText(/27 de 30 itens entregues/)).toBeInTheDocument()
+    expect(screen.getAllByText(/Ainda falta transpor a experiência visual completa/).length).toBeGreaterThan(0)
+    expect(screen.queryByText('Roadmap do projeto publicado')).not.toBeInTheDocument()
+  })
+  it('explica o bloqueio final sem carregar o Editor', async () => {
+    mocks.loadClientDashboard.mockResolvedValue(gazetaData())
+    renderDashboardRoute('editor')
+    expect(await screen.findByText(gazeta.roadmap.next_steps.presentation.editor_lock_reason)).toBeInTheDocument()
+    expect(screen.queryByText(/O Editor é liberado quando/)).not.toBeInTheDocument()
+    expect(document.querySelector('iframe')).toBeNull()
+  })
+  it('mantém o pacote de aprovação navegável independente do bloqueio do Editor', async () => {
+    mocks.loadClientDashboard.mockResolvedValue(gazetaData())
+    renderDashboardRoute('prototipo')
+    expect(await screen.findByTitle('Protótipo navegável do projeto')).toHaveAttribute('src', gazeta.roadmap.prototype_url)
+    expect(screen.getByText('Versão final em análise')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Abrir protótipo em nova aba ↗' })).toHaveAttribute('href', gazeta.roadmap.prototype_url)
   })
 })

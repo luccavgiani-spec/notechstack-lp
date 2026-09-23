@@ -1,0 +1,1470 @@
+/* ==========================================================================
+   GAZETA BRAGANTINA · artigo.css
+   Corpo de materia + os 4 modelos:
+     A. padrao   (.materia)
+     B. coluna   (.coluna)
+     C. foto     (.foto-reportagem)
+     D. especial (.especial)
+   ========================================================================== */
+
+/* ==========================================================================
+   1. CABECALHO DA MATERIA
+   ========================================================================== */
+.materia {
+  padding-block: var(--e-8) var(--e-10);
+}
+
+.materia__cabeca {
+  max-width: var(--medida);
+  display: grid;
+  gap: var(--e-4);
+}
+
+.materia__titulo {
+  font-size: var(--fs-titulo-materia);
+  line-height: var(--lh-titulo-materia);
+  margin-top: var(--e-1);
+}
+
+.materia__linha-fina {
+  font-size: var(--fs-linha-fina);
+  line-height: 1.4;
+  color: var(--cor-tinta-2);
+  font-weight: 400;
+}
+
+/* --- Byline + dateline + datas ------------------------------------------- */
+.byline {
+  display: flex;
+  align-items: center;
+  gap: var(--e-4);
+  padding-top: var(--e-2);
+}
+
+.byline__foto {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex: none;
+  object-fit: cover;
+}
+
+.byline__texto {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  line-height: 1.55;
+  color: var(--cor-tinta-2);
+}
+
+.byline__autor {
+  color: var(--cor-tinta);
+  font-weight: 700;
+}
+
+.byline__autor:hover {
+  text-decoration: underline;
+}
+
+.dateline {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+  font-size: var(--fs-200);
+}
+
+.byline__datas {
+  display: block;
+  color: var(--cor-tinta-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.tempo-leitura {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-1);
+}
+
+.tempo-leitura svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ==========================================================================
+   2. SHAREBAR — WhatsApp em primeiro (§2.5)
+   ========================================================================== */
+.sharebar {
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  flex-wrap: wrap;
+  padding-block: var(--e-4);
+  border-block: 1px solid var(--cor-fio);
+}
+
+.sharebar__rotulo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-tinta-3);
+  margin-right: var(--e-2);
+}
+
+.share-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-2) var(--e-4);
+  border: 1px solid var(--cor-fio-forte);
+  border-radius: var(--raio);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-weight: 600;
+  color: var(--cor-tinta-2);
+  transition: all var(--dur-rapida) var(--easing);
+}
+
+.share-botao:hover {
+  border-color: var(--cor-tinta);
+  color: var(--cor-tinta);
+  background: var(--cor-superficie);
+}
+
+.share-botao svg {
+  width: 16px;
+  height: 16px;
+}
+
+.share-botao--whatsapp {
+  background: #128c7e;
+  border-color: #128c7e;
+  color: #ffffff;
+}
+
+.share-botao--whatsapp:hover {
+  background: #0d6d62;
+  border-color: #0d6d62;
+  color: #ffffff;
+}
+
+.share-botao--icone {
+  padding-inline: var(--e-3);
+}
+
+/* Barra fixa inferior no mobile (§3.3) */
+.sharebar-fixa {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-2) var(--e-3);
+  background: var(--cor-fundo);
+  border-top: 1px solid var(--cor-fio);
+  box-shadow: 0 -2px 12px rgba(22, 22, 26, 0.07);
+}
+
+.sharebar-fixa .share-botao--whatsapp {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .sharebar-fixa {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   3. FIGURA, LEGENDA E CREDITO
+   ========================================================================== */
+.figura {
+  margin-block: var(--e-8);
+}
+
+.figura__midia {
+  overflow: hidden;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.figura__midia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.figura__legenda {
+  margin-top: var(--e-3);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  line-height: 1.5;
+  color: var(--cor-tinta-2);
+  max-width: var(--medida);
+}
+
+.figura__credito {
+  display: block;
+  margin-top: var(--e-1);
+  font-size: var(--fs-100);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-tinta-3);
+}
+
+/* A imagem de capa extrapola a medida do texto (960px, §3.3) */
+.figura--capa {
+  max-width: 960px;
+  margin-top: var(--e-6);
+}
+
+@media (max-width: 767px) {
+  .figura--capa {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    max-width: 100vw;
+  }
+
+  .figura--capa .figura__midia {
+    border-radius: 0;
+  }
+
+  .figura--capa .figura__legenda {
+    padding-inline: var(--gutter);
+  }
+}
+
+/* ==========================================================================
+   4. CORPO — renderizador de blocos (§2.5)
+   ========================================================================== */
+.corpo {
+  max-width: var(--medida);
+  font-size: var(--fs-corpo);
+  line-height: var(--lh-corpo);
+}
+
+.corpo > * + * {
+  margin-top: var(--e-6);
+}
+
+.corpo p {
+  /* sem hyphens: auto — portal brasileiro nao hifeniza (ver NOTAS.md) */
+  text-wrap: pretty;
+}
+
+.corpo a:not(.card__link):not(.botao) {
+  color: var(--cor-acao);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+
+.corpo a:not(.card__link):not(.botao):hover {
+  text-decoration-thickness: 2px;
+}
+
+.corpo strong {
+  font-weight: 700;
+}
+
+/* --- intertitulo --------------------------------------------------------- */
+.corpo h2 {
+  font-size: var(--fs-800);
+  line-height: 1.22;
+  margin-top: var(--e-10);
+}
+
+.corpo h3 {
+  font-size: var(--fs-700);
+  line-height: 1.25;
+  margin-top: var(--e-8);
+}
+
+/* --- listas -------------------------------------------------------------- */
+.corpo ul.lista-texto,
+.corpo ol.lista-texto {
+  display: grid;
+  gap: var(--e-3);
+  padding-left: var(--e-6);
+}
+
+.corpo ul.lista-texto {
+  list-style: disc;
+}
+
+.corpo ol.lista-texto {
+  list-style: decimal;
+}
+
+.corpo li::marker {
+  color: var(--cor-editoria);
+}
+
+/* --- citacao ------------------------------------------------------------- */
+.citacao {
+  border-left: 4px solid var(--cor-editoria);
+  padding-left: var(--e-6);
+  font-size: var(--fs-800);
+  line-height: 1.35;
+  font-style: italic;
+  color: var(--cor-tinta);
+}
+
+.citacao footer {
+  margin-top: var(--e-3);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-style: normal;
+  color: var(--cor-tinta-3);
+}
+
+/* --- caixa de destaque --------------------------------------------------- */
+.caixa-destaque {
+  background: var(--cor-superficie);
+  border-radius: var(--raio-grande);
+  padding: var(--e-6);
+  font-size: var(--fs-500);
+  line-height: 1.55;
+}
+
+.caixa-destaque__titulo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+  margin-bottom: var(--e-3);
+}
+
+/* --- ficha tecnica de servico (muito usada em jornal local) --------------- */
+.ficha-servico {
+  border: 1px solid var(--cor-fio);
+  border-top: 4px solid var(--cor-editoria);
+  border-radius: var(--raio);
+  padding: var(--e-6);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-400);
+}
+
+.ficha-servico__titulo {
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+  margin-bottom: var(--e-4);
+}
+
+.ficha-servico dl {
+  display: grid;
+  gap: var(--e-3) var(--e-5);
+}
+
+.ficha-servico dt {
+  font-weight: 700;
+  font-size: var(--fs-300);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cor-tinta-3);
+}
+
+.ficha-servico dd {
+  margin: 0;
+  color: var(--cor-tinta);
+}
+
+@media (min-width: 480px) {
+  .ficha-servico dl {
+    grid-template-columns: minmax(110px, auto) minmax(0, 1fr);
+  }
+
+  .ficha-servico dt {
+    grid-column: 1;
+  }
+
+  .ficha-servico dd {
+    grid-column: 2;
+  }
+}
+
+/* --- leia tambem (dentro do texto) --------------------------------------- */
+.leia-tambem {
+  border-block: 1px solid var(--cor-fio);
+  padding-block: var(--e-5);
+  display: grid;
+  gap: var(--e-3);
+}
+
+.leia-tambem__rotulo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+}
+
+/* --- facade de embed (§6.5): so carrega o script no clique --------------- */
+.embed-facade {
+  position: relative;
+  display: block;
+  width: 100%;
+  border-radius: var(--raio);
+  overflow: hidden;
+  background: var(--cor-tinta);
+}
+
+.embed-facade img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.62;
+}
+
+.embed-facade__play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: var(--e-3);
+  align-content: center;
+  color: var(--cor-inverso);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  text-align: center;
+  padding: var(--e-4);
+}
+
+.embed-facade__play span[aria-hidden] {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--cor-tinta);
+}
+
+.embed-facade__play svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* --- anuncio no corpo ---------------------------------------------------- */
+.corpo .ad-bloco {
+  margin-block: var(--e-10);
+}
+
+/* --- separador ----------------------------------------------------------- */
+.separador-texto {
+  display: block;
+  text-align: center;
+  letter-spacing: 0.6em;
+  color: var(--cor-fio-forte);
+  margin-block: var(--e-10);
+}
+
+/* ==========================================================================
+   5. PES DA MATERIA — tags, autor, correcao, relacionadas
+   ========================================================================== */
+.materia__rodape {
+  max-width: var(--medida);
+  display: grid;
+  gap: var(--e-8);
+  margin-top: var(--e-10);
+}
+
+.autor-box {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: var(--e-5);
+  padding: var(--e-6);
+  background: var(--cor-superficie);
+  border-radius: var(--raio-grande);
+}
+
+.autor-box img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.autor-box__nome {
+  font-family: var(--fonte-titulo);
+  font-size: var(--fs-600);
+}
+
+.autor-box__cargo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-tinta-3);
+  margin-top: var(--e-1);
+}
+
+.autor-box__bio {
+  margin-top: var(--e-3);
+  font-size: var(--fs-400);
+  line-height: 1.55;
+  color: var(--cor-tinta-2);
+}
+
+.autor-box__link {
+  display: inline-block;
+  margin-top: var(--e-3);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-weight: 600;
+  color: var(--cor-editoria);
+}
+
+.autor-box__link:hover {
+  text-decoration: underline;
+}
+
+.nota-correcao {
+  border: 1px solid var(--cor-fio-forte);
+  border-left: 4px solid var(--cor-plantao);
+  border-radius: var(--raio);
+  padding: var(--e-5);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  line-height: 1.6;
+  color: var(--cor-tinta-2);
+}
+
+.nota-correcao strong {
+  display: block;
+  color: var(--cor-plantao);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-chapeu);
+  font-size: var(--fs-200);
+  margin-bottom: var(--e-2);
+}
+
+.proxima-materia {
+  display: grid;
+  gap: var(--e-2);
+  border-top: 3px solid var(--cor-editoria);
+  padding-top: var(--e-4);
+}
+
+.proxima-materia__rotulo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+}
+
+.proxima-materia__titulo {
+  font-size: var(--fs-700);
+  line-height: 1.25;
+}
+
+.proxima-materia a:hover .proxima-materia__titulo {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   6. MODELO B — COLUNA / OPINIAO (§3.4)
+   Nada aqui e "outro site": e um modelo de materia. Fundo diferenciado,
+   selo explicito e a foto do colunista no lugar da imagem de capa.
+   ========================================================================== */
+[data-modelo="coluna"] body,
+body[data-modelo="coluna"] {
+  background: var(--cor-fundo-opiniao);
+}
+
+.coluna {
+  padding-block: var(--e-8) var(--e-10);
+}
+
+.coluna__cabeca {
+  max-width: var(--medida-coluna);
+  display: grid;
+  gap: var(--e-5);
+}
+
+.selo-opiniao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  align-self: start;
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cor-inverso);
+  background: var(--cor-editoria);
+  padding: var(--e-2) var(--e-4);
+  border-radius: var(--raio);
+}
+
+.colunista-cartao {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: var(--e-5);
+  align-items: center;
+}
+
+.colunista-cartao img {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.colunista-cartao__nome {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-500);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.colunista-cartao__sobre {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  color: var(--cor-tinta-2);
+  margin-top: var(--e-1);
+}
+
+.colunista-cartao__link {
+  display: inline-block;
+  margin-top: var(--e-2);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-weight: 600;
+  color: var(--cor-editoria);
+}
+
+.colunista-cartao__link:hover {
+  text-decoration: underline;
+}
+
+.coluna__titulo {
+  font-size: clamp(1.75rem, 1.1rem + 2.4vw, 2.375rem); /* 28 -> 38 */
+  line-height: 1.18;
+  font-style: italic;
+  font-weight: 500;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+/* fio duplo separando cabecalho e texto (§3.4) */
+.fio-duplo {
+  max-width: var(--medida-coluna);
+  border-top: 1px solid var(--cor-tinta);
+  border-bottom: 1px solid var(--cor-tinta);
+  height: 4px;
+  margin-block: var(--e-8);
+}
+
+.corpo--coluna {
+  max-width: var(--medida-coluna);
+  font-size: var(--fs-corpo-coluna);
+  line-height: var(--lh-corpo-coluna);
+}
+
+.corpo--coluna > p + p {
+  margin-top: var(--e-6);
+}
+
+/* capitular — ligavel por coluna */
+.corpo--coluna.tem-capitular > p:first-of-type::first-letter {
+  float: left;
+  font-family: var(--fonte-titulo);
+  font-size: 3.7em;
+  line-height: 0.84;
+  font-weight: 700;
+  font-style: normal;
+  padding-right: 0.07em;
+  padding-top: 0.04em;
+  color: var(--cor-editoria);
+}
+
+.corpo--coluna .citacao {
+  border-left: none;
+  padding-left: 0;
+  text-align: center;
+  font-size: var(--fs-900);
+  font-style: normal;
+  font-weight: 500;
+  max-width: 22ch;
+  margin-inline: auto;
+  margin-block: var(--e-10);
+  line-height: 1.28;
+}
+
+.faixa-colunistas {
+  display: grid;
+  gap: var(--e-6);
+  padding-block: var(--e-8);
+  border-top: 1px solid var(--cor-fio-forte);
+}
+
+@media (min-width: 768px) {
+  .faixa-colunistas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .faixa-colunistas {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================================
+   7. MODELO C — FOTO-REPORTAGEM (§3.5)
+   ========================================================================== */
+.abertura-foto {
+  position: relative;
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: var(--cor-tinta);
+}
+
+.abertura-foto__midia {
+  position: absolute;
+  inset: 0;
+}
+
+.abertura-foto__midia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.abertura-foto__texto {
+  position: relative;
+  width: 100%;
+  padding-block: var(--e-16) var(--e-8);
+  color: var(--cor-inverso);
+  background: linear-gradient(to top, rgba(8, 8, 10, 0.9) 0%, rgba(8, 8, 10, 0.55) 45%, rgba(8, 8, 10, 0) 100%);
+}
+
+.abertura-foto__titulo {
+  font-size: var(--fs-titulo-materia);
+  line-height: 1.12;
+  max-width: 20ch;
+  margin-top: var(--e-4);
+}
+
+.abertura-foto__credito {
+  margin-top: var(--e-4);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.foto-reportagem {
+  padding-block: var(--e-10);
+}
+
+.foto-reportagem .corpo {
+  max-width: var(--medida-larga);
+  font-size: var(--fs-corpo-coluna);
+}
+
+/* --- mosaico ------------------------------------------------------------- */
+.mosaico {
+  display: grid;
+  gap: var(--e-3);
+  margin-block: var(--e-8);
+}
+
+.mosaico--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mosaico--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mosaico--1 { grid-template-columns: minmax(0, 1fr); }
+
+@media (min-width: 768px) {
+  .mosaico {
+    gap: var(--e-4);
+  }
+
+  .mosaico--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.foto-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  cursor: zoom-in;
+}
+
+.foto-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-lenta) var(--easing);
+}
+
+.foto-item:hover img {
+  transform: scale(1.04);
+}
+
+.foto-item__lupa {
+  position: absolute;
+  right: var(--e-3);
+  bottom: var(--e-3);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(10, 10, 12, 0.62);
+  color: var(--cor-inverso);
+  opacity: 0;
+  transition: opacity var(--dur-media) var(--easing);
+}
+
+.foto-item:hover .foto-item__lupa,
+.foto-item:focus-visible .foto-item__lupa {
+  opacity: 1;
+}
+
+.foto-item__lupa svg {
+  width: 16px;
+  height: 16px;
+}
+
+.mosaico__legenda {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  line-height: 1.5;
+  color: var(--cor-tinta-2);
+  margin-top: calc(var(--e-4) * -1);
+  margin-bottom: var(--e-8);
+  max-width: var(--medida-larga);
+}
+
+.creditos-box {
+  background: var(--cor-superficie);
+  border-radius: var(--raio-grande);
+  padding: var(--e-6);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-400);
+  max-width: var(--medida-larga);
+}
+
+.creditos-box dl {
+  display: grid;
+  gap: var(--e-3) var(--e-5);
+}
+
+.creditos-box dt {
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-tinta-3);
+}
+
+.creditos-box dd {
+  margin: 0;
+}
+
+@media (min-width: 480px) {
+  .creditos-box dl {
+    grid-template-columns: minmax(150px, auto) minmax(0, 1fr);
+  }
+}
+
+/* --- lightbox ------------------------------------------------------------ */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-lightbox);
+  background: rgba(8, 8, 10, 0.985);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity var(--dur-media) var(--easing), visibility 0s linear var(--dur-media);
+}
+
+.lightbox.is-aberto {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.lightbox__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e-4);
+  padding: var(--e-4) var(--e-5);
+  color: var(--cor-inverso);
+}
+
+.lightbox__contador {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+
+.lightbox__acoes {
+  display: flex;
+  gap: var(--e-2);
+}
+
+.lightbox__botao {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: var(--cor-inverso);
+  background: rgba(255, 255, 255, 0.1);
+  transition: background var(--dur-rapida) var(--easing);
+}
+
+.lightbox__botao:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.lightbox__botao svg {
+  width: 19px;
+  height: 19px;
+}
+
+.lightbox__palco {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding-inline: var(--e-4);
+  touch-action: pan-y;
+  min-height: 0;
+}
+
+.lightbox__palco img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--raio);
+}
+
+.lightbox__nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--cor-inverso);
+  transition: background var(--dur-rapida) var(--easing);
+}
+
+.lightbox__nav:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.lightbox__nav svg {
+  width: 22px;
+  height: 22px;
+}
+
+.lightbox__nav--anterior { left: var(--e-3); }
+.lightbox__nav--proxima { right: var(--e-3); }
+
+.lightbox__rodape {
+  padding: var(--e-4) var(--e-6) var(--e-8);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  line-height: 1.55;
+  text-align: center;
+  max-width: 74ch;
+  margin-inline: auto;
+}
+
+.lightbox__credito {
+  display: block;
+  margin-top: var(--e-1);
+  font-size: var(--fs-100);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================================================
+   8. MODELO D — REPORTAGEM ESPECIAL (§3.6)
+   Dois efeitos de movimento no maximo: fade-in por bloco e parallax <= 8%.
+   ========================================================================== */
+.barra-progresso {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: var(--z-progresso);
+  background: transparent;
+  opacity: 0;
+  transition: opacity var(--dur-media) var(--easing);
+}
+
+.barra-progresso.is-visivel {
+  opacity: 1;
+}
+
+.barra-progresso__preenchimento {
+  height: 100%;
+  width: 0%;
+  background: var(--cor-editoria);
+  transform-origin: left center;
+}
+
+.capa-especial {
+  position: relative;
+  min-height: 85vh;
+  display: grid;
+  align-items: end;
+  overflow: hidden;
+  background: var(--cor-tinta);
+}
+
+.capa-especial__midia {
+  position: absolute;
+  inset: -8% 0;
+  will-change: transform;
+}
+
+.capa-especial__midia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.capa-especial__texto {
+  position: relative;
+  padding-block: var(--e-20) var(--e-16);
+  color: var(--cor-inverso);
+  background: linear-gradient(to top, rgba(8, 8, 10, 0.94) 0%, rgba(8, 8, 10, 0.78) 38%, rgba(8, 8, 10, 0.42) 72%, rgba(8, 8, 10, 0.18) 100%);
+}
+
+.capa-especial__titulo {
+  font-size: var(--fs-capa-especial);
+  line-height: 1.02;
+  max-width: 16ch;
+  margin-top: var(--e-5);
+}
+
+.capa-especial__linha-fina {
+  margin-top: var(--e-4);
+  font-size: var(--fs-linha-fina);
+  color: rgba(255, 255, 255, 0.86);
+  max-width: 34ch;
+}
+
+.capa-especial__creditos {
+  margin-top: var(--e-6);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.capa-especial__role {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  margin-top: var(--e-8);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.capa-especial__role svg {
+  width: 15px;
+  height: 15px;
+  animation: pisca-desce 2.2s var(--easing) infinite;
+}
+
+@keyframes pisca-desce {
+  0%, 100% { transform: translateY(0); opacity: 0.6; }
+  50% { transform: translateY(5px); opacity: 1; }
+}
+
+@media (min-width: 768px) {
+  .capa-especial {
+    min-height: 100vh;
+  }
+}
+
+/* O header do site fica oculto no inicio e reaparece fino ao rolar 1 tela.
+   Precisa ser fixo: em fluxo normal ele ficaria preso ao topo do documento,
+   ja rolado para fora quando deveria reaparecer. */
+.cabecalho-retratil {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  z-index: var(--z-topo);
+  background: var(--cor-fundo);
+  transition: transform var(--dur-media) var(--easing), opacity var(--dur-media) var(--easing);
+}
+
+.cabecalho-retratil.is-escondido {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- sumario ------------------------------------------------------------- */
+.especial-corpo {
+  padding-block: var(--e-12);
+}
+
+.sumario {
+  border: 1px solid var(--cor-fio);
+  border-top: 3px solid var(--cor-editoria);
+  border-radius: var(--raio);
+  padding: var(--e-5);
+  background: var(--cor-fundo);
+}
+
+.sumario__titulo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+  margin-bottom: var(--e-4);
+}
+
+.sumario ol {
+  display: grid;
+  gap: var(--e-3);
+  counter-reset: cap;
+}
+
+.sumario a {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: var(--e-2);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-400);
+  line-height: 1.4;
+  color: var(--cor-tinta-2);
+  counter-increment: cap;
+}
+
+.sumario a::before {
+  content: counter(cap) ".";
+  color: var(--cor-tinta-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.sumario a:hover,
+.sumario a[aria-current="true"] {
+  color: var(--cor-editoria);
+  font-weight: 600;
+}
+
+.sumario-botao {
+  position: fixed;
+  right: var(--e-4);
+  bottom: calc(var(--e-4) + env(safe-area-inset-bottom, 0px));
+  z-index: var(--z-nav);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e-2);
+  padding: var(--e-3) var(--e-5);
+  border-radius: 999px;
+  background: var(--cor-tinta);
+  color: var(--cor-inverso);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  font-weight: 600;
+  box-shadow: var(--sombra-2);
+}
+
+.sumario-botao svg {
+  width: 15px;
+  height: 15px;
+}
+
+.especial-capitulo {
+  max-width: var(--medida-especial);
+  margin-inline: auto;
+  padding-block: var(--e-10);
+  font-size: var(--fs-corpo-coluna);
+  line-height: 1.8;
+}
+
+.especial-capitulo > * + * {
+  margin-top: var(--e-6);
+}
+
+.especial-capitulo__numero {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+}
+
+.especial-capitulo__titulo {
+  font-size: var(--fs-1000);
+  line-height: 1.15;
+  margin-top: var(--e-2);
+}
+
+.citacao-especial {
+  max-width: 24ch;
+  margin-inline: auto;
+  margin-block: var(--e-16);
+  text-align: center;
+  font-size: var(--fs-1000);
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.citacao-especial footer {
+  text-wrap: balance;
+  margin-top: var(--e-5);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  color: var(--cor-tinta-3);
+  letter-spacing: 0.04em;
+}
+
+.bloco-imersivo {
+  margin-block: var(--e-16);
+  background: var(--cor-superficie);
+}
+
+.bloco-imersivo img {
+  width: 100%;
+  height: auto;
+}
+
+/* full-bleed condicional — ver NOTAS.md */
+@media (max-width: 1023px) {
+  .bloco-imersivo {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    max-width: 100vw;
+  }
+}
+
+.bloco-imersivo figcaption {
+  max-width: var(--medida-especial);
+  margin-inline: auto;
+  padding: var(--e-4) var(--gutter) var(--e-6);
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-300);
+  color: var(--cor-tinta-3);
+}
+
+.ficha-tecnica-especial {
+  max-width: var(--medida-especial);
+  margin-inline: auto;
+  border-top: 3px solid var(--cor-editoria);
+  padding-top: var(--e-6);
+  margin-top: var(--e-16);
+  font-family: var(--fonte-apoio);
+}
+
+.ficha-tecnica-especial dl {
+  display: grid;
+  gap: var(--e-3) var(--e-6);
+  font-size: var(--fs-400);
+}
+
+.ficha-tecnica-especial dt {
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-tinta-3);
+}
+
+.ficha-tecnica-especial dd {
+  margin: 0;
+}
+
+@media (min-width: 480px) {
+  .ficha-tecnica-especial dl {
+    grid-template-columns: minmax(160px, auto) minmax(0, 1fr);
+  }
+}
+
+/* --- os dois unicos efeitos de movimento --------------------------------- */
+.revelar {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--dur-lenta) var(--easing), transform var(--dur-lenta) var(--easing);
+}
+
+.revelar.is-visivel {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revelar {
+    opacity: 1;
+    transform: none;
+  }
+
+  .capa-especial__midia {
+    transform: none !important;
+    inset: 0;
+  }
+
+  .capa-especial__role svg {
+    animation: none;
+  }
+}
+
+/* Sumario sticky no desktop */
+@media (min-width: 1024px) {
+  .especial-com-sumario {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: var(--e-12);
+    align-items: start;
+  }
+
+  .especial-com-sumario .sumario {
+    position: sticky;
+    top: var(--e-10);
+  }
+
+  .sumario-botao {
+    display: none;
+  }
+
+  .especial-capitulo {
+    margin-inline: 0;
+  }
+}
+
+/* ==========================================================================
+   9. PAGINA 404
+   ========================================================================== */
+.pagina-404 {
+  padding-block: var(--e-16) var(--e-12);
+  max-width: var(--medida);
+}
+
+.pagina-404__codigo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cor-plantao);
+}
+
+.pagina-404__titulo {
+  font-size: var(--fs-titulo-materia);
+  line-height: 1.15;
+  margin-top: var(--e-3);
+}
+
+.pagina-404__texto {
+  margin-top: var(--e-4);
+  font-size: var(--fs-600);
+  line-height: 1.55;
+  color: var(--cor-tinta-2);
+}
+
+.pagina-404__url {
+  font-family: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Consolas, monospace;
+  font-size: var(--fs-300);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-fio);
+  border-radius: var(--raio);
+  padding: var(--e-2) var(--e-3);
+  display: inline-block;
+  margin-top: var(--e-4);
+  word-break: break-all;
+}
+
+.sugestoes-404 {
+  margin-top: var(--e-10);
+  border-top: 3px solid var(--cor-editoria);
+  padding-top: var(--e-5);
+}
+
+.sugestoes-404__rotulo {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  font-weight: 700;
+  letter-spacing: var(--tracking-chapeu);
+  text-transform: uppercase;
+  color: var(--cor-editoria);
+  margin-bottom: var(--e-4);
+}
+
+.sugestoes-404__lista {
+  display: grid;
+  gap: var(--e-4);
+}
+
+.sugestao-item {
+  padding-bottom: var(--e-4);
+  border-bottom: 1px solid var(--cor-fio);
+}
+
+/* O <a> e que empilha score, titulo e meta — o <li> cuida so do espacamento. */
+.sugestao-item a {
+  display: grid;
+  gap: var(--e-1);
+  justify-items: start;
+}
+
+.sugestao-item__titulo {
+  font-size: var(--fs-600);
+  line-height: 1.3;
+}
+
+.sugestao-item a:hover .sugestao-item__titulo {
+  text-decoration: underline;
+}
+
+.sugestao-item__meta {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-200);
+  color: var(--cor-tinta-3);
+}
+
+.sugestao-item__score {
+  font-family: var(--fonte-apoio);
+  font-size: var(--fs-100);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cor-sucesso);
+}

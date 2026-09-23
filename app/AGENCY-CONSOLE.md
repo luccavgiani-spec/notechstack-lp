@@ -1,5 +1,11 @@
 # Console de agências
 
+> Estado atualizado em 23/09/2026: console e branding migrados e frontend publicado
+> em produção, após autorização. Maisis vinculada à Gazeta Bragantina; projeto
+> `fa681812-5c4a-4868-bf9d-699442ec7c52`. Login CLIENT da Gazeta validado, Editor
+> bloqueado e protótipo dentro do dashboard padrão. O operador Maisis também está ativo em produção. As seções de implementação local abaixo documentam a etapa anterior.
+> Deploy: `dpl_HYVJaQQdcoLw1Q4UWZuj4NRr3VEm`. Ver `onboarding/GAZETA.md`.
+
 Implementação local em 23/09/2026, tomando como referência o console Green Marketing
 em `C:/Users/lucca/projetos/roteador/roteador-console-green` e a nota Roteador Console do vault.
 

@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gazeta Bragantina · Notícias de Bragança Paulista e região</title>
+<meta name="description" content="Notícias de Bragança Paulista e da região: cidade, política, economia, Bragantino, cultura e polícia. Protótipo de validação visual.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16161A">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..800;1,400..600&family=Libre+Franklin:ital,wght@0,400..800;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..800;1,6..72,300..700&display=swap">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/layout.css">
+<link rel="stylesheet" href="assets/css/componentes.css">
+<link rel="stylesheet" href="assets/css/artigo.css">
+</head>
+<body>
+
+<a class="pular-para-conteudo" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- ============================ TOPBAR ============================ -->
+<div class="topbar">
+  <div class="container topbar__interno">
+    <p class="topbar__data">Terça, 28 de julho de 2026 · Bragança Paulista, SP</p>
+    <div class="topbar__acoes">
+      <button type="button" class="topbar__acao" data-abre-busca aria-expanded="false" aria-controls="busca">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        Buscar
+      </button>
+      <a class="topbar__acao topbar__acao--destaque" href="#" data-rota="/newsletter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        Receber notícias
+      </a>
+      <a class="topbar__acao" href="#" data-rota="/entrar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.8 20c.6-3.9 3.6-6 7.2-6s6.6 2.1 7.2 6"/></svg>
+        Entrar
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ PLANTÃO ============================ -->
+<div class="plantao" data-plantao data-editoria="cidade">
+  <div class="container plantao__interno">
+    <span class="plantao__selo">Plantão</span>
+    <a class="plantao__texto" href="noticia.html">Chuva forte alaga a Avenida dos Imigrantes e trânsito é desviado no Centro</a>
+    <button type="button" class="plantao__fechar" data-plantao-fechar aria-label="Dispensar o plantão">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ======================= BARRA MOBILE (<768px) ======================= -->
+<div class="barra-mobile" data-barra-mobile>
+  <button type="button" class="barra-icone" data-abre-drawer aria-expanded="false" aria-controls="drawer" aria-label="Abrir o menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <a class="barra-mobile__logo" href="index.html"><img src="assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34"></a>
+  <span class="barra-mobile__espaco"></span>
+  <button type="button" class="barra-icone" data-abre-busca aria-expanded="false" aria-controls="busca" aria-label="Buscar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+  </button>
+</div>
+
+<!-- ============================ MASTHEAD ============================ -->
+<header class="masthead">
+  <div class="container masthead__interno">
+    <h1 class="masthead__marca">
+      <a href="index.html"><img class="masthead__logo" src="assets/img/logo-gazeta.svg" alt="Gazeta Bragantina" width="760" height="104"></a>
+    </h1>
+    <p class="masthead__tagline">Notícias de Bragança Paulista e região</p>
+  </div>
+</header>
+
+<!-- ========================= NAV DE EDITORIAS ========================= -->
+<div class="nav-editorias" data-nav-sticky>
+  <div class="container nav-editorias__interno">
+    <a class="nav-editorias__logo" href="index.html"><img src="assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34"></a>
+    <nav class="nav-editorias__lista" aria-label="Editorias">
+      <ul>
+        <li><a class="nav-editorias__link" href="#" data-rota="/ultimas">Últimas</a></li>
+        <li data-editoria="cidade"><a class="nav-editorias__link" href="editoria.html">Cidade</a></li>
+        <li data-editoria="regiao"><a class="nav-editorias__link" href="editoria.html">Região</a></li>
+        <li data-editoria="politica"><a class="nav-editorias__link" href="editoria.html">Política</a></li>
+        <li data-editoria="economia"><a class="nav-editorias__link" href="editoria.html">Economia</a></li>
+        <li data-editoria="bragantino"><a class="nav-editorias__link" href="editoria.html">Bragantino</a></li>
+        <li data-editoria="esportes"><a class="nav-editorias__link" href="editoria.html">Esportes</a></li>
+        <li data-editoria="cultura"><a class="nav-editorias__link" href="editoria.html">Cultura</a></li>
+        <li data-editoria="policia"><a class="nav-editorias__link" href="editoria.html">Polícia</a></li>
+        <li data-editoria="colunas"><a class="nav-editorias__link" href="coluna.html">Colunas</a></li>
+        <li data-editoria="opiniao"><a class="nav-editorias__link" href="coluna.html">Opinião</a></li>
+      </ul>
+    </nav>
+    <span class="nav-editorias__divisor" aria-hidden="true"></span>
+    <div class="nav-editorias__extras">
+      <a class="nav-editorias__extra" href="gbnorte.html" data-parceiro="gbnorte">GB Norte</a>
+      <a class="nav-editorias__extra" href="sindicato.html" data-parceiro="sindicato">Sindicato</a>
+    </div>
+  </div>
+</div>
+
+<main id="conteudo">
+
+  <!-- ================= ZONA 1 · MANCHETE + 3 CHAMADAS ================= -->
+  <div class="container">
+    <div class="zona-capa">
+
+      <article class="card card--manchete zona-capa__manchete" data-editoria="cidade">
+        <a class="card__link" href="noticia.html">
+          <div class="card__midia ar-16x9">
+            <img src="assets/img/foto-hospital-obra.jpg" alt="Terreno cercado na Avenida dos Imigrantes onde o Hospital Regional será construído, com placa da obra em primeiro plano" width="1600" height="900" fetchpriority="high">
+          </div>
+          <div class="card__texto">
+            <p class="chapeu chapeu--grande">Cidade · Destaque</p>
+            <h2 class="card__titulo">Governo do Estado confirma Hospital Regional em Bragança e obra começa em outubro</h2>
+            <p class="card__linha-fina">Unidade terá 200 leitos e seis salas cirúrgicas, e vai atender as 12 cidades da microrregião. O contrato prevê 30 meses de execução e repasse mensal fiscalizado pelo consórcio intermunicipal.</p>
+            <p class="card__meta">Por Marina Toledo Prado · Centro · 08h12</p>
+          </div>
+        </a>
+      </article>
+
+      <div class="zona-capa__chamadas">
+        <article class="card card--texto" data-editoria="cidade">
+          <a class="card__link" href="noticia.html">
+            <div class="card__texto">
+              <p class="chapeu">Saúde</p>
+              <h2 class="card__titulo">Vacinação contra a gripe é ampliada para todas as idades nas 32 unidades</h2>
+              <p class="card__resumo">Doses ficam disponíveis sem agendamento até 15 de agosto. A UBS do Taboão passa a abrir aos sábados.</p>
+            </div>
+          </a>
+        </article>
+
+        <article class="card card--texto" data-editoria="politica">
+          <a class="card__link" href="noticia.html">
+            <div class="card__texto">
+              <p class="chapeu">Política</p>
+              <h2 class="card__titulo">Câmara aprova LDO de 2027 com R$ 1,3 bilhão e emenda de R$ 12 mi para o Lavapés</h2>
+              <p class="card__resumo">Texto passou em segunda votação por 12 votos a 5. A oposição queria vincular a emenda ao piscinão.</p>
+            </div>
+          </a>
+        </article>
+
+        <article class="card card--texto" data-editoria="economia">
+          <a class="card__link" href="noticia.html">
+            <div class="card__texto">
+              <p class="chapeu">Economia</p>
+              <h2 class="card__titulo">Fábrica de embalagens se instala no distrito industrial e promete 340 vagas</h2>
+              <p class="card__resumo">Investimento é de R$ 90 milhões. Contratações começam em setembro, com prioridade para moradores da cidade.</p>
+            </div>
+          </a>
+        </article>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================= AD · topo-billboard ======================= -->
+  <div class="container">
+    <div class="ad-bloco ad--billboard">
+      <p class="ad-bloco__rotulo">Publicidade</p>
+      <div class="ad-slot ad-slot--dcm">
+        <img src="assets/img/parceiro-mercadao-billboard.svg" alt="Anúncio ilustrativo" width="970" height="250" loading="lazy"><!-- demonstração: a tag DCM real deste formato está em ANUNCIOS-DCM.md -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CORPO DA CAPA · conteúdo + lateral ================= -->
+  <div class="container">
+    <div class="corpo-com-lateral">
+
+      <div class="corpo-principal">
+
+        <!-- ÚLTIMAS -->
+        <section class="ordem-1" aria-labelledby="tit-ultimas">
+          <header class="bloco__cabeca" data-editoria="policia">
+            <h2 class="bloco__titulo" id="tit-ultimas">Últimas notícias</h2>
+            <a class="bloco__ver-tudo" href="#" data-rota="/ultimas">Ver todas →</a>
+          </header>
+          <div class="pilha pilha--densa">
+            <article class="card card--ultima" data-editoria="cidade"><a class="card__link" href="noticia.html"><span class="card__hora">14h32</span><div class="card__texto"><h3 class="card__titulo">DAE conclui limpeza da rede do Lavapés e libera trecho da Rua Coronel Osório</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="bragantino"><a class="card__link" href="noticia.html"><span class="card__hora">13h50</span><div class="card__texto"><h3 class="card__titulo">Bragantino encerra a preparação para o clássico com dois desfalques na defesa</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="cidade"><a class="card__link" href="noticia.html"><span class="card__hora">13h12</span><div class="card__texto"><h3 class="card__titulo">Feira do produtor rural muda para a Praça Raul Leme a partir de sábado</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="cidade"><a class="card__link" href="noticia.html"><span class="card__hora">12h40</span><div class="card__texto"><h3 class="card__titulo">Prefeitura abre 180 vagas em cursos gratuitos de qualificação no Taboão</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="regiao"><a class="card__link" href="noticia.html"><span class="card__hora">11h58</span><div class="card__texto"><h3 class="card__titulo">Atibaia decreta situação de atenção após 40 mm de chuva em duas horas</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="cidade"><a class="card__link" href="noticia.html"><span class="card__hora">11h20</span><div class="card__texto"><h3 class="card__titulo">Santa Casa reabre a ala de pediatria depois de sete meses de reforma</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="regiao"><a class="card__link" href="noticia.html"><span class="card__hora">10h45</span><div class="card__texto"><h3 class="card__titulo">Trecho da Fernão Dias tem interdição noturna para obra de recuperação</h3></div></a></article>
+            <article class="card card--ultima" data-editoria="cidade"><a class="card__link" href="noticia.html"><span class="card__hora">09h58</span><div class="card__texto"><h3 class="card__titulo">Escolas municipais começam a distribuir o kit de uniforme na segunda-feira</h3></div></a></article>
+          </div>
+          <p class="bloco-ultimas__rodape"><a class="botao botao--contorno botao--bloco" href="#" data-rota="/ultimas">Ver todas as últimas notícias</a></p>
+        </section>
+
+        <!-- BLOCO CIDADE -->
+        <section class="ordem-4" data-editoria="cidade" aria-labelledby="tit-cidade">
+          <header class="bloco__cabeca">
+            <h2 class="bloco__titulo" id="tit-cidade">Cidade</h2>
+            <a class="bloco__ver-tudo" href="editoria.html">Ver tudo em Cidade →</a>
+          </header>
+          <div class="bloco-editoria__corpo">
+            <article class="card card--destaque">
+              <a class="card__link" href="noticia.html">
+                <div class="card__midia ar-16x9"><img src="assets/img/foto-terminal-obra.jpg" alt="Canteiro de obras do terminal urbano com estrutura metálica montada e operários ao fundo" width="1600" height="900" loading="lazy"></div>
+                <div class="card__texto">
+                  <p class="chapeu">Mobilidade</p>
+                  <h3 class="card__titulo">Obras do novo terminal urbano avançam e prefeitura promete entrega em março</h3>
+                  <p class="card__resumo">Estrutura de 4,2 mil m² vai concentrar as 14 linhas hoje espalhadas entre o Centro e a Rua Coronel Osório. Comerciantes cobram plano para o período de transição.</p>
+                  <p class="card__meta">Por Rafael Siqueira Bueno · Centro</p>
+                </div>
+              </a>
+            </article>
+            <div class="pilha">
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Meio ambiente</p><h3 class="card__titulo">Coleta seletiva chega a mais quatro bairros e passa a atender 60% da cidade</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-coleta-seletiva.jpg" alt="Caminhão de coleta seletiva estacionado em rua residencial com contêineres azuis na calçada" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Educação</p><h3 class="card__titulo">Fila da creche cai 22% no semestre, mas 480 crianças ainda esperam por vaga</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-creche.jpg" alt="Pátio de creche municipal vazio com brinquedos coloridos e muro pintado" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Bairros</p><h3 class="card__titulo">Iluminação de LED chega ao Jardim América depois de dois anos de espera</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-luminaria-led.jpg" alt="Poste com luminária de LED recém-instalada em rua do Jardim América ao entardecer" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO POLÍTICA -->
+        <section class="ordem-5" data-editoria="politica" aria-labelledby="tit-politica">
+          <header class="bloco__cabeca">
+            <h2 class="bloco__titulo" id="tit-politica">Política</h2>
+            <a class="bloco__ver-tudo" href="editoria.html">Ver tudo em Política →</a>
+          </header>
+          <div class="bloco-editoria__corpo">
+            <article class="card card--destaque">
+              <a class="card__link" href="noticia.html">
+                <div class="card__midia ar-16x9"><img src="assets/img/foto-camara-plenario.jpg" alt="Plenário da Câmara Municipal com vereadores em pé durante votação" width="1600" height="900" loading="lazy"></div>
+                <div class="card__texto">
+                  <p class="chapeu">Câmara</p>
+                  <h3 class="card__titulo">Oposição protocola pedido de CPI do transporte escolar com sete assinaturas</h3>
+                  <p class="card__resumo">Faltam duas para instalar a comissão. O requerimento cita contratos emergenciais renovados quatro vezes desde 2024 sem novo processo licitatório.</p>
+                  <p class="card__meta">Por Camila Nogueira Franco · Centro</p>
+                </div>
+              </a>
+            </article>
+            <div class="pilha">
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Prefeitura</p><h3 class="card__titulo">Decreto reorganiza secretarias, extingue duas pastas e cria a de Projetos</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-prefeitura.jpg" alt="Fachada do prédio da Prefeitura de Bragança Paulista em dia nublado" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Servidores</p><h3 class="card__titulo">Vereadores aprovam reajuste de 4,1% para servidores em votação única</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-saguao-camara.jpg" alt="Servidores municipais reunidos no saguão da Câmara acompanhando a sessão" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Mobilidade</p><h3 class="card__titulo">Audiência do plano de mobilidade tem 40 inscritos e três horas de fala</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-audiencia-publica.jpg" alt="Auditório com cadeiras ocupadas durante audiência pública sobre mobilidade" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- BLOCO REGIÃO -->
+        <section class="ordem-7" data-editoria="regiao" aria-labelledby="tit-regiao">
+          <header class="bloco__cabeca">
+            <h2 class="bloco__titulo" id="tit-regiao">Região</h2>
+            <a class="bloco__ver-tudo" href="editoria.html">Ver tudo em Região →</a>
+          </header>
+          <div class="bloco-editoria__corpo">
+            <article class="card card--destaque">
+              <a class="card__link" href="noticia.html">
+                <div class="card__midia ar-16x9"><img src="assets/img/foto-enchente-rua.jpg" alt="Rua alagada em Atibaia com moradores retirando móveis de uma casa" width="1600" height="900" loading="lazy"></div>
+                <div class="card__texto">
+                  <p class="chapeu">Atibaia</p>
+                  <h3 class="card__titulo">Atibaia decreta emergência após chuva de 82 mm e 40 famílias deixam casas</h3>
+                  <p class="card__resumo">Defesa Civil montou abrigo no ginásio municipal. O nível do rio baixou na madrugada, mas a prefeitura mantém alerta para as próximas 48 horas.</p>
+                  <p class="card__meta">Por Thiago Marcondes Leme · Atibaia · Região</p>
+                </div>
+              </a>
+            </article>
+            <div class="pilha">
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Piracaia</p><h3 class="card__titulo">Piracaia inaugura UBS no Bairro dos Ribeiros e amplia atendimento rural</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-ubs.jpg" alt="Prédio novo da unidade básica de saúde com faixa de inauguração na fachada" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Bom Jesus dos Perdões</p><h3 class="card__titulo">Plano diretor é aprovado depois de seis meses de audiências públicas</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-bomjesus-centro.jpg" alt="Vista do centro de Bom Jesus dos Perdões com igreja matriz ao fundo" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+              <article class="card card--lista">
+                <a class="card__link" href="noticia.html">
+                  <div class="card__texto"><p class="chapeu">Joanópolis e Vargem</p><h3 class="card__titulo">Cidades estudam consórcio para a coleta de lixo a partir de 2027</h3></div>
+                  <div class="card__midia ar-4x3"><img src="assets/img/foto-estrada-joanopolis.jpg" alt="Estrada rural entre Joanópolis e Vargem com serra ao fundo" width="1200" height="900" loading="lazy"></div>
+                </a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- AD · capa-meio-1 -->
+        <div class="ad-bloco ad--billboard ordem-10">
+          <p class="ad-bloco__rotulo">Publicidade</p>
+          <div class="ad-slot ad-slot--dcm">
+            <img src="assets/img/parceiro-uniserra-billboard.svg" alt="Anúncio ilustrativo" width="970" height="250" loading="lazy"><!-- demonstração: a tag DCM real deste formato está em ANUNCIOS-DCM.md -->
+          </div>
+        </div>
+
+      </div><!-- /.corpo-principal -->
+
+      <aside class="corpo-lateral" aria-label="Mais lidas, newsletter e colunistas">
+        <div class="lateral-pilha">
+
+          <section class="ordem-2" data-editoria="bragantino" aria-labelledby="tit-mais-lidas">
+            <header class="bloco-lateral__cabeca">
+              <h2 class="bloco-lateral__titulo" id="tit-mais-lidas">Mais lidas em 24 horas</h2>
+            </header>
+            <div class="pilha pilha--densa">
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">1</span><div class="card__texto"><h3 class="card__titulo">Concurso da Prefeitura tem 4,2 mil inscritos para 96 vagas; provas em setembro</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">2</span><div class="card__texto"><h3 class="card__titulo">Motorista perde o controle e carro cai no Lago do Taboão; ninguém se feriu</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="foto-reportagem.html"><span class="card__numero" aria-hidden="true">3</span><div class="card__texto"><h3 class="card__titulo">Festa do Divino: a programação completa dos nove dias de festa no Centro</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">4</span><div class="card__texto"><h3 class="card__titulo">Bragantino fecha a janela com seis reforços e um lateral de 21 anos</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">5</span><div class="card__texto"><h3 class="card__titulo">IPTU 2026: prazo da última parcela vence na sexta e o desconto de 8% acaba</h3></div></a></article>
+              <article class="card card--numerado"><a class="card__link" href="noticia.html"><span class="card__numero" aria-hidden="true">6</span><div class="card__texto"><h3 class="card__titulo">Câmara arquiva projeto que mudava o transporte escolar da zona rural</h3></div></a></article>
+            </div>
+          </section>
+
+          <div class="ad-bloco ad--retangulo ordem-3">
+            <p class="ad-bloco__rotulo">Publicidade</p>
+            <div class="ad-slot ad-slot--dcm">
+              <img src="assets/img/parceiro-vistadaserra-retangulo.svg" alt="Anúncio ilustrativo" width="300" height="250" loading="lazy"><!-- demonstração: a tag DCM real deste formato está em ANUNCIOS-DCM.md -->
+            </div>
+          </div>
+
+          <section class="newsletter ordem-8" aria-labelledby="tit-newsletter">
+            <h2 class="newsletter__titulo" id="tit-newsletter">O resumo do dia, às 18h</h2>
+            <p class="newsletter__texto">O que aconteceu em Bragança e na região, em cinco minutos de leitura. De segunda a sexta, no seu e-mail.</p>
+            <form class="newsletter__form" data-form-newsletter novalidate>
+              <label class="apenas-leitor" for="nl-capa">Seu e-mail</label>
+              <input class="campo" id="nl-capa" name="email" type="email" placeholder="seu@email.com.br" required autocomplete="email">
+              <button class="botao botao--primario botao--bloco" type="submit">Quero receber</button>
+              <p class="form-nota">Ao assinar você concorda com a <a href="#" data-rota="/privacidade">política de privacidade</a>. Cancela quando quiser.</p>
+            </form>
+          </section>
+
+          <section class="ordem-9" data-editoria="colunas" aria-labelledby="tit-colunistas">
+            <header class="bloco-lateral__cabeca">
+              <h2 class="bloco-lateral__titulo" id="tit-colunistas">Colunistas</h2>
+            </header>
+            <div class="pilha pilha--densa">
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-09.jpg" alt="Retrato de Sérgio Bittencourt Mattos" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Sérgio B. Mattos</p><h3 class="card__titulo">A política da semana em Bragança</h3></div></a></article>
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-10.jpg" alt="Retrato de Cida Ramalho" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Cida Ramalho</p><h3 class="card__titulo">O bonde que passava na Rua Barão</h3></div></a></article>
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-11.jpg" alt="Retrato de Vinícius Aragão Tavares" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Vinícius A. Tavares</p><h3 class="card__titulo">Por que o comércio do Centro não reage</h3></div></a></article>
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-12.jpg" alt="Retrato de Marta Iglesias Pontes" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Marta I. Pontes</p><h3 class="card__titulo">A escola que sobrou depois da enchente</h3></div></a></article>
+              <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-13.jpg" alt="Retrato de Fábio Quintanilha" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Fábio Quintanilha</p><h3 class="card__titulo">O Bragantino aprendeu a sofrer</h3></div></a></article>
+            </div>
+          </section>
+
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ========================= BLOCO BRAGANTINO ========================= -->
+  <div class="container">
+    <section class="bloco-bragantino" data-editoria="bragantino" aria-labelledby="tit-bragantino">
+      <header class="bloco__cabeca">
+        <h2 class="bloco__titulo" id="tit-bragantino">Bragantino</h2>
+        <a class="bloco__ver-tudo" href="editoria.html">Ver tudo em Bragantino →</a>
+      </header>
+      <div class="bloco-bragantino__grade grade--3">
+        <article class="card card--destaque">
+          <a class="card__link" href="noticia.html">
+            <div class="card__midia ar-16x9"><img src="assets/img/foto-futebol-gol.jpg" alt="Jogadores comemoram gol em campo iluminado durante partida noturna" width="1600" height="900" loading="lazy"></div>
+            <div class="card__texto">
+              <p class="chapeu">Brasileirão</p>
+              <h3 class="card__titulo">Bragantino vence fora de casa e cola no G-4 com gol nos acréscimos</h3>
+              <p class="card__resumo">Time somou a terceira vitória seguida como visitante e chegou a 42 pontos, três atrás do quarto colocado.</p>
+              <p class="card__meta">Por Douglas Ferraz Pinto</p>
+            </div>
+          </a>
+        </article>
+
+        <div class="painel-jogo">
+          <p class="painel-jogo__rotulo">Próximo jogo</p>
+          <p class="painel-jogo__times">
+            <span class="painel-jogo__time"><img class="painel-jogo__escudo" src="assets/img/escudo-bragantino.png" alt="Escudo do Red Bull Bragantino" width="297" height="240" loading="lazy"><span>Bragantino</span></span>
+            <span class="painel-jogo__x" aria-label="contra">×</span>
+            <span class="painel-jogo__time"><img class="painel-jogo__escudo" src="assets/img/escudo-athletico.svg" alt="Escudo do Athletico Paranaense" width="180" height="240" loading="lazy"><span>Athletico-PR</span></span>
+          </p>
+          <p class="painel-jogo__quando">Domingo, 2 de agosto · 16h<br>Estádio Nabi Abi Chedid · 24ª rodada</p>
+        </div>
+
+        <div>
+          <table class="tabela-leve">
+            <caption>Classificação · trecho</caption>
+            <thead>
+              <tr><th scope="col">Time</th><th scope="col">P</th><th scope="col">J</th><th scope="col">SG</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">3. Fluminense</th><td>46</td><td>23</td><td>+14</td></tr>
+              <tr><th scope="row">4. Internacional</th><td>45</td><td>23</td><td>+11</td></tr>
+              <tr data-destaque><th scope="row">5. Bragantino</th><td>42</td><td>23</td><td>+9</td></tr>
+              <tr><th scope="row">6. Botafogo</th><td>41</td><td>23</td><td>+7</td></tr>
+              <tr><th scope="row">7. São Paulo</th><td>39</td><td>23</td><td>+4</td></tr>
+            </tbody>
+          </table>
+          <p class="tabela-leve__nota">Dados de exemplo, gerados para o protótipo.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== CHAMADA DE REPORTAGEM ESPECIAL ==================== -->
+  <div class="container">
+    <div class="separador-secao"></div>
+    <article class="card card--especial" data-editoria="cidade">
+      <a class="card__link" href="especial.html">
+        <div class="card__midia"><img src="assets/img/foto-lavapes-enchente.jpg" alt="Rua do Lavapés com marcas de água nas paredes das casas seis meses depois da enchente" width="1600" height="900" loading="lazy"></div>
+        <div class="card__texto">
+          <p class="chapeu chapeu--sobreposto">Reportagem especial</p>
+          <h2 class="card__titulo">O que sobrou do Lavapés</h2>
+          <p class="card__resumo">Seis meses depois da enchente, a Gazeta voltou às 214 casas atingidas para saber quem recebeu ajuda, quem saiu do bairro e o que a cidade fez para que não se repita.</p>
+        </div>
+      </a>
+    </article>
+  </div>
+
+  <!-- ======================= GALERIA DA SEMANA ======================= -->
+  <div class="container">
+    <section class="espaco-topo-g" aria-labelledby="tit-galeria">
+      <header class="bloco__cabeca" data-editoria="cultura">
+        <h2 class="bloco__titulo" id="tit-galeria">Fotos da semana</h2>
+        <a class="bloco__ver-tudo" href="foto-reportagem.html">Ver todas as fotos →</a>
+      </header>
+      <div class="faixa-galeria">
+        <article class="card card--foto" data-editoria="cultura"><a class="card__link" href="foto-reportagem.html"><div class="card__midia ar-3x2"><img src="assets/img/foto-procissao-divino.jpg" alt="Fiéis carregam o mastro do Divino pela Rua Cel. Osório sob chuva de pétalas" width="1500" height="1000" loading="lazy"></div><div class="card__texto"><h3 class="card__titulo">A procissão do Divino tomou o Centro</h3></div></a></article>
+        <article class="card card--foto" data-editoria="esportes"><a class="card__link" href="foto-reportagem.html"><div class="card__midia ar-3x2"><img src="assets/img/foto-corrida-rua.jpg" alt="Corredores largam na Praça Raul Leme durante a manhã" width="1500" height="1000" loading="lazy"></div><div class="card__texto"><h3 class="card__titulo">A largada da corrida na Raul Leme</h3></div></a></article>
+        <article class="card card--foto" data-editoria="cidade"><a class="card__link" href="foto-reportagem.html"><div class="card__midia ar-3x2"><img src="assets/img/foto-feira-livre.jpg" alt="Feirantes montam barracas na madrugada com lâmpadas amarelas acesas" width="1500" height="1000" loading="lazy"></div><div class="card__texto"><h3 class="card__titulo">A feira antes de a cidade acordar</h3></div></a></article>
+        <article class="card card--foto" data-editoria="regiao"><a class="card__link" href="foto-reportagem.html"><div class="card__midia ar-3x2"><img src="assets/img/foto-serra-neblina.jpg" alt="Neblina cobre a serra vista da estrada de Joanópolis ao amanhecer" width="1500" height="1000" loading="lazy"></div><div class="card__texto"><h3 class="card__titulo">O inverno chegou na serra</h3></div></a></article>
+      </div>
+    </section>
+  </div>
+
+  <!-- ==================== VITRINES DOS SUB-PORTAIS ==================== -->
+  <div class="container">
+    <div class="grade grade--2 espaco-topo-g">
+
+      <section class="vitrine" data-parceiro="gbnorte" aria-labelledby="tit-jb">
+        <header class="vitrine__cabeca">
+          <h2 id="tit-jb"><a href="gbnorte.html"><img class="vitrine__logo" src="assets/img/logo-gbnorte.svg" alt="GB Norte" width="560" height="96"></a></h2>
+          <a class="vitrine__ir" href="gbnorte.html">Ir para a capa →</a>
+        </header>
+        <p class="vitrine__tagline">Notícias do seu quarteirão · uma seção da Gazeta Bragantina</p>
+        <article class="card card--lista">
+          <a class="card__link" href="gbnorte.html">
+            <div class="card__texto"><p class="chapeu">Bairro</p><h3 class="card__titulo">Moradores do Taboão fazem mutirão e recuperam a praça da Rua das Acácias</h3></div>
+            <div class="card__midia ar-4x3"><img src="assets/img/foto-mutirao-praca.jpg" alt="Moradores pintando bancos de praça durante mutirão de fim de semana" width="1200" height="900" loading="lazy"></div>
+          </a>
+        </article>
+        <article class="card card--texto">
+          <a class="card__link" href="gbnorte.html">
+            <div class="card__texto"><p class="chapeu">Eventos</p><h3 class="card__titulo">Festa julina do Jardim América tem quermesse e leilão de bolos no sábado</h3></div>
+          </a>
+        </article>
+      </section>
+
+      <section class="vitrine" data-parceiro="sindicato" aria-labelledby="tit-sind">
+        <header class="vitrine__cabeca">
+          <h2 id="tit-sind"><a href="sindicato.html"><img class="vitrine__logo" src="assets/img/logo-sindicato.svg" alt="Sindicato dos Trabalhadores" width="640" height="96"></a></h2>
+          <a class="vitrine__ir" href="sindicato.html">Ir para a capa →</a>
+        </header>
+        <p class="vitrine__tagline">Direitos, convenções e assembleias · uma seção da Gazeta Bragantina</p>
+        <article class="card card--lista">
+          <a class="card__link" href="sindicato.html">
+            <div class="card__texto"><p class="chapeu">Convenção</p><h3 class="card__titulo">Assembleia aprova reajuste de 5,2% e vale-alimentação de R$ 780</h3></div>
+            <div class="card__midia ar-4x3"><img src="assets/img/foto-assembleia.jpg" alt="Trabalhadores levantam a mão em votação durante assembleia em ginásio" width="1200" height="900" loading="lazy"></div>
+          </a>
+        </article>
+        <article class="card card--texto">
+          <a class="card__link" href="sindicato.html">
+            <div class="card__texto"><p class="chapeu">Direitos</p><h3 class="card__titulo">Banco de horas: o que muda para quem trabalha em escala 6×1</h3></div>
+          </a>
+        </article>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============ FAIXA: ECONOMIA · ESPORTES · CULTURA · POLÍCIA · OPINIÃO ============ -->
+  <div class="container">
+    <div class="separador-secao"></div>
+    <div class="grade grade--5">
+
+      <section data-editoria="economia" aria-labelledby="tit-economia">
+        <header class="bloco__cabeca"><h2 class="bloco__titulo" id="tit-economia">Economia</h2></header>
+        <div class="pilha pilha--densa">
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Comércio do Centro projeta alta de 6% nas vendas do Dia dos Pais</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Feira do produtor ganha 22 barracas e passa a abrir também às quartas</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Cooperativa de café da região fecha primeiro contrato de exportação</h3></div></a></article>
+        </div>
+      </section>
+
+      <section data-editoria="esportes" aria-labelledby="tit-esportes">
+        <header class="bloco__cabeca"><h2 class="bloco__titulo" id="tit-esportes">Esportes</h2></header>
+        <div class="pilha pilha--densa">
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Bolsa Atleta abre inscrições e amplia para 120 o número de beneficiados</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Ginásio do Taboão recebe etapa estadual de handebol com 28 equipes</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Corrida da Cidade muda o percurso e larga na Praça Raul Leme</h3></div></a></article>
+        </div>
+      </section>
+
+      <section data-editoria="cultura" aria-labelledby="tit-cultura">
+        <header class="bloco__cabeca"><h2 class="bloco__titulo" id="tit-cultura">Cultura</h2></header>
+        <div class="pilha pilha--densa">
+          <article class="card card--texto"><a class="card__link" href="foto-reportagem.html"><div class="card__texto"><h3 class="card__titulo">Festa do Divino leva 12 mil às ruas do Centro em três dias de procissão</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Museu Municipal reabre com acervo restaurado e entrada gratuita às terças</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Bienal do livro regional confirma 40 editoras e passa por cinco cidades</h3></div></a></article>
+        </div>
+      </section>
+
+      <section data-editoria="policia" aria-labelledby="tit-policia">
+        <header class="bloco__cabeca"><h2 class="bloco__titulo" id="tit-policia">Polícia</h2></header>
+        <div class="pilha pilha--densa">
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Operação apreende 1,2 tonelada de fios de cobre em galpão no Jardim Europa</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Furtos de bicicleta caem 18% no Centro após reforço de câmeras</h3></div></a></article>
+          <article class="card card--texto"><a class="card__link" href="noticia.html"><div class="card__texto"><h3 class="card__titulo">Motociclista fica ferido em colisão na Alkindar Monteiro Junqueira</h3></div></a></article>
+        </div>
+      </section>
+
+      <section data-editoria="opiniao" aria-labelledby="tit-opiniao">
+        <header class="bloco__cabeca"><h2 class="bloco__titulo" id="tit-opiniao">Opinião</h2></header>
+        <div class="pilha pilha--densa">
+          <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-09.jpg" alt="Retrato de Sérgio Bittencourt Mattos" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Sérgio B. Mattos</p><h3 class="card__titulo">A política da semana em Bragança</h3></div></a></article>
+          <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-12.jpg" alt="Retrato de Marta Iglesias Pontes" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Marta I. Pontes</p><h3 class="card__titulo">A escola que sobrou depois da enchente</h3></div></a></article>
+          <article class="card card--colunista"><a class="card__link" href="coluna.html"><div class="card__midia ar-1x1"><img src="assets/img/autor-11.jpg" alt="Retrato de Vinícius Aragão Tavares" width="400" height="400" loading="lazy"></div><div class="card__texto"><p class="card__nome">Vinícius A. Tavares</p><h3 class="card__titulo">Por que o comércio do Centro não reage</h3></div></a></article>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ============================= RODAPÉ ============================= -->
+<footer class="site-rodape superficie-escura">
+  <div class="container">
+    <div class="site-rodape__topo">
+      <div class="site-rodape__marca">
+        <img src="assets/img/logo-gazeta-branco.svg" alt="Gazeta Bragantina" width="760" height="104">
+        <p class="site-rodape__tagline">Jornalismo local de Bragança Paulista e da microrregião. Substitui o portal em WordPress a partir de 2026.</p>
+        <div class="site-rodape__redes">
+          <a class="site-rodape__rede" href="#" data-rota="/redes/instagram" aria-label="Instagram da Gazeta Bragantina"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+          <a class="site-rodape__rede" href="#" data-rota="/redes/facebook" aria-label="Facebook da Gazeta Bragantina"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5H16.7V3.6A21 21 0 0 0 14.3 3.5c-2.4 0-4 1.45-4 4.1v2.3H7.6V13h2.7v8Z"/></svg></a>
+          <a class="site-rodape__rede" href="#" data-rota="/redes/whatsapp" aria-label="Canal da Gazeta no WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2a8.7 8.7 0 0 0-7.4 13.3L3.4 21l4.7-1.2A8.7 8.7 0 1 0 12 3.2Zm0 1.8a6.9 6.9 0 1 1-3.6 12.8l-.3-.2-2.6.7.7-2.5-.2-.3A6.9 6.9 0 0 1 12 5Zm-3 3.4c-.2 0-.5.1-.7.4-.2.3-.7.8-.7 1.8s.8 2 .9 2.2c.1.2 1.5 2.5 3.8 3.4 1.9.7 2.3.6 2.7.5.4 0 1.3-.5 1.5-1.1.2-.5.2-1 .1-1.1l-.6-.3-1.3-.6c-.2 0-.3-.1-.5.1l-.6.8c-.1.1-.2.2-.4 0a5.6 5.6 0 0 1-2.8-2.4c-.2-.3 0-.4.1-.6l.4-.4.2-.4v-.4l-.6-1.5c-.2-.4-.3-.3-.5-.4Z"/></svg></a>
+          <a class="site-rodape__rede" href="#" data-rota="/rss.xml" aria-label="Feed RSS"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6.5" cy="17.5" r="2"/><path d="M4 10.5v2.8a7.7 7.7 0 0 1 6.7 6.7h2.8A10.5 10.5 0 0 0 4 10.5Zm0-5.5v2.8A13.2 13.2 0 0 1 16.2 20H19A16 16 0 0 0 4 5Z"/></svg></a>
+        </div>
+      </div>
+
+      <nav aria-labelledby="rod-editorias">
+        <h2 class="site-rodape__titulo" id="rod-editorias">Editorias</h2>
+        <ul class="site-rodape__lista">
+          <li><a href="editoria.html">Cidade</a></li>
+          <li><a href="editoria.html">Região</a></li>
+          <li><a href="editoria.html">Política</a></li>
+          <li><a href="editoria.html">Economia</a></li>
+          <li><a href="editoria.html">Bragantino</a></li>
+          <li><a href="editoria.html">Esportes</a></li>
+          <li><a href="editoria.html">Cultura</a></li>
+          <li><a href="editoria.html">Polícia</a></li>
+          <li><a href="coluna.html">Colunas e Opinião</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="rod-secoes">
+        <h2 class="site-rodape__titulo" id="rod-secoes">Seções especiais</h2>
+        <ul class="site-rodape__lista">
+          <li><a href="gbnorte.html">GB Norte</a></li>
+          <li><a href="sindicato.html">Sindicato dos Trabalhadores</a></li>
+          <li><a href="especial.html">Reportagens especiais</a></li>
+          <li><a href="foto-reportagem.html">Foto-reportagens</a></li>
+          <li><a href="#" data-rota="/newsletter">Newsletter</a></li>
+          <li><a href="#" data-rota="/anuncie">Anuncie</a></li>
+        </ul>
+      </nav>
+
+      <nav aria-labelledby="rod-institucional">
+        <h2 class="site-rodape__titulo" id="rod-institucional">Institucional</h2>
+        <ul class="site-rodape__lista">
+          <li><a href="#" data-rota="/sobre">Sobre a Gazeta</a></li>
+          <li><a href="#" data-rota="/expediente">Expediente</a></li>
+          <li><a href="#" data-rota="/principios-editoriais">Princípios editoriais</a></li>
+          <li><a href="#" data-rota="/correcoes">Correções</a></li>
+          <li><a href="#" data-rota="/contato">Contato</a></li>
+          <li><a href="404.html">Página 404</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <div class="site-rodape__base">
+      <p>Gazeta Bragantina · Bragança Paulista, SP · CNPJ, razão social e endereço a confirmar com o cliente (§7.11).<br>
+        Protótipo de validação visual — conteúdo, nomes de pessoas e dados são fictícios.</p>
+      <ul class="site-rodape__legal">
+        <li><a href="#" data-rota="/privacidade">Privacidade</a></li>
+        <li><a href="#" data-rota="/termos">Termos</a></li>
+        <li><a href="#" data-rota="/cookies">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ==================== AD · rodapé fixo mobile ==================== -->
+<div class="rodape-fixo-mobile">
+  <a class="ad-slot ad-slot--dcm" href="#" data-rota="/anuncie"><img src="assets/img/parceiro-vistadaserra-mobile.svg" alt="Anúncio ilustrativo" width="320" height="50"></a>
+</div>
+
+<!-- ============================= DRAWER ============================= -->
+<div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu de navegação">
+  <div class="drawer__fundo" data-fecha-drawer></div>
+  <div class="drawer__painel">
+    <div class="drawer__topo">
+      <img src="assets/img/logo-gazeta-compacto.svg" alt="Gazeta Bragantina" width="340" height="34">
+      <button type="button" class="barra-icone" data-fecha-drawer aria-label="Fechar o menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Editorias</p>
+      <div class="drawer__lista">
+        <a class="drawer__link" href="#" data-rota="/ultimas" data-editoria="policia">Últimas</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="cidade">Cidade</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="regiao">Região</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="politica">Política</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="economia">Economia</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="bragantino">Bragantino</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="esportes">Esportes</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="cultura">Cultura</a>
+        <a class="drawer__link" href="editoria.html" data-editoria="policia">Polícia</a>
+        <a class="drawer__link" href="coluna.html" data-editoria="colunas">Colunas</a>
+        <a class="drawer__link" href="coluna.html" data-editoria="opiniao">Opinião</a>
+      </div>
+    </div>
+
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Seções especiais</p>
+      <div class="drawer__lista">
+        <a class="drawer__link" href="gbnorte.html" data-parceiro="gbnorte">GB Norte</a>
+        <a class="drawer__link" href="sindicato.html" data-parceiro="sindicato">Sindicato dos Trabalhadores</a>
+      </div>
+    </div>
+
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Sua conta</p>
+      <div class="drawer__lista">
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/entrar">Entrar ou criar conta</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/minha-conta/salvos">Matérias salvas</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/newsletter">Receber notícias por e-mail</a>
+      </div>
+    </div>
+
+    <div class="drawer__grupo">
+      <p class="drawer__rotulo">Institucional</p>
+      <div class="drawer__lista">
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/expediente">Expediente</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/principios-editoriais">Princípios editoriais</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/anuncie">Anuncie</a>
+        <a class="drawer__link drawer__link--simples" href="#" data-rota="/contato">Contato</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================== BUSCA (overlay) ========================== -->
+<div class="busca" id="busca" role="dialog" aria-modal="true" aria-label="Buscar no site">
+  <div class="busca__fundo" data-fecha-busca></div>
+  <div class="busca__painel">
+    <div class="container">
+      <form class="busca__form" data-form-busca role="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <label class="apenas-leitor" for="campoBusca">Buscar matérias</label>
+        <input class="busca__campo" id="campoBusca" type="search" name="q" placeholder="Buscar em toda a Gazeta…" autocomplete="off">
+        <button type="button" class="barra-icone" data-fecha-busca aria-label="Fechar a busca">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </form>
+
+      <div class="busca__sugestoes">
+        <div>
+          <p class="drawer__rotulo">Assuntos em alta</p>
+          <div class="chips">
+            <a class="chip" href="#" data-rota="/assunto/hospital-regional">Hospital Regional</a>
+            <a class="chip" href="#" data-rota="/assunto/enchente-do-lavapes">Enchente do Lavapés</a>
+            <a class="chip" href="#" data-rota="/assunto/ldo-2027">LDO 2027</a>
+            <a class="chip" href="#" data-rota="/assunto/festa-do-divino">Festa do Divino</a>
+            <a class="chip" href="#" data-rota="/assunto/bragantino">Bragantino</a>
+            <a class="chip" href="#" data-rota="/assunto/concurso-publico">Concurso público</a>
+          </div>
+        </div>
+        <div>
+          <p class="drawer__rotulo">Buscas recentes</p>
+          <div class="chips">
+            <a class="chip" href="#" data-rota="/busca?q=iptu">IPTU 2026</a>
+            <a class="chip" href="#" data-rota="/busca?q=creche">Fila da creche</a>
+            <a class="chip" href="#" data-rota="/busca?q=terminal">Terminal urbano</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/js/prototipo.js" defer></script>
+<script src="assets/js/logo-opcoes.js" defer></script>
+</body>
+</html>

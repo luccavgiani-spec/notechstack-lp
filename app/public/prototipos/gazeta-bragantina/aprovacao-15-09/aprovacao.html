@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gazeta Bragantina — aprovação da marca e do painel</title>
+<meta name="description" content="Compare as três versões da marca atual e as quatro propostas aplicadas na home do novo site e aprove o painel da redação.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#16161a">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..800;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..800&display=swap">
+<style>
+  :root{
+    --tinta:#16161a; --tinta-3:#8a8a93;
+    --fundo:#0f0f12; --fundo-2:#1b1b20; --fio:#2c2c33;
+    --marca:#9d1c22;
+    --apoio:"Archivo",system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serifa:"Newsreader",Georgia,"Times New Roman",serif;
+    --barra:64px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--fundo); color:#fff;
+    font-family:var(--apoio); -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+
+  /* ---------------------------------------------------- barra de controle */
+  .barra{
+    height:var(--barra); display:flex; align-items:center; gap:20px;
+    padding:0 20px; background:var(--fundo-2);
+    border-bottom:1px solid var(--fio); position:relative; z-index:5;
+  }
+  .barra__marca{display:flex; flex-direction:column; line-height:1.2; min-width:130px}
+  .barra__marca b{font-size:14px; font-weight:700}
+  .barra__marca span{font-size:11px; color:var(--tinta-3); letter-spacing:.06em; text-transform:uppercase}
+
+  .abas{display:flex; align-items:center; gap:6px; margin-inline:auto}
+  .abas__grupo{
+    font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--tinta-3);
+    padding:0 2px 0 6px; white-space:nowrap;
+  }
+  .abas__fio{width:1px; height:22px; background:var(--fio); margin:0 6px; flex:none}
+  .aba{
+    appearance:none; border:1px solid var(--fio); background:transparent;
+    color:#c9c9d1; font-family:inherit; font-size:12.5px; font-weight:600;
+    padding:8px 12px; border-radius:999px; cursor:pointer; white-space:nowrap;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .aba:hover{border-color:#4a4a55; color:#fff}
+  .aba[aria-pressed="true"]{background:#fff; color:var(--tinta); border-color:#fff}
+  .seta{
+    appearance:none; width:34px; height:34px; border-radius:50%;
+    border:1px solid var(--fio); background:transparent; color:#c9c9d1;
+    cursor:pointer; display:grid; place-items:center; flex:none;
+  }
+  .seta:hover{border-color:#4a4a55; color:#fff}
+  .seta svg{width:16px; height:16px}
+
+  .barra__acoes{display:flex; align-items:center; gap:10px}
+  .btn-painel{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+    background:var(--marca); color:#fff; font-size:13px; font-weight:700;
+    padding:11px 18px; border-radius:8px; white-space:nowrap;
+  }
+  .btn-painel:hover{background:#b32229}
+  .btn-painel svg{width:15px; height:15px}
+  .btn-lado{
+    appearance:none; border:1px solid var(--fio); background:transparent;
+    color:#c9c9d1; font-family:inherit; font-size:13px; font-weight:600;
+    padding:11px 14px; border-radius:8px; cursor:pointer; white-space:nowrap;
+  }
+  .btn-lado:hover{border-color:#4a4a55; color:#fff}
+
+  /* --------------------------------------------------------------- palco */
+  .palco{height:calc(100% - var(--barra)); position:relative; background:#fff}
+  iframe{width:100%; height:100%; border:0; display:block}
+
+  .legenda{
+    position:absolute; left:50%; bottom:22px; transform:translateX(-50%);
+    background:rgba(15,15,18,.92); color:#fff;
+    padding:11px 20px; border-radius:999px; font-size:13px;
+    display:flex; align-items:center; gap:12px; max-width:min(92vw,760px);
+    box-shadow:0 8px 30px rgba(0,0,0,.35); pointer-events:none;
+  }
+  .legenda b{font-weight:700; white-space:nowrap}
+  .legenda span{color:#c9c9d1; font-weight:400}
+  .legenda i{width:1px; height:16px; background:#41414c; flex:none}
+  body.com-overlay .legenda{display:none}
+
+  /* ------------------------------------------------------------ overlays */
+  .capa, .lado{
+    position:fixed; inset:0; z-index:20; overflow:auto;
+    background:rgba(10,10,12,.97); display:grid; place-items:center; padding:40px 24px;
+  }
+  .capa[hidden], .lado[hidden]{display:none}
+  .capa__caixa{max-width:680px}
+  .capa h1{
+    font-family:var(--serifa); font-weight:600; font-size:clamp(28px,4.4vw,44px);
+    line-height:1.12; margin:0 0 12px;
+  }
+  .capa .olho{
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:#c8434a; font-weight:700; margin:0 0 14px;
+  }
+  .capa p{color:#c2c2cb; line-height:1.6; font-size:16px; margin:0 0 14px}
+  .passos{list-style:none; padding:0; margin:26px 0 30px; display:grid; gap:16px}
+  .passos li{display:flex; gap:14px; align-items:flex-start}
+  .passos .num{
+    flex:none; width:26px; height:26px; border-radius:50%; background:var(--marca);
+    color:#fff; font-size:13px; font-weight:700; display:grid; place-items:center;
+  }
+  .passos strong{display:block; font-size:15px; margin-bottom:3px}
+  .passos em{font-style:normal; color:#a9a9b3; font-size:14px; line-height:1.55}
+  .btn-comecar{
+    appearance:none; border:0; background:#fff; color:var(--tinta);
+    font-family:inherit; font-size:15px; font-weight:700;
+    padding:14px 28px; border-radius:8px; cursor:pointer;
+  }
+  .btn-comecar:hover{background:#e9e9ee}
+  .rodape-capa{margin-top:24px; font-size:13px; color:#75757f; line-height:1.6}
+
+  /* ---------------------------------------------------- as cinco juntas */
+  .lado__caixa{width:min(1100px,100%)}
+  .lado h2{font-family:var(--serifa); font-weight:600; font-size:26px; margin:0 0 4px}
+  .lado__sub{color:#a9a9b3; font-size:14px; margin:0 0 26px}
+  .grade{display:grid; grid-template-columns:repeat(2,1fr); gap:18px}
+  .grade__titulo{grid-column:1/-1; margin:14px 0 -4px; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#c8434a; font-weight:700}
+  .grade__titulo:first-child{margin-top:0}
+  .cartao{border:1px solid var(--fio); border-radius:12px; overflow:hidden; background:var(--fundo-2)}
+  .cartao__claro{background:#fff; padding:26px; display:grid; place-items:center; min-height:150px}
+  .cartao__escuro{background:#16161a; padding:20px; display:grid; place-items:center; border-top:1px solid var(--fio)}
+  .cartao img{max-width:100%; height:auto}
+  .cartao__claro img{max-height:92px; width:auto}
+  .cartao__escuro img{max-height:52px; width:auto; background:#fff; padding:8px 14px; border-radius:8px}
+  /* o letreiro é preto e horizontal: no escuro vira branco, sem selo */
+  .cartao--letreiro .cartao__claro img{max-height:56px}
+  .cartao--letreiro .cartao__escuro img{max-height:34px; background:none; padding:0; filter:invert(1)}
+  .cartao__pe{padding:14px 18px; border-top:1px solid var(--fio)}
+  .cartao__pe b{display:block; font-size:14px; margin-bottom:3px}
+  .cartao__pe span{font-size:13px; color:#a0a0aa; line-height:1.5}
+  .fechar{
+    position:fixed; top:18px; right:22px; appearance:none; border:1px solid var(--fio);
+    background:var(--fundo-2); color:#fff; width:38px; height:38px; border-radius:50%;
+    cursor:pointer; font-size:20px; line-height:1;
+  }
+
+  @media (max-width:1240px){
+    .barra{flex-wrap:wrap; padding:12px 14px; gap:12px; height:auto}
+    .barra__marca{min-width:0}
+    .abas{margin-inline:0; order:3; width:100%; overflow-x:auto; padding-bottom:2px}
+    .barra__acoes{margin-left:auto}
+    .palco{height:auto; min-height:60vh}
+    body{overflow:auto}
+    iframe{height:75vh}
+    .grade{grid-template-columns:1fr}
+    .legenda{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- =====================================================================
+     CAPA — o que a Gazeta precisa fazer nesta página
+     ===================================================================== -->
+<div class="capa" id="capa">
+  <div class="capa__caixa">
+    <p class="olho">Gazeta Bragantina · novo portal</p>
+    <h1>Duas coisas para vocês aprovarem.</h1>
+    <p>Esta página mostra a home do novo site já funcionando. Não é uma imagem parada: é o site de verdade, navegável.</p>
+
+    <ol class="passos">
+      <li>
+        <span class="num">1</span>
+        <span>
+          <strong>Escolher a logo</strong>
+          <em>São sete opções: a marca atual da Gazeta em três versões — o urubu, o GB com o urubu e o letreiro “Gazeta Bragantina” — e as quatro propostas anteriores. Use os botões no alto da tela para trocar entre elas e ver cada uma aplicada no site inteiro — no topo, na barra de navegação e no rodapé. Passe de uma para a outra quantas vezes quiser.</em>
+        </span>
+      </li>
+      <li>
+        <span class="num">2</span>
+        <span>
+          <strong>Aprovar o painel de publicações</strong>
+          <em>É a tela onde a redação vai escrever, revisar e publicar as matérias. Abre pelo botão vermelho “Painel da redação”, no canto direito.</em>
+        </span>
+      </li>
+    </ol>
+
+    <button type="button" class="btn-comecar" id="comecar">Começar</button>
+
+    <p class="rodape-capa">
+      Demonstração navegável, sem servidor — o conteúdo é de exemplo e nada do que for feito aqui é publicado.
+      Melhor visto no computador.
+    </p>
+  </div>
+</div>
+
+<!-- =====================================================================
+     BARRA DE CONTROLE
+     ===================================================================== -->
+<div class="barra">
+  <div class="barra__marca">
+    <b>Gazeta Bragantina</b>
+    <span>Aprovação da marca</span>
+  </div>
+
+  <div class="abas" id="abas">
+    <button type="button" class="seta" id="anterior" aria-label="Opção anterior">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>
+    </button>
+    <!-- os botões das opções entram por JS, antes da seta seguinte -->
+    <button type="button" class="seta" id="proximo" aria-label="Próxima opção">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <div class="barra__acoes">
+    <button type="button" class="btn-lado" id="abre-lado">Ver as 7 juntas</button>
+    <a class="btn-painel" id="btn-painel" href="admin/index.html?logo=1" target="_blank" rel="noopener">
+      Painel da redação
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M20 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- =====================================================================
+     PALCO — a home de verdade, dentro de um iframe
+     ===================================================================== -->
+<div class="palco">
+  <iframe id="palco" src="index.html?logo=1" title="Home do novo site da Gazeta Bragantina"></iframe>
+  <div class="legenda" id="legenda"></div>
+</div>
+
+<!-- =====================================================================
+     AS SETE LADO A LADO
+     ===================================================================== -->
+<div class="lado" id="lado" hidden>
+  <button type="button" class="fechar" id="fecha-lado" aria-label="Fechar">×</button>
+  <div class="lado__caixa">
+    <h2>As sete opções, lado a lado</h2>
+    <p class="lado__sub">Cada uma aparece como fica no topo do site e como fica no rodapé — onde o fundo é escuro: as marcas coloridas ganham um selo branco para não sumir, e o letreiro passa para branco.</p>
+    <div class="grade" id="grade"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* n = número do arquivo logo-opcao-N.png; a ordem da lista é a ordem das abas */
+  var GRUPOS = { atual:'Marca atual', proposta:'Propostas' };
+  var OPCOES = [
+    { n:1, grupo:'atual', nome:'Urubu', desc:'O urubu tradicional utilizado hoje pela Gazeta, aplicado ao novo site.' },
+    { n:6, grupo:'atual', nome:'GB com urubu', desc:'O urubu sentado sobre o “GB” vermelho, com as faixas em azul — a versão completa da marca atual.' },
+    { n:7, grupo:'atual', nome:'Letreiro', desc:'O nome “Gazeta Bragantina” em letras de jornal, sem o urubu.' },
+    { n:2, grupo:'proposta', nome:'Opção 2', desc:'Selo redondo, “GB” em destaque e o “NEWS” discreto, separado por um fio azul.' },
+    { n:3, grupo:'proposta', nome:'Opção 3', desc:'Selo redondo com a águia maior; “GB” e “NEWS” com o mesmo peso, divididos por um fio vermelho.' },
+    { n:4, grupo:'proposta', nome:'Opção 4', desc:'A mais compacta: selo redondo e o bloco “GB NEWS” travado ao lado, sem fio de separação.' },
+    { n:5, grupo:'proposta', nome:'Opção 5', desc:'Sem o selo redondo — a águia sai do círculo e a assinatura fica mais larga e horizontal.' }
+  ];
+  var TOTAL = OPCOES.length;
+  function porNumero(n) {
+    for (var i = 0; i < TOTAL; i++) if (OPCOES[i].n === n) return i;
+    return 0;
+  }
+
+  var palco   = document.getElementById('palco');
+  var abas    = document.getElementById('abas');
+  var proximo = document.getElementById('proximo');
+  var legenda = document.getElementById('legenda');
+  var capa    = document.getElementById('capa');
+  var atual   = 1;
+
+  /* ------------------------------ botões das 7 opções, em dois grupos */
+  OPCOES.forEach(function (o, i) {
+    if (i === 0 || OPCOES[i - 1].grupo !== o.grupo) {
+      if (i > 0) {
+        var fio = document.createElement('span');
+        fio.className = 'abas__fio';
+        abas.insertBefore(fio, proximo);
+      }
+      var g = document.createElement('span');
+      g.className = 'abas__grupo';
+      g.textContent = GRUPOS[o.grupo];
+      abas.insertBefore(g, proximo);
+    }
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'aba';
+    b.textContent = o.nome;
+    b.dataset.opcao = o.n;
+    b.setAttribute('aria-pressed', 'false');
+    abas.insertBefore(b, proximo);
+  });
+
+  /* ------------------------------------------------------- troca viva */
+  function mostra(n) {
+    atual = n;
+    palco.contentWindow.postMessage({ tipo:'gb-logo', opcao:n }, '*');
+
+    Array.prototype.forEach.call(abas.querySelectorAll('.aba'), function (b) {
+      b.setAttribute('aria-pressed', String(Number(b.dataset.opcao) === n));
+    });
+
+    var o = OPCOES[porNumero(n)];
+    legenda.innerHTML = '<b>' + o.nome + '</b><i></i><span>' + o.desc + '</span>';
+
+    /* o painel abre já com a logo que está sendo avaliada */
+    document.getElementById('btn-painel').href = 'admin/index.html?logo=' + n;
+
+    history.replaceState(null, '', '#opcao-' + n);
+  }
+
+  abas.addEventListener('click', function (ev) {
+    var b = ev.target.closest('.aba');
+    if (b) mostra(Number(b.dataset.opcao));
+  });
+
+  /* as setas circulam entre as 7 opções, na ordem das abas */
+  function passo(d) {
+    mostra(OPCOES[(porNumero(atual) + d + TOTAL) % TOTAL].n);
+  }
+  proximo.addEventListener('click', function () { passo(1); });
+  document.getElementById('anterior').addEventListener('click', function () { passo(-1); });
+
+  /* se o cliente navegar dentro do site, reforça a opção escolhida */
+  palco.addEventListener('load', function () {
+    palco.contentWindow.postMessage({ tipo:'gb-logo', opcao:atual }, '*');
+  });
+
+  /* --------------------------------------------------- as 7 lado a lado */
+  var lado  = document.getElementById('lado');
+  var grade = document.getElementById('grade');
+
+  OPCOES.forEach(function (o, i) {
+    if (i === 0 || OPCOES[i - 1].grupo !== o.grupo) {
+      var t = document.createElement('p');
+      t.className = 'grade__titulo';
+      t.textContent = GRUPOS[o.grupo];
+      grade.appendChild(t);
+    }
+    var d = document.createElement('div');
+    d.className = 'cartao' + (o.n === 7 ? ' cartao--letreiro' : '');
+    d.innerHTML =
+      '<div class="cartao__claro"><img src="assets/img/logo-opcao-' + o.n + '.png" alt="' + o.nome + ' sobre fundo claro"></div>' +
+      '<div class="cartao__escuro"><img src="assets/img/logo-opcao-' + o.n + '.png" alt="' + o.nome + ' sobre fundo escuro"></div>' +
+      '<div class="cartao__pe"><b>' + o.nome + '</b><span>' + o.desc + '</span></div>';
+    grade.appendChild(d);
+  });
+
+  function fechaLado() {
+    lado.hidden = true;
+    document.body.classList.remove('com-overlay');
+  }
+  document.getElementById('abre-lado').addEventListener('click', function () {
+    lado.hidden = false;
+    document.body.classList.add('com-overlay');
+  });
+  document.getElementById('fecha-lado').addEventListener('click', fechaLado);
+  lado.addEventListener('click', function (ev) { if (ev.target === lado) fechaLado(); });
+
+  /* ------------------------------------------------------------ teclado */
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { fechaLado(); return; }
+    if (!capa.hidden) return;
+    if (ev.key === 'ArrowRight') passo(1);
+    if (ev.key === 'ArrowLeft')  passo(-1);
+    if (ev.key >= '1' && ev.key <= String(TOTAL)) mostra(OPCOES[Number(ev.key) - 1].n);
+  });
+
+  /* --------------------------------------------------------------- capa */
+  document.getElementById('comecar').addEventListener('click', function () {
+    capa.hidden = true;
+  });
+
+  /* --------------------------------------------------- estado inicial */
+  var hash    = location.hash;
+  var doHash  = (hash.match(/opcao-(\d)/) || [])[1];
+  mostra(doHash && doHash >= 1 && doHash <= TOTAL ? Number(doHash) : 1);
+
+  /* #comparar abre direto na tela das sete juntas (link para mandar solto) */
+  if (/comparar/.test(hash)) {
+    capa.hidden = true;
+    lado.hidden = false;
+    document.body.classList.add("com-overlay");
+  }
+})();
+</script>
+</body>
+</html>
