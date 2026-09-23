@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -110,6 +110,29 @@ beforeEach(() => {
     preferred_tier: tier,
     changed: true,
   }))
+})
+
+describe('marca da agência no painel do cliente', () => {
+  it('exibe agência no cabeçalho e nó no rodapé do menu', async () => {
+    renderDashboard('etapas', dashboardData({ agency: { name: 'Maisis Publicidade', logoUrl: '/agencies/maisis/logo.png' } }))
+    const logo = await screen.findByRole('img', { name: 'Maisis Publicidade' })
+    expect(logo.closest('.client-sidebar > a')).not.toBeNull()
+    const navigation = screen.getByLabelText('Tecnologia nó')
+    expect(within(navigation).getByRole('img', { name: 'nó tech stack' })).toBeVisible()
+    expect(screen.getAllByRole('img', { name: 'nó tech stack' })).toHaveLength(1)
+  })
+  it('mantém nome da agência quando a imagem falha', async () => {
+    renderDashboard('etapas', dashboardData({ agency: { name: 'Maisis Publicidade', logoUrl: '/missing.png' } }))
+    fireEvent.error(await screen.findByRole('img', { name: 'Maisis Publicidade' }))
+    expect(screen.getByText('Maisis Publicidade').closest('.client-sidebar > a')).not.toBeNull()
+    expect(screen.getAllByRole('img', { name: 'nó tech stack' })).toHaveLength(1)
+  })
+  it('mantém a marca da nó no cabeçalho de um cliente direto', async () => {
+    renderDashboard('etapas', dashboardData({ agency: null }))
+    const logos = await screen.findAllByRole('img', { name: 'nó tech stack' })
+    expect(logos.some(logo => logo.closest('.client-sidebar > a'))).toBe(true)
+    expect(logos.some(logo => logo.closest('.sidebar-bottom'))).toBe(true)
+  })
 })
 
 describe('dashboard do cliente', () => {

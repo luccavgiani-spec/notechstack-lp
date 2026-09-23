@@ -344,12 +344,15 @@ export function AdminProjectsPage() {
               Todos os projetos.
             </h2>
           </div>
+          <div className="flex flex-wrap gap-3">
+          <Link to="/no/agencias" className="rounded-xl border border-borda bg-white px-4 py-2.5 text-sm font-semibold hover:border-azul">Agências</Link>
           <Link
             to="/no/atividade"
             className="rounded-xl border border-borda bg-white px-4 py-2.5 text-sm font-semibold hover:border-azul"
           >
             Ver atividade
           </Link>
+          </div>
         </div>
         <div className="mt-7 grid gap-3 rounded-2xl border border-borda bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block text-sm sm:col-span-2">

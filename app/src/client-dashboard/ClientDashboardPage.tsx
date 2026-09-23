@@ -44,6 +44,17 @@ const TIER_ORDER: Array<{ key: TierKey; label: string; color: string }> = [
 
 type ClientDashboardPageProps = {
   module: ModuleKey
+  previewData?: DashboardData
+}
+
+function ClientBrand({ agency, theme }: { agency: DashboardData['agency']; theme: DashboardTheme }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null)
+  const logo = agency?.logoUrl
+  const validLogo = logo && (/^\/(?!\/)/.test(logo) || /^https:\/\//.test(logo))
+  if (!agency) return <img className="client-logo" src={theme === 'light' ? '/no-tech-stack-tinta-ponto-ambar.svg' : '/no-tech-stack-branca-ponto-ambar.svg'} alt="nó tech stack" />
+  return validLogo && failedUrl !== logo
+    ? <img className="client-agency-logo" src={logo} alt={agency.name} onError={() => setFailedUrl(logo)} />
+    : <span className="client-agency-name">{agency.name}</span>
 }
 
 type DashboardTheme = 'light' | 'dark'
@@ -582,10 +593,12 @@ function ProjectNavigation({
   projectId,
   currentModule,
   modules,
+  preview = false,
 }: {
   projectId: string
   currentModule: ModuleKey
   modules: NonNullable<DashboardData['shell']>['modules']
+  preview?: boolean
 }) {
   return (
     <nav aria-label="Módulos do projeto" className="lg:w-64 lg:shrink-0">
@@ -593,7 +606,7 @@ function ProjectNavigation({
         {MODULES.map((item) => (
           <NavLink
             key={item.key}
-            to={`/p/${encodeURIComponent(projectId)}/${item.path}`}
+            to={preview ? `/__preview/cliente-agencia/${item.path}` : `/p/${encodeURIComponent(projectId)}/${item.path}`}
             aria-current={currentModule === item.key ? 'page' : undefined}
             className={({ isActive }) =>
               `group flex min-w-max items-center gap-3 rounded-xl px-4 py-3 text-sm transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-azul ${isActive ? 'bg-tinta text-white shadow-card' : 'bg-white text-tinta hover:bg-azul-tint'}`
@@ -625,7 +638,7 @@ function ProjectNavigation({
   )
 }
 
-export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
+export function ClientDashboardPage({ module, previewData }: ClientDashboardPageProps) {
   const { projectId = '' } = useParams()
   const [now] = useState(() => Date.now())
   const [theme, setTheme] = useState<DashboardTheme>(getInitialTheme)
@@ -642,7 +655,7 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
   useEffect(() => {
     let active = true
 
-    void loadClientDashboard(projectId)
+    void (previewData ? Promise.resolve(previewData) : loadClientDashboard(projectId))
       .then((nextData) => {
         if (!active) return
         setData(nextData)
@@ -658,9 +671,10 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
     return () => {
       active = false
     }
-  }, [projectId, reloadKey])
+  }, [projectId, reloadKey, previewData])
 
   async function selectTier(tier: TierKey) {
+    if (previewData) return
     if (tier === selectedTier || savingTier !== null) return
     setSavingTier(tier)
     setSaveError(false)
@@ -739,7 +753,7 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
             Sua janela de análise terminou.
           </h1>
           <p className="mt-5 font-light leading-7 text-cinza">
-            Fale com a Nó para retomar o projeto e manter o dashboard disponível
+            Fale com {data.agency?.name ?? 'a Nó'} para retomar o projeto e manter o dashboard disponível
             durante a construção.
           </p>
           <p className="mt-5 font-mono text-xs uppercase tracking-[0.1em] text-cinza">
@@ -766,15 +780,7 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
       <div className="brand-stripe" />
       <aside className="client-sidebar">
         <Link to="/p/projetos" aria-label="Voltar aos projetos">
-          <img
-            className="client-logo"
-            src={
-              theme === 'light'
-                ? '/no-tech-stack-tinta-ponto-ambar.svg'
-                : '/no-tech-stack-branca-ponto-ambar.svg'
-            }
-            alt="nó tech stack"
-          />
+          <ClientBrand agency={data.agency} theme={theme} />
         </Link>
         <p className="sidebar-label">Projeto</p>
         <strong className="sidebar-project-name">{shell.project_name}</strong>
@@ -782,8 +788,13 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
           projectId={projectId}
           currentModule={module}
           modules={shell.modules}
+          preview={Boolean(previewData)}
         />
         <div className="sidebar-bottom">
+          <div className="agency-powered-by" aria-label="Tecnologia nó">
+            <p>Tecnologia e desenvolvimento</p>
+            <img src={theme === 'light' ? '/no-tech-stack-tinta-ponto-ambar.svg' : '/no-tech-stack-branca-ponto-ambar.svg'} alt="nó tech stack" />
+          </div>
           <Link to="/p/projetos">← Meus projetos</Link>
           <div className="theme-switch" role="group" aria-label="Tema do painel">
             <button
@@ -812,6 +823,7 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
         </div>
       </aside>
       <div className={`client-main${module === 'editor' ? ' editor-main' : ''}`}>
+        {previewData ? <p className="agency-preview-notice">Prévia visual · nenhum cliente cadastrado · alterações não são salvas</p> : null}
         {module === 'como_funciona' ? (
           <>
             <section className="project-hero">
@@ -826,9 +838,9 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
                 <div className="hero-actions">
                   <Link
                     className="hero-primary-action"
-                    to={`/p/${encodeURIComponent(projectId)}/etapas`}
+                    to={previewData ? '/__preview/cliente-agencia/etapas' : `/p/${encodeURIComponent(projectId)}/etapas`}
                   >
-                    Falar com a equipe da Nó <span aria-hidden="true">→</span>
+                    Falar com a equipe {data.agency ? `da ${data.agency.name}` : 'da Nó'} <span aria-hidden="true">→</span>
                   </Link>
                 </div>
               </div>
@@ -862,7 +874,7 @@ export function ClientDashboardPage({ module }: ClientDashboardPageProps) {
               Tudo no mesmo nó.
             </p>
             <Link
-              to={`/p/${encodeURIComponent(projectId)}/${module === 'versoes' && shell.modules.editor === 'ativo' ? 'editor' : 'como-funciona'}`}
+              to={`${previewData ? '/__preview/cliente-agencia' : `/p/${encodeURIComponent(projectId)}`}/${module === 'versoes' && shell.modules.editor === 'ativo' ? 'editor' : 'como-funciona'}`}
             >
               {module === 'versoes' && shell.modules.editor === 'ativo'
                 ? 'Abrir o Editor →'

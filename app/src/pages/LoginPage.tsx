@@ -33,6 +33,11 @@ export function LoginPage() {
       return
     }
 
+    if (user.app_metadata.role === 'AGENCY_ADMIN') {
+      navigate('/agencia', { replace: true })
+      return
+    }
+
     const { projects, error: projectsError } = await listAccessibleProjects()
 
     if (projectsError) {

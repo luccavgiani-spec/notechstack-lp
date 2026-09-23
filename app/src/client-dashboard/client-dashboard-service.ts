@@ -79,6 +79,7 @@ export type EditorVersionChecklist = {
 }
 
 export type DashboardData = {
+  agency?: { name: string; logoUrl: string | null } | null
   shell: ProjectShell | null
   roadmap: Roadmap | null
   kanban: KanbanItem[]
@@ -86,7 +87,7 @@ export type DashboardData = {
 }
 
 export async function loadClientDashboard(projectId: string): Promise<DashboardData> {
-  const [shellResult, roadmapResult, kanbanResult, versionsResult, checklistsResult] = await Promise.all([
+  const [shellResult, roadmapResult, kanbanResult, versionsResult, checklistsResult, brandingResult] = await Promise.all([
     supabase.rpc('get_client_project_shell', { p_project_id: projectId }).maybeSingle(),
     supabase
       .from('roadmaps')
@@ -106,15 +107,17 @@ export async function loadClientDashboard(projectId: string): Promise<DashboardD
       .order('published_at', { ascending: false })
       .order('created_at', { ascending: false }),
     supabase.rpc('list_client_version_checklists', { p_project_id: projectId }),
+    supabase.rpc('get_client_project_branding', { p_project_id: projectId }),
   ])
 
-  const error = shellResult.error ?? roadmapResult.error ?? kanbanResult.error ?? versionsResult.error ?? checklistsResult.error
+  const error = shellResult.error ?? roadmapResult.error ?? kanbanResult.error ?? versionsResult.error ?? checklistsResult.error ?? brandingResult.error
   if (error) {
     throw error
   }
 
   const checklists = (checklistsResult.data ?? []) as EditorVersionChecklist[]
   return {
+    agency: brandingResult.data as DashboardData['agency'],
     shell: shellResult.data as ProjectShell | null,
     roadmap: roadmapResult.data as Roadmap | null,
     kanban: (kanbanResult.data ?? []) as KanbanItem[],

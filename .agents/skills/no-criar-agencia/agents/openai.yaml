@@ -1,0 +1,4 @@
+interface:
+  display_name: "Criar agência · nó"
+  short_description: "Cadastre agências e operadores no portal da nó"
+  default_prompt: "Use $no-criar-agencia para cadastrar uma agência no portal da nó, verificando duplicidades e o ambiente de destino."
