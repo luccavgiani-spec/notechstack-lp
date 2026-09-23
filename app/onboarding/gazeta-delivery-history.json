@@ -1,0 +1,23 @@
+[
+  {
+    "label": "V1",
+    "title": "Protótipo navegável",
+    "date": "2026-07-13",
+    "changelog": "Entrega do protótipo navegável do portal para validação visual das páginas e da navegação.",
+    "current": false
+  },
+  {
+    "label": "V2",
+    "title": "Painel editorial",
+    "date": "2026-08-18",
+    "changelog": "Entrega do Painel da Redação para apresentação do fluxo editorial e da gestão de notícias.",
+    "current": false
+  },
+  {
+    "label": "V3",
+    "title": "Final",
+    "date": "2026-09-02",
+    "changelog": "Entrega da versão final do portal para análise. A virada de DNS e a entrada em produção seguem no cronograma do projeto.",
+    "current": true
+  }
+]
