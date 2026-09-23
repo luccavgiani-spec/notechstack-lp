@@ -18,11 +18,14 @@ const AgencyConsolePage = lazy(() => import('./agency/AgencyConsolePage').then(m
 const AgencyManagementPage = lazy(() => import('./agency/AgencyManagementPage').then(m => ({ default: m.AgencyManagementPage })))
 const BrandingPreview = import.meta.env.DEV && import.meta.env.VITE_AGENCY_LOCAL_PREVIEW === 'true'
   ? lazy(() => import('./client-dashboard/ClientBrandingPreview')) : null
+const AgencyProjectPreview = import.meta.env.DEV && import.meta.env.VITE_AGENCY_LOCAL_PREVIEW === 'true'
+  ? lazy(() => import('./agency/AgencyProjectPreview')) : null
 
 export function AppRoutes() {
   return (
     <Suspense fallback={<p role="status">Carregando página…</p>}>
     <Routes>
+      {AgencyProjectPreview ? <Route path="/__preview/agencia/projeto" element={<AgencyProjectPreview />} /> : null}
       {BrandingPreview ? <Route path="/__preview/cliente-agencia/:module" element={<Suspense fallback={<p>Carregando prévia…</p>}><BrandingPreview /></Suspense>} /> : null}
       <Route path="/acesso" element={<AccessPage />} />
       <Route path="/login" element={<LoginPage />} />

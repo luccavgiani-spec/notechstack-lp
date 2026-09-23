@@ -1,0 +1,114 @@
+/* Project workspace: full-width header, task board and delivery history. */
+.ac-project-detail { background: #fcfcfa; }
+.ac-project-detail .ac-container { max-width: 1560px; padding-inline: 4.4%; }
+.ac-project-detail .ac-detail-header { background: #171817; }
+.ac-project-detail .ac-topbar { min-height: 88px; gap: 24px; }
+.ac-project-detail .ac-logo img { width: 180px; }
+.ac-project-detail .ac-breadcrumb { font-size: 12px; }
+.ac-project-detail .ac-topbar-actions { gap: 18px; }
+.ac-back-link { display: inline-flex; align-items: center; gap: 14px; border: 1px solid #60625f; border-radius: 8px; padding: 11px 16px; font-size: 11px; color: #fff; }
+.ac-back-link:hover { background: #2b2d2a; }
+.ac-back-link svg { width: 16px; }
+.ac-project-detail .ac-project-heading { gap: 32px; padding: 20px 0 35px; }
+.ac-project-detail .ac-project-identity { flex: 1.2; gap: 22px; }
+.ac-project-detail .ac-avatar-large { width: 76px; height: 76px; flex-basis: 76px; border-radius: 50%; background: #343633; font-size: 30px; }
+.ac-project-detail .ac-project-identity h1 { font-size: clamp(22px, 2vw, 29px); font-weight: 650; letter-spacing: -.045em; line-height: 1.25; }
+.ac-project-detail .ac-project-client { font-size: 12px; margin-top: 8px; }
+.ac-project-detail .ac-project-metrics { flex: 2.1; }
+.ac-project-detail .ac-project-metric { padding-inline: 20px; }
+.ac-project-detail .ac-project-metric:last-child { padding-right: 0; }
+.ac-project-detail .ac-project-metric strong { font-size: 15px; line-height: 1.45; min-height: 34px; overflow-wrap: anywhere; }
+.ac-project-detail .ac-project-metric > span { font-size: 11px; margin-top: 7px; }
+.ac-project-detail .ac-project-metric progress { height: 6px; width: 100%; border: 0; border-radius: 9px; overflow: hidden; appearance: none; background: #454744; }
+.ac-project-detail .ac-project-metric progress::-webkit-progress-value { background: #39bc82; border-radius: 9px; }
+.ac-project-detail .ac-project-metric progress::-moz-progress-bar { background: #39bc82; }
+.ac-completion-ring { width: 28px; height: 28px; transform: rotate(-90deg); fill: none; stroke-width: 5px; }
+.ac-completion-ring circle:first-child { stroke: #3d5547; }
+.ac-completion-ring circle:last-child { stroke: #56ca95; stroke-linecap: round; }
+.ac-project-detail .ac-metric-rule { margin-top: 13px; height: 6px; }
+.ac-project-detail .ac-tabs { margin: 5px 0 0; gap: 32px; }
+.ac-project-detail .ac-tabs button { font-size: 13px; padding: 22px 8px 15px; }
+.ac-board-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 19px 1px 14px; }
+.ac-board-heading p { font-size: 12px; font-weight: 600; }
+.ac-board-heading span { font-size: 10px; color: var(--ac-muted); }
+.ac-project-detail .ac-board { gap: 16px; }
+.ac-project-detail .ac-column { padding: 11px; border-radius: 10px; background: #f5f5f2; min-height: 370px; }
+.ac-project-detail .ac-column-amber { background: #faf7ef; border-color: #eae4d8; }
+.ac-project-detail .ac-column-green { background: #f0f7f3; border-color: #dfeae3; }
+.ac-project-detail .ac-column h2 { padding: 7px 6px 17px; font-size: 14px; gap: 10px; letter-spacing: -.03em; }
+.ac-project-detail .ac-column h2 > span { font-size: 12px; }
+.ac-project-detail .ac-column h2 .ac-dot { height: 16px; width: 16px; flex-basis: 16px; }
+.ac-project-detail .ac-task-list { gap: 9px; max-height: 360px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #c5c9c3 transparent; }
+.ac-project-detail .ac-task { padding: 17px; border-radius: 8px; border-color: #e7e8e3; box-shadow: 0 2px 4px #14141402; }
+.ac-project-detail .ac-task h3 { font-size: 14px; line-height: 1.5; font-weight: 550; letter-spacing: -.025em; }
+.ac-project-detail .ac-task-check { padding: 4px; margin-top: 1px; }
+.ac-task-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-top: 12px; }
+.ac-task-meta:empty { display: none; }
+.ac-project-detail .ac-task-tag { margin: 0; font-size: 10px; padding: 4px 9px; }
+.ac-project-detail .ac-task-date { margin: 0 0 0 auto; font-size: 10px; }
+.ac-project-detail .ac-column-green .ac-task-tag { color: #26794d; background: #e5f4ec; }
+.ac-project-detail .ac-column-foot { font-size: 10px; margin-top: auto; padding: 17px 0 4px; }
+.ac-project-detail .ac-detail-bottom { grid-template-columns: 1.65fr 1fr; gap: 20px; margin-top: 20px; align-items: start; }
+.ac-project-detail .ac-panel { border-radius: 10px; padding: 20px; }
+.ac-project-detail .ac-panel h2 { font-size: 18px; letter-spacing: -.045em; }
+.ac-project-detail .ac-count { border: 1px solid var(--ac-border); border-radius: 7px; padding: 7px 10px; white-space: nowrap; }
+.ac-project-detail .ac-timeline { margin: 18px 0; position: relative; }
+.ac-project-detail .ac-timeline::before { content: ''; position: absolute; left: 6px; top: 19px; bottom: 25px; width: 2px; background: #e1e5e0; }
+.ac-project-detail .ac-timeline li { position: relative; padding: 13px 0 13px 32px; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 17px; }
+.ac-project-detail .ac-timeline li::before { content: ''; position: absolute; left: 1px; top: 28px; width: 12px; height: 12px; border-radius: 50%; background: var(--ac-green); box-shadow: 0 0 0 4px white; }
+.ac-project-detail .ac-timeline li:last-child { border-bottom: 0; }
+.ac-project-detail .ac-timeline-icon { width: 40px; height: 40px; }
+.ac-project-detail .ac-timeline strong { font-size: 12px; }
+.ac-project-detail .ac-timeline p { font-size: 12px; margin-top: 4px; }
+.ac-project-detail .ac-timeline time { font-size: 11px; padding-top: 2px; }
+.ac-project-detail .ac-timeline time small { display: block; font-size: 9px; margin-top: 4px; }
+.ac-project-detail .ac-info { margin-top: 14px; }
+.ac-project-detail .ac-info > div { font-size: 11px; gap: 18px; padding-block: 10px; }
+.ac-project-detail .ac-info dd { max-width: 62%; }
+.ac-project-detail .ac-info .ac-status { font-size: 11px; }
+.ac-project-detail .ac-tab-panel { margin-top: 20px; }
+.ac-project-detail .ac-footer { padding-top: 28px; }
+@media (max-width: 1200px) {
+  .ac-project-detail .ac-project-identity { flex-basis: 100%; }
+  .ac-project-detail .ac-project-heading { gap: 24px; }
+  .ac-project-detail .ac-project-metric:first-child { padding-left: 0; }
+  .ac-project-detail .ac-topbar-actions { gap: 14px; }
+  .ac-project-detail .ac-topbar-actions .ac-agency-name { display: none; }
+}
+@media (min-width: 851px) and (max-width: 1050px) {
+  .ac-project-detail .ac-container { padding-inline: 24px; }
+  .ac-project-detail .ac-task { padding: 13px; }
+  .ac-project-detail .ac-task h3 { font-size: 12px; }
+}
+@media (max-width: 850px) {
+  .ac-project-detail .ac-container { padding-inline: 24px; }
+  .ac-project-detail .ac-detail-bottom { grid-template-columns: 1fr; }
+  .ac-project-detail .ac-column { min-height: 150px; }
+  .ac-project-detail .ac-task-list { max-height: none; overflow: visible; }
+  .ac-project-detail .ac-topbar-actions { flex-wrap: wrap; justify-content: flex-end; }
+}
+@media (max-width: 560px) {
+  .ac-project-detail .ac-container { padding-inline: 16px; }
+  .ac-project-detail .ac-topbar { gap: 12px; padding-block: 18px; }
+  .ac-project-detail .ac-logo img { width: 140px; }
+  .ac-project-detail .ac-topbar-actions { gap: 12px; }
+  .ac-back-link { padding: 8px 10px; font-size: 10px; gap: 8px; }
+  .ac-back-link svg { display: none; }
+  .ac-project-detail .ac-project-heading { padding: 16px 0 28px; }
+  .ac-project-detail .ac-project-identity { gap: 14px; }
+  .ac-project-detail .ac-avatar-large { width: 56px; height: 56px; flex-basis: 56px; font-size: 24px; }
+  .ac-project-detail .ac-project-identity h1 { font-size: 23px; }
+  .ac-project-detail .ac-project-metric { padding-inline: 14px; }
+  .ac-project-detail .ac-project-metric:nth-child(3) { padding-left: 0; }
+  .ac-project-detail .ac-project-metric strong { font-size: 13px; gap: 9px; }
+  .ac-project-detail .ac-project-metric > span { font-size: 10px; }
+  .ac-project-detail .ac-tabs { gap: 20px; }
+  .ac-project-detail .ac-tabs button { font-size: 12px; padding-inline: 0; }
+  .ac-board-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .ac-project-detail .ac-panel { padding: 16px; }
+  .ac-project-detail .ac-panel h2 { font-size: 16px; }
+  .ac-project-detail .ac-timeline li { grid-template-columns: 32px minmax(0, 1fr); padding-left: 24px; gap: 10px; }
+  .ac-project-detail .ac-timeline-icon { width: 32px; height: 32px; }
+  .ac-project-detail .ac-timeline time { grid-column: 2; }
+  .ac-project-detail .ac-timeline time small { display: inline; margin-left: 8px; }
+}
