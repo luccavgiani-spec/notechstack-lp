@@ -1252,6 +1252,7 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;backgrou
   width:22px;height:22px;object-fit:contain;
 }
 }</style>
+<link rel="stylesheet" href="/shared/products-nav.css">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -2081,7 +2082,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 </style>
 <link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/historia.css?v=62">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap">
-<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=13">
+<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=15">
 <!-- HERO -->
 <section id="hero">
   <!-- Fundo em vídeo, avançado/retrocedido pelo movimento horizontal do mouse.
@@ -2666,17 +2667,8 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     }
   })();
 
-  import { initPillNav } from '/shared/pillnav.js';
-  import { pillNavConfig } from '/shared/pillnav-config.js';
-
-  initPillNav(document.getElementById('pill-nav-root'), {
-    ...pillNavConfig,
-    /* nesta LP a nav é só Home · Health · Contact — o Roteador fica de fora
-       (filtro local: o pillnav-config compartilhado segue intacto pros outros
-       sites) */
-    items: pillNavConfig.items.filter(i => i.label !== 'Roteador'),
-    activeHref: '/'
-  });
+  import { initProductsNav } from '/shared/products-nav.js';
+  initProductsNav(document.getElementById('pill-nav-root'));
 
   /* Contato: a seção #cta (formulário) saiu na reestruturação de 13/08 e o
      formulário vai renascer dentro do "Senta aí". Até lá, todo link de contato
@@ -4173,7 +4165,7 @@ requestAnimationFrame(frame);
 <!-- v8 · editor (historia.js), cenas 3D, galerias/fluxograma/app/cronograma (v8.js) e o diagnóstico -->
 <script src="/lp-narrador/cenas-lp/historia/historia.js?v=49" defer></script>
 <script type="module" src="/lp-narrador/cenas-lp/historia/cenas3d.js?v=50"></script>
-<script src="/lp-narrador/cenas-lp/historia/v8.js?v=5" defer></script>
+<script src="/lp-narrador/cenas-lp/historia/v8.js?v=7" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/pagarme-public-config.js?v=1" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/roadmap-checkout.js?v=4" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/diagnostico.js?v=69" defer></script>

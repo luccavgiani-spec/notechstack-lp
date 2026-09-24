@@ -39,9 +39,19 @@
   /* ─────────────── galeria circular ───────────────
      Os itens correm numa esteira sem fim e, no caminho, descrevem um arco:
      quanto mais longe do centro, mais sobem (ou descem) e mais inclinam. */
-  /* Logos de clientes: preencher com { n:'Nome', url:'/caminho/logo.svg' }.
-     Enquanto a lista estiver vazia, a linha mostra vagas tracejadas. */
-  const CLIENTES = [];
+  /* Fundo é controlado por marca: branco como padrão, com as duas exceções
+     aprovadas (Xocó verde e Palladio preto). */
+  const CLIENTES = [
+    { n:'Plantão Digital',          url:'/lp-narrador/cenas-lp/historia/logos-clientes/plantao-digital.webp' },
+    { n:'Consulta de Casa',         url:'/lp-narrador/cenas-lp/historia/logos-clientes/consulta-de-casa.webp' },
+    { n:'SOS Telemedicina',         url:'/lp-narrador/cenas-lp/historia/logos-clientes/sos-telemedicina.webp' },
+    { n:'Loiê Sala Aromática',      url:'/lp-narrador/cenas-lp/historia/logos-clientes/loie.webp' },
+    { n:'Gazeta Bragantina',        url:'/lp-narrador/cenas-lp/historia/logos-clientes/gazeta-bragantina.webp', largo:true },
+    { n:'Maisis Marketing Digital', url:'/lp-narrador/cenas-lp/historia/logos-clientes/maisis-marketing-digital.webp', largo:true },
+    { n:'Pesqueiro Xocó',           url:'/lp-narrador/cenas-lp/historia/logos-clientes/pesqueiro-xoco.webp', fundo:'verde', zoom:'xl' },
+    { n:'Prontia Saúde',            url:'/lp-narrador/cenas-lp/historia/logos-clientes/prontia-saude.webp', fundo:'prontia', zoom:'lg' },
+    { n:'Palladio',                 url:'/lp-narrador/cenas-lp/historia/logos-clientes/palladio.webp', fundo:'preto' }
+  ];
 
   function galeria(el){
     const tipo = el.dataset.galeria;
@@ -62,6 +72,9 @@
       n.className = 'v8-gi' + (d.vago ? ' vago' : '');
       if (d.vago){ n.textContent = 'logo do cliente'; }
       else {
+        if (d.fundo) n.classList.add('fundo-' + d.fundo);
+        if (d.largo) n.classList.add('logo-largo');
+        if (d.zoom) n.classList.add('logo-zoom-' + d.zoom);
         if (d.url){ const im = new Image(); im.src = d.url; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.draggable = false; n.append(im); }
         if (tipo === 'ferramentas' || !d.url){ const s = document.createElement('span'); s.textContent = d.n; n.append(s); }
         n.setAttribute('aria-label', d.n);

@@ -67,7 +67,13 @@
   height:96px; width:210px; padding:0 18px; justify-content:center; background:#fff;
   font:700 20px var(--font); letter-spacing:-.02em;
 }
-.v8-galeria-logos .v8-gi img{ width:auto; height:48px; max-width:170px; border-radius:0 }
+.v8-galeria-logos .v8-gi img{ width:auto; height:56px; max-width:172px; border-radius:0 }
+.v8-galeria-logos .v8-gi.logo-largo img{ width:172px; height:auto; max-height:56px }
+.v8-galeria-logos .v8-gi.fundo-verde{ background:#123d2b; border-color:#123d2b }
+.v8-galeria-logos .v8-gi.fundo-prontia{ background:#00766a; border-color:#00766a }
+.v8-galeria-logos .v8-gi.fundo-preto{ background:#000; border-color:#000 }
+.v8-galeria-logos .v8-gi.logo-zoom-lg img{ height:76px; max-width:184px }
+.v8-galeria-logos .v8-gi.logo-zoom-xl img{ height:86px; max-width:190px }
 .v8-gi.vago{ border-style:dashed; background:transparent; box-shadow:none; color:rgba(20,20,20,.35); font:500 12px var(--font-mono); letter-spacing:.12em; text-transform:uppercase }
 /* ── 04 · fluxograma ── */
 #como-funciona{ padding-bottom:clamp(80px,9vw,130px) }
@@ -672,6 +678,10 @@ button.v8-lo-prod:hover img{ transform:scale(1.03) }
   .v8-gi img{ width:28px; height:28px }
   .v8-galeria-logos{ height:130px }
   .v8-galeria-logos .v8-gi{ height:78px; width:160px; font-size:17px }
+  .v8-galeria-logos .v8-gi img{ height:46px; max-width:128px }
+  .v8-galeria-logos .v8-gi.logo-largo img{ width:128px; max-height:46px }
+  .v8-galeria-logos .v8-gi.logo-zoom-lg img{ height:62px; max-width:142px }
+  .v8-galeria-logos .v8-gi.logo-zoom-xl img{ height:70px; max-width:146px }
 
   /* fluxograma: coluna única, fio à esquerda */
   .v8-passo{ grid-template-columns:52px 1fr; column-gap:16px; align-items:start }
