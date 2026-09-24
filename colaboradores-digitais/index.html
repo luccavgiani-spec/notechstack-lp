@@ -182,12 +182,18 @@ a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--no-ambar);outli
 .companies-marquee::after{right:0;background:linear-gradient(270deg,rgba(207,185,157,.98) 8%,rgba(207,185,157,0))}
 .companies-track{display:flex;width:max-content;will-change:transform;animation:companiesRight 46s linear infinite}
 .companies-sequence{display:flex;align-items:center;gap:10px;padding-right:10px;flex:none}
-.company-chip{width:auto;min-width:0;height:60px;padding:9px 15px;display:flex;align-items:center;justify-content:center;gap:10px;flex:none;border:1px solid rgba(44,33,23,.14);border-radius:999px;background:rgba(255,252,246,.42);box-shadow:0 10px 26px rgba(62,45,28,.075),inset 0 1px rgba(255,255,255,.62);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .28s ease,border-color .28s ease,background .28s ease,box-shadow .28s ease}
-.company-chip:hover{transform:translateY(-5px);border-color:rgba(184,121,78,.5);background:rgba(255,250,241,.82);box-shadow:0 20px 44px rgba(62,45,28,.14),inset 0 1px rgba(255,255,255,.8)}
+.company-chip{width:auto;min-width:0;height:60px;padding:9px 15px;display:flex;align-items:center;justify-content:center;gap:10px;flex:none;border:1px solid rgba(44,33,23,.14);border-radius:999px;background:#fff;box-shadow:0 10px 26px rgba(62,45,28,.075),inset 0 1px rgba(255,255,255,.62);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:transform .28s ease,border-color .28s ease,background .28s ease,box-shadow .28s ease}
+.company-chip:hover{transform:translateY(-5px);border-color:rgba(184,121,78,.5)}
+.company-chip--verde{background:#123d2b;border-color:#123d2b}
+.company-chip--prontia{background:#00766a;border-color:#00766a}
+.company-chip--preto{background:#000;border-color:#000}
+.company-chip--wide .company-logo{width:148px;height:auto;max-height:38px}
+.company-chip--zoom-lg .company-logo{height:44px;max-height:44px}
+.company-chip--zoom-xl .company-logo{height:48px;max-height:48px}
 .company-logo{display:block;width:auto;max-width:148px;height:32px;max-height:38px;object-fit:contain}
-.company-chip--icon .company-logo{width:34px;height:34px;object-fit:contain;flex:none}
+
 .company-name{font-size:11px;font-weight:700;line-height:1.15;letter-spacing:-.01em;color:#29231e;white-space:nowrap}
-.company-logo--prontia{width:112px;height:32px;max-width:none;max-height:none;object-fit:cover;object-position:center;filter:brightness(0)}
+
 @keyframes companiesRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}
 
 @media (min-width:901px){
@@ -277,8 +283,10 @@ a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--no-ambar);outli
   .companies-marquee::before,.companies-marquee::after{width:42px}
   .company-chip{width:auto;height:54px;padding:8px 13px;border-radius:999px}
   .company-logo{max-width:122px;height:28px;max-height:32px}
-  .company-chip--icon .company-logo{width:30px;height:30px}
-  .company-logo--prontia{width:98px;height:28px;max-width:none;max-height:none}
+  .company-chip--zoom-lg .company-logo{height:36px;max-height:36px}
+  .company-chip--zoom-xl .company-logo{height:40px;max-height:40px}
+
+
   .company-name{font-size:10px}
   .integration-logo{width:21px;height:21px}
 }
@@ -585,25 +593,56 @@ class Component extends DCLogic {
 </script>
 <script>
 (function () {
+  // Mesmos nove assets e tratamentos da galeria de clientes da home.
   const companies = [
-    { name: 'Prontia Saúde', logo: './assets/empresas/prontia.png', mode: 'wordmark', treatment: 'prontia' },
-    { name: 'Gazeta Bragantina', logo: './assets/empresas/gazeta.svg', mode: 'wordmark' },
-    { name: 'GB News', logo: './assets/empresas/gb-news.png', mode: 'wordmark' },
-    { name: 'Loiê', logo: './assets/empresas/loie.svg', mode: 'wordmark' },
-    { name: 'Maisis', logo: './assets/empresas/maisis-transparent.png', mode: 'wordmark' },
-    { name: 'Lo Sardo', logo: './assets/empresas/lo-sardo.png', mode: 'wordmark' },
-    { name: 'Plantão Digital', logo: './assets/empresas/plantao-digital-transparent.png', mode: 'icon' },
-    { name: 'SOS Telemedicina', logo: './assets/empresas/sos-telemedicina-transparent.png', mode: 'wordmark' },
-    { name: 'Consulta de Casa', logo: './assets/empresas/consulta-de-casa-transparent.png', mode: 'icon' },
-    { name: 'Doutor Facilita', logo: './assets/empresas/doutor-facilita.svg', mode: 'icon' },
-    { name: 'Espaço Saúde Mental', logo: './assets/empresas/espaco-saude-mental.svg', mode: 'icon' }
-  ];
+    {
+        "name": "Plantão Digital",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/plantao-digital.webp"
+    },
+    {
+        "name": "Consulta de Casa",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/consulta-de-casa.webp"
+    },
+    {
+        "name": "SOS Telemedicina",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/sos-telemedicina.webp"
+    },
+    {
+        "name": "Loiê Sala Aromática",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/loie.webp"
+    },
+    {
+        "name": "Gazeta Bragantina",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/gazeta-bragantina.webp",
+        "wide": true
+    },
+    {
+        "name": "Maisis Marketing Digital",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/maisis-marketing-digital.webp",
+        "wide": true
+    },
+    {
+        "name": "Pesqueiro Xocó",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/pesqueiro-xoco.webp",
+        "background": "verde",
+        "zoom": "xl"
+    },
+    {
+        "name": "Prontia Saúde",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/prontia-saude.webp",
+        "background": "prontia",
+        "zoom": "lg"
+    },
+    {
+        "name": "Palladio",
+        "logo": "/lp-narrador/cenas-lp/historia/logos-clientes/palladio.webp",
+        "background": "preto"
+    }
+];
 
-  const companyChip = ({ name, logo, mode, treatment }) => {
-    const className = `company-chip${mode === 'icon' ? ' company-chip--icon' : ''}`;
-    const imageClass = `company-logo${treatment ? ` company-logo--${treatment}` : ''}`;
-    const visibleName = mode === 'icon' ? `<span class="company-name">${name}</span>` : '';
-    return `<span class="${className}"><img class="${imageClass}" src="${logo}" alt="${name}" loading="lazy" decoding="async">${visibleName}</span>`;
+  const companyChip = ({ name, logo, wide, background, zoom }) => {
+    const classes = ['company-chip', wide && 'company-chip--wide', background && 'company-chip--' + background, zoom && 'company-chip--zoom-' + zoom].filter(Boolean).join(' ');
+    return `<span class="${classes}"><img class="company-logo" src="${logo}" alt="${name}" loading="lazy" decoding="async"></span>`;
   };
 
   const populateCompanies = () => {
