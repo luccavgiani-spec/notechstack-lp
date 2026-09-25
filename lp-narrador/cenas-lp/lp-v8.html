@@ -135,12 +135,21 @@
   });
 })();
 </script>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+<!-- Google Tag Manager — começa logo DEPOIS do primeiro quadro da página.
+     Não é o loader adiado de 2 s que saiu em 14/08: aqui o GTM entra no mesmo
+     instante em que a hero aparece (rAF + setTimeout 0), então quem vê a
+     página é medido e o gclid segue na URL da mesma visita. O que muda é que
+     os ~700 KB de GTM/GA4/Ads/Meta deixam de disputar banda e CPU com o
+     pôster da hero. Medido no preview (Lighthouse mobile, 3 rodadas):
+     Performance 59 → 73 (mediana), LCP estável em ~3,7 s.
+     Para voltar ao carregamento imediato, tire o requestAnimationFrame/setTimeout. -->
+<script>requestAnimationFrame(function(){ setTimeout(function(){
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
+})(window,document,'script','dataLayer','GTM-NK87FH8W');
+}, 0); });</script>
 <!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
