@@ -2064,10 +2064,16 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   const sl = document.getElementById('heroSlogan');
   if (!sl) return;
   const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const espera = (typeof CFG === 'object' && CFG.heroSloganMs != null) ? CFG.heroSloganMs : 600;
-  requestAnimationFrame(function(){
-    setTimeout(function(){ sl.classList.add('in'); }, reduzido ? 0 : espera);
-  });
+  /* CFG nasce no mascote-v8.js (defer): o atraso calibrado no painel só é
+     conhecido no DOMContentLoaded, que dispara logo depois dos defer */
+  function agenda(){
+    const espera = (typeof CFG === 'object' && CFG.heroSloganMs != null) ? CFG.heroSloganMs : 600;
+    requestAnimationFrame(function(){
+      setTimeout(function(){ sl.classList.add('in'); }, reduzido ? 0 : espera);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', agenda, { once:true });
+  else agenda();
 })();
 </script>
 <script>
@@ -2182,6 +2188,10 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   function arma(){ if (armado) return; armado = true; observa(); }
   addEventListener('scroll', arma, { once:true, passive:true });
   addEventListener('keydown', arma, { once:true });
+  addEventListener('pointerdown', arma, { once:true, passive:true });
+  /* quem chega por /#diagnostico (ou com a rolagem restaurada) já está longe
+     do topo antes deste script existir: o salto não gera o scroll que arma */
+  addEventListener('load', function(){ if (scrollY > 0 || location.hash) arma(); }, { once:true });
 })();
 </script>
 <script src="/lp-narrador/cenas-lp/historia/v8.js?v=9" defer></script>
