@@ -87,11 +87,11 @@
     `<label class="dg-op"><input type="${tipo}" name="${nome}" value="${v}"><span>${mapa[v]}</span></label>`).join('');
   const passo = (n,q,corpo) =>
     `<section class="dg-passo" data-passo="${n}" hidden aria-labelledby="dgQ${n}">`+
-    `<h4 class="dg-q" id="dgQ${n}" tabindex="-1">${q}</h4>${corpo}`+
+    `<h3 class="dg-q" id="dgQ${n}" tabindex="-1">${q}</h3>${corpo}`+
     '<p class="dg-erro" role="alert" hidden></p></section>';
   form.innerHTML =
     '<section class="dg-passo dg-inicio" data-passo="0" aria-label="Iniciar diagnóstico">'+
-      (V8 ? '<p class="dg-k">seu roadmap + protótipo</p><h4 class="dg-q dg-q-inicio">Transforme sua ideia em um plano que dá para executar.</h4><div class="dg-cena-vaga"></div>'
+      (V8 ? '<p class="dg-k">seu roadmap + protótipo</p><h3 class="dg-q dg-q-inicio">Transforme sua ideia em um plano que dá para executar.</h3><div class="dg-cena-vaga"></div>'
           : '<p class="dg-abertura">5 etapas e começamos seu projeto<span class="dg-cursor" aria-hidden="true">_</span></p>')+
       '<label class="dg-campo"><span>qual é o seu nome?</span><input name="nome" type="text" maxlength="80" autocomplete="name" placeholder="seu nome"></label>'+
       '<p class="dg-erro" role="alert" hidden></p><button type="button" class="dg-comecar" data-nav="comecar">iniciar →</button></section>'+
@@ -166,7 +166,7 @@
   function criaFinal(){
     if (telaFinalCriada) return;
     telaFinalCriada=true;
-    telaPasso(7).innerHTML='<p class="dg-k">seu roadmap + protótipo</p><h4 class="dg-q" id="dgQ7" tabindex="-1">Transforme sua ideia em um plano que dá para executar.</h4>'+
+    telaPasso(7).innerHTML='<p class="dg-k">seu roadmap + protótipo</p><h3 class="dg-q" id="dgQ7" tabindex="-1">Transforme sua ideia em um plano que dá para executar.</h3>'+
       '<div class="dg-preco"><p class="dg-preco-rot">Por R$ 149,90, a Nó organiza o que você contou, monta um roadmap, prepara um protótipo que você pode testar e mostra 3 opções para colocar o produto no ar, cada uma com o que entra, prazo e valor.</p>'+
       '<p class="dg-preco-por">R$ 149,90</p>'+
       '<p class="dg-preco-nota">Seu material fica pronto em até 3 dias após a confirmação do pagamento.</p></div>'+
@@ -176,7 +176,7 @@
       '<p class="dg-erro" role="alert" hidden></p>';
     // lp-v8: sem o texto do preço (o valor segue no botão).
     if (V8) telaPasso(7).querySelector('.dg-preco').remove();
-    telaPasso(8).innerHTML='<p class="dg-k">pagamento</p><h4 class="dg-q" id="dgQ8" tabindex="-1">como você quer pagar?</h4>'+
+    telaPasso(8).innerHTML='<p class="dg-k">pagamento</p><h3 class="dg-q" id="dgQ8" tabindex="-1">como você quer pagar?</h3>'+
       '<div class="dg-metodos" role="group" aria-label="Escolha a forma de pagamento">'+
       '<button type="button" data-pagamento="pix"><b>Pix</b><span>QR Code ou copia e cola</span></button>'+
       '<button type="button" data-pagamento="cartao"><b>cartão</b><span>preencha os dados na próxima tela</span></button></div>';
@@ -187,11 +187,11 @@
     const documento='<label class="dg-campo"><span>CPF do pagador</span><input name="pagador_documento" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="000.000.000-00" aria-describedby="dgDocumentoAjuda"></label>'+
       '<p id="dgDocumentoAjuda">Usado apenas para processar o pagamento na Pagar.me.</p>';
     if (forma==='pix'){
-      s.innerHTML='<p class="dg-k">pagamento via Pix</p><h4 class="dg-q" id="dgQ9" tabindex="-1">gere seu Pix</h4>'+
+      s.innerHTML='<p class="dg-k">pagamento via Pix</p><h3 class="dg-q" id="dgQ9" tabindex="-1">gere seu Pix</h3>'+
         documento+'<div class="dg-pag-metodo dg-pix"><span class="dg-pag-selo">Pix</span><div><b>pagamento na hora</b>'+
         '<p>O QR Code e o copia e cola aparecem nesta tela.</p></div></div><p class="dg-erro" role="alert" hidden></p>';
     } else {
-      s.innerHTML='<p class="dg-k">pagamento</p><h4 class="dg-q" id="dgQ9" tabindex="-1">dados do cartão</h4>'+
+      s.innerHTML='<p class="dg-k">pagamento</p><h3 class="dg-q" id="dgQ9" tabindex="-1">dados do cartão</h3>'+
         documento+'<div class="dg-cartao"><label class="dg-campo"><span>nome no cartão</span><input name="cartao_nome" autocomplete="cc-name"></label>'+
         '<label class="dg-campo"><span>número do cartão</span><input name="cartao_numero" inputmode="numeric" autocomplete="cc-number" maxlength="23"></label>'+
         '<div class="dg-cartao-linha"><label class="dg-campo"><span>validade</span><input name="cartao_validade" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA"></label>'+
@@ -244,7 +244,7 @@
   }
   function mostraPix(data){
     const s=telaPasso(9), pix=data.pix||{};
-    s.innerHTML='<p class="dg-k">pagamento via Pix</p><h4 class="dg-q" id="dgQ9" tabindex="-1">seu Pix está pronto</h4>'+
+    s.innerHTML='<p class="dg-k">pagamento via Pix</p><h3 class="dg-q" id="dgQ9" tabindex="-1">seu Pix está pronto</h3>'+
       '<div class="dg-pix-pronto"><img class="dg-pix-qr" alt="QR Code do Pix"><div><b>escaneie ou copie o código</b><p>Assim que o pagamento for confirmado, começamos seu material.</p></div></div>'+
       '<label class="dg-campo dg-pix-codigo"><span>Pix copia e cola</span><textarea readonly rows="3"></textarea></label>'+
       '<button type="button" class="dg-copiar-pix">copiar código Pix</button><p class="dg-erro" role="alert" hidden></p>';
@@ -258,7 +258,7 @@
     pagamentoConcluido=true;
   }
   function mostraAprovado(){
-    telaPasso(9).innerHTML='<p class="dg-k">pagamento aprovado</p><h4 class="dg-q" id="dgQ9" tabindex="-1">já começamos por aqui.</h4>'+
+    telaPasso(9).innerHTML='<p class="dg-k">pagamento aprovado</p><h3 class="dg-q" id="dgQ9" tabindex="-1">já começamos por aqui.</h3>'+
       '<div class="dg-aprovado"><b>Seu material fica pronto em até 3 dias após a confirmação do pagamento.</b>'+
       '<p>No Dia 1, a Nó entra em contato pelo WhatsApp para pedir referências, marca e contexto complementar.</p></div>';
     pagamentoConcluido=true;

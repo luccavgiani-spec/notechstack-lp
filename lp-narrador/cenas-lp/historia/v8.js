@@ -75,9 +75,12 @@
         if (d.fundo) n.classList.add('fundo-' + d.fundo);
         if (d.largo) n.classList.add('logo-largo');
         if (d.zoom) n.classList.add('logo-zoom-' + d.zoom);
-        if (d.url){ const im = new Image(); im.src = d.url; im.alt = ''; im.loading = 'lazy'; im.decoding = 'async'; im.draggable = false; n.append(im); }
-        if (tipo === 'ferramentas' || !d.url){ const s = document.createElement('span'); s.textContent = d.n; n.append(s); }
-        n.setAttribute('aria-label', d.n);
+        /* logo de cliente: o nome é o alt (é o único texto do item). Nas
+           ferramentas o nome já aparece escrito ao lado, então o ícone é
+           decorativo (alt vazio) */
+        const rotulo = tipo === 'ferramentas' || !d.url;
+        if (d.url){ const im = new Image(); im.src = d.url; im.alt = rotulo ? '' : 'Logo ' + d.n; im.loading = 'lazy'; im.decoding = 'async'; im.draggable = false; n.append(im); }
+        if (rotulo){ const s = document.createElement('span'); s.textContent = d.n; n.append(s); }
       }
       el.append(n); return n;
     });
@@ -294,8 +297,10 @@
     $$('.v8-tier-stack', box).forEach(el => {
       el.dataset.stack.split(',').forEach(k => {
         const [nome, slug] = ICONES[k] || [k, ''];
-        const i = document.createElement('span'); i.title = nome; i.setAttribute('aria-label', nome);
-        if (slug){ const im = new Image(); im.src = 'https://cdn.simpleicons.org/' + slug; im.alt = ''; im.loading = 'lazy'; i.append(im); }
+        /* o nome vai no alt da imagem: aria-label num <span> sem papel é
+           proibido pelo ARIA e o leitor de tela o ignora */
+        const i = document.createElement('span'); i.title = nome;
+        if (slug){ const im = new Image(); im.src = 'https://cdn.simpleicons.org/' + slug; im.alt = nome; im.width = im.height = 13; im.loading = 'lazy'; i.append(im); }
         el.append(i);
       });
     });
@@ -558,7 +563,7 @@
     $('#v8KbTotal').textContent = ITENS.length;
     const cards = ITENS.map(([t, fase, v, dia]) => {
       const a = document.createElement('article'); a.className = 'v8-kb-card';
-      const h = document.createElement('h6'); h.textContent = t;
+      const h = document.createElement('h5'); h.textContent = t;
       const pe = document.createElement('p'); pe.textContent = fase + ' · ' + v + ' · dia ' + dia;
       a.append(h, pe);
       bento(a, { g:'237,163,59', tilt:false, particulas:5 });

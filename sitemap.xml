@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Páginas públicas do site. Ao criar ou apagar uma página, atualize aqui
+     (e o lastmod de quem mudou de conteúdo). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.notechstack.com.br/</loc><lastmod>2026-09-25</lastmod></url>
+  <url><loc>https://www.notechstack.com.br/colaboradores-digitais/</loc><lastmod>2026-09-24</lastmod></url>
+  <url><loc>https://www.notechstack.com.br/roteador/</loc><lastmod>2026-09-24</lastmod></url>
+  <url><loc>https://www.notechstack.com.br/health/</loc><lastmod>2026-09-24</lastmod></url>
+  <url><loc>https://www.notechstack.com.br/termos/</loc><lastmod>2026-08-14</lastmod></url>
+  <url><loc>https://www.notechstack.com.br/privacidade/</loc><lastmod>2026-08-14</lastmod></url>
+</urlset>

@@ -177,7 +177,7 @@
 .v8-app-pan{ animation:v8Entra .45s cubic-bezier(.22,1,.36,1) }
 @keyframes v8Entra{ from{ opacity:0; transform:translateY(8px) } to{ opacity:1; transform:none } }
 .v8-app-k{ font:600 10px var(--font-mono); letter-spacing:.16em; text-transform:uppercase; color:var(--yellow) }
-.v8-app-tela h4{ margin:8px 0 20px; font:800 clamp(20px,2vw,28px)/1.1 var(--font); letter-spacing:-.03em; color:#fff }
+.v8-app-tela h3{ margin:8px 0 20px; font:800 clamp(20px,2vw,28px)/1.1 var(--font); letter-spacing:-.03em; color:#fff }
 /* planos em linhas: nome + botão | o que entra + ferramentas | valores */
 .v8-tiers{ display:grid; gap:8px }
 .v8-tier{
@@ -446,7 +446,7 @@
 .v8-kb-marca i{ color:#E0543C; font-style:italic }
 .v8-kb-k{ color:#7FA7E8 }
 .v8-kb-topo{ display:flex; justify-content:space-between; align-items:flex-end; gap:10px }
-.v8-kb-topo h4{ margin:6px 0 0!important; font-size:clamp(26px,2.6vw,38px)!important; letter-spacing:-.06em!important }
+.v8-kb-topo h3{ margin:6px 0 0!important; font-size:clamp(26px,2.6vw,38px)!important; letter-spacing:-.06em!important }
 .v8-kb-dia{ padding:4px 10px; border-radius:999px; background:var(--yellow); color:#141414; font:700 10.5px var(--font-mono); letter-spacing:.08em; text-transform:uppercase }
 .v8-kb-sub{ margin:8px 0 0; font-size:12px; color:#bdbdb8 }
 .v8-kb-sub b{ color:#fff }
@@ -464,16 +464,16 @@
 .v8-kb-col{ border:1px solid rgba(255,255,255,.07); background:#191919; border-radius:14px; padding:0 9px 9px; min-height:230px }
 .v8-kb-col[data-col="em_andamento"]{ border-color:rgba(237,163,59,.25); background:linear-gradient(rgba(237,163,59,.05),#191919) }
 .v8-kb-col header{ display:flex; justify-content:space-between; align-items:center; margin:0 -9px 9px; padding:11px 12px; border-bottom:1px solid rgba(255,255,255,.07) }
-.v8-kb-col h5{ margin:0; font:700 11.5px var(--font) }
-.v8-kb-col h5::before{ content:'●'; margin-right:6px; font-size:9px; color:#3D63DB }
-.v8-kb-col[data-col="em_andamento"] h5::before{ color:#EDA33B }
-.v8-kb-col[data-col="concluido"] h5::before{ color:#30A46C }
+.v8-kb-col h4{ margin:0; font:700 11.5px var(--font) }
+.v8-kb-col h4::before{ content:'●'; margin-right:6px; font-size:9px; color:#3D63DB }
+.v8-kb-col[data-col="em_andamento"] h4::before{ color:#EDA33B }
+.v8-kb-col[data-col="concluido"] h4::before{ color:#30A46C }
 .v8-kb-col header span{ font:500 10.5px var(--font-mono); color:#aaa }
 .v8-kb-lista{ display:grid; gap:7px }
 .v8-kb-card{ padding:9px 10px; border-radius:10px; background:#131313; border:1px solid rgba(255,255,255,.05); border-left:2px solid #3D63DB }
 .v8-kb-card.andando{ border-left-color:#EDA33B; --g:237,163,59 }
 .v8-kb-card.feito{ border-left-color:#30A46C; --g:48,164,108!important; color:#bbb }
-.v8-kb-card h6{ margin:0; font:600 11.5px/1.3 var(--font) }
+.v8-kb-card h5{ margin:0; font:600 11.5px/1.3 var(--font) }
 .v8-kb-card p{ margin:5px 0 0; font:400 9px/1.4 var(--font-mono); letter-spacing:.04em; text-transform:uppercase; color:#888 }
 
 /* ── formulário: a cena do sistema no lugar do texto do preço ── */
@@ -508,7 +508,7 @@
 
 /* ── app: protótipo da Loiê ── */
 .v8-proto-topo{ display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:14px }
-.v8-proto-topo h4{ margin-bottom:0!important }
+.v8-proto-topo h3{ margin-bottom:0!important }
 .v8-disp{ display:flex; gap:3px; padding:3px; border-radius:999px; background:#232323 }
 .v8-disp button{ padding:6px 12px; border:0; border-radius:999px; background:none; color:#bbb; font:600 11px var(--font); cursor:pointer }
 .v8-disp button[aria-checked="true"]{ background:#fff; color:#141414 }
@@ -545,7 +545,7 @@
 .v8-lo-cats span{ padding:4px 7px; border:1px solid rgba(252,244,223,.35); color:#FCF4DF; font:500 6.5px 'LoieSackers',var(--font); letter-spacing:.12em; text-transform:uppercase }
 .v8-lo-best{ padding:22px 14px 26px; text-align:center }
 .v8-lo-best small{ font:500 7px 'LoieSackers',var(--font); letter-spacing:.2em; text-transform:uppercase; color:#8a8070 }
-.v8-lo-best h5{ margin:6px 0 16px; font:200 24px 'LoieWagon',Georgia,serif; color:#A99E89 }
+.v8-lo-best h4{ margin:6px 0 16px; font:200 24px 'LoieWagon',Georgia,serif; color:#A99E89 }
 .v8-lo-grade{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; text-align:left }
 .modo-pc .v8-lo-grade{ grid-template-columns:repeat(4,1fr) }
 .v8-lo-prod{ display:grid; gap:4px; padding:0; border:0; background:none; font:inherit; color:inherit; text-align:left }
@@ -560,7 +560,7 @@ button.v8-lo-prod:hover img{ transform:scale(1.03) }
 .v8-lo-pdp{ display:grid; gap:14px; padding:0 12px 24px }
 .modo-pc .v8-lo-pdp{ grid-template-columns:1fr 1fr; gap:22px; padding:6px 22px 26px; align-items:start }
 .v8-lo-pdp img{ width:100%; aspect-ratio:4/5; object-fit:cover }
-.v8-lo-info h5{ margin:0; font:200 26px 'LoieWagon',Georgia,serif; color:var(--lo-tinta) }
+.v8-lo-info h4{ margin:0; font:200 26px 'LoieWagon',Georgia,serif; color:var(--lo-tinta) }
 .v8-lo-est{ margin:4px 0 0; font-size:8px; color:#8a8070 }
 .v8-lo-preco{ margin:8px 0 0; font:200 16px 'LoieWagon',Georgia,serif }
 .v8-lo-fam{ margin:10px 0 0; font:500 7px 'LoieSackers',var(--font); letter-spacing:.14em; text-transform:uppercase; color:#6f6553 }
@@ -610,7 +610,7 @@ button.v8-lo-prod:hover img{ transform:scale(1.03) }
 .v8-site-hero{ display:grid; grid-template-columns:1fr .8fr; gap:14px; align-items:center; padding:18px 16px 20px }
 .v8-site-hero > div{ display:grid; justify-items:start; gap:9px }
 .v8-site-hero small{ font:500 7px 'LoieSackers',var(--font); letter-spacing:.16em; text-transform:uppercase; color:#8a8070 }
-.v8-site-hero h4{ margin:0; font:200 calc(34px * var(--k))/1 'LoieWagon',Georgia,serif; letter-spacing:0 }
+.v8-site-hero h3{ margin:0; font:200 calc(34px * var(--k))/1 'LoieWagon',Georgia,serif; letter-spacing:0 }
 .v8-site-hero p{ margin:0; font:500 7.5px/1.7 'LoieSackers',var(--font); letter-spacing:.12em; text-transform:uppercase; max-width:26ch }
 .v8-site-bt{ display:inline-block; margin-top:4px; padding:calc(9px * var(--k)) calc(14px * var(--k)); border-radius:0; background:#2B2520; color:#FCF4DF; font:500 calc(8px * var(--k)) 'LoieSackers',var(--font); letter-spacing:.16em; text-transform:uppercase }
 .v8-site-hero img{ width:100%; aspect-ratio:3/4; object-fit:cover }
@@ -651,8 +651,8 @@ button.v8-lo-prod:hover img{ transform:scale(1.03) }
 .dg-v8 .dg-comecar,.dg-v8 .dg-dica{ display:none!important }
 .dg-v8 .dg-tela.em-inicio .dg-pe{ display:flex!important }
 .dg-v8 .dg-pe{ justify-content:space-between; align-items:center; gap:14px; padding-top:18px }
-.v8-seguro{ display:flex; align-items:center; gap:9px; font:500 10px/1.35 var(--font); letter-spacing:.06em; text-transform:uppercase; color:rgba(20,20,20,.5) }
-.v8-seguro svg{ width:22px; height:22px; flex:none; fill:none; stroke:rgba(20,20,20,.5); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
+.v8-seguro{ display:flex; align-items:center; gap:9px; font:500 10px/1.35 var(--font); letter-spacing:.06em; text-transform:uppercase; color:rgba(20,20,20,.68) }
+.v8-seguro svg{ width:22px; height:22px; flex:none; fill:none; stroke:rgba(20,20,20,.68); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
 .dg-v8 .dg-bt{ padding:15px 26px; font-size:15px; box-shadow:0 12px 26px rgba(48,164,108,.28) }
 .dg-v8 .dg-bt:disabled{ background:#BFD9C9; box-shadow:none; opacity:1; cursor:default }
 .dg-v8 .dg-q-inicio{ margin:6px 0 4px!important; font-size:clamp(22px,2vw,28px)!important; line-height:1.15!important; letter-spacing:-.03em!important }
@@ -713,14 +713,14 @@ button.v8-lo-prod:hover img{ transform:scale(1.03) }
   .v8-ed-log{ display:none }
   .v8-ed-carimbo{ left:50%; top:30% }
   .v8-kb-grade{ grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px }
-  .v8-kb-card h6{ overflow-wrap:anywhere }
+  .v8-kb-card h5{ overflow-wrap:anywhere }
   .v8-kb-marcos span:last-child{ display:none }
   .v8-kb-col{ padding:0 5px 5px; min-height:180px }
   .v8-kb-col header{ margin:0 -5px 6px; padding:8px 6px }
-  .v8-kb-col h5{ font-size:10px }
-  .v8-kb-col h5::before{ display:none }
+  .v8-kb-col h4{ font-size:10px }
+  .v8-kb-col h4::before{ display:none }
   .v8-kb-card{ padding:6px 7px }
-  .v8-kb-card h6{ font-size:10px }
+  .v8-kb-card h5{ font-size:10px }
   .v8-kb-card p{ font-size:8px }
   .v8-kb-marcos span{ font-size:8.5px }
   .v8-tier{ grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"nome valor" "itens itens" "stack stack"; padding:12px }

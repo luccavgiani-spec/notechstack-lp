@@ -12,7 +12,7 @@ export function initProductsNav(root, { active = '/', contact = '/#ctafinal' } =
           <a href="/health/" style="--product-color:#30A46C">Nó Health</a>
         </div>
       </div>
-      <a href="${contact}">Contact</a>
+      <a href="${contact}">Contato</a>
     </div>
   </nav>`;
   const button = root.querySelector('button');

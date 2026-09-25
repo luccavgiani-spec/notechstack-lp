@@ -143,7 +143,90 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="view-transition" content="same-origin">
 <meta name="facebook-domain-verification" content="nnp34mxbka50bgauppz7inoutl6gts">
-<title>nó — sites, apps e painéis para a sua empresa</title>
+<!-- SEO · o que o Google e as redes mostram quando alguém acha a home.
+     A home é servida em "/" por rewrite (vercel.json) — o canonical aponta
+     pra "/" e não pra este arquivo, senão o endereço interno vira o oficial. -->
+<title>Sistemas e aplicativos sob medida para empresas | Nó Tech Stack</title>
+<meta name="description" content="Sistemas, aplicativos e painéis sob medida para empresas. Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90, sem obrigação de continuar.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://www.notechstack.com.br/">
+<meta name="theme-color" content="#141414">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Nó Tech Stack">
+<meta property="og:url" content="https://www.notechstack.com.br/">
+<meta property="og:title" content="Sistemas e aplicativos sob medida para empresas | Nó Tech Stack">
+<meta property="og:description" content="Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90. Você decide depois como construir.">
+<meta property="og:image" content="https://www.notechstack.com.br/brand/og/og-home.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Nó Tech Stack — sistemas, aplicativos e painéis sob medida. Diagnóstico por R$ 149,90.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sistemas e aplicativos sob medida para empresas | Nó Tech Stack">
+<meta name="twitter:description" content="Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90.">
+<meta name="twitter:image" content="https://www.notechstack.com.br/brand/og/og-home.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.notechstack.com.br/#organizacao",
+      "name": "Nó Tech Stack",
+      "alternateName": ["nó", "nó tech stack"],
+      "legalName": "60.342.339 LUCCA VICCHIATTI GIANI",
+      "taxID": "60.342.339/0001-06",
+      "url": "https://www.notechstack.com.br/",
+      "logo": { "@type": "ImageObject", "url": "https://www.notechstack.com.br/brand/favicon/favicon-512.png", "width": 512, "height": 512 },
+      "description": "Agência que planeja, desenha e constrói sistemas, aplicativos e painéis sob medida para empresas.",
+      "founder": { "@type": "Person", "name": "Lucca Giani" },
+      "areaServed": { "@type": "Country", "name": "Brasil" },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+55-11-93928-9413",
+        "availableLanguage": "pt-BR",
+        "areaServed": "BR"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.notechstack.com.br/#site",
+      "url": "https://www.notechstack.com.br/",
+      "name": "Nó Tech Stack",
+      "inLanguage": "pt-BR",
+      "publisher": { "@id": "https://www.notechstack.com.br/#organizacao" }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.notechstack.com.br/#pagina",
+      "url": "https://www.notechstack.com.br/",
+      "name": "Sistemas e aplicativos sob medida para empresas | Nó Tech Stack",
+      "description": "Sistemas, aplicativos e painéis sob medida para empresas. Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90.",
+      "inLanguage": "pt-BR",
+      "isPartOf": { "@id": "https://www.notechstack.com.br/#site" },
+      "about": { "@id": "https://www.notechstack.com.br/#organizacao" },
+      "primaryImageOfPage": "https://www.notechstack.com.br/brand/og/og-home.png"
+    },
+    {
+      "@type": "Service",
+      "@id": "https://www.notechstack.com.br/#diagnostico-de-sistema",
+      "name": "Diagnóstico de sistema: roadmap + protótipo em 3 dias",
+      "serviceType": "Planejamento de sistema sob medida",
+      "description": "Em até 3 dias você recebe o roadmap do sistema, um protótipo navegável e 3 opções de construção (Básico, Essencial e Completo), cada uma com prazo e valor. Sem obrigação de continuar.",
+      "provider": { "@id": "https://www.notechstack.com.br/#organizacao" },
+      "areaServed": { "@type": "Country", "name": "Brasil" },
+      "offers": {
+        "@type": "Offer",
+        "price": "149.90",
+        "priceCurrency": "BRL",
+        "availability": "https://schema.org/InStock",
+        "url": "https://www.notechstack.com.br/#diagnostico"
+      }
+    }
+  ]
+}
+</script>
 <!-- v7 · three.js das cenas 3D: um nome só ("three") pra todos os módulos
      (cenas3d.js e giro.js) dividirem a mesma instância -->
 <script type="importmap">
@@ -417,7 +500,11 @@ textarea.finput{resize:none;height:96px}
 /* ── FOOTER ── */
 footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
 .ft-logo{font-family:var(--font);font-size:19px;font-weight:700}
-.ft-txt{font-family:var(--font);font-size:12px;color:rgba(255,255,255,.24)}
+.ft-txt{font-family:var(--font);font-size:12px;color:rgba(255,255,255,.62)}  /* .24 dava 2,2:1 — reprovado no WCAG AA */
+/* mapa do site no rodapé: links de texto que o Google segue (o menu do topo é montado por JS) */
+.ft-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;max-width:520px;font-family:var(--font);font-size:13px}
+.ft-nav a{color:rgba(255,255,255,.78);text-decoration:none;border-bottom:1px solid transparent}
+.ft-nav a:hover{color:#fff;border-bottom-color:var(--accent)}
 /* links legais do rodapé: legíveis sem competir com a assinatura */
 .ft-link{color:rgba(255,255,255,.5);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18)}
 .ft-link:hover{color:#fff;border-bottom-color:var(--no-ambar,#e8a33d)}
@@ -972,8 +1059,10 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
              -webkit-mask-position 1.5s cubic-bezier(.22,1,.36,1),
                      mask-position 1.5s cubic-bezier(.22,1,.36,1);
 }
-/* 1s de espera entre a 1ª e a 2ª linha */
-.hero-slogan > span:nth-child(2){ transition-delay:1s }
+/* as linhas entram uma depois da outra (eram 2 com 1s; o H1 tem 3 linhas
+   pra não encostar no parágrafo da direita no desktop) */
+.hero-slogan > span:nth-child(2){ transition-delay:.6s }
+.hero-slogan > span:nth-child(3){ transition-delay:1.2s }
 .hero-slogan.in > span{ opacity:1; -webkit-mask-position:0 0; mask-position:0 0 }
 /* movimento reduzido: sem varredura, a frase só aparece */
 @media (prefers-reduced-motion: reduce){
@@ -1079,6 +1168,9 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
   color:#1F1C19;
   max-width:36ch;margin:0;
 }
+/* a oferta abre o parágrafo, em peso de subtítulo — é o que a pessoa precisa
+   ler primeiro; o resto do texto segue em corpo */
+.hero-preco{ display:block;margin-bottom:4px;font-weight:var(--no-weight-subtitulo);color:var(--dark) }
 
 /* CTA em pílula com círculo — pílula sólida tinta + ponto âmbar é a receita
    da marca (BRAND.md §6), no lugar da pílula creme da referência */
@@ -2082,7 +2174,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 </style>
 <link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/historia.css?v=62">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap">
-<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=15">
+<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=16">
 <!-- HERO -->
 <section id="hero">
   <!-- Fundo em vídeo, avançado/retrocedido pelo movimento horizontal do mouse.
@@ -2105,17 +2197,22 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
       <div class="hero-left">
         <img class="hero-mark h-rise" style="animation-delay:.2s"
              src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="1633" height="964">
-        <!-- slogan: entra 3s depois que o vídeo de fundo carrega -->
-        <p class="hero-slogan" id="heroSlogan">
-          <span>Sites, apps e painéis</span>
-          <span>feitos para a sua empresa.</span>
-        </p>
+        <!-- slogan = o H1 da página (o assunto principal pro Google).
+             Entra logo depois que a hero pinta — ver o script do slogan no fim. -->
+        <h1 class="hero-slogan" id="heroSlogan">
+          <span>Sistemas, aplicativos</span>
+          <span>e painéis sob medida</span>
+          <span>para empresas.</span>
+        </h1>
       </div>
       <div class="hero-right">
-        <p class="hero-desc h-rise" style="animation-delay:.62s">Comece pelo diagnóstico da sua ideia: em até 3 dias
-        você recebe um plano, um protótipo para testar e 3 opções de construção, com prazo e valor.</p>
+        <!-- o preço mora aqui, na primeira dobra: quem chega por busca ou anúncio
+             precisa ver o que custa começar antes de rolar -->
+        <p class="hero-desc h-rise" style="animation-delay:.62s"><strong class="hero-preco">Roadmap + protótipo em até 3 dias
+        por R$&nbsp;149,90.</strong> Você recebe o plano, um protótipo para testar e 3 opções de construção,
+        com prazo e valor.</p>
         <a href="#diagnostico" id="heroCtaBtn" class="pill-cta h-rise" style="animation-delay:.82s"
-           onclick="abrirDiagnostico({origem:'hero'});return false">Diagnóstico da ideia
+           onclick="abrirDiagnostico({origem:'hero'});return false">Comprar diagnóstico
           <span class="pill-cta-circle" aria-hidden="true">→</span>
         </a>
       </div>
@@ -2283,7 +2380,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
           <!-- aba 0 · como funciona: 3 opções (ordem fixa: Básico → Essencial → Completo) -->
           <div class="v8-app-pan" data-pan="0">
             <small class="v8-app-k">01 · como funciona</small>
-            <h4>Escolha como construir a sua loja.</h4>
+            <h3>Escolha como construir a sua loja.</h3>
             <div class="v8-tiers">
               <div class="v8-tier" style="--c:var(--blue)" data-g="61,99,219">
                 <b>Básico</b>
@@ -2315,7 +2412,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
           <!-- aba 1 · protótipo da loja em moldura de celular -->
           <div class="v8-app-pan" data-pan="1" hidden>
             <div class="v8-proto-topo">
-              <div><small class="v8-app-k">02 · protótipo</small><h4>Navegue pela loja.</h4></div>
+              <div><small class="v8-app-k">02 · protótipo</small><h3>Navegue pela loja.</h3></div>
               <div class="v8-disp" role="radiogroup" aria-label="Ver o protótipo no">
                 <button type="button" role="radio" data-disp="cel" aria-checked="true">celular</button>
                 <button type="button" role="radio" data-disp="pc" aria-checked="false">computador</button>
@@ -2337,7 +2434,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
                   </section>
                   <div class="v8-lo-cats"><span>cítricos &amp; frescos</span><span>verdes &amp; herbais</span><span>florais</span><span>amadeirados</span><span>especiados &amp; quentes</span><span>gourmand &amp; conforto</span></div>
                   <section class="v8-lo-best">
-                    <small>bestsellers</small><h5>mais pedidos</h5>
+                    <small>bestsellers</small><h4>mais pedidos</h4>
                     <div class="v8-lo-grade">
                       <button type="button" class="v8-lo-prod" data-ir="produto" data-alvo="prod"><img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo.webp" alt="" loading="lazy"><b>Caramelo</b><span>R$ 150,00</span></button>
                       <div class="v8-lo-prod"><img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo-emb.webp" alt="" loading="lazy"><b>Caramelo</b><span>R$ 260,00</span></div>
@@ -2351,7 +2448,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
                   <div class="v8-lo-pdp">
                     <img src="/lp-narrador/cenas-lp/historia/img/loie/caramelo.webp" alt="" loading="lazy">
                     <div class="v8-lo-info">
-                      <h5>Caramelo</h5>
+                      <h4>Caramelo</h4>
                       <p class="v8-lo-est">☆☆☆☆☆ 0 (0 avaliações)</p>
                       <p class="v8-lo-preco">R$ 150,00</p>
                       <p class="v8-lo-fam">chipre frutado — patchouli</p>
@@ -2368,7 +2465,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
           <!-- aba 2 · etapas: kanban -->
           <div class="v8-app-pan" data-pan="2" hidden>
             <small class="v8-app-k">03 · etapas do plano</small>
-            <h4>O que já foi feito e o que falta.</h4>
+            <h3>O que já foi feito e o que falta.</h3>
             <div class="v8-prog"><i style="width:40%"></i><span>40% concluído</span></div>
             <ul class="v8-tipos" aria-label="Tipos de tarefa">
               <li data-t="negocio"><b>negócio</b>decisões e contas da loja</li>
@@ -2425,7 +2522,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
               <div class="v8-site-hero">
                 <div>
                   <small>gourmand &amp; conforto</small>
-                  <h4 class="v8-el" data-el="texto" tabindex="0">Caramelo</h4>
+                  <h3 class="v8-el" data-el="texto" tabindex="0">Caramelo</h3>
                   <p>acorde gourmand cremoso ambarado. R$ 150,00</p>
                   <span class="v8-el v8-site-bt" data-el="botao" tabindex="0">adicionar ao carrinho</span>
                 </div>
@@ -2499,16 +2596,16 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
         <div class="v8-app-tela">
           <small class="v8-app-k v8-kb-k">progresso do projeto</small>
           <div class="v8-kb-topo">
-            <h4><span id="v8KbPct">0</span>% concluído</h4>
+            <h3><span id="v8KbPct">0</span>% concluído</h3>
             <span class="v8-kb-dia" id="v8KbDia">dia 1</span>
           </div>
           <p class="v8-kb-sub"><b id="v8KbFeitos">0</b> de <b id="v8KbTotal">0</b> itens entregues. A equipe da Nó move os cartões; você acompanha por aqui.</p>
           <div class="v8-kb-barra" aria-hidden="true"><span class="feito" id="v8KbBarraF"></span><span class="andando" id="v8KbBarraA"></span></div>
           <div class="v8-kb-marcos" aria-hidden="true"><span style="left:50%">V1 · dia 15</span><span style="left:73.3%">V2 · dia 22</span><span style="left:96.6%">V3</span></div>
           <div class="v8-kb-grade">
-            <section class="v8-kb-col" data-col="a_fazer"><header><h5>A fazer</h5><span>0</span></header><div class="v8-kb-lista"></div></section>
-            <section class="v8-kb-col" data-col="em_andamento"><header><h5>Em andamento</h5><span>0</span></header><div class="v8-kb-lista"></div></section>
-            <section class="v8-kb-col" data-col="concluido"><header><h5>Concluído</h5><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="a_fazer"><header><h4>A fazer</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="em_andamento"><header><h4>Em andamento</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="concluido"><header><h4>Concluído</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
           </div>
         </div>
       </div>
@@ -2587,15 +2684,21 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     <div class="ft-txt">IA que arquiteta, integra e opera.</div>
     <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
   </div>
+  <nav class="ft-nav" aria-label="Mapa do site">
+    <a href="/#diagnostico">Diagnóstico de sistema</a>
+    <a href="/colaboradores-digitais/">Colaboradores digitais</a>
+    <a href="/roteador/">Roteador</a>
+    <a href="/health/">Nó Health</a>
+  </nav>
   <!-- Os dois links também vivem no aceite do formulário. Aqui eles existem
        porque uma política de privacidade alcançável só de dentro de um
        formulário é, na prática, uma política escondida: quem ainda não decidiu
        se vai deixar contato é justamente quem precisa lê-la antes. -->
   <div class="ft-legal ft-txt">
     <div class="ft-legal-links">
-      <a href="/termos" class="ft-link">Termos de uso</a>
+      <a href="/termos/" class="ft-link">Termos de uso</a>
       <span aria-hidden="true"> · </span>
-      <a href="/privacidade" class="ft-link">Privacidade e cookies</a>
+      <a href="/privacidade/" class="ft-link">Privacidade e cookies</a>
     </div>
     <div>© 2026 <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Todos os direitos reservados.</div>
   </div>
@@ -2731,7 +2834,8 @@ const DEFAULT_CFG = {
   angEase:     0.03,   // suavidade da transição de ângulo
   warm:        0.4,    // correção quente do render (0 = desliga)
   dark:        0.5,    // escurecimento global do mascote (0-0.5)
-  heroSloganMs: 3000,  // atraso do slogan da hero depois que o vídeo carrega (ms)
+  heroSloganMs: 600,   // atraso do slogan (o H1) depois que a hero pinta (ms) — era 3000
+                       // atrelado ao vídeo; virou H1 e precisa aparecer já (SEO/LCP, 25/09)
   bgBege:      '#E2D8CF', // cor de fundo — seções claras (hero, cta, platforms)
   bgMarrom:    '#70533f', // cor de fundo — seções escuras (o que fazemos)
   bgPreto:     '#141414', // cor de fundo — seções escuras 2 (como usamos IA)
@@ -4072,29 +4176,19 @@ requestAnimationFrame(frame);
 })();
 </script>
 <script>
-/* ── slogan da hero: entra 3s DEPOIS que o vídeo de fundo carrega ──
-   O gatilho é o vídeo de propósito: o slogan chega quando a cena já está
-   viva, não enquanto a hero ainda é um retângulo parado. Se o vídeo falhar
-   ou demorar, uma rede de segurança solta o slogan assim mesmo — ele nunca
-   pode ficar invisível por causa de um arquivo que não veio. */
+/* ── slogan da hero (o H1): entra logo depois que a hero pinta ──
+   Até 25/09 ele esperava o vídeo de fundo carregar + 3s. Virou o H1 da
+   página — o assunto principal pro Google e a primeira frase que explica o
+   que a Nó faz —, então não pode depender de um arquivo de vídeo: entra
+   CFG.heroSloganMs depois do primeiro quadro, com a mesma varredura. */
 (function(){
   const sl = document.getElementById('heroSlogan');
   if (!sl) return;
-  const v = document.querySelector('.hero-video');
   const reduzido = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let armado = false;
-  function entrar(){
-    if (armado) return; armado = true;
-    /* o atraso é calibrável no painel (pasta "Tempo") */
-    const espera = (typeof CFG === 'object' && CFG.heroSloganMs != null) ? CFG.heroSloganMs : 3000;
+  const espera = (typeof CFG === 'object' && CFG.heroSloganMs != null) ? CFG.heroSloganMs : 600;
+  requestAnimationFrame(function(){
     setTimeout(function(){ sl.classList.add('in'); }, reduzido ? 0 : espera);
-  }
-  if (!v || reduzido || v.readyState >= 2) entrar();
-  else {
-    v.addEventListener('loadeddata', entrar, { once:true });
-    v.addEventListener('error', entrar, { once:true });
-  }
-  setTimeout(entrar, 8000);   // rede de segurança
+  });
 })();
 </script>
 <!-- O loader adiado de 2 s saiu daqui em 14/08/2026: subiu pro <head>, no
@@ -4160,12 +4254,12 @@ requestAnimationFrame(frame);
 })();
 </script>
 <script src="/shared/glow-cursor.js?v=1" defer></script>
-</body>
-</html>
 <!-- v8 · editor (historia.js), cenas 3D, galerias/fluxograma/app/cronograma (v8.js) e o diagnóstico -->
 <script src="/lp-narrador/cenas-lp/historia/historia.js?v=49" defer></script>
 <script type="module" src="/lp-narrador/cenas-lp/historia/cenas3d.js?v=50"></script>
-<script src="/lp-narrador/cenas-lp/historia/v8.js?v=7" defer></script>
+<script src="/lp-narrador/cenas-lp/historia/v8.js?v=8" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/pagarme-public-config.js?v=1" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/roadmap-checkout.js?v=4" defer></script>
-<script src="/lp-narrador/cenas-lp/historia/diagnostico.js?v=69" defer></script>
+<script src="/lp-narrador/cenas-lp/historia/diagnostico.js?v=70" defer></script>
+</body>
+</html>

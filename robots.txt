@@ -1,0 +1,19 @@
+# nó tech stack — www.notechstack.com.br
+# Tudo o que é página pública pode ser rastreado. Fora do rastreio fica só o
+# que é código-fonte, rascunho ou material interno que mora no mesmo repo e,
+# por isso, também é publicado junto (app/, supabase/, posts/ ...).
+# CSS, JS, fontes e imagens (/brand, /shared, /lp-narrador, /assets) ficam
+# liberados de propósito: o Google precisa deles para renderizar as páginas.
+
+User-agent: *
+Allow: /
+Disallow: /app/
+Disallow: /supabase/
+Disallow: /posts/
+Disallow: /tracking/
+Disallow: /content/
+Disallow: /_legacy-identidade-v1/
+Disallow: /.checks/
+Disallow: /.agents/
+
+Sitemap: https://www.notechstack.com.br/sitemap.xml
