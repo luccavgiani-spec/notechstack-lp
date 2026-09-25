@@ -237,6 +237,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </script>
 <link rel="preload" href="/brand/fonts/sora/sora-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/brand/fonts/sora/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<!-- pôster do vídeo da hero = o LCP da página -->
+<link rel="preload" href="/lp-narrador/cenas-lp/assets/video/hero-parede.jpg" as="image" fetchpriority="high">
+<link rel="preconnect" href="https://www.googletagmanager.com">
 <link rel="icon" type="image/svg+xml" href="/brand/favicon/favicon.svg">
 <link rel="icon" href="/brand/favicon/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon/favicon-32.png">
@@ -288,10 +291,6 @@ html{scroll-behavior:smooth}
   width:.17em;height:.17em;background:var(--accent);
 }
 .logo-no.on-dark{color:#fff}
-.logo-no.dot-blue::after{background:var(--blue)}
-.logo-no.dot-red::after{background:var(--red)}
-.logo-no.dot-yellow::after{background:var(--yellow)}
-.logo-no.dot-green::after{background:var(--green)}
 
 /* ── Barra de 4 cores no topo da peça (BRAND.md §7) ── */
 .brand-topbar{
@@ -304,18 +303,8 @@ html{scroll-behavior:smooth}
 .brand-topbar span:nth-child(4){background:var(--green)}
 
 /* ── Rodapé: 4 pontos + nó · @notechstack (BRAND.md §7) ── */
-.brand-dots{display:inline-flex;align-items:center;gap:6px}
-.brand-dots i{width:8px;height:8px;border-radius:50%;display:block}
-.brand-dots i:nth-child(1){background:var(--blue)}
-.brand-dots i:nth-child(2){background:var(--red)}
-.brand-dots i:nth-child(3){background:var(--yellow)}
-.brand-dots i:nth-child(4){background:var(--green)}
 
 /* ── Label técnico em JetBrains Mono (substitui a antiga Caveat) ── */
-.mono-label{
-  font-family:var(--font-mono);font-size:11px;font-weight:500;
-  text-transform:uppercase;letter-spacing:var(--no-tracking-label);
-}
 /* offset do nav flutuante — a hero precisa anular isso pra o fundo
    dela passar por baixo do nav em vez de deixar faixa branca no topo */
 :root{--nav-offset:96px}
@@ -339,43 +328,18 @@ body{font-family:var(--font);background:var(--studio);color:var(--dark);overflow
 
 /* ── HERO ── */
 /* hero layout now set by hw grid CSS */
-
-.hero-content{position:relative;z-index:2}
 /* pílula no âmbar = fundo preto, texto branco (BRAND.md §6) */
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--dark);color:#fff;padding:7px 18px;border-radius:100px;font-family:var(--font);font-size:13px;font-weight:600;margin-bottom:30px;animation:fadeUp .8s ease both}
-.hero-badge .logo-no{color:#fff}
-.hero-badge::before{content:'';width:6px;height:6px;background:var(--accent);border-radius:50%;animation:blink 1.6s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
 /* headline: CAIXA ALTA + tracking apertado (BRAND.md §5) */
-.hero-title{font-family:var(--font);font-size:clamp(30px,3vw,54px);font-weight:var(--no-weight-titulo);line-height:1.08;text-transform:uppercase;letter-spacing:var(--no-tracking-headline);margin-bottom:22px;animation:fadeUp .8s ease .1s both}
-.t-blue{color:var(--blue)}.t-red{color:var(--red)}.t-yellow{color:var(--yellow)}.t-green{color:var(--green)}.t-dark{color:var(--dark)}
-.hero-sub{font-family:var(--font);font-size:15px;font-weight:300;color:var(--mid);line-height:1.7;margin-bottom:28px;animation:fadeUp .8s ease .2s both}
-.hero-sub strong{color:var(--dark);font-weight:600}
-.hero-actions{display:flex;gap:14px;align-items:center;animation:fadeUp .8s ease .3s both;flex-wrap:wrap}
-.btn-primary{background:var(--dark);color:var(--white);padding:15px 34px;border-radius:100px;font-family:var(--font);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all .25s;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{background:var(--blue);transform:translateY(-2px);box-shadow:0 14px 40px rgba(61,99,219,.3)}
-.btn-secondary{background:transparent;color:var(--dark);padding:15px 34px;border-radius:100px;font-family:var(--font);font-size:15px;font-weight:600;border:2px solid var(--border);cursor:pointer;transition:all .25s;text-decoration:none}
-.btn-secondary:hover{border-color:var(--dark);transform:translateY(-2px)}
 
 /* ── STATS ── */
 #stats{display:none!important}
-.stat-item{background:var(--dark);padding:44px;text-align:center;position:relative}
-.stat-item::after{content:'';position:absolute;right:0;top:20%;bottom:20%;width:1px;background:rgba(255,255,255,.08)}
-.stat-item:last-child::after{display:none}
-.stat-number{font-family:var(--font);font-size:50px;font-weight:700;line-height:1;margin-bottom:8px}
-.stat-label{font-family:var(--font);font-size:13px;color:rgba(255,255,255,.4)}
-.stat-item:nth-child(1) .stat-number{color:var(--blue)}.stat-item:nth-child(2) .stat-number{color:var(--green)}
-.stat-item:nth-child(3) .stat-number{color:var(--yellow)}.stat-item:nth-child(4) .stat-number{color:var(--red)}
 
 /* ── SECTIONS ── */
 section{padding:100px 60px}
 /* label de seção: JetBrains Mono UPPERCASE + linha lateral colorida (BRAND.md §5) */
 .section-label{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:var(--no-tracking-label);text-transform:uppercase;margin-bottom:14px}
 .section-label::before{content:'';width:22px;height:2px;border-radius:2px}
-.label-blue{color:var(--blue)}.label-blue::before{background:var(--blue)}
-.label-green{color:var(--green)}.label-green::before{background:var(--green)}
-.label-red{color:var(--red)}.label-red::before{background:var(--red)}
-.label-yellow{color:var(--yellow)}.label-yellow::before{background:var(--yellow)}
 .section-title{font-family:var(--font);font-size:clamp(32px,3.7vw,50px);font-weight:var(--no-weight-titulo);line-height:1.1;text-transform:uppercase;letter-spacing:var(--no-tracking-headline);margin-bottom:18px}
 .section-sub{font-family:var(--font);font-size:17px;font-weight:300;color:var(--mid);line-height:1.7;max-width:540px;margin-bottom:56px}
 
@@ -385,117 +349,23 @@ section{padding:100px 60px}
 .reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}
 
 /* ── HOW IT WORKS ── */
-#how{background:var(--light)}
-.how-header{text-align:center;max-width:680px;margin:0 auto 80px}
-.how-header .section-sub{margin:0 auto}
-.flowchart{display:flex;flex-direction:column;align-items:center}
-.flow-row{display:flex;align-items:center;justify-content:center;width:100%}
-.flow-node{background:var(--white);border-radius:16px;padding:22px 24px;border:2px solid var(--border);min-width:175px;max-width:195px;text-align:center;position:relative;transition:all .3s;cursor:default}
-.flow-node:hover{transform:translateY(-5px)}
-.flow-node.blue{border-color:var(--blue)}.flow-node.blue:hover{box-shadow:0 20px 40px rgba(61,99,219,.14)}
-.flow-node.green{border-color:var(--green)}.flow-node.green:hover{box-shadow:0 20px 40px rgba(48,164,108,.14)}
-.flow-node.yellow{border-color:var(--yellow)}.flow-node.yellow:hover{box-shadow:0 20px 40px rgba(237,163,59,.14)}
-.flow-node.red{border-color:var(--red)}.flow-node.red:hover{box-shadow:0 20px 40px rgba(224,84,60,.14)}
-.flow-node-icon{width:36px;height:36px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center}.flow-node-icon svg{width:28px;height:28px;stroke:currentColor}
-.flow-node-title{font-family:var(--font);font-weight:700;font-size:14px;margin-bottom:4px}
-.flow-node-desc{font-family:var(--font);font-size:11px;color:var(--mid);line-height:1.5}
-.flow-node-step{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;font-family:var(--font);font-size:11px;font-weight:700;color:white;display:grid;place-items:center}
-.flow-node.blue .flow-node-step{background:var(--blue)}.flow-node.green .flow-node-step{background:var(--green)}
-.flow-node.yellow .flow-node-step{background:var(--yellow)}.flow-node.red .flow-node-step{background:var(--red)}
-.flow-arrow{display:flex;align-items:center;color:var(--mid);font-size:18px;padding:0 10px;flex-shrink:0}
-.flow-arrow-v{display:flex;flex-direction:column;align-items:center;padding:6px 0;height:36px;justify-content:center}
-.flow-arrow-v::before{content:'';width:2px;height:36px;background:linear-gradient(var(--border),var(--mid));display:block}
-.flow-tree-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
-.flow-tree{display:flex;align-items:flex-start;justify-content:center;gap:18px;margin-top:0;position:relative;padding-top:36px;width:100%}
-.flow-tree::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:36px;background:var(--border)}
-.flow-branch{display:flex;flex-direction:column;align-items:center}
-.branch-label{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mid);margin-bottom:10px;text-align:center}.flow-node svg{width:28px;height:28px}
 @keyframes solIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 /* PLATFORMS */
 #platforms{background:var(--studio);padding:80px 0;overflow:hidden}
 .plat-hdr{text-align:center;padding:0 60px;margin-bottom:48px}
-.plat-marquee-wrap{position:relative;overflow:hidden}
-.plat-marquee-wrap::before,.plat-marquee-wrap::after{content:'';position:absolute;top:0;bottom:0;width:120px;z-index:2;pointer-events:none}
-.plat-marquee-wrap::before{left:0;background:linear-gradient(to right,var(--white),transparent)}
-.plat-marquee-wrap::after{right:0;background:linear-gradient(to left,var(--white),transparent)}
-.marquee-row{display:flex;gap:0;margin-bottom:16px;overflow:hidden;will-change:transform}
-.marquee-inner{display:flex;gap:12px;animation:marqueeL 38s linear infinite;white-space:nowrap}
-.marquee-inner.rev{animation-direction:reverse}
-.plat-chip{display:inline-flex;align-items:center;gap:9px;background:var(--white);border:1.5px solid var(--border);border-radius:100px;padding:8px 20px 8px 12px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--dark);flex-shrink:0;transition:border-color .2s,box-shadow .2s;min-width:120px;justify-content:center}
-.plat-chip:hover{border-color:var(--blue);box-shadow:0 4px 16px rgba(61,99,219,.12)}
-.plat-logo{width:24px;height:24px;display:grid;place-items:center;flex-shrink:0}
-.plat-logo img{width:100%;height:100%;object-fit:contain}
 @keyframes marqueeL{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* ── MIND MAP ── */
-#mindmap{background:var(--dark);color:var(--white);text-align:center}
-#mindmap .section-title{color:var(--white)}
-#mindmap .section-sub{color:rgba(255,255,255,.45);margin:0 auto 60px}
-.mm-wrap{position:relative;width:100%;max-width:900px;margin:0 auto;height:600px}
-.mm-center{will-change:box-shadow;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:140px;height:140px;
-  background:linear-gradient(135deg,var(--blue),#5b8dee);border-radius:50%;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;z-index:10;animation:mmPulse 3s ease-in-out infinite}
 @keyframes mmPulse{0%,100%{box-shadow:0 0 40px rgba(61,99,219,.3)}50%{box-shadow:0 0 80px rgba(61,99,219,.6)}}
-.mm-ci{font-size:30px}.mm-ct{font-family:var(--font);font-size:12px;font-weight:700;color:white;margin-top:5px}
-svg.mm-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.mm-node{will-change:transform;position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;text-align:center;z-index:5;animation:mmFloat 5s ease-in-out infinite}
-.mm-node:nth-child(2){animation-delay:.5s}.mm-node:nth-child(3){animation-delay:1s}
-.mm-node:nth-child(4){animation-delay:1.5s}.mm-node:nth-child(5){animation-delay:2s}.mm-node:nth-child(6){animation-delay:2.5s}
 @keyframes mmFloat{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,calc(-50% - 8px))}}
-.mm-bub{padding:10px 16px;border-radius:14px;font-family:var(--font);font-size:13px;font-weight:700;margin-bottom:8px;white-space:nowrap}
-.mm-bub.blue{background:rgba(61,99,219,.2);border:1.5px solid var(--blue);color:#92a7e9}
-.mm-bub.green{background:rgba(48,164,108,.2);border:1.5px solid var(--green);color:#8bcbac}
-.mm-bub.yellow{background:rgba(237,163,59,.2);border:1.5px solid var(--yellow);color:#f3ca91}
-.mm-bub.red{background:rgba(224,84,60,.2);border:1.5px solid var(--red);color:#f48080}
-.mm-subs{display:flex;flex-direction:column;gap:5px}
-.mm-sub{font-family:var(--font);font-size:11px;color:rgba(255,255,255,.32);padding:3px 9px;background:rgba(255,255,255,.05);border-radius:7px;white-space:nowrap}
-.cost-compare{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 32px;
-  margin-top:36px;max-width:880px;margin-left:auto;margin-right:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}
 
 /* ── CTA / FORM ── */
 #cta{background:var(--studio);position:relative;overflow:hidden}
 #cta::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(61,99,219,.05),transparent 70%)}
 /* coluna esquerda enxuta (só headline + subtítulo) centrada verticalmente
    contra o formulário; a lista de features saiu a pedido de 10/08 */
-.cta-grid{display:grid;grid-template-columns:0.85fr 1.15fr;gap:72px;align-items:center}
-.cta-left .section-title{font-size:clamp(32px,3.8vw,50px)}
-.form-wrap{background:var(--white);border:1.5px solid var(--border);border-radius:24px;padding:38px;box-shadow:0 20px 60px rgba(0,0,0,.05)}
-.form-step{display:none;animation:fadeUp .4s ease}.form-step.active{display:block}
-.form-prog{display:flex;gap:5px;margin-bottom:28px}
-.pdot{height:4px;border-radius:2px;background:var(--border);flex:1;transition:background .3s}
-.pdot.done,.pdot.active{background:var(--blue)}
-.form-step-lbl{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
-.form-step-ttl{font-family:var(--font);font-size:21px;font-weight:700;margin-bottom:22px;letter-spacing:-.3px}
-.form-opts{display:flex;flex-direction:column;gap:9px}
-.form-opt{display:flex;align-items:center;gap:13px;border:1.5px solid var(--border);border-radius:13px;padding:13px 16px;cursor:pointer;transition:all .2s}
-.form-opt:hover,.form-opt.sel{border-color:var(--blue);background:var(--blue-l)}
-.form-opt-ico{font-size:20px}
-.form-opt-txt strong{font-family:var(--font);font-size:13px;font-weight:600;display:block}
-.form-opt-txt span{font-family:var(--font);font-size:12px;color:var(--mid)}
-.form-tags{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
-.ftag{font-family:var(--font);padding:7px 15px;border-radius:100px;border:1.5px solid var(--border);font-size:12px;cursor:pointer;transition:all .2s;background:var(--white);font-weight:500}
-.ftag:hover{border-color:var(--blue);color:var(--blue)}.ftag.sel{background:var(--blue);color:var(--white);border-color:var(--blue)}
-.finput{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:11px;font-family:var(--font);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:12px;background:var(--white)}
-.finput:focus{border-color:var(--blue)}.finput::placeholder{color:#bbb}
-textarea.finput{resize:none;height:96px}
-.fnext{width:100%;padding:15px;background:var(--dark);color:var(--white);border:none;border-radius:11px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;transition:all .25s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px}
-.fnext:hover{background:var(--blue);transform:translateY(-2px)}.fnext:disabled{opacity:.45;cursor:not-allowed;transform:none}
-.ai-box{background:var(--light);border-radius:14px;padding:18px;margin-top:14px;border-left:3px solid var(--blue);display:none}
-.ai-box.show{display:block;animation:fadeUp .5s ease}
-.ai-box-hdr{display:flex;align-items:center;gap:9px;margin-bottom:10px}
-.ai-ava{width:26px;height:26px;background:var(--blue);border-radius:50%;display:grid;place-items:center;font-size:13px;color:white;flex-shrink:0}
 /* variante nó: o quadradinho âmbar da marca no lugar do ✦ genérico */
-.ai-ava-no{background:var(--dark);border-radius:7px}
-.ai-ava-no::after{content:'';width:9px;height:9px;background:var(--no-ambar,#e8a33d);border-radius:2px}
-.ai-lbl{font-family:var(--font);font-size:12px;font-weight:700;color:var(--blue)}
-.ai-txt{font-family:var(--font);font-size:13px;color:var(--mid);line-height:1.7}
-.dots span{display:inline-block;width:5px;height:5px;background:var(--blue);border-radius:50%;animation:dot 1.2s ease-in-out infinite;margin:0 2px}
-.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
 @keyframes dot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
-.form-done{text-align:center;padding:36px 18px;display:none}.form-done.show{display:block;animation:fadeUp .5s ease}
-.done-ico{font-size:56px;margin-bottom:14px}
-.done-ttl{font-family:var(--font);font-size:24px;font-weight:700;margin-bottom:8px}
-.done-sub{font-family:var(--font);font-size:14px;color:var(--mid);line-height:1.6}
 
 /* ── FOOTER ── */
 footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
@@ -524,48 +394,30 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
-  #hero{padding:110px 20px 56px}.floating-pills{display:none}
+  #hero{padding:110px 20px 56px}
   #stats{grid-template-columns:repeat(2,1fr);padding:0 20px}
   section{padding:56px 20px}
-  .uc-1,.uc-2,.uc-3,.uc-4,.uc-5{grid-column:1/-1;grid-row:auto}
-  .cases-grid{grid-template-columns:1fr}.case-wide{grid-column:span 1}
-  .case-wide .case-metrics{grid-template-columns:1fr 1fr}.cta-grid{grid-template-columns:1fr;gap:36px}
-  .mm-wrap{height:720px}
   footer{flex-direction:column;gap:18px;text-align:center;padding:36px 20px}
   /* empilhado, os dois blocos centram junto — deixar um alinhado à esquerda e
      outro à direita numa coluna só é o desalinho clássico de rodapé */
   .ft-brand{ align-items:center }
   .ft-legal{ align-items:center; text-align:center }
   .ft-legal-links{ justify-content:center }
-  .cost-compare{flex-direction:column;text-align:center}
 }
 
 /* ══════════════════════════════════════════
 /* ══════════════════════════════════════════
    MODULES (flip cards)
 ══════════════════════════════════════════ */
-#modulos{background:var(--dark);padding:80px 60px}
-#modulos .section-title{color:var(--white)}
-#modulos .section-sub{color:rgba(255,255,255,.42);margin-bottom:52px}
-@media(max-width:700px){
-  #modulos{padding:60px 20px}
-}
 @keyframes hubProgress{0%{width:0}100%{width:100%}}
 @keyframes btnPulse{0%,100%{opacity:1}50%{opacity:.65}}
-.scl-before,.scl-after{font-family:var(--font);font-size:10px;font-weight:600;padding:2px 9px;border-radius:100px;display:flex;align-items:center;gap:5px}
-.scl-before{background:#f3f2ed;color:var(--mid)}
-.scl-after{color:white}
-.pcomp-table{display:none}
 
 /* ── SCROLL INDICATOR ── */
-.scroll-indicator{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;font-family:var(--font);font-size:11px;font-weight:600;color:var(--mid);letter-spacing:.12em;text-transform:uppercase;animation:fadeUp 1s ease 1s both}
-.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,var(--mid),transparent);animation:scrollPulse 2.2s ease-in-out infinite;will-change:opacity}
 @keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── HERO LAYOUT 2-col ── */
 /* hero now grid — defined in hero-chat CSS */
-.hero-content{position:relative;z-index:2;max-width:600px}
 
 @media(max-width:1100px){#hero{padding:140px 48px 60px}}
 @media(max-width:900px){#hero{padding:140px 24px 60px}}
@@ -589,111 +441,49 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 
   /* ── HERO ── */
   #hero{padding:110px 20px 64px;min-height:auto}
-  .hero-title{font-size:clamp(32px,9vw,52px)!important;letter-spacing:-1px}
-  .hero-sub{font-size:14px;margin-bottom:24px}
-  .hero-badge{font-size:11px;padding:5px 12px}
-  .hero-actions{flex-direction:column;gap:10px;align-items:stretch}
-  .btn-primary,.btn-secondary{text-align:center;padding:14px 24px;font-size:14px}
-  .scroll-indicator{display:none}
   /* orbs: smaller, no overflow */
-  .orb-1{width:260px;height:260px;top:-60px;right:-60px}
-  .orb-2{width:160px;height:160px}
-  .orb-3,.orb-4{display:none}
 
   /* ── STATS ── */
   #stats{grid-template-columns:repeat(2,1fr)!important;padding:0!important}
-  .stat-item{padding:28px 16px}
-  .stat-number{font-size:36px}
-  .stat-label{font-size:11px}
 
   /* ── HOW IT WORKS ── */
-  #how{padding:72px 20px}
   /* flow steps: vertical stack */
-  .flow-steps{flex-direction:column;align-items:center;gap:0}
-  .flow-step{width:100%;max-width:320px}
-  .flow-arrow{display:none}
-  .flow-arrow-v{display:flex}
   /* tech-stack tree: scroll horizontally */
-  .flow-tree-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:12px}
-  .flow-tree{flex-wrap:nowrap;gap:12px;padding:0 4px;justify-content:flex-start}
-  .flow-branch{min-width:120px}
-  .flow-node{padding:14px 12px;min-width:110px!important;max-width:130px!important}
-  .flow-node-icon svg{width:22px;height:22px}
-  .flow-node-title{font-size:11px}
-  .flow-node-desc{font-size:9px}
-  .branch-label{font-size:8px}
   /* maintenance node */
-  .maint-node{max-width:100%!important;width:100%}
 
   /* ── CASES ── */
-  #cases{padding:72px 20px}
-  .cases-grid{grid-template-columns:1fr!important;gap:16px}
-  .case-preview{height:160px}
-  .case-metrics{grid-template-columns:1fr 1fr}
-  .case-metric-v{font-size:15px}
 
   /* ── PLATFORMS marquee ── */
   #platforms{padding:60px 0}
   .plat-hdr{padding:0 20px;margin-bottom:32px}
-  .plat-chip{padding:6px 12px 6px 8px;font-size:11px;gap:6px}
-  .plat-logo{width:20px;height:20px}
 
   /* ── MIND MAP ── */
-  #mindmap{padding:72px 20px}
-  .mm-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .mm-svg{min-width:600px}
 
   /* ── CTA / FORM ── */
   #cta{padding:72px 20px}
-  .cta-grid{grid-template-columns:1fr!important}
-  .cta-left{display:none}
-  .form-wrap{padding:24px 16px;border-radius:16px}
-  .form-opts{grid-template-columns:1fr 1fr!important}
-  .form-opt{padding:12px 10px;font-size:12px}
-  .ftag{font-size:11px;padding:5px 10px}
-  .form-title{font-size:20px}
-  .fnext{padding:13px}
 
   /* ── FOOTER ── */
   footer{padding:40px 20px}
-  .ft-grid{grid-template-columns:1fr!important;gap:32px}
-  .ft-links{grid-template-columns:1fr 1fr!important}
   .ft-logo img{height:40px}
-  .ft-bottom{flex-direction:column;gap:8px;text-align:center}
 
   /* ── SCROLL INDICATOR ── */
-  .scroll-indicator{display:none}
 }
 
 /* ── SMALL PHONES (< 375px) ── */
 @media(max-width:375px){
-  .hero-title{font-size:28px!important}
   .section-title{font-size:24px!important}
-  .form-opts{grid-template-columns:1fr!important}
-  .case-metrics{grid-template-columns:1fr!important}
 }
 
 /* ── TABLET (769px–1024px) ── */
 @media(min-width:769px) and (max-width:1024px){
   nav{padding:10px 30px}
   #hero{padding:130px 40px 80px}
-  .hero-title{font-size:clamp(36px,5vw,58px)!important}
   #stats{padding:0 40px!important}
-  #how{padding:80px 40px}
-  #cases{padding:80px 40px}
-  .cases-grid{grid-template-columns:repeat(2,1fr)!important}
   #cta{padding:80px 40px}
   footer{padding:60px 40px}
-  .flow-tree{gap:10px}
-  .flow-node{padding:16px 14px;min-width:120px!important}
 }
 
 /* ── TOUCH: disable hover effects that cause layout shift ── */
-@media(hover:none){
-  .case-card:hover{transform:none!important;box-shadow:none!important}
-  .case-card:hover::after{top:-1px!important}
-  .case-card:hover .case-expand{max-height:0!important;opacity:0!important}
-}
 
 /* ── PREVENT HORIZONTAL OVERFLOW everywhere ──
    Só o body clampa: html+body com overflow-x:hidden fazia o body virar
@@ -703,33 +493,11 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
   body{max-width:100vw;overflow-x:hidden}
   footer,nav{max-width:100vw;overflow-x:hidden}
   /* orb blur: reduce filter cost on mobile */
-  .orb{filter:blur(40px)!important}
 }
 
 /* ── iOS SAFE AREA ── */
 @supports(padding: max(0px)){
   nav{padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
-}
-
-@media(max-width:768px){
-  .flow-tree-wrap{overflow-x:unset;padding-bottom:0}
-  .flow-tree{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-    justify-items:center;
-  }
-  .flow-branch{width:100%;align-items:center}
-  .flow-node{
-    min-width:unset!important;
-    max-width:100%!important;
-    width:100%;
-    padding:14px 10px;
-  }
-  .branch-label{font-size:9px;letter-spacing:.06em}
-  .flow-node-title{font-size:11px}
-  .flow-node-desc{font-size:9px;line-height:1.4}
-  .flow-node-icon svg{width:24px;height:24px}
 }
 
 /* ══════════════════════════════════════════════
@@ -738,163 +506,29 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 ══════════════════════════════════════════════ */
 @media(max-width:768px){
   /* Hide desktop flowchart, show mobile version */
-  #how .flowchart{display:none!important}
-  #howMobileWrap{display:block!important}
-  #how{padding:48px 0 56px}
-  .chat-msgs{display:flex;flex-direction:column;gap:8px}
-  .cm{
-    display:flex;gap:8px;
-    opacity:0;transform:translateY(8px);
-    transition:opacity 380ms ease,transform 380ms ease;
-  }
-  .cm.cm-show{opacity:1;transform:translateY(0)}
-  .cm.cm-left{align-items:flex-end}
-  .cm.cm-right{flex-direction:row-reverse;align-items:flex-end}
-  .cm-avatar{
-    width:28px;height:28px;border-radius:50%;
-    background:#141414;color:#fff;
-    font-size:6.5px;font-weight:700;
-    display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;letter-spacing:.03em;
-  }
-  .cm-bubble{
-    max-width:82%;padding:9px 13px;
-    font-family:var(--font);font-size:13px;line-height:1.52;
-    border-radius:4px 16px 16px 16px;
-  }
-  .cm-left .cm-bubble{background:#fff;border:1.5px solid #ecebe6;color:#141414}
-  .cm-right .cm-bubble{background:#3D63DB;color:#fff;border-radius:16px 4px 16px 16px}
-  .cm-typing .cm-bubble{
-    padding:11px 16px;background:#fff;
-    border:1.5px solid #ecebe6;border-radius:4px 16px 16px 16px;
-  }
-  .typing-dots{display:flex;gap:5px;align-items:center}
-  .typing-dot{
-    width:7px;height:7px;border-radius:50%;background:#6b6f76;
-    animation:mTypingBounce 1.2s ease-in-out infinite;
-  }
-  .typing-dot:nth-child(2){animation-delay:.18s}
-  .typing-dot:nth-child(3){animation-delay:.36s}
   @keyframes mTypingBounce{
     0%,60%,100%{transform:translateY(0);opacity:.4}
     30%{transform:translateY(-5px);opacity:1}
   }
 
   /* ── Transition phrase ── */
-  .how-transition-phrase{
-    text-align:center;font-family:var(--font);font-weight:600;font-size:14px;
-    color:#6b6f76;margin:0 0 26px;padding:26px 20px 0;
-    display:flex;align-items:center;gap:10px;
-  }
-  .how-transition-phrase::before,.how-transition-phrase::after{
-    content:'';flex:1;height:1px;background:#ecebe6;
-  }
 
   /* ── Mindmap — responsive SVG canvas w/ percentage-positioned nodes ── */
   /* NOTE: classes prefixed "hw-" to avoid collision with existing .mm-* used elsewhere */
-  .how-mindmap-wrap{width:100%;display:flex;flex-direction:column;align-items:center;padding:0 12px}
-  .how-mindmap{
-    position:relative!important;
-    width:100%!important;max-width:340px;
-    aspect-ratio:350/370;height:auto!important;
-  }
-  .hw-svg{
-    position:absolute;inset:0;width:100%;height:100%;
-    pointer-events:none;overflow:visible;z-index:0;
-  }
   @keyframes hwMarch{from{stroke-dashoffset:0}to{stroke-dashoffset:-20}}
-  .hw-line{opacity:0;stroke-dasharray:6 4;transition:opacity .4s ease}
-  .hw-line.hw-show{opacity:1;animation:hwMarch .55s linear infinite}
-  .hw-l1.hw-show{animation-duration:.50s}
-  .hw-l2.hw-show{animation-duration:.58s}
-  .hw-l3.hw-show{animation-duration:.52s}
-  .hw-l4.hw-show{animation-duration:.60s}
-  .hw-l5.hw-show{animation-duration:.55s}
-
-  .hw-hub{
-    position:absolute;left:50%;top:50%;
-    transform:translate(-50%,-50%) scale(0.7);
-    background:#141414;border-radius:42px;padding:14px 22px;
-    text-align:center;z-index:3;
-    box-shadow:0 6px 28px rgba(0,0,0,.35);
-    white-space:nowrap;
-    opacity:0;
-    transition:opacity .4s ease,transform .4s ease;
-  }
-  .hw-hub.hw-show{opacity:1;transform:translate(-50%,-50%) scale(1)}
   /* SVG já é a versão branca com ponto âmbar — sem filtro, senão o ponto some */
-  .hw-hub-logo{height:36px;width:auto;display:block;margin:0 auto}
-
-  .hw-node{
-    position:absolute;
-    width:29.14%; /* = 102/350 */
-    background:#fff;
-    border-radius:12px;
-    border:2px solid #ecebe6;
-    padding:8px 5px 9px;
-    text-align:center;z-index:2;
-    opacity:0;transform:scale(0.85);
-    transition:opacity .3s ease,transform .32s ease;
-  }
-  .hw-node.hw-show{opacity:1;transform:scale(1)}
-  .hw-node.n-blue  {border-color:#3D63DB}
-  .hw-node.n-green {border-color:#30A46C}
-  .hw-node.n-yellow{border-color:#EDA33B}
-  .hw-node.n-red   {border-color:#E0543C}
-  .hw-node-label{font-family:var(--font);font-size:6.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b6f76;margin-bottom:3px;line-height:1.15}
-  .hw-node-icon{display:flex;align-items:center;justify-content:center;margin-bottom:2px;height:17px}
-  .hw-node-icon svg{width:14px;height:14px}
-  .hw-node-title{font-family:var(--font);font-size:9.5px;font-weight:700;margin-bottom:1px;line-height:1.15}
-  .hw-node-desc{font-family:var(--font);font-size:7.5px;color:#6b6f76;line-height:1.3}
 
   /* ── Thought bubble ── */
-  .thought-section{
-    width:100%;display:flex;flex-direction:column;align-items:center;
-    margin-top:40px;padding:0 20px 20px;opacity:0;
-  }
   @keyframes mThoughtFloat{
     0%,100%{transform:translateY(0) rotate(-.5deg)}
     40%{transform:translateY(-10px) rotate(.8deg)}
     70%{transform:translateY(-5px) rotate(-.3deg)}
   }
-  .thought-bubble-anim{animation:mThoughtFloat 3.2s ease-in-out infinite;width:100%;max-width:320px}
-  .thought-chain{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:8px}
   @keyframes mDotPop{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.25);opacity:1}}
-  .tc{background:#6b6f76;border-radius:50%;animation:mDotPop 1.4s ease-in-out infinite}
-  .tc1{width:3px;height:3px;animation-delay:0s}
-  .tc2{width:5px;height:5px;animation-delay:.22s}
-  .tc3{width:8px;height:8px;animation-delay:.44s}
-  .thought-bubble{
-    background:#141414;border-radius:16px;padding:10px 12px;
-    color:#fff;text-align:center;position:relative;
-    box-shadow:0 8px 24px rgba(0,0,0,.18);
-  }
-  .thought-bubble::before{content:'';position:absolute;top:-5px;left:14px;width:14px;height:14px;background:#141414;border-radius:50%}
-  .thought-bubble::after{content:'';position:absolute;top:-9px;left:28px;width:10px;height:10px;background:#141414;border-radius:50%}
 }
 
 @media(max-width:768px){
   /* Hide the sidebar completely — use only category tabs */
-  #solSidebar{display:none!important}
-  #solPanelWrap{min-height:auto!important}
-}
-
-@media(max-width:768px){
-  .case-preview{height:220px}
-  .case-preview iframe{
-    /* Recalc scale: card ~350px wide → 350/1280 = 0.273 */
-    transform:scale(0.273)!important;
-    left:0!important;
-    top:0!important;
-    width:1280px!important;
-    height:720px!important;
-    transform-origin:top left!important;
-  }
-  .case-preview video{
-    object-fit:cover;
-    width:100%!important;
-    height:100%!important;
-  }
 }
 
 /* ── HERO AI CHAT ── */
@@ -930,10 +564,6 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
    Sobre o osso quase branco, o cinza secundário #6B6F76 dá 4.8:1; sobre o
    estúdio cai pra 4.0:1, abaixo do AA. Por isso --mid é escurecido dentro
    dessas seções (5.2:1) em vez de aplicar só o background. */
-.sec-studio{
-  background:var(--studio);
-  --mid:#5A5E65;
-}
 
 /* Fundo de estúdio: cinza quente chapado com queda de luz suave, como papel
    seamless de fotografia. O ponto claro fica em 68%/42% pra bater com o
@@ -962,9 +592,6 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 }
 /* quando o vídeo entra, ele cobre o backdrop — que segue como cor de espera */
 #hero.has-video .hero-backdrop{opacity:0;transition:opacity .8s ease}
-@media(max-width:1199px){
-  .hero-ctas{justify-content:center;text-align:center}
-}
 
 /* v5 · o conteúdo da hero agora mora no rodapé do palco, em 12 colunas:
    marca gigante à esquerda, texto + CTA à direita (referência Prisma). */
@@ -1200,108 +827,31 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 }
 
 /* 1 · headline — Sora 800 caixa alta, tracking apertado (BRAND.md §5) */
-.hero-h1{
-  font-family:var(--font);
-  font-size:clamp(38px,5.4vw,74px);
-  font-weight:var(--no-weight-display);
-  line-height:.98;
-  text-transform:uppercase;
-  letter-spacing:var(--no-tracking-headline);
-  color:var(--dark);
-  margin:0 0 22px;
-}
 
 /* 2 · lead */
-.hero-lead{
-  font-family:var(--font);
-  font-size:clamp(15px,1.25vw,18px);
-  font-weight:var(--no-weight-corpo);
-  line-height:1.6;color:var(--mid);
-  max-width:100%;margin:0 0 30px;
-}
 
 /* 3 · botões — sólido tinta + contornados */
-.hero-ctas{
-  display:flex;flex-wrap:wrap;gap:10px;max-width:100%;margin-bottom:30px;
-}
 /* as sugestões de pergunta pesam menos que o CTA principal — corpo menor,
    respiro menor, pra caberem mais por linha e não competirem com ele */
-.btn-pill-q{
-  font-size:12.5px;font-weight:var(--no-weight-corpo);
-  padding:9px 16px;border-color:rgba(20,20,20,.14);
-}
 
 /* Quebra que só existe no mobile. O <br> mora dentro de um <span> porque
    solto num flex container ele viraria item do flex; dentro do span ele é
    quebra de linha normal. O espaço antes dele mantém a frase correta no
    desktop, onde o <br> some. */
-.so-mobile{display:none}
 @media(max-width:768px){
-  .so-mobile{display:inline}
   /* sem isso o nowrap do .btn-pill corta a frase fora da tela */
-  .btn-pill{white-space:normal;text-align:center;line-height:1.4;max-width:100%}
 }
 
 /* `nó.` em pílula dentro da headline — logo oficial (palavra branca, ponto
    azul), nunca texto recriado. O ponto quadrado do SVG é o ponto final da frase. */
-.h1-pill{
-  display:inline-flex;align-items:center;justify-content:center;
-  background:var(--dark);border-radius:999px;
-  /* o ponto do SVG fica embaixo à direita, bem onde o raio da pílula corta —
-     por isso o respiro é maior desse lado */
-  padding:.22em .52em .26em .42em;
-  vertical-align:baseline;
-}
-.h1-pill img{height:.58em;width:auto;display:block}
-.btn-pill{
-  display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  font-family:var(--font);font-size:15px;font-weight:var(--no-weight-subtitulo);
-  padding:14px 26px;border-radius:999px;
-  border:1.5px solid rgba(20,20,20,.18);
-  background:transparent;color:var(--dark);
-  cursor:pointer;text-decoration:none;white-space:nowrap;
-  transition:background .2s,color .2s,border-color .2s,transform .2s;
-}
-.btn-pill:hover{background:var(--dark);color:#fff;border-color:var(--dark);transform:translateY(-1px)}
-.btn-pill-solid{background:var(--dark);color:#fff;border-color:var(--dark)}
-.btn-pill-solid:hover{background:var(--no-tinta-alt2)}
-.btn-pill .arw{font-size:1.05em;line-height:1}
-.cc-head{display:flex;align-items:flex-start;gap:11px}
-.cc-avatar{
-  width:38px;height:38px;border-radius:50%;flex:none;
-  background:var(--dark);object-fit:cover;
-}
-.cc-copy{flex:1;min-width:0}
-.cc-title{
-  font-family:var(--font);font-size:14.5px;
-  font-weight:var(--no-weight-subtitulo);color:var(--dark);
-}
-.cc-sub{
-  font-family:var(--font);font-size:13px;font-weight:var(--no-weight-corpo);
-  color:var(--mid);line-height:1.45;margin-top:3px;
-}
-.cc-status{
-  display:inline-flex;align-items:center;gap:6px;flex:none;
-  font-family:var(--font);font-size:12.5px;color:var(--mid);
-}
-.cc-status i{width:7px;height:7px;border-radius:50%;background:var(--no-verde);display:block}
-.cc-send{
-  width:38px;height:38px;flex:none;border-radius:50%;border:none;
-  background:var(--dark);color:#fff;cursor:pointer;
-  display:grid;place-items:center;transition:background .2s,transform .2s;
-}
-.cc-send:hover{background:var(--no-tinta-alt2);transform:scale(1.06)}
-.cc-send svg{width:15px;height:15px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 
 /* controles herdados do chat antigo que o mockup não mostra.
    Ficam no DOM porque main.js os referencia sem checar null. */
-.cc-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
 @media(max-width:900px){#hero{padding:120px 20px 60px}}
 
 /* scroll-indicator centered */
-#hero .scroll-indicator{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);display:flex;z-index:3}
 
 /* ── Gradiente fixo no topo ── */
 body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;background:linear-gradient(to bottom,rgba(255,255,255,.97) 0%,rgba(255,255,255,.6) 45%,rgba(255,255,255,0) 100%);pointer-events:none;z-index:199}
@@ -1311,38 +861,15 @@ body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;backgrou
 @media(max-width:1100px){#hero{padding:130px 48px 60px}}
 @media(max-width:768px){
   #hero{padding:100px 20px 48px;gap:24px}
-  .hero-content{text-align:center;max-width:100%}
-  .hero-badge{margin:0 auto 20px}
-  .hero-actions{justify-content:center}
-  .btn-primary,.btn-secondary{width:100%;justify-content:center}
-  .hero-sub,.hero-title{text-align:center}
 }
 
 /* ── Stats hidden ── */
 #stats{display:none!important}
 
 /* ── Flow-node spacing ── */
-.flow-node{min-width:140px;max-width:160px;padding:16px 14px}
-.flow-arrow{padding:0 6px;font-size:14px}
-@media(max-width:768px){
-  .flow-tree{grid-template-columns:1fr 1fr;gap:10px}
-  .flow-node{padding:12px 8px}
-  .flow-tree .flow-branch:last-child{grid-column:1/-1;max-width:180px}
-}
 
 /* ── Logos: garantir visibilidade em fundos escuros ── */
-.slogo img{
-  width:18px;height:18px;object-fit:contain;
-  filter:drop-shadow(0 0 0 transparent);
-}
 /* Logos escuros (GitHub, Vercel, Cal.com, Notion) ficam visíveis com fundo claro */
-.case-logos .slogo{
-  background:rgba(255,255,255,.22) !important;
-  border-radius:6px;
-}
-.plat-logo img{
-  width:22px;height:22px;object-fit:contain;
-}
 }</style>
 <link rel="stylesheet" href="/shared/products-nav.css">
 </head>
@@ -1355,8 +882,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- barra de 4 cores no topo da peça (BRAND.md §7) -->
 <div class="brand-topbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
-<div class="cursor" id="cur"></div>
-<div class="cursor-ring" id="curR"></div>
 
 <!-- PILL NAV (floating, primary navigation) -->
 <div id="pill-nav-root"></div>
@@ -1376,11 +901,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 /* ── navbar: transparência total, só a logo e os botões em evidência —
    sem nenhum fundo/máscara própria (o container em si já é transparente;
    o resto do ajuste é não deixar os fades das seções vazarem atrás dela) ── */
-.pill-nav-container{ background:none }
-#pill-nav-root .pill-nav{ --logo: 92px }
 /* v7 (14/09): no celular a marca ocupava demais o topo — 20% menor (92 → 74) */
-@media (max-width: 760px){ #pill-nav-root .pill-nav{ --logo: 74px } }
-#pill-nav-root .pill-logo img{ transform:scale(1.05) }
 
 /* ── paleta intercalada entre seções (bege / marrom / preto) — os três tons
    são ajustáveis ao vivo no painel de calibragem, por isso vivem em variáveis
@@ -1395,62 +916,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   padding-top:120px; padding-bottom:120px;
 }
 #ia .section-title,#ia .section-label{ color:#fff }
-#ia .ia-feat{ border-top-color:rgba(255,255,255,.16) }
-#ia .ia-feat-text strong{ color:#fff }
 /* limite hero → como usamos ia: metade fica em #hero::after (acima),
    metade aqui — as duas pontas se encontram no meio pra um degradê mais largo */
 #ia::before{ content:''; position:absolute; left:0; right:0; top:-1px; height:80px; opacity:.4; pointer-events:none; background:linear-gradient(var(--lp-bege), transparent); z-index:1 }
 #ia::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:80px; opacity:.4; pointer-events:none; background:linear-gradient(transparent, var(--lp-marrom)); z-index:1 }
-
-#oquefaz{
-  background:var(--lp-marrom); --mid:rgba(255,255,255,.55); position:relative;
-  padding-top:120px; padding-bottom:120px;
-}
-#oquefaz .section-title,#oquefaz .section-label{ color:#fff }
-#oquefaz .oq-card{ background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12) }
-#oquefaz .oq-card-title{ color:#fff }
 /* limite como usamos ia → o que fazemos: preto vai cedendo lugar pro marrom */
-#oquefaz::before{ content:''; position:absolute; left:0; right:0; top:-1px; height:80px; opacity:.4; pointer-events:none; background:linear-gradient(var(--lp-preto), transparent); z-index:1 }
-#oquefaz::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:70px; opacity:.4; pointer-events:none; background:linear-gradient(transparent, var(--lp-bege)); z-index:1 }
 
 /* ── seção 2 · defesa do uso de IA ── */
-.ia-feats{
-  display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
-  max-width:760px; margin-top:8px;
-}
-@media(max-width:700px){ .ia-feats{ grid-template-columns:1fr } }
-.ia-feat{
-  display:flex; align-items:flex-start; gap:14px;
-  padding:16px 4px; border-top:1px solid var(--border);
-}
-.ia-feat-icon{
-  width:42px;height:42px;border-radius:11px;flex-shrink:0;
-  display:grid;place-items:center;font-size:19px;background:var(--blue-l);
-}
-.ia-feat-text strong{font-family:var(--font);font-weight:600;font-size:14px;display:block;margin-bottom:2px}
-.ia-feat-text span{font-family:var(--font);font-size:12.5px;color:var(--mid);line-height:1.55}
 
 /* ── seção 3 · o que a nó faz ── */
-.oq-grid{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:8px;
-}
-@media(max-width:900px){ .oq-grid{ grid-template-columns:1fr 1fr } }
-@media(max-width:560px){ .oq-grid{ grid-template-columns:1fr } }
-.oq-card{
-  background:var(--white); border:1.5px solid var(--border); border-radius:16px;
-  padding:22px 20px; transition:transform .3s,box-shadow .3s;
-}
-.oq-card:hover{ transform:translateY(-4px) }
-.oq-icon{
-  width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
-  font-size:18px; margin-bottom:14px;
-}
-.oq-card.blue .oq-icon{ background:var(--blue-l); color:var(--blue) }
-.oq-card.red .oq-icon{ background:var(--red-l); color:var(--red) }
-.oq-card.yellow .oq-icon{ background:var(--yellow-l); color:#805c28 }
-.oq-card.green .oq-icon{ background:var(--green-l); color:var(--green) }
-.oq-card-title{ font-family:var(--font);font-weight:700;font-size:15px;margin-bottom:6px }
-.oq-card-desc{ font-family:var(--font);font-size:12.5px;color:var(--mid);line-height:1.6 }
 
 /* ═══════════════════════════════════════════════════════════════════════
    v5 · SEÇÃO "QUEM É A NÓ" — o miolo de conteúdo que a página não tinha.
@@ -1459,19 +933,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
    O que não veio junto: a fonte itálica serifada de ênfase (BRAND.md §3
    proíbe outra fonte) — no lugar dela, a pílula sólida do §6.
    ═══════════════════════════════════════════════════════════════════════ */
-#quemsomos{
-  background:var(--studio); --mid:#5A5E65;
-  position:relative;padding:120px 60px 130px;
-}
-@media(max-width:768px){ #quemsomos{ padding:88px 24px 96px } }
 /* a emenda bege → preto que antes saía do #hero: agora é esta seção que
    faz fronteira com o #ia (a outra metade do degradê segue em #ia::before) */
-#quemsomos::after{
-  content:'';position:absolute;left:0;right:0;bottom:0;height:110px;
-  z-index:1;pointer-events:none;opacity:.4;
-  background:linear-gradient(to bottom, rgba(20,20,20,0) 0%, var(--lp-preto) 100%);
-}
-.qs-inner{ max-width:980px;margin:0 auto;text-align:center;position:relative;z-index:2 }
 .qs-head{
   font-family:var(--font);font-weight:var(--no-weight-titulo);
   font-size:clamp(25px,3.5vw,47px);
@@ -1487,10 +950,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   transition:opacity .5s ease,transform .5s cubic-bezier(.16,1,.3,1);
 }
 .qs-head.in .w{ opacity:1;transform:translateY(0) }
-.qs-pill{
-  background:var(--dark);color:#fff;border-radius:999px;
-  padding:.02em .3em .1em;
-}
 .qs-body{
   font-family:var(--font);font-weight:var(--no-weight-corpo);
   font-size:clamp(15px,1.35vw,19px);line-height:1.8;
@@ -1502,67 +961,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 /* ── v5 · #ia · itens numerados no lugar dos emoji ──
    número em JetBrains Mono é a "voz de engenharia" da marca (BRAND.md §5);
    emoji não existe no sistema visual da nó. */
-.ia-num{
-  font-family:var(--font-mono);font-size:12px;font-weight:500;
-  letter-spacing:.1em;width:34px;flex-shrink:0;padding-top:3px;
-}
-.ia-feat.n-blue .ia-num{ color:var(--blue) }
-.ia-feat.n-red .ia-num{ color:var(--red) }
-.ia-feat.n-yellow .ia-num{ color:var(--yellow) }
-.ia-feat.n-green .ia-num{ color:var(--green) }
 
 /* ── v5 · #oquefaz · grade de cartões da referência Prisma ──
    um painel de vídeo alto à esquerda + as quatro frentes em 2×2. Assim o
    vídeo entra como cartão (igual à referência) sem sacrificar nenhuma das
    quatro frentes, que lá não existiam. */
-.oq-grid{
-  display:grid;gap:14px;margin-top:8px;grid-template-columns:1fr;
-}
-@media(min-width:700px){ .oq-grid{ grid-template-columns:1fr 1fr } }
-@media(min-width:1040px){
-  .oq-grid{ grid-template-columns:.84fr 1fr 1fr }
-  .oq-video{ grid-row:1/3;grid-column:1 }
-}
-.oq-video{
-  position:relative;border-radius:16px;overflow:hidden;min-height:300px;
-  background:#1b120b;border:1.5px solid rgba(255,255,255,.12);
-}
-.oq-video video{ position:absolute;inset:0;width:100%;height:100%;object-fit:cover }
-.oq-video-cap{
-  position:absolute;left:0;right:0;bottom:0;z-index:2;padding:52px 18px 18px;
-  font-family:var(--font);font-weight:600;font-size:14px;color:#fff;line-height:1.4;
-  background:linear-gradient(to top, rgba(15,10,6,.9), rgba(15,10,6,0));
-}
-.oq-card{ display:flex;flex-direction:column }
-.oq-num{
-  display:block;margin-bottom:12px;
-  font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.14em;
-}
-.oq-card.blue .oq-num{ color:var(--blue) }
-.oq-card.red .oq-num{ color:var(--red) }
-.oq-card.yellow .oq-num{ color:var(--yellow) }
-.oq-card.green .oq-num{ color:var(--green) }
-.oq-list{ list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:8px }
-.oq-list li{
-  font-family:var(--font);font-size:12.5px;line-height:1.45;color:var(--mid);
-  display:flex;gap:9px;align-items:flex-start;
-}
-.oq-list li::before{
-  content:'';width:5px;height:5px;border-radius:1px;flex:none;margin-top:6px;
-  background:currentColor;opacity:.55;
-}
-.oq-card.blue .oq-list li::before{ background:var(--blue);opacity:.9 }
-.oq-card.red .oq-list li::before{ background:var(--red);opacity:.9 }
-.oq-card.yellow .oq-list li::before{ background:var(--yellow);opacity:.9 }
-.oq-card.green .oq-list li::before{ background:var(--green);opacity:.9 }
-.oq-more{
-  margin-top:auto;padding:16px 0 0;background:none;border:0;cursor:pointer;
-  font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
-  display:inline-flex;align-items:center;gap:7px;color:#fff;opacity:.66;
-  transition:opacity .2s,gap .2s;
-}
-.oq-more:hover{ opacity:1;gap:11px }
-.oq-more .arw{ display:inline-block;transform:rotate(-45deg) }
 
 /* ── fade entre seções: suaviza o corte duro na troca bege/estúdio ── */
 #platforms{ position:relative; padding-top:96px !important; padding-bottom:96px !important }
@@ -1571,26 +974,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 /* ── CTA: formulário começa fechado — botão em dobro, centralizado dentro
    da coluna direita (a coluna em si segue alinhada à direita na seção) ── */
-.cta-reveal-wrap{
-  display:flex; justify-content:center; align-items:center; padding:24px 0; width:100%;
-  /* .cta-grid usa align-items:start (pra não descentralizar o texto quando o
-     formulário abre), então sem uma altura mínima aqui o botão fica grudado
-     no topo. Este valor imita a altura típica da coluna .cta-left, pra ele
-     ficar centralizado no meio da seção — não da página. */
-  /* coluna esquerda ficou enxuta (sem a lista de features) — o botão
-     centraliza contra bem menos altura */
-  min-height:clamp(200px, 26vw, 300px);
-}
-@media(max-width:768px){ .cta-reveal-wrap{ min-height:0; padding:12px 0 } }
-.cta-reveal-btn{
-  font-family:var(--font); font-size:clamp(18px,2.6vw,32px); font-weight:700;
-  padding:clamp(20px,3.4vw,38px) clamp(44px,7vw,84px); border-radius:100px; border:none; cursor:pointer;
-  background:var(--green); color:#fff; box-shadow:0 22px 56px rgba(48,164,108,.3);
-  transition:transform .25s, box-shadow .25s;
-}
-.cta-reveal-btn:hover{ transform:translateY(-2px); box-shadow:0 28px 68px rgba(48,164,108,.36) }
-.form-wrap{ overflow:hidden; transition:max-height .6s cubic-bezier(.16,1,.3,1), opacity .45s ease }
-.form-wrap[data-collapsed="1"]{ max-height:0 !important; opacity:0 !important; pointer-events:none !important }
 
 /* ── mascote (sprite sheet) — mesma mecânica do protótipo ── */
 #mascot{
@@ -1709,20 +1092,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 .lp-editable[contenteditable="true"]{ resize:both; overflow:auto; max-width:none }
 
 /* ── convite de scroll na hero: "saiba mais" com seta quicando ── */
-.scroll-hint{
-  display:inline-flex; align-items:center; gap:9px;
-  background:none; border:none; cursor:pointer; padding:12px 10px;
-  font-family:var(--font-mono); font-size:12.5px; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--mid);
-  transition:color .2s;
-}
-.scroll-hint:hover{ color:var(--dark) }
-.sh-arrow{
-  display:inline-block; font-size:15px; line-height:1;
-  animation:shBounce 1.6s ease-in-out infinite;
-}
 @keyframes shBounce{ 0%,100%{ transform:translateY(-2px); opacity:.55 } 50%{ transform:translateY(4px); opacity:1 } }
-@media (prefers-reduced-motion: reduce){ .sh-arrow{ animation:none } }
 
 /* ═══════════════════════════════════════════════════════════════════════
    v5.1 · #fluxo — SEÇÃO 2: os seis capítulos que se rolam de um fôlego só
@@ -1741,34 +1111,22 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   background:linear-gradient(var(--lp-bege), transparent);
 }
 .fx-sec{ position:relative; overflow:hidden; box-sizing:border-box; padding:80px 6vw }
-.fx-center{ min-height:80vh; display:flex; align-items:center; justify-content:center; padding:120px 6vw 90px }
-.fx-split{
-  min-height:88vh; display:grid; align-items:center; gap:5vw;
-  grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);
-}
 /* capítulo invertido: a prova vem à esquerda, o texto à direita */
-.fx-split.fx-rev{ grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) }
 @media(max-width:900px){
   /* minmax(0,1fr), NUNCA 1fr: "1fr" é minmax(auto,1fr), e aí o min-content do
      filho manda na largura da coluna. Com a pílula de destaque em nowrap isso
      esticava a coluna pra 441px dentro de um viewport de 386px — o
      overflow-x:hidden do body só escondia o estrago em vez de evitá-lo. */
-  .fx-split,.fx-split.fx-rev{ grid-template-columns:minmax(0,1fr); gap:36px; min-height:0; padding:76px 24px }
-  .fx-center{ min-height:0; padding:88px 24px 64px }
   /* no empilhamento o texto sempre vem antes da prova */
-  .fx-split.fx-rev .fx-col{ order:1 } .fx-split.fx-rev .fx-proof{ order:2 }
 }
 
 /* (as palavras-fantasma de contorno no fundo dos capítulos saíram em 14/08 —
    competiam com o texto e sujavam o preto) */
-
-.fx-col,.fx-proof{ position:relative; z-index:1 }
 .fx-lbl{
   display:inline-flex; align-items:center; gap:10px;
   font-family:var(--font-mono); font-size:11px; font-weight:500;
   letter-spacing:var(--no-tracking-label); text-transform:uppercase;
 }
-.fx-caret{ width:8px; height:14px; background:currentColor; animation:fxCaret 1.1s step-end infinite; flex-shrink:0 }
 @keyframes fxCaret{ 0%,49%{ opacity:1 } 50%,100%{ opacity:0 } }
 .fx-h2{
   margin:20px 0 22px; font-family:var(--font); font-weight:var(--no-weight-titulo);
@@ -1794,40 +1152,19 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
    na cor do capítulo (--mk, inline). A faixa translúcida de marca-texto que
    estava aqui saiu em 14/08: sobre o preto ela virava um borrão marrom.
    box-decoration-break:clone pra pílula quebrar direito em duas linhas. */
-.fx-mark{
-  background:var(--mk,var(--yellow)); color:var(--dark);
-  border-radius:999px; padding:.02em .3em .1em;
-  /* a pílula quebra como UMA peça: sem isto, "o seu?" partia entre as linhas
-     e o "o" sozinho virava uma bolinha amarela no meio do título */
-  white-space:nowrap;
-  -webkit-box-decoration-break:clone; box-decoration-break:clone;
-}
 
 /* ── provas: cartão genérico ── */
-.fx-card{
-  border:1px solid rgba(255,255,255,.14); border-radius:18px;
-  padding:30px 28px; background:rgba(255,255,255,.03);
-}
-.fx-card-hd{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
 .fx-tag{ font-family:var(--font-mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase }
 .fx-note{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px; color:rgba(255,255,255,.4) }
-.fx-dot{ width:6px; height:6px; border-radius:50%; background:currentColor; animation:fxBlink 1.6s ease-in-out infinite }
 @keyframes fxBlink{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
 
 /* ── prova 1: terminal "o que dá pra fazer com IA" ── */
-.fx-term{
-  border:1px solid rgba(255,255,255,.14); border-radius:14px; background:#0C0C0C;
-  overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.5);
-}
-.fx-term-bar{ display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,.08) }
-.fx-term-bar i{ width:10px; height:10px; border-radius:50%; flex-shrink:0 }
 .fx-term-path{ margin-left:10px; font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,.45) }
 .fx-term-body{
   padding:22px 22px 26px; font-family:var(--font-mono);
   font-size:clamp(11px,.92vw,12.5px); line-height:2.1; color:rgba(255,255,255,.82);
 }
 .fx-term-body .pr{ color:#6B6F76 }
-.fx-term-body .dim{ color:rgba(255,255,255,.4) }
 .fx-term-body > div{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
 /* seis linhas com entrada escalonada num ciclo de 14s (step-end: o terminal
    "imprime", não desliza) */
@@ -1837,13 +1174,8 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 @keyframes fxT4{ 0%,43%{opacity:0} 44%,95%{opacity:1} 99%,100%{opacity:0} }
 @keyframes fxT5{ 0%,57%{opacity:0} 58%,95%{opacity:1} 99%,100%{opacity:0} }
 @keyframes fxT6{ 0%,73%{opacity:0} 74%,95%{opacity:1} 99%,100%{opacity:0} }
-.fx-t1{animation:fxT1 14s step-end infinite}.fx-t2{animation:fxT2 14s step-end infinite}
-.fx-t3{animation:fxT3 14s step-end infinite}.fx-t4{animation:fxT4 14s step-end infinite}
-.fx-t5{animation:fxT5 14s step-end infinite}.fx-t6{animation:fxT6 14s step-end infinite}
 
 /* colunas "marketing / programação" do capítulo 1 */
-.fx-two{ display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:26px; max-width:560px }
-@media(max-width:520px){ .fx-two{ grid-template-columns:1fr } }
 .fx-two-hd{
   font-family:var(--font-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
   padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,.12);
@@ -1861,10 +1193,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
    seção prometia uma conversa e entregava o fim dela. Agora o cartão tem a
    altura da conversa inteira: os slots já nascem reservados, então cada balão
    acende no lugar, sem reflow, e nada nunca sai de quadro. */
-.fx-chat{ position:relative; margin-top:20px }
-.fx-thread{ display:flex; flex-direction:column; gap:10px; transition:transform .55s cubic-bezier(.22,1,.36,1) }
-.fx-chat > .fx-thread > *{ opacity:0; transform:translateY(10px); transition:opacity .4s ease, transform .45s cubic-bezier(.22,1,.36,1) }
-.fx-chat > .fx-thread > *.on{ opacity:1; transform:translateY(0) }
 .fx-msg-in{
   align-self:flex-start; max-width:80%; background:rgba(255,255,255,.07);
   border-radius:4px 14px 14px 14px; padding:10px 14px;
@@ -1893,28 +1221,16 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 }
 
 /* ── prova 3: painel de segunda de manhã ── */
-.fx-kpi{ display:flex; gap:24px; align-items:flex-end; margin-top:24px; flex-wrap:wrap }
 .fx-kpi-lbl{ font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4) }
 .fx-kpi-num{ font-family:var(--font); font-weight:var(--no-weight-titulo); font-size:40px; color:#fff; margin-top:4px; line-height:1 }
 .fx-kpi-delta{ display:inline-flex; align-items:center; gap:6px; margin-top:6px; font-family:var(--font-mono); font-size:11px; color:var(--green) }
-.fx-spark{ flex:1; min-width:140px; height:70px; overflow:visible }
-.fx-spark path{ stroke-dasharray:240; animation:fxSpark 5s ease-in-out infinite }
 @keyframes fxSpark{ 0%{ stroke-dashoffset:240 } 55%,100%{ stroke-dashoffset:0 } }
-.fx-bars{ display:flex; align-items:flex-end; gap:8px; height:92px; margin-top:26px }
-.fx-bars i{
-  flex:1; border-radius:3px 3px 0 0; transform-origin:bottom;
-  background:linear-gradient(to top, color-mix(in srgb, var(--blue) 35%, transparent), var(--blue));
-  animation:fxBar 2.6s ease-in-out infinite alternate;
-}
-.fx-bars i.hi{ background:linear-gradient(to top, color-mix(in srgb, var(--green) 40%, transparent), var(--green)) }
 @keyframes fxBar{ 0%{ transform:scaleY(.3) } 100%{ transform:scaleY(1) } }
-.fx-days{ display:flex; justify-content:space-between; margin-top:8px; font-family:var(--font-mono); font-size:9.5px; color:rgba(255,255,255,.35) }
 
 /* ── prova 4: a conferência painel × extrato ──
    Sem gráfico: o que a seção promete é que os dois números batem, então a
    peça é o próprio fechamento, linha a linha. Números em mono, alinhados
    à direita, como saem de um sistema — não como saem de um infográfico. */
-.fx-ledger{ padding:26px 26px 24px }
 /* migalha do funil: uma linha, no lugar das quatro barras */
 .fx-trail{
   display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; margin-top:18px;
@@ -1923,60 +1239,26 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 .fx-trail i{ font-style:normal; color:rgba(255,255,255,.34) }
 .fx-trail b{ color:rgba(255,255,255,.22); font-weight:400 }
 .fx-trail .on{ color:var(--green) } .fx-trail .on i{ color:color-mix(in srgb, var(--green) 62%, transparent) }
-
-.fx-led{ margin-top:20px }
-.fx-led-hd,.fx-led-r{ display:grid; grid-template-columns:1fr 96px 96px 22px; align-items:baseline; gap:14px }
-.fx-led-hd span{
-  font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase;
-  color:rgba(255,255,255,.3); text-align:right; padding-bottom:9px;
-}
-.fx-led-r{ padding:11px 0; border-top:1px solid rgba(255,255,255,.09) }
 .fx-led-k{ font-family:var(--font); font-size:13.5px; color:rgba(255,255,255,.78) }
 .fx-led-a,.fx-led-b{ font-family:var(--font-mono); font-size:13px; color:rgba(255,255,255,.62); text-align:right; font-variant-numeric:tabular-nums }
 .fx-led-b{ color:#fff }
 /* os ✓ acendem um a um na entrada — a única animação que sobrou, e ela
    significa alguma coisa: é a conferência acontecendo */
-.fx-led-c{ font-family:var(--font-mono); font-size:13px; color:var(--green); text-align:center; opacity:0; transform:scale(.6); transition:opacity .3s ease, transform .3s cubic-bezier(.34,1.56,.64,1) }
-.reveal.visible .fx-led-r:nth-child(2) .fx-led-c{ opacity:1; transform:none; transition-delay:.35s }
-.reveal.visible .fx-led-r:nth-child(3) .fx-led-c{ opacity:1; transform:none; transition-delay:.6s }
-.reveal.visible .fx-led-r:nth-child(4) .fx-led-c{ opacity:1; transform:none; transition-delay:.85s }
-.reveal.visible .fx-led-r:nth-child(5) .fx-led-c{ opacity:1; transform:none; transition-delay:1.2s }
-.fx-led-r.is-tot{ border-top:1px solid rgba(255,255,255,.24); margin-top:4px }
-.fx-led-r.is-tot .fx-led-k{ font-family:var(--font-mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.45) }
-.fx-led-r.is-tot .fx-led-a{ color:rgba(255,255,255,.75) }
-.fx-led-r.is-tot .fx-led-b{ font-size:17px; color:var(--green) }
 @media(max-width:520px){
-  .fx-led-hd,.fx-led-r{ grid-template-columns:1fr 82px 82px 18px; gap:8px }
   .fx-led-a,.fx-led-b{ font-size:11.5px }
 }
 .fx-capi{ display:flex; align-items:center; gap:12px; margin-top:20px }
-.fx-capi-line{
-  flex:1; height:2px;
-  background:repeating-linear-gradient(90deg, color-mix(in srgb, var(--yellow) 60%, transparent) 0 8px, transparent 8px 16px);
-  background-size:22px 2px; animation:fxMarch 1s linear infinite reverse;
-}
 @keyframes fxMarch{ to{ background-position:22px 0 } }
 .fx-capi span{ font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4) }
 
 /* ── capítulo 0 (quem é a nó) e 5 (como usamos IA): blocos centrados ── */
-.fx-wrap{ max-width:980px; width:100%; position:relative; z-index:1; text-align:center }
 
 /* ── "como usamos IA": o log da nossa própria operação ──
    Linha por linha, em mono, com a última REPROVADA. Nada de cards: a lista é
    a prova, e o item riscado é o que impede que ela vire vitrine. */
-.fx-log{ margin:44px auto 0; max-width:820px; text-align:left; border-top:1px solid rgba(255,255,255,.1) }
-.fx-log-row{
-  display:grid; grid-template-columns:22px 1fr auto; align-items:baseline; gap:14px;
-  padding:15px 4px; border-bottom:1px solid rgba(255,255,255,.1);
-}
-.fx-log-ic{ font-family:var(--font-mono); font-size:13px; line-height:1 }
-.fx-log-ic.ok{ color:var(--green) } .fx-log-ic.no{ color:var(--red) }
 .fx-log-t{ font-family:var(--font); font-size:15px; color:#fff; line-height:1.45 }
 .fx-log-m{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.36); text-align:right }
-.fx-log-row.is-no .fx-log-t{ color:rgba(255,255,255,.45); text-decoration:line-through; text-decoration-color:rgba(224,84,60,.55) }
-.fx-log-row.is-no .fx-log-m{ color:color-mix(in srgb, var(--red) 70%, transparent) }
 @media(max-width:640px){
-  .fx-log-row{ grid-template-columns:22px 1fr; gap:8px 12px }
   .fx-log-m{ grid-column:2; text-align:left }
 }
 .fx-log-foot{
@@ -1992,34 +1274,21 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   display:flex!important; flex-wrap:wrap; justify-content:center;
   gap:clamp(24px,4vw,56px); margin-top:52px; background:none;
 }
-#fluxo #stats .stat-item{ background:none; padding:0; min-width:120px }
-#fluxo #stats .stat-item::after{ display:none }
-#fluxo #stats .stat-number{ font-size:clamp(30px,3.4vw,42px) }
-#fluxo #stats .stat-label{ font-size:12px; color:rgba(255,255,255,.4); margin-top:4px }
 /* o 3º item é o gráfico de receita incremental: número em cima, curva embaixo
    como faixa própria — atrás do número a linha cortava o texto no meio */
-#fluxo #stats .stat-chart{ min-width:240px }
-#fluxo #stats .stat-chart .stat-number{ color:var(--green) }
-.sc-svg{ display:block; width:100%; height:44px; margin-top:12px; overflow:visible }
-.sc-line{ stroke-dasharray:230; stroke-dashoffset:230; transition:stroke-dashoffset 1.6s cubic-bezier(.22,1,.36,1) .2s }
-.sc-area{ opacity:0; transition:opacity .9s ease .9s }
-.reveal.visible .sc-line{ stroke-dashoffset:0 }
-.reveal.visible .sc-area{ opacity:1 }
 
 /* ── neutralização das regras da v5 que assumiam a ORDEM ANTIGA das seções ──
    #quemsomos e #ia eram seções soltas (bege e preta) com degradês próprios de
    fronteira; agora as duas são capítulos DENTRO do #fluxo, que já pinta o
    preto contínuo e cuida das emendas. Só as bordas mudam — o conteúdo delas
    (inclusive a animação letra a letra do #qsBody) segue igual. */
-#fluxo #quemsomos{ background:none; padding-top:120px; padding-bottom:90px }
 /* último capítulo do fluxo: respiro grande embaixo. O CTA final tem o mesmo
    preto, então sem esse vão o "como usamos IA" e o CTA leem como uma seção
    só. As duas metades do intervalo ficam uma em cada seção pra continuarem
    ajustáveis separadamente pelo "Respiro" do painel. */
 #fluxo #ia{ background:none; padding-top:120px; padding-bottom:180px }
-#fluxo #quemsomos::after,#fluxo #ia::before,#fluxo #ia::after{ display:none }
+#fluxo #ia::before,#fluxo #ia::after{ display:none }
 #fluxo .qs-head{ color:#fff; max-width:22ch; margin-bottom:26px }
-#fluxo .qs-pill{ background:var(--yellow); color:var(--dark) }
 #fluxo .qs-body{ color:#fff; max-width:64ch }
 
 /* ── emendas da ordem (14/08, revista quando as ferramentas subiram) ──
@@ -2056,7 +1325,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 
 /* o degradê do topo é uma camada por cima da seção — sem isto o rótulo e o
    título das ferramentas nascem lavados por baixo dele */
-#platforms .plat-hdr,#platforms .marquee-wrap{ position:relative; z-index:2 }
+#platforms .plat-hdr{ position:relative; z-index:2 }
 /* ferramentas(bege) → cta final(preto). Antes esta rampa levava ao rodapé,
    que é uma faixa fina; agora ela entrega numa seção preta de tela inteira,
    e a emenda pesa mais no olho. Por isso ela fecha de verdade (opacidade 1)
@@ -2077,10 +1346,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 @media(max-width:640px){
   /* respiro: os 120/180px de topo e base dos capítulos centrados foram
      calibrados no desktop e no celular viram tela em branco */
-  #fluxo #quemsomos{ padding:84px 24px 64px }
   #fluxo #ia{ padding:84px 24px 110px }
-  .fx-card{ padding:22px 18px }
-  .fx-ledger{ padding:22px 18px 20px }
 
   /* MARGEM DIREITA (14/08) — a pílula de destaque tem white-space:nowrap pra
      não partir em pedaços ("o seu?" virava um "o" solto numa linha). Em 390px
@@ -2090,7 +1356,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
      Aqui ela volta a quebrar — box-decoration-break:clone, que já está
      ligado, desenha cada linha como uma pílula inteira, que é exatamente o
      propósito dele. */
-  .fx-mark{ white-space:normal }
 
   /* "SAIBA MAIS" COM PESO DE BOTÃO (14/08) — era texto mono de 12px sem
      moldura. No celular cada capítulo ocupa a tela toda, e o chamado sumia no
@@ -2120,15 +1385,11 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 
   /* CONFERÊNCIA — com 63px a coluna do nome quebrava "Google Ads" em duas
      linhas. Números um pouco menores devolvem ~35px pro rótulo. */
-  .fx-led-hd,.fx-led-r{ grid-template-columns:1fr 78px 78px 16px; gap:8px }
   .fx-led-a,.fx-led-b{ font-size:11px }
   /* o total em 15px estourava os 74px e quebrava "R$ 41.240" em duas linhas */
-  .fx-led-r.is-tot .fx-led-b{ font-size:13px }
   .fx-led-k{ font-size:12.5px }
 
-  /* provas: nada de altura fixa nem número gigante espremido */
-  .fx-kpi{ gap:16px } .fx-kpi-num{ font-size:32px }
-  .fx-two{ gap:26px }
+  /* provas: nada de altura fixa nem número gigante espremido */ .fx-kpi-num{ font-size:32px }
   .fx-msg-in,.fx-msg-out{ max-width:92% }
 
   /* CONVERSA DOS AGENTES — A JANELA VOLTA A SER JANELA (14/08).
@@ -2145,12 +1406,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
      O medo de 14/08 (perder as primeiras trocas) não se aplica mais: o
      IntersectionObserver REINICIA a conversa do primeiro balão toda vez que a
      seção entra em quadro, então ninguém pega o meio. */
-  .fx-chat{
-    height:300px; overflow:hidden;
-    -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 26px);
-            mask-image:linear-gradient(to bottom, transparent 0, #000 26px);
-  }
-  .fx-thread{ gap:8px }
   .fx-msg-in,.fx-msg-out{ font-size:12.5px; line-height:1.45; padding:8px 12px }
   .fx-tool{ font-size:10px; padding:4px 10px }
 
@@ -2162,18 +1417,13 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 }
 
 @media (prefers-reduced-motion: reduce){
-  .fx-caret,.fx-dot,.fx-spark path,.fx-bars i,.fx-capi-line,.fx-tool i,
-  .fx-t1,.fx-t2,.fx-t3,.fx-t4,.fx-t5,.fx-t6{ animation:none!important }
-  .fx-spark path,.sc-line{ stroke-dashoffset:0 }
-  .sc-area{ opacity:1 }
+  .fx-tool i{ animation:none!important }
   /* a thread inteira aparece de uma vez, sem encenação */
-  .fx-chat{ height:auto; -webkit-mask-image:none; mask-image:none }
-  .fx-chat > .fx-thread > *{ opacity:1!important; transform:none!important; transition:none }
-  .fx-thread{ transition:none }
 }
 </style>
 <link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/historia.css?v=62">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap">
+<!-- Kalam (só a anotação à mão do formulário, no fim da página): não bloqueia a pintura -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=16">
 <!-- HERO -->
 <section id="hero">
@@ -2186,8 +1436,11 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
          (palíndromo: o clipe roda pra frente e volta, emenda exata).
          O fundo do palco reproduz a parede e o chão DESTE vídeo, então ele
          não é uma imagem colada num canto: é a continuação do mesmo espaço. -->
+    <!-- O PÔSTER é o maior elemento da primeira tela (o LCP): ele vem com
+         prioridade alta (preload no <head>) e o vídeo só começa a descer
+         depois do load — ver "vídeo da hero" no fim da página. -->
     <video class="hero-video" poster="/lp-narrador/cenas-lp/assets/video/hero-parede.jpg"
-           autoplay loop muted playsinline preload="auto" aria-hidden="true">
+           loop muted playsinline preload="none" aria-hidden="true">
       <source src="/lp-narrador/cenas-lp/assets/video/hero-parede.mp4" type="video/mp4">
     </video>
     <div class="hero-scrim" aria-hidden="true"></div>
@@ -2794,7 +2047,9 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     }
   });
 </script>
-<script src="/main.js" defer></script>
+<!-- base da página (reveal, âncoras e a lista de ferramentas): era o /main.js
+     inteiro, 2,3 MB, para usar três trechos -->
+<script src="/lp-narrador/cenas-lp/historia/base-v8.js?v=1" defer></script>
 <script>
 /* ============================================================
    MASCOTE DE SPRITE — copiado do protótipo (lp-narrador/cenas-lp/no-lp-queda-v2.html)
@@ -3431,9 +2686,20 @@ function frame(now){
 
 /* ---- start ---- */
 measure();
-play('queda_a','loop');
+/* As folhas do mascote (queda_a ~550 KB) só descem quando a pessoa começa a
+   rolar: ele entra caindo a partir da 2ª seção, nunca na hero, então baixar
+   isso na carga só disputava banda com o que aparece primeiro. O frame()
+   chama play() sozinho quando a queda começa. */
 const idle = window.requestIdleCallback || (fn => setTimeout(fn, 400));
-idle(() => { load('queda_b'); });
+let folhasPedidas = false;
+function pedeFolhas(){
+  if (folhasPedidas) return; folhasPedidas = true;
+  load('queda_a');
+  idle(() => { load('queda_b'); });
+}
+addEventListener('scroll', pedeFolhas, { once:true, passive:true });
+addEventListener('pointerdown', pedeFolhas, { once:true, passive:true });
+addEventListener('keydown', pedeFolhas, { once:true });
 document.fonts && document.fonts.ready.then(measure);
 addEventListener('load', measure);
 requestAnimationFrame(frame);
@@ -4191,6 +3457,25 @@ requestAnimationFrame(frame);
   });
 })();
 </script>
+<script>
+/* ── vídeo da hero: começa depois do load ──
+   Com autoplay + preload=auto os ~360 KB do vídeo disputavam banda com o
+   pôster, as fontes e o CSS — e o pôster é o que a pessoa vê primeiro. Agora
+   o pôster pinta sozinho e o vídeo entra logo depois do load, sem mudar nada
+   do que se vê (o 1º quadro é o próprio pôster). Movimento reduzido: fica o
+   pôster parado. */
+(function(){
+  const v = document.querySelector('.hero-video');
+  if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  function toca(){
+    v.preload = 'auto';
+    const p = v.play();
+    if (p && p.catch) p.catch(function(){});
+  }
+  if (document.readyState === 'complete') setTimeout(toca, 600);
+  else addEventListener('load', function(){ setTimeout(toca, 600); }, { once:true });
+})();
+</script>
 <!-- O loader adiado de 2 s saiu daqui em 14/08/2026: subiu pro <head>, no
      formato padrão. Os dois segundos eram economia de performance numa home
      institucional; numa LP que vai receber tráfego pago é conversão jogada
@@ -4256,7 +3541,36 @@ requestAnimationFrame(frame);
 <script src="/shared/glow-cursor.js?v=1" defer></script>
 <!-- v8 · editor (historia.js), cenas 3D, galerias/fluxograma/app/cronograma (v8.js) e o diagnóstico -->
 <script src="/lp-narrador/cenas-lp/historia/historia.js?v=49" defer></script>
-<script type="module" src="/lp-narrador/cenas-lp/historia/cenas3d.js?v=50"></script>
+<script>
+/* cenas 3D sob demanda: three.js (~260 KB) + cenas3d.js só descem depois que
+   a pessoa começa a rolar e a primeira cena está a menos de 600px da tela.
+   Na carga da página nenhuma delas está visível, e montá-las custava ~3 s de
+   CPU num celular médio bem na hora em que a hero precisa pintar.
+   import() de script clássico também respeita o importmap do <head>. */
+(function(){
+  var figs = document.querySelectorAll('.hs-palco-3d');
+  if (!figs.length) return;
+  var foi = false;
+  function carrega(){
+    if (foi) return; foi = true;
+    import('/lp-narrador/cenas-lp/historia/cenas3d.js?v=51').catch(function(e){
+      figs.forEach(function(f){ f.classList.add('sem-3d'); });
+      console.warn('[historia] cenas 3D indisponíveis', e);
+    });
+  }
+  function observa(){
+    if (!('IntersectionObserver' in window)) return carrega();
+    var io = new IntersectionObserver(function(es){
+      for (var i = 0; i < es.length; i++) if (es[i].isIntersecting){ io.disconnect(); carrega(); return; }
+    }, { rootMargin:'600px 0px' });
+    figs.forEach(function(f){ io.observe(f); });
+  }
+  var armado = false;
+  function arma(){ if (armado) return; armado = true; observa(); }
+  addEventListener('scroll', arma, { once:true, passive:true });
+  addEventListener('keydown', arma, { once:true });
+})();
+</script>
 <script src="/lp-narrador/cenas-lp/historia/v8.js?v=8" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/pagarme-public-config.js?v=1" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/roadmap-checkout.js?v=4" defer></script>
