@@ -64,9 +64,22 @@
     /* defaultPrevented: o CTA do diagnóstico já rolou (onclick → abrirDiagnostico
        centraliza o formulário); rolar de novo aqui desfaria isso */
     if (e.defaultPrevented) return;
-    var a = e.target.closest && e.target.closest('a[href^="#"]');
-    if (!a || a.getAttribute('href').length < 2) return;
-    var alvo = document.querySelector(a.getAttribute('href'));
+    var a = e.target.closest && e.target.closest('a[href^="#"], a[href^="/#"]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    /* o menu compartilhado aponta para "/#..." (serve de qualquer página);
+       aqui na home isso é uma âncora local */
+    if (href.indexOf('/#') === 0){
+      if (location.pathname !== '/' && !/lp-v8\.html$/.test(location.pathname)) return;
+      href = href.slice(1);
+    }
+    if (href.length < 2) return;
+    if (href === '#diagnostico' && typeof window.abrirDiagnostico === 'function'){
+      e.preventDefault();
+      window.abrirDiagnostico({ origem:'menu' });
+      return;
+    }
+    var alvo = document.querySelector(href);
     if (!alvo) return;
     e.preventDefault();
     alvo.scrollIntoView({ behavior:'smooth' });

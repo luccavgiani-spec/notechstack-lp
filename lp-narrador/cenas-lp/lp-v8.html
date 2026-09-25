@@ -17,7 +17,10 @@
      RODA ANTES DO gtm.js, de propósito: a primeira tag a disparar já quer o
      `sid`, e um sid que nasce depois não deduplica nada contra o CAPI.
 
-     Mapa completo em PLANO-rastreio.md / RASTREIO-lp-v5.html. -->
+     Mapa completo em PLANO-rastreio.md / RASTREIO-lp-v5.html.
+     As outras páginas (diagnóstico, serviços, cases, conteúdos) usam a mesma
+     lógica em /shared/telemetria.js — aqui fica inline para não custar uma ida
+     à rede na página mais visitada. Mudou um, mude o outro. -->
 <script>
 (function(){
   var SS = window.sessionStorage, sid = '';
@@ -147,7 +150,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
      A home é servida em "/" por rewrite (vercel.json) — o canonical aponta
      pra "/" e não pra este arquivo, senão o endereço interno vira o oficial. -->
 <title>Sistemas e aplicativos sob medida para empresas | Nó Tech Stack</title>
-<meta name="description" content="Sistemas, aplicativos e painéis sob medida para empresas. Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90, sem obrigação de continuar.">
+<meta name="description" content="Sistemas, aplicativos e painéis sob medida para empresas. Comece pelo diagnóstico: roadmap + protótipo em até 3 dias por R$ 149,90, sem obrigação.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://www.notechstack.com.br/">
 <meta name="theme-color" content="#141414">
@@ -221,7 +224,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         "price": "149.90",
         "priceCurrency": "BRL",
         "availability": "https://schema.org/InStock",
-        "url": "https://www.notechstack.com.br/#diagnostico"
+        "url": "https://www.notechstack.com.br/diagnostico-de-sistema/"
       }
     }
   ]
@@ -375,6 +378,9 @@ footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1p
 .ft-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;max-width:520px;font-family:var(--font);font-size:13px}
 .ft-nav a{color:rgba(255,255,255,.78);text-decoration:none;border-bottom:1px solid transparent}
 .ft-nav a:hover{color:#fff;border-bottom-color:var(--accent)}
+/* links de texto dentro dos parágrafos da home (serviços e diagnóstico) */
+.v8-links-serv{margin-top:18px}
+.v8-links-serv a,#como-funciona .v8-p a,.v8-dg-mais{color:inherit;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px;text-decoration-thickness:2px}
 /* links legais do rodapé: legíveis sem competir com a assinatura */
 .ft-link{color:rgba(255,255,255,.5);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18)}
 .ft-link:hover{color:#fff;border-bottom-color:var(--no-ambar,#e8a33d)}
@@ -884,7 +890,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 
 <!-- PILL NAV (floating, primary navigation) -->
-<div id="pill-nav-root"></div>
+<!-- menu já no HTML (links rastreáveis); o products-nav.js só liga os dropdowns -->
+<div id="pill-nav-root"><nav class="no-products-nav" aria-label="Navegação principal">
+    <a class="no-products-brand" href="/" aria-label="Nó Tech Stack — página inicial"><img src="/brand/favicon/favicon-dark.svg" alt="nó." width="64" height="64"></a>
+    <div class="no-products-pills">
+      <div class="no-products-dropdown">
+        <button type="button" aria-expanded="false" aria-controls="no-servicos-menu">Serviços <span aria-hidden="true">⌄</span></button>
+        <div id="no-servicos-menu" class="no-products-menu" hidden><a href="/diagnostico-de-sistema/" style="--product-color:#EDA33B">Diagnóstico de sistema</a><a href="/sistemas-sob-medida/" style="--product-color:#3D63DB">Sistemas sob medida</a><a href="/desenvolvimento-de-aplicativos/" style="--product-color:#E0543C">Aplicativos</a><a href="/paineis-empresariais/" style="--product-color:#30A46C">Painéis empresariais</a><a href="/integracoes-e-automacoes/" style="--product-color:#EDA33B">Integrações e automações</a><a href="/cases/" style="--product-color:#3D63DB">Cases</a><a href="/conteudos/" style="--product-color:#E0543C">Conteúdos</a></div>
+      </div>
+      <div class="no-products-dropdown">
+        <button type="button" aria-expanded="false" aria-controls="no-products-menu">Produtos <span aria-hidden="true">⌄</span></button>
+        <div id="no-products-menu" class="no-products-menu" hidden><a href="/colaboradores-digitais/" style="--product-color:#EDA33B">Agentes</a><a href="/roteador/" style="--product-color:#3D63DB">Roteador</a><a href="/health/" style="--product-color:#30A46C">Nó Health</a></div>
+      </div>
+      <a href="/#diagnostico">Contato</a>
+    </div>
+  </nav></div>
 
 <style>
 /* ════════════════════════════════════════════════════════════
@@ -1495,6 +1515,8 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
         <li><i style="--c:var(--yellow)"></i><b>Apps</b><span>Um aplicativo para os seus clientes ou a sua equipe usarem no celular.</span></li>
         <li><i style="--c:var(--green)"></i><b>Painéis</b><span>Uma tela que junta pedidos, vendas e números da empresa num lugar só.</span></li>
       </ul>
+      <!-- links de texto para as páginas de serviço (SEO: cada serviço tem URL própria) -->
+      <p class="v8-p v8-links-serv reveal reveal-d3">Veja cada serviço: <a href="/sistemas-sob-medida/">sistemas sob medida</a>, <a href="/desenvolvimento-de-aplicativos/">aplicativos</a>, <a href="/paineis-empresariais/">painéis</a> e <a href="/integracoes-e-automacoes/">integrações</a>.</p>
     </div>
     <figure class="hs-palco hs-palco-3d v8-palco-3d reveal reveal-d1" id="cenaIdeia" data-zoom=".86" aria-label="Animação: as informações soltas de uma empresa se organizam num plano">
       <div class="hs-cena"><canvas class="hs-canvas" aria-hidden="true"></canvas></div>
@@ -1520,7 +1542,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   <div class="v8-in v8-topo-centro">
     <p class="v8-k reveal">como funciona</p>
     <h2 class="v8-h reveal reveal-d1">Do diagnóstico à entrega, em 7 passos.</h2>
-    <p class="v8-p reveal reveal-d2">Você começa pagando só o diagnóstico da ideia: R$ 149,90. Ele inclui o plano, um protótipo para testar e 3 opções de como construir. A partir daí, cada passo tem prazo.</p>
+    <p class="v8-p reveal reveal-d2">Você começa pagando só o <a href="/diagnostico-de-sistema/">diagnóstico de sistema</a>: R$ 149,90. Ele inclui o roadmap (o plano), um protótipo para testar e 3 opções de como construir. A partir daí, cada passo tem prazo.</p>
   </div>
 
   <div class="v8-fluxo" id="v8Fluxo">
@@ -1531,7 +1553,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
         <span class="v8-n">01</span>
         <div class="v8-card">
           <small class="v8-quando">hoje</small>
-          <h3>Você compra o diagnóstico da ideia</h3>
+          <h3>Você compra o diagnóstico de sistema</h3>
           <p>R$ 149,90, por Pix ou cartão, direto no formulário desta página.</p>
           <ul class="v8-inclui"><li>plano do passo a passo</li><li>protótipo para testar</li><li>3 opções de construção</li></ul>
         </div>
@@ -1886,9 +1908,9 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   <div class="dg-palco">
     <div class="dg-conteudo">
       <div class="dg-texto">
-        <p class="v8-k">diagnóstico da ideia</p>
+        <p class="v8-k">diagnóstico de sistema</p>
         <h2 class="dg-h" id="dgTitulo">Conte a sua ideia. <span>R$ 149,90.</span></h2>
-        <p class="dg-sub">São 5 perguntas rápidas. No fim, você paga por Pix ou cartão. No dia seguinte, a Nó te chama no WhatsApp.</p>
+        <p class="dg-sub">São 5 perguntas rápidas. No fim, você paga por Pix ou cartão. No dia seguinte, a Nó te chama no WhatsApp. <a class="v8-dg-mais" href="/diagnostico-de-sistema/">Veja o que vem no diagnóstico e as perguntas frequentes</a>.</p>
         <ul class="dg-lista v8-dg-lista">
           <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>
             <div><b>Até o dia 3</b><span>acesso ao app com plano, protótipo e 3 opções</span></div></li>
@@ -1938,7 +1960,14 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
   </div>
   <nav class="ft-nav" aria-label="Mapa do site">
-    <a href="/#diagnostico">Diagnóstico de sistema</a>
+    <a href="/diagnostico-de-sistema/">Diagnóstico de sistema</a>
+    <a href="/sistemas-sob-medida/">Sistemas sob medida</a>
+    <a href="/desenvolvimento-de-aplicativos/">Aplicativos</a>
+    <a href="/paineis-empresariais/">Painéis empresariais</a>
+    <a href="/integracoes-e-automacoes/">Integrações e automações</a>
+    <a href="/cases/">Cases</a>
+    <a href="/conteudos/">Conteúdos</a>
+    <a href="/sobre/">Sobre a Nó</a>
     <a href="/colaboradores-digitais/">Colaboradores digitais</a>
     <a href="/roteador/">Roteador</a>
     <a href="/health/">Nó Health</a>
@@ -2049,7 +2078,7 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
 </script>
 <!-- base da página (reveal, âncoras e a lista de ferramentas): era o /main.js
      inteiro, 2,3 MB, para usar três trechos -->
-<script src="/lp-narrador/cenas-lp/historia/base-v8.js?v=1" defer></script>
+<script src="/lp-narrador/cenas-lp/historia/base-v8.js?v=2" defer></script>
 <!-- mascote de sprite + painel de calibragem (tecla D, só em localhost): era um
      <script> inline de 66 KB que rodava no meio do parse e segurava a primeira
      pintura da hero -->
