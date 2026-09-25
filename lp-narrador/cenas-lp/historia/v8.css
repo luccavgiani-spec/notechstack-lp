@@ -456,8 +456,16 @@
 }
 .v8-kb-barra span{ transition:width .5s cubic-bezier(.22,1,.36,1) }
 .v8-kb-barra .feito{ background:linear-gradient(90deg,#3D63DB,#30A46C) }
-.v8-kb-barra .andando{ background:repeating-linear-gradient(45deg,#EDA33B 0 6px,#F2B85E 6px 12px); background-size:17px 17px; animation:v8Listra 1s linear infinite }
-@keyframes v8Listra{ to{ background-position:17px 0 } }
+/* a listra corre por transform numa camada própria (composta pela GPU):
+   animar background-position recalculava o estilo da página a cada quadro,
+   mesmo com o cronograma fora da tela */
+.v8-kb-barra .andando{ position:relative; overflow:hidden; background:#EDA33B }
+.v8-kb-barra .andando::before{
+  content:''; position:absolute; top:0; bottom:0; left:-17px; right:0;
+  background:repeating-linear-gradient(45deg,#EDA33B 0 6px,#F2B85E 6px 12px); background-size:17px 17px;
+  animation:v8Listra 1s linear infinite; will-change:transform
+}
+@keyframes v8Listra{ from{ transform:translateX(0) } to{ transform:translateX(17px) } }
 .v8-kb-marcos{ position:relative; height:20px; margin-bottom:12px }
 .v8-kb-marcos span{ position:absolute; top:0; transform:translateX(-100%); padding-right:4px; border-right:1px solid rgba(255,255,255,.3); font:500 9.5px var(--font-mono); color:#999995; white-space:nowrap }
 .v8-kb-grade{ position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; align-items:start }
@@ -479,8 +487,9 @@
 /* ── formulário: a cena do sistema no lugar do texto do preço ── */
 
 /* ═══ rodada 3 (18/09) ═══ */
-@font-face{ font-family:'LoieWagon'; src:url('/lp-narrador/cenas-lp/historia/img/loie/Wagon-ExtraLight.woff2') format('woff2'); font-weight:200; font-display:swap }
-@font-face{ font-family:'LoieSackers'; src:url('/lp-narrador/cenas-lp/historia/img/loie/sackersgothicstd-medium.woff2') format('woff2'); font-weight:500; font-display:swap }
+/* As fontes da Loiê (LoieWagon e LoieSackers) são registradas pelo v8.js,
+   por FontFace, quando o #app ou o #editor se aproximam da tela: declaradas
+   aqui, os 45 KB desciam junto com a hero e disputavam banda com ela. */
 
 /* ── o que é: a cena 3D solta, grande, entrando por baixo do texto ── */
 @media (min-width:1001px){

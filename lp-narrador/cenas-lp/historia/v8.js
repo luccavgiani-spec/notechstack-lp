@@ -36,6 +36,26 @@
     };
   }
 
+  /* fontes da Loiê: só os mockups do app e do editor usam. Entram quando uma
+     das duas seções chega a ~1 tela de distância (ver nota no v8.css). */
+  (function fontesLoie(){
+    const alvos = ['#app', '#editor'].map(s => $(s)).filter(Boolean);
+    if (!alvos.length || !('FontFace' in window) || !('IntersectionObserver' in window)) return;
+    const FONTES = [
+      ['LoieWagon', '/lp-narrador/cenas-lp/historia/img/loie/Wagon-ExtraLight.woff2', '200'],
+      ['LoieSackers', '/lp-narrador/cenas-lp/historia/img/loie/sackersgothicstd-medium.woff2', '500']
+    ];
+    const io = new IntersectionObserver(es => {
+      if (!es.some(e => e.isIntersecting)) return;
+      io.disconnect();
+      FONTES.forEach(([familia, url, peso]) => {
+        const f = new FontFace(familia, "url('" + url + "') format('woff2')", { weight:peso, display:'swap' });
+        document.fonts.add(f); f.load().catch(() => {});
+      });
+    }, { rootMargin:'1000px 0px' });
+    alvos.forEach(a => io.observe(a));
+  })();
+
   /* ─────────────── galeria circular ───────────────
      Os itens correm numa esteira sem fim e, no caminho, descrevem um arco:
      quanto mais longe do centro, mais sobem (ou descem) e mais inclinam. */
