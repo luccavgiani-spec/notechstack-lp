@@ -1,0 +1,245 @@
+/* ─── páginas de serviço, case e conteúdo ───
+   Landing pages de leitura: diagnóstico, serviços, cases e artigos. Consome
+   brand/tokens/tokens.css + shared/brand-derived.css — nenhum hex de marca é
+   redeclarado aqui (os três tons de fundo abaixo são os mesmos da home v8).
+   O menu do topo é o shared/products-nav.css. */
+
+:root{
+  --st-tinta: var(--no-tinta);
+  --st-osso: var(--no-osso);
+  --st-bege: #E2D8CF;          /* bege da parede da home */
+  --st-cinza: var(--no-cinza);
+  --st-borda: var(--no-borda);
+  --st-acento: var(--no-ambar);
+  --st-acento-texto: #7A5212;  /* âmbar legível como texto: 4,9:1 no bege, 6,6:1 no osso (WCAG AA) */
+  --st-larg: 1180px;
+  /* apelidos que o formulário do diagnóstico (historia.css / v8.css) espera */
+  --font: var(--no-font-sans); --font-mono: var(--no-font-mono);
+  --blue: var(--no-azul); --red: var(--no-vermelho); --yellow: var(--no-ambar); --green: var(--no-verde);
+  --dark: var(--no-tinta); --mid: var(--no-cinza); --light: var(--no-osso); --white:#fff; --border: var(--no-borda);
+  --accent: var(--no-ambar);
+}
+
+*,*::before,*::after{ box-sizing:border-box }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100% }
+body{
+  margin:0; background:var(--st-osso); color:var(--st-tinta);
+  font-family:var(--no-font-sans); font-weight:var(--no-weight-corpo);
+  font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased;
+}
+img{ max-width:100%; height:auto; display:block }
+a{ color:inherit }
+:focus-visible{ outline:3px solid var(--st-acento); outline-offset:3px }
+.st-pular{ position:absolute; left:-9999px; top:8px; z-index:2000; background:var(--st-tinta); color:#fff; padding:10px 16px; border-radius:999px }
+.st-pular:focus{ left:16px }
+
+/* barra de 4 cores (BRAND.md §7) */
+.st-barra{ position:fixed; top:0; left:0; right:0; height:4px; display:flex; z-index:1200 }
+.st-barra i{ flex:1 }
+.st-barra i:nth-child(1){ background:var(--no-azul) }
+.st-barra i:nth-child(2){ background:var(--no-vermelho) }
+.st-barra i:nth-child(3){ background:var(--no-ambar) }
+.st-barra i:nth-child(4){ background:var(--no-verde) }
+
+.st-in{ width:100%; max-width:var(--st-larg); margin:0 auto; padding:0 24px }
+@media(min-width:768px){ .st-in{ padding:0 40px } }
+
+/* ── hero ── */
+.st-hero{ padding:150px 0 72px; background:var(--st-bege); position:relative; overflow:hidden }
+.st-hero.st-escuro{ background:var(--st-tinta); color:#fff }
+@media(max-width:768px){ .st-hero{ padding:118px 0 56px } }
+.st-hero-grade{ display:grid; gap:40px; align-items:center }
+@media(min-width:980px){ .st-hero-grade{ grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr) } }
+
+.st-migalhas{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 22px; padding:0; list-style:none; font:500 12px var(--no-font-mono); letter-spacing:.04em; color:rgba(20,20,20,.68) }
+.st-escuro .st-migalhas{ color:rgba(255,255,255,.62) }
+.st-migalhas li+li::before{ content:'/'; margin-right:6px; opacity:.5 }
+.st-migalhas a{ text-decoration:none; border-bottom:1px solid transparent }
+.st-migalhas a:hover{ border-bottom-color:var(--st-acento) }
+
+.st-rot{
+  display:inline-flex; align-items:center; gap:10px; margin:0 0 16px;
+  font:500 12px var(--no-font-mono); letter-spacing:var(--no-tracking-label); text-transform:uppercase;
+  color:var(--st-acento-texto);
+}
+.st-rot::before{ content:''; width:24px; height:2px; border-radius:2px; background:currentColor }
+.st-escuro .st-rot{ color:var(--st-acento) }
+
+.st-h1{
+  margin:0 0 20px; font-weight:var(--no-weight-display);
+  font-size:clamp(32px,4.6vw,58px); line-height:1.04; letter-spacing:-.04em; text-wrap:balance;
+}
+.st-h1 em{ font-style:normal; color:var(--st-acento-texto) }
+.st-escuro .st-h1 em{ color:var(--st-acento) }
+.st-lead{ margin:0 0 28px; max-width:58ch; font-size:clamp(17px,1.5vw,20px); line-height:1.6; color:rgba(20,20,20,.8) }
+.st-escuro .st-lead{ color:rgba(255,255,255,.78) }
+
+/* preço + CTA na primeira dobra */
+.st-oferta{ display:flex; flex-wrap:wrap; align-items:center; gap:14px 22px }
+.st-preco{ display:flex; flex-direction:column; line-height:1.15 }
+.st-preco b{ font-weight:var(--no-weight-display); font-size:clamp(28px,3vw,36px); letter-spacing:-.03em }
+.st-preco small{ font:500 12px var(--no-font-mono); letter-spacing:.06em; text-transform:uppercase; color:rgba(20,20,20,.68) }
+.st-escuro .st-preco small{ color:rgba(255,255,255,.62) }
+.st-selos{ display:flex; flex-wrap:wrap; gap:8px 18px; margin:22px 0 0; padding:0; list-style:none; font-size:14px; color:rgba(20,20,20,.75) }
+.st-escuro .st-selos{ color:rgba(255,255,255,.72) }
+.st-selos li{ display:flex; align-items:center; gap:8px }
+.st-selos li::before{ content:''; width:8px; height:8px; border-radius:2px; background:var(--no-verde) }
+
+/* botão pílula (BRAND.md §6: pílula tinta + círculo âmbar) */
+.st-btn{
+  display:inline-flex; align-items:center; gap:14px; padding:7px 7px 7px 24px;
+  border-radius:999px; background:var(--st-tinta); color:#fff; text-decoration:none;
+  font:var(--no-weight-subtitulo) 15px/1.2 var(--no-font-sans); border:0; cursor:pointer;
+  transition:gap .25s ease, background .25s ease;
+}
+.st-btn:hover{ gap:20px; background:var(--no-tinta-alt2) }
+@media(max-width:520px){ .st-so-largo{ display:none } }
+.st-btn i{ width:38px; height:38px; border-radius:50%; flex:none; display:grid; place-items:center; background:var(--st-acento); color:var(--st-tinta); font-style:normal; font-size:17px }
+.st-escuro .st-btn,.st-sec-escura .st-btn{ background:var(--st-osso); color:var(--st-tinta) }
+.st-escuro .st-btn:hover,.st-sec-escura .st-btn:hover{ background:#fff }
+.st-link{ font-weight:var(--no-weight-subtitulo); text-decoration:underline; text-decoration-color:var(--st-acento); text-underline-offset:4px; text-decoration-thickness:2px }
+.st-link:hover{ color:var(--st-acento-texto) }
+
+/* figura do hero / figuras gerais */
+.st-fig{ margin:0 }
+.st-fig img{ width:100%; border-radius:22px; box-shadow:var(--no-shadow-lg) }
+.st-fig figcaption{ margin-top:12px; font:400 13px/1.5 var(--no-font-mono); color:rgba(20,20,20,.7) }
+.st-sec-escura .st-fig figcaption{ color:rgba(255,255,255,.6) }
+
+/* ── seções ── */
+.st-sec{ padding:clamp(72px,9vw,120px) 0 }
+.st-sec-bege{ background:var(--st-bege) }
+.st-sec-branca{ background:#fff }
+.st-sec-escura{ background:var(--st-tinta); color:#fff }
+.st-h2{
+  margin:0 0 16px; font-weight:var(--no-weight-titulo); font-size:clamp(28px,3.6vw,46px);
+  line-height:1.08; letter-spacing:-.035em; text-wrap:balance; max-width:24ch;
+}
+.st-sub{ margin:0 0 44px; max-width:60ch; font-size:18px; color:rgba(20,20,20,.72) }
+.st-sec-escura .st-sub{ color:rgba(255,255,255,.72) }
+.st-sec-escura .st-rot{ color:var(--st-acento) }
+.st-centro{ text-align:center }
+.st-centro .st-h2,.st-centro .st-sub{ margin-left:auto; margin-right:auto }
+
+/* cards com barra de acento à esquerda (BRAND.md §7) */
+.st-grade{ display:grid; gap:18px }
+@media(min-width:720px){ .st-grade-2{ grid-template-columns:repeat(2,minmax(0,1fr)) } .st-grade-3{ grid-template-columns:repeat(2,minmax(0,1fr)) } }
+@media(min-width:1020px){ .st-grade-3{ grid-template-columns:repeat(3,minmax(0,1fr)) } }
+.st-card{
+  position:relative; padding:26px 26px 24px 30px; border-radius:18px; background:#fff;
+  border:1px solid var(--st-borda); box-shadow:var(--no-shadow-card);
+}
+.st-card::before{ content:''; position:absolute; left:0; top:22px; bottom:22px; width:4px; border-radius:0 4px 4px 0; background:var(--c,var(--st-acento)) }
+.st-sec-branca .st-card{ background:var(--st-osso) }
+.st-sec-escura .st-card{ background:var(--no-tinta-alt); border-color:var(--no-borda-dark); box-shadow:none }
+.st-card h3{ margin:0 0 8px; font-weight:var(--no-weight-titulo); font-size:20px; line-height:1.25; letter-spacing:-.02em }
+.st-card p{ margin:0; font-size:16px; color:rgba(20,20,20,.72) }
+.st-sec-escura .st-card p{ color:rgba(255,255,255,.72) }
+.st-card .st-k{ display:block; margin-bottom:10px; font:500 11px var(--no-font-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--st-acento-texto) }
+.st-sec-escura .st-card .st-k{ color:var(--st-acento) }
+a.st-card{ text-decoration:none; transition:transform .2s ease, box-shadow .2s ease }
+a.st-card:hover{ transform:translateY(-3px); box-shadow:var(--no-shadow-lg) }
+.st-card .st-mais{ display:inline-block; margin-top:14px; font-weight:var(--no-weight-subtitulo); font-size:15px; color:var(--st-tinta); border-bottom:2px solid var(--st-acento) }
+.st-sec-escura .st-card .st-mais{ color:#fff }
+
+/* lista com marcador */
+.st-lista{ margin:0 0 18px; padding:0; list-style:none }
+.st-lista li{ position:relative; padding-left:26px; margin-bottom:10px }
+.st-lista li::before{ content:''; position:absolute; left:0; top:.62em; width:10px; height:10px; border-radius:3px; background:var(--c,var(--no-verde)) }
+.st-lista.st-nao li::before{ background:var(--no-vermelho) }
+
+/* passos numerados (linha do tempo) */
+.st-passos{ margin:0; padding:0; list-style:none; counter-reset:passo; display:grid; gap:14px }
+.st-passos li{
+  counter-increment:passo; display:grid; grid-template-columns:auto minmax(0,1fr); gap:18px; align-items:start;
+  padding:22px 24px; border-radius:18px; background:#fff; border:1px solid var(--st-borda);
+}
+.st-sec-escura .st-passos li{ background:var(--no-tinta-alt); border-color:var(--no-borda-dark) }
+.st-passos li::before{
+  content:counter(passo,decimal-leading-zero); display:grid; place-items:center; width:46px; height:46px; border-radius:50%;
+  background:var(--st-tinta); color:var(--st-acento); font:600 14px var(--no-font-mono);
+}
+.st-sec-escura .st-passos li::before{ background:var(--st-acento); color:var(--st-tinta) }
+.st-passos b{ display:block; font-weight:var(--no-weight-titulo); font-size:18px; margin-bottom:4px }
+.st-passos small{ display:inline-block; margin-bottom:6px; font:500 11px var(--no-font-mono); letter-spacing:.12em; text-transform:uppercase; color:var(--st-acento-texto) }
+.st-sec-escura .st-passos small{ color:var(--st-acento) }
+.st-passos p{ margin:0; font-size:16px; color:rgba(20,20,20,.72) }
+.st-sec-escura .st-passos p{ color:rgba(255,255,255,.72) }
+
+/* duas colunas texto + figura */
+.st-duas{ display:grid; gap:40px; align-items:center }
+@media(min-width:980px){ .st-duas{ grid-template-columns:repeat(2,minmax(0,1fr)) } .st-duas.st-inv > :first-child{ order:2 } }
+.st-duas.st-topo{ align-items:start }
+@media(min-width:980px){ .st-duas.st-topo > :first-child{ position:sticky; top:120px } }
+
+/* tabela */
+.st-tabela-wrap{ overflow-x:auto; border:1px solid var(--st-borda); border-radius:16px; background:#fff; margin:0 0 20px }
+.st-tabela{ width:100%; min-width:560px; border-collapse:collapse; font-size:15px }
+.st-tabela th,.st-tabela td{ padding:14px 16px; text-align:left; vertical-align:top; border-bottom:1px solid var(--st-borda) }
+.st-tabela th{ font:500 11px var(--no-font-mono); letter-spacing:.1em; text-transform:uppercase; color:rgba(20,20,20,.68); background:rgba(20,20,20,.03) }
+.st-tabela tr:last-child td{ border-bottom:0 }
+.st-tabela td b{ font-weight:var(--no-weight-titulo) }
+.st-tabela td:nth-last-child(-n+2){ white-space:nowrap }
+
+/* perguntas frequentes */
+.st-faq{ display:grid; gap:10px; max-width:860px }
+.st-faq details{ border:1px solid var(--st-borda); border-radius:16px; background:#fff; padding:0 22px }
+.st-faq summary{
+  list-style:none; cursor:pointer; padding:20px 34px 20px 0; position:relative;
+  font-weight:var(--no-weight-subtitulo); font-size:17px; line-height:1.4;
+}
+.st-faq summary::-webkit-details-marker{ display:none }
+.st-faq summary::after{ content:'+'; position:absolute; right:0; top:50%; transform:translateY(-50%); font:500 22px var(--no-font-mono); color:var(--st-acento-texto) }
+.st-faq details[open] summary::after{ content:'–' }
+.st-faq details > div{ padding:0 0 20px; color:rgba(20,20,20,.78) }
+.st-faq details > div p{ margin:0 0 10px }
+
+/* faixa final de chamada */
+.st-cta{ background:var(--st-tinta); color:#fff; border-radius:30px; padding:clamp(34px,5vw,64px); display:grid; gap:26px; align-items:center }
+@media(min-width:900px){ .st-cta{ grid-template-columns:minmax(0,1fr) auto } }
+.st-cta .st-h2{ max-width:20ch; margin-bottom:10px }
+.st-cta p{ margin:0; color:rgba(255,255,255,.75); max-width:52ch }
+.st-cta .st-btn{ background:var(--st-osso); color:var(--st-tinta) }
+.st-cta .st-btn:hover{ background:#fff }
+.st-cta .st-preco small{ color:rgba(255,255,255,.62) }
+
+/* nota / destaque */
+.st-nota{ border-left:4px solid var(--st-acento); background:rgba(237,163,59,.1); padding:18px 22px; border-radius:0 14px 14px 0; margin:0 0 22px }
+.st-nota p:last-child{ margin-bottom:0 }
+
+/* ── artigo ── */
+.st-artigo{ max-width:760px; margin:0 auto }
+.st-artigo > p,.st-artigo li{ font-size:18px; line-height:1.75 }
+.st-artigo h2{ margin:56px 0 14px; font-weight:var(--no-weight-titulo); font-size:clamp(24px,2.6vw,32px); line-height:1.2; letter-spacing:-.03em }
+.st-artigo h3{ margin:34px 0 10px; font-weight:var(--no-weight-titulo); font-size:21px; letter-spacing:-.02em }
+.st-artigo p{ margin:0 0 18px }
+.st-artigo ul,.st-artigo ol{ margin:0 0 20px; padding-left:22px }
+.st-artigo li{ margin-bottom:8px }
+.st-artigo strong{ font-weight:var(--no-weight-subtitulo) }
+.st-artigo a{ text-decoration:underline; text-decoration-color:var(--st-acento); text-underline-offset:3px }
+.st-meta{ display:flex; flex-wrap:wrap; gap:6px 16px; margin:0; font:500 12px var(--no-font-mono); letter-spacing:.04em; color:rgba(20,20,20,.68) }
+.st-escuro .st-meta{ color:rgba(255,255,255,.62) }
+.st-resumo{ margin:0 0 36px; padding:22px 24px; border-radius:18px; background:#fff; border:1px solid var(--st-borda) }
+.st-resumo b{ display:block; margin-bottom:8px; font:500 11px var(--no-font-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--st-acento-texto) }
+.st-resumo ul{ margin:0; padding-left:20px }
+.st-resumo li{ font-size:16px; margin-bottom:6px }
+
+/* ── rodapé ── */
+.st-rodape{ background:var(--st-tinta); color:rgba(255,255,255,.72); padding:64px 0 40px; font-size:14px }
+.st-rodape-grade{ display:grid; gap:34px }
+@media(min-width:860px){ .st-rodape-grade{ grid-template-columns:1.2fr repeat(3,minmax(0,1fr)) } }
+.st-rodape img{ height:26px; width:auto }
+.st-rodape h2{ margin:0 0 12px; font:500 11px var(--no-font-mono); letter-spacing:.14em; text-transform:uppercase; color:var(--st-acento) }
+.st-rodape ul{ margin:0; padding:0; list-style:none }
+.st-rodape li{ margin-bottom:8px }
+.st-rodape a{ color:rgba(255,255,255,.82); text-decoration:none; border-bottom:1px solid transparent }
+.st-rodape a:hover{ color:#fff; border-bottom-color:var(--st-acento) }
+.st-rodape-pe{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; margin-top:44px; padding-top:22px; border-top:1px solid var(--no-borda-dark); font-size:13px; color:rgba(255,255,255,.62) }
+
+/* o formulário do diagnóstico (historia.css + v8.css) mora numa seção própria */
+.st-form{ scroll-margin-top:90px }
+
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto }
+  .st-btn,a.st-card{ transition:none }
+}
