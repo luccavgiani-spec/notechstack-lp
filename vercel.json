@@ -1,6 +1,37 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "trailingSlash": true,
   "rewrites": [
     { "source": "/", "destination": "/lp-narrador/cenas-lp/lp-v8.html" }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "notechstack-lp.vercel.app" }],
+      "destination": "https://www.notechstack.com.br/:path*",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/lp-narrador/cenas-lp/(lp-v3|lp-v5|lp-v7|painel-leads|parede-editorial|RASTREIO-lp-v5|_mobile-harness)\\.html",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/(preview-mobile|roteador-jornada-v3)\\.html",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/roteador/(roteador-lp-v2\\.html|roteador-lp-teste-videos)(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/(.*)\\.md",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+    },
+    {
+      "source": "/brand/fonts/(.*)\\.woff2",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
   ]
 }
