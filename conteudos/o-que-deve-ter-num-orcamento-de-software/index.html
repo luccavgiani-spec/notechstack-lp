@@ -300,6 +300,16 @@ document.addEventListener('click', function(e){
   var a = e.target.closest && e.target.closest('[data-cta]');
   if (a && window.track) track('cta_click', { cta: a.getAttribute('data-cta'), pagina: location.pathname });
 }, true);
+/* link para o formulário da PRÓPRIA página (o "Contato" do menu, na página do
+   diagnóstico): sem isto o navegador só pula até a âncora — o formulário não
+   fica centralizado e o diag_abrir não é registrado */
+document.addEventListener('click', function(e){
+  if (e.defaultPrevented || typeof window.abrirDiagnostico !== 'function') return;
+  var a = e.target.closest && e.target.closest('a[href*="#diagnostico"]');
+  if (!a || new URL(a.href, location.href).pathname !== location.pathname) return;
+  e.preventDefault();
+  window.abrirDiagnostico({ origem: a.getAttribute('data-cta') || 'menu' });
+});
 </script>
 </body>
 </html>
