@@ -543,9 +543,20 @@ async function inicia(){
       new Promise(r => setTimeout(r, 2500))
     ]);
   } catch (e) {}
-  alvos.forEach(([el, fn]) => {
+  /* cada cena só é montada quando chega perto da tela: montar as duas de uma
+     vez (geometria, sombras, texturas de texto e compilação de shader) custava
+     ~3 s de CPU num celular médio logo na carga da página */
+  const monta = ([el, fn]) => {
     try { palco(el, fn); }
     catch (e) { el.classList.add('sem-3d'); console.warn('[historia] cena 3D indisponível', e); }
-  });
+  };
+  if (!('IntersectionObserver' in window)) { alvos.forEach(monta); return; }
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    io.unobserve(e.target);
+    const alvo = alvos.find(([el]) => el === e.target);
+    if (alvo) monta(alvo);
+  }), { rootMargin: '400px 0px' });
+  alvos.forEach(([el]) => io.observe(el));
 }
 inicia();
