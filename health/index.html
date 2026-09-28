@@ -142,11 +142,6 @@ button{font-family:inherit}
 .hero-sub .brand{color:var(--green);display:inline;line-height:inherit;position:relative;top:.04em;font-size:1.12em;margin:0 .02em}
 .hero-screen.in .hero-sub{opacity:1;transform:translateY(0)}
 
-/* ─── Custom cursor ─── */
-.cursor{width:10px;height:10px;background:var(--health-accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply;left:-50px;top:-50px}
-.cursor-ring{width:38px;height:38px;border:1.5px solid var(--health-accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .22s ease;opacity:.45;left:-50px;top:-50px}
-@media(hover:none),(max-width:768px){.cursor,.cursor-ring{display:none}}
-
 /* ─── Scroll progress bar (top) ─── */
 .scroll-progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--green);z-index:9999;transition:width .08s ease;will-change:width}
 
@@ -613,6 +608,7 @@ footer .ft-right a:hover{color:var(--health-link)}
 <link rel="stylesheet" href="/shared/card-nav.css">
 <link rel="stylesheet" href="/shared/site-layout.css">
 <script src="/shared/card-nav.js" defer></script>
+<link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -624,8 +620,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="brand-topbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
 <!-- Cursor -->
-<div class="cursor" id="cur"></div>
-<div class="cursor-ring" id="curR"></div>
 
 <!-- Top scroll progress -->
 <div class="scroll-progress" id="scrollProgress"></div>
@@ -1037,6 +1031,7 @@ compliance</div>
     });
   }
 </script>
-<script src="/shared/glow-cursor.js?v=1" defer></script>
+
+<script src="/shared/smooth-cursor.js?v=1" defer></script>
 </body>
 </html>

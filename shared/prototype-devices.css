@@ -1,0 +1,42 @@
+/* Responsive, interactive screens for Devices.css (see vendor/devices/LICENSE). */
+.no-device-stage{position:relative;display:flex;justify-content:center;width:100%;height:582px;margin:28px auto 18px}
+#v8Loie.no-device{position:absolute;top:0;left:50%;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible;transform:translateX(-50%) scale(var(--device-scale,.67));transform-origin:top center;transition:none;z-index:1}
+#v8Loie.no-device-iphone-14-pro{width:428px;height:868px}
+#v8Loie.no-device-macbook-pro{width:740px;height:434px}
+#v8Loie .no-device-frame{position:relative;z-index:1}
+#v8Loie .no-device-screen{display:flex;flex-direction:column;position:relative;overflow:hidden;background:#fcf4df;color:#2b2520}
+#v8Loie .no-device-screen .v8-loie-tela{flex:1;min-height:0;height:0;max-height:none;overflow-y:auto;overflow-x:hidden;border-radius:0;scrollbar-width:thin;scrollbar-color:#98975a #fcf4df;overscroll-behavior:contain}
+#v8Loie .v8-loie-tela:focus-visible{outline:3px solid #eda33b;outline-offset:-3px}
+#v8Loie .no-device-stripe,#v8Loie .no-device-header,#v8Loie .no-device-sensors,#v8Loie .no-device-btns,#v8Loie .no-device-power,#v8Loie .no-device-home{pointer-events:none}
+#v8Loie .no-device-header,#v8Loie .no-device-sensors{z-index:3}
+#v8Loie.modo-cel .no-device-screen{padding-top:56px;padding-bottom:26px}
+.no-device-status{position:absolute;top:16px;left:34px;right:28px;display:flex;justify-content:space-between;align-items:center;height:24px;font:600 16px/1 system-ui,sans-serif}
+.no-device-home-indicator{position:absolute;bottom:9px;left:50%;width:130px;height:5px;border-radius:9px;transform:translateX(-50%);background:#2b2520}
+#v8Loie.modo-cel .v8-lo-nav{padding:16px 22px}
+#v8Loie.modo-cel .v8-lo-logo{width:76px;height:42px}
+#v8Loie.modo-cel .v8-lo-links::before{font-size:18px}
+#v8Loie.modo-cel .v8-lo-sacola{min-width:22px;height:22px;border-radius:50%;font-size:12px}
+#v8Loie.modo-cel .v8-lo-hero{padding:36px 22px 30px;gap:22px}
+#v8Loie.modo-cel .v8-lo-hero p{font-size:12px;line-height:1.65;letter-spacing:.08em}
+#v8Loie.modo-cel .v8-lo-3{font-size:10px;gap:9px;letter-spacing:.09em}
+#v8Loie.modo-cel .v8-lo-bts span{font-size:10px;padding:12px 16px}
+#v8Loie.modo-cel .v8-lo-cats{gap:7px;padding:16px}
+#v8Loie.modo-cel .v8-lo-cats span{font-size:9px;padding:7px 9px;letter-spacing:.08em}
+#v8Loie.modo-cel .v8-lo-best{padding:28px 20px}
+#v8Loie.modo-cel .v8-lo-best small{font-size:10px}
+#v8Loie.modo-cel .v8-lo-best h4{font-size:36px;margin:10px 0 20px}
+#v8Loie.modo-cel .v8-lo-grade{gap:16px}
+#v8Loie.modo-cel .v8-lo-prod b{font-size:21px}
+#v8Loie.modo-cel .v8-lo-prod span{font-size:11px}
+#v8Loie.modo-cel .v8-lo-trilha{font-size:9px;padding:18px 20px}
+#v8Loie.modo-cel .v8-lo-pdp{padding:0 20px 28px;gap:20px}
+#v8Loie.modo-cel .v8-lo-info h4{font-size:38px}
+#v8Loie.modo-cel .v8-lo-preco{font-size:25px}
+#v8Loie.modo-cel .v8-lo-desc,#v8Loie.modo-cel .v8-lo-fam,#v8Loie.modo-cel .v8-lo-est,#v8Loie.modo-cel .v8-lo-acc li{font-size:11px;line-height:1.6}
+#v8Loie.modo-cel .v8-lo-add{font-size:12px;padding:16px 20px;min-height:44px}
+#v8Loie.modo-pc .no-device-status,#v8Loie.modo-pc .no-device-home-indicator{display:none}
+#v8Loie.modo-pc .no-device-screen{padding-top:15px;background:#0d0d0d}
+#v8Loie.modo-pc .v8-loie-barra{flex:none;padding:5px 10px;height:26px}
+#v8Loie.modo-pc .v8-loie-barra span{font-size:8px;padding:2px 14px}
+.no-device-hint{margin:0!important;text-align:center;font:400 11px/1.6 var(--font);color:#bdbdb8}
+@media(max-width:768px){.no-device-stage{margin-top:24px}.no-device-hint{font-size:10px}}

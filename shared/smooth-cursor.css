@@ -1,0 +1,12 @@
+/* Cores fixas da marca: o cursor é idêntico em todas as verticais. */
+.magic-smooth-cursor{display:none;position:fixed;z-index:2147483000;top:0;left:0;width:30px;height:30px;opacity:0;pointer-events:none;transform-origin:4px 4px;will-change:transform;transition:opacity .16s ease}
+.magic-smooth-cursor svg{display:block;width:100%;height:100%;filter:drop-shadow(0 2px 4px #14141438)}
+.magic-smooth-cursor path{fill:#FAFAF7;stroke:#141414;stroke-width:1.8;stroke-linejoin:round}
+.magic-smooth-cursor circle{fill:#EDA33B;stroke:#141414;stroke-width:1.2}
+@media(hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  html.has-smooth-cursor,html.has-smooth-cursor *{cursor:none!important}
+  .magic-smooth-cursor{display:block}
+  .magic-smooth-cursor.is-visible{opacity:1}
+  html.has-smooth-cursor input,html.has-smooth-cursor textarea,html.has-smooth-cursor [contenteditable]{cursor:text!important}
+  html.has-smooth-cursor select,html.has-smooth-cursor video[controls],html.has-smooth-cursor dialog[open],html.has-smooth-cursor dialog[open] *{cursor:auto!important}
+}

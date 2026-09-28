@@ -216,84 +216,17 @@
   })();
 
 
-  /* ─────────────── Magic Bento (reactbits.dev/components/magic-bento) ───────────────
-     Recriado sem React: brilho na borda que segue o cursor (e acende também
-     nos cartões vizinhos, pela distância — o "spotlight global"), luz suave
-     dentro do cartão, partículas no hover, inclinação leve, ímã e onda no
-     clique. Cor por cartão em data-g="r,g,b" (padrão: âmbar da marca).
-     Toque (sem hover): só a borda, parada. */
-  const FINO = matchMedia('(hover:hover) and (pointer:fine)').matches && !REDUZ;
-  const RAIO = 320;
+  /* Cartões estáticos; o movimento do ponteiro pertence ao cursor compartilhado. */
   function bento(card, opts){
-    if (card.__bento) return; card.__bento = true;
-    opts = opts || {};
+    if (!card || card.__bento) return; card.__bento = true;
     card.classList.add('v8-bento');
-    if (!card.style.getPropertyValue('--g')) card.style.setProperty('--g', card.dataset.g || opts.g || '237,163,59');
-    const fx = document.createElement('span'); fx.className = 'v8-bento-fx'; fx.setAttribute('aria-hidden', 'true');
-    const borda = document.createElement('span'); borda.className = 'v8-bento-borda'; borda.setAttribute('aria-hidden', 'true');
-    card.prepend(fx); card.append(borda);
-    if (!FINO) return;
-    const tilt = opts.tilt !== false, ima = opts.ima !== false;
-    let parts = [], dentro = false;
-    card.addEventListener('pointerenter', () => {
-      dentro = true;
-      for (let i = 0; i < (opts.particulas || 10); i++){
-        const p = document.createElement('i'); p.className = 'v8-part';
-        p.style.left = (Math.random() * 100) + '%'; p.style.top = (Math.random() * 100) + '%';
-        p.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px'); p.style.setProperty('--dy', (Math.random() * 60 - 30) + 'px');
-        p.style.animationDelay = (i * 90) + 'ms'; p.style.animationDuration = (2 + Math.random() * 2) + 's';
-        fx.append(p); parts.push(p);
-      }
-    });
-    card.addEventListener('pointermove', e => {
-      const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-      if (!tilt && !ima) return;
-      const rx = tilt ? ((y / r.height) - .5) * -7 : 0, ry = tilt ? ((x / r.width) - .5) * 7 : 0;
-      const mx = ima ? (x - r.width / 2) * .035 : 0, my = ima ? (y - r.height / 2) * .035 : 0;
-      card.style.transform = 'perspective(900px) translate(' + mx.toFixed(1) + 'px,' + my.toFixed(1) + 'px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
-    });
-    card.addEventListener('pointerleave', () => {
-      dentro = false; card.style.transform = '';
-      parts.forEach(p => { p.classList.add('sai'); setTimeout(() => p.remove(), 400); }); parts = [];
-    });
-    card.addEventListener('click', e => {
-      const r = card.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-      const d = Math.max(Math.hypot(x, y), Math.hypot(x - r.width, y), Math.hypot(x, y - r.height), Math.hypot(x - r.width, y - r.height));
-      const o = document.createElement('i'); o.className = 'v8-onda';
-      o.style.cssText = 'width:' + d * 2 + 'px;height:' + d * 2 + 'px;left:' + (x - d) + 'px;top:' + (y - d) + 'px';
-      fx.append(o); setTimeout(() => o.remove(), 850);
-    });
-  }
-  /* spotlight global: um halo segue o cursor dentro do grupo e cada cartão
-     acende a borda do lado mais perto dele, com força pela distância */
-  function spotlight(grupo, seletor){
-    if (!FINO) return;
-    const halo = document.createElement('div'); halo.className = 'v8-halo'; halo.setAttribute('aria-hidden', 'true');
-    grupo.append(halo);
-    let tic = false, ult = null;
-    function aplica(){
-      tic = false; if (!ult) return;
-      const g = grupo.getBoundingClientRect();
-      halo.style.transform = 'translate(' + (ult.x - g.left) + 'px,' + (ult.y - g.top) + 'px)';
-      $$(seletor, grupo).forEach(c => {
-        const r = c.getBoundingClientRect();
-        const dx = Math.max(r.left - ult.x, 0, ult.x - r.right), dy = Math.max(r.top - ult.y, 0, ult.y - r.bottom);
-        const forca = Math.max(0, 1 - Math.hypot(dx, dy) / RAIO);
-        c.style.setProperty('--gx', ((ult.x - r.left) / r.width * 100).toFixed(1) + '%');
-        c.style.setProperty('--gy', ((ult.y - r.top) / r.height * 100).toFixed(1) + '%');
-        c.style.setProperty('--gi', forca.toFixed(3));
-      });
-    }
-    grupo.addEventListener('pointermove', e => { ult = { x:e.clientX, y:e.clientY }; halo.classList.add('on'); if (!tic){ tic = true; requestAnimationFrame(aplica); } });
-    grupo.addEventListener('pointerleave', () => { ult = null; halo.classList.remove('on'); $$(seletor, grupo).forEach(c => c.style.setProperty('--gi', 0)); });
-    addEventListener('scroll', () => { if (ult && !tic){ tic = true; requestAnimationFrame(aplica); } }, { passive:true });
+    card.style.setProperty('--g', card.dataset.g || (opts && opts.g) || '237,163,59');
   }
   const COR_G = { azul:'61,99,219', vermelho:'224,84,60', ambar:'237,163,59', verde:'48,164,108' };
   $$('#v8Fluxo .v8-passo').forEach(p => bento($('.v8-card', p), { g: COR_G[p.dataset.cor] }));
   const ctaCinza = $('.v8-cta-cinza');
   if (ctaCinza) bento(ctaCinza, { tilt:false, particulas:8 });
-  const fluxoSec = $('#como-funciona');
-  if (fluxoSec) spotlight(fluxoSec, '.v8-bento');
+
 
   /* logos das ferramentas por plano (mesma fonte da esteira da v5) */
   const ICONES = {
@@ -363,6 +296,16 @@
     const loie = $('#v8Loie'), telaLoie = $('.v8-loie-tela', loie), pags = $$('.v8-lo-pag', loie);
     const urlLoie = $('.v8-loie-barra em', loie), sacola = $('.v8-lo-sacola', loie), toast = $('.v8-lo-toast', loie);
     const disps = $$('.v8-disp button', box);
+    const deviceStage = loie.closest('.no-device-stage');
+    function fitDevice(){
+      if (!deviceStage || !deviceStage.clientWidth) return;
+      const phone = loie.classList.contains('modo-cel');
+      const width = phone ? 428 : 740, height = phone ? 868 : 434;
+      const maxWidth = phone ? 296 : 1080;
+      const scale = Math.min(maxWidth, Math.max(0, deviceStage.clientWidth - 12)) / width;
+      loie.style.setProperty('--device-scale', scale);
+      deviceStage.style.height = Math.ceil(height * scale) + 'px';
+    }
     function pagina(n){
       pags.forEach(p => { p.hidden = p.dataset.pag !== n; });
       telaLoie.scrollTop = 0;
@@ -370,8 +313,13 @@
     }
     function dispositivo(m){
       loie.classList.toggle('modo-cel', m === 'cel'); loie.classList.toggle('modo-pc', m === 'pc');
-      disps.forEach(b => b.setAttribute('aria-checked', String(b.dataset.disp === m)));
+      loie.classList.toggle('no-device-iphone-14-pro', m === 'cel');
+      loie.classList.toggle('no-device-black', m === 'cel');
+      loie.classList.toggle('no-device-macbook-pro', m === 'pc');
+      disps.forEach(b => {const active=b.dataset.disp === m;b.setAttribute('aria-checked', String(active));b.tabIndex=active?0:-1;});
+      fitDevice();
     }
+    if(deviceStage){new ResizeObserver(fitDevice).observe(deviceStage);fitDevice();}
     let toastT = null;
     function adiciona(){
       sacola.textContent = String(+sacola.textContent + 1);
@@ -380,6 +328,13 @@
     $$('[data-ir]', loie).forEach(b => b.addEventListener('click', () => pagina(b.dataset.ir)));
     $('.v8-lo-add', loie).addEventListener('click', adiciona);
     disps.forEach(b => b.addEventListener('click', () => dispositivo(b.dataset.disp)));
+    disps.forEach((b,index) => b.addEventListener('keydown', event => {
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+      event.preventDefault();
+      const next=event.key==='Home'?0:event.key==='End'?disps.length-1:(index+1)%disps.length;
+      dispositivo(disps[next].dataset.disp);disps[next].focus();
+    }));
+    dispositivo('cel');
     function rola(ate, ms){
       return new Promise(res => {
         const de = telaLoie.scrollTop, t0 = performance.now();
@@ -611,7 +566,7 @@
       return { a, dia, col:null };
     });
     Object.values(COLS).forEach(c => bento(c, { g:'61,99,219', tilt:false, ima:false, particulas:0 }));
-    spotlight($('.v8-kb-grade', box), '.v8-bento');
+
     function colDe(dia, n){ return dia <= n ? 'concluido' : dia - n <= 3 ? 'em_andamento' : 'a_fazer'; }
     function mostra(n, animar){
       let movidos = 0;

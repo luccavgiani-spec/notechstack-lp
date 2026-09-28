@@ -61,6 +61,9 @@
 <link rel="stylesheet" href="/shared/card-nav.css">
 <link rel="stylesheet" href="/shared/site-layout.css">
 <script src="/shared/card-nav.js" defer></script>
+<link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
+<link rel="stylesheet" href="/shared/vendor/devices/devices.css">
+<link rel="stylesheet" href="/shared/prototype-devices.css?v=1">
 </head>
 <body>
 <div class="brand-topbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -172,9 +175,12 @@
                 <button type="button" role="radio" data-disp="pc" aria-checked="false">computador</button>
               </div>
             </div>
-            <div class="v8-loie modo-cel" id="v8Loie">
+            <div class="no-device-stage">
+            <div class="v8-loie modo-cel no-device no-device-iphone-14-pro no-device-black" id="v8Loie">
+              <div class="no-device-frame"><div class="no-device-screen">
+              <div class="no-device-status" aria-hidden="true"><span>9:41</span><span>▮▮▮ ▰</span></div>
               <div class="v8-loie-barra" aria-hidden="true"><i></i><i></i><i></i><span>loie.com.br<em>/</em></span></div>
-              <div class="v8-loie-tela">
+              <div class="v8-loie-tela" tabindex="0" role="region" aria-label="Loja Loiê — protótipo navegável">
                 <header class="v8-lo-nav">
                   <span class="v8-lo-links"><b>velas</b><b>borrifadores</b></span>
                   <button type="button" class="v8-lo-logo" data-ir="home" aria-label="Loiê, página inicial"></button>
@@ -213,8 +219,11 @@
                   </div>
                 </div>
               </div>
+              <div class="no-device-home-indicator" aria-hidden="true"></div></div></div>
+              <div class="no-device-stripe" aria-hidden="true"></div><div class="no-device-header" aria-hidden="true"></div><div class="no-device-sensors" aria-hidden="true"></div><div class="no-device-btns" aria-hidden="true"></div><div class="no-device-power" aria-hidden="true"></div><div class="no-device-home" aria-hidden="true"></div>
               <div class="v8-lo-toast" hidden>Caramelo adicionado à sacola ✓</div>
             </div>
+            </div><p class="no-device-hint">Role dentro da tela para explorar a loja.</p>
           </div>
           <div class="v8-app-pan" data-pan="2" hidden>
             <small class="v8-app-k">03 · etapas do plano</small>
@@ -702,7 +711,7 @@
   Array.prototype.forEach.call(alvos, function(el){ obs.observe(el); });
 })();
 </script>
-<script src="/shared/glow-cursor.js?v=1" defer></script>
+
 <script>
 /* cenas 3D sob demanda: three.js (~260 KB) + cenas3d.js só descem depois que
    a pessoa começa a rolar e a primeira cena está a menos de 600px da tela.
@@ -743,5 +752,6 @@
 <script src="/lp-narrador/cenas-lp/historia/home-stepper.js" defer></script>
 <script src="/lp-narrador/cenas-lp/historia/home-lazy.js?v=1" defer></script>
 
+<script src="/shared/smooth-cursor.js?v=1" defer></script>
 </body>
 </html>
