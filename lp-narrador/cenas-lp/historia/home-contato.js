@@ -91,12 +91,12 @@
       const response = await fetch(form.action, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
       const result = await response.json();
       if (!response.ok || result.success !== true || !(result.saved === true || result.emailSent === true)) throw new Error('lead_not_accepted');
+      track('lead_submit', {etapa:5,valor:0}, 'home');
       if(files.length && result.attachmentsSent!==files.length){
         sent=true; steps.forEach(item=>{item.hidden=true;});nav.hidden=true;bar.hidden=true;next.hidden=true;
         status.textContent='Seu contato foi recebido, mas os arquivos não foram confirmados. Guarde-os para compartilhar quando a Nó chamar no WhatsApp.';status.hidden=false;status.focus();return;
       }
       sent = true;
-      track('lead_submit', {etapa:5,valor:0}, 'home');
       steps.forEach(item => { item.hidden = true; }); nav.hidden = true; bar.hidden = true; next.hidden = true;
       status.textContent = 'Ideia recebida! A equipe da Nó vai entrar em contato pelo WhatsApp que você informou.';
       status.hidden = false; status.focus({preventScroll:true});

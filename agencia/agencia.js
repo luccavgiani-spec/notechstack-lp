@@ -42,15 +42,14 @@
   initSmoothCursor();
 
   var video=document.querySelector('.agency-hero-video');
-  if(video)window.addEventListener('load',function(){video.play().catch(function(){});},{once:true});
+  if(video){let started=false;const play=function(){if(started||reduce)return;started=true;video.play().catch(function(){});};['pointerdown','keydown','scroll'].forEach(function(event){window.addEventListener(event,play,{once:true,passive:true});});}
 
   var agencyDemoVideo=document.querySelector('.agency-video-player');
   if(agencyDemoVideo){
-    function keepAgencyDemoPlaying(){agencyDemoVideo.muted=true;if(agencyDemoVideo.paused)agencyDemoVideo.play().catch(function(){});}
-    if(agencyDemoVideo.readyState>=2)keepAgencyDemoPlaying();
-    else agencyDemoVideo.addEventListener('loadeddata',keepAgencyDemoPlaying,{once:true});
-    window.addEventListener('load',keepAgencyDemoPlaying,{once:true});
-    document.addEventListener('visibilitychange',function(){if(!document.hidden)keepAgencyDemoPlaying();});
+    let inView=false;
+    function syncDemo(){if(inView&&!document.hidden&&!reduce){agencyDemoVideo.muted=true;agencyDemoVideo.play().catch(function(){});}else agencyDemoVideo.pause();}
+    new IntersectionObserver(function(entries){inView=entries[0].isIntersecting;syncDemo();},{rootMargin:'200px'}).observe(agencyDemoVideo);
+    document.addEventListener('visibilitychange',syncDemo);
   }
 
   var agencyKanban=document.querySelector('#v8Crono');
@@ -238,7 +237,7 @@
     var interests=Array.from(form.querySelectorAll('input[name="interesses"]:checked')).map(function(input){return input.nextElementSibling.textContent.trim();});
     submit.disabled=true;submit.firstElementChild.textContent='Enviando...';
     try{
-      var response=await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nome:document.getElementById('ag-name').value.trim(),email:document.getElementById('ag-email').value.trim(),whatsapp:document.getElementById('ag-phone').value.trim(),contexto:'nó.agência — landing page | agência: '+document.getElementById('ag-company').value.trim()+' | cargo: '+document.getElementById('ag-role').value.trim()+' | instagram: '+document.getElementById('ag-instagram').value.trim(),objetivos:interests.join(', ')||'Parceria com agência',investimento:'',prazo:'',aiAnalysis:document.getElementById('ag-message').value.trim()})});
+      var response=await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:window.leadSid,origem:window.leadOrig,modo:"agencia",event_source_url:location.href,valor:0,nome:document.getElementById('ag-name').value.trim(),email:document.getElementById('ag-email').value.trim(),whatsapp:document.getElementById('ag-phone').value.trim(),contexto:'nó.agência — landing page | agência: '+document.getElementById('ag-company').value.trim()+' | cargo: '+document.getElementById('ag-role').value.trim()+' | instagram: '+document.getElementById('ag-instagram').value.trim(),objetivos:interests.join(', ')||'Parceria com agência',investimento:'',prazo:'',aiAnalysis:document.getElementById('ag-message').value.trim()})});
       var result=await response.json();
       if(!response.ok||!result.success||!(result.saved||result.emailSent))throw new Error('Falha ao enviar contato');
       if(window.track)window.track('agencia_lead_enviado',{etapa:5,interesses:interests.join('|')},'agencia_form');

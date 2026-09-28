@@ -7,7 +7,7 @@
    e a ORIGEM (utm/gclid) só é gravada na primeira página da sessão — por
    isso ela roda em todas as páginas, não só nas que têm formulário. */
 (function(){
-  var SS = window.sessionStorage, sid = '';
+  var SS; try { SS=window.sessionStorage; } catch(e) { SS={getItem:function(){return null},setItem:function(){}}; } var sid='';
   try { sid = SS.getItem('no_sid') || ''; } catch(e){}
   if (!sid){
     sid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
@@ -35,6 +35,13 @@
       referrer: document.referrer || '(direto)'
     };
     try { SS.setItem('no_orig', JSON.stringify(orig)); } catch(e){}
+  }
+  if (!orig.utm_source && !orig.gclid && !orig.fbclid){
+    try {
+      var sourceHost = new URL(orig.referrer).hostname;
+      var search = sourceHost.match(/(?:^|\.)(google|bing|duckduckgo|yahoo|ecosia)\./);
+      if (search){ orig.utm_source=search[1]; orig.utm_medium='organic'; SS.setItem('no_orig',JSON.stringify(orig)); }
+    } catch(e){}
   }
   window.leadOrig  = orig;
   window.leadEtapa = 0;          /* 0..5 — o quão longe esta sessão chegou */
@@ -67,6 +74,7 @@
     window.dataLayer.push(p);
     if (window.trackFila) window.trackFila(nome, p);
   };
+
 
   /* ---------- fila do painel de percurso ----------
      Um POST por clique competiria com a digitação do terminal pela banda e pelo
@@ -106,6 +114,7 @@
   }
 
   window.trackFila = function(nome, p){
+    if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
     if (mandados + fila.length >= TETO_SESSAO) return;
     fila.push({ evento: nome, etapa: p.etapa || 0, params: p });
     if (fila.length >= 20) return descarrega(false);
@@ -117,4 +126,5 @@
   addEventListener('visibilitychange', function(){
     if (document.visibilityState === 'hidden') descarrega(true);
   });
+  track('site_visit',{pagina:location.pathname},'pagina');
 })();
