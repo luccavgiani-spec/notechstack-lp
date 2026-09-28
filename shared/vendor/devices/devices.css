@@ -1,0 +1,359 @@
+/*! Devices.css v0.2.0 | MIT | Copyright (c) 2017 Yan Zhu | see LICENSE */
+/* Only iPhone 14 Pro and MacBook Pro; class prefix adapted to no-device. */
+
+
+.no-device-iphone-14-pro {
+  height: 868px;
+  width: 428px;
+}
+
+
+.no-device-iphone-14-pro .no-device-frame {
+  background: #010101;
+  border: 1px solid #1b1721;
+  border-radius: 68px;
+  box-shadow: inset 0 0 4px 2px #c0b7cd, inset 0 0 0 6px #342c3f;
+  height: 868px;
+  padding: 19px;
+  width: 428px;
+}
+
+
+.no-device-iphone-14-pro .no-device-screen {
+  border-radius: 49px;
+  height: 830px;
+  width: 390px;
+}
+
+
+.no-device-iphone-14-pro .no-device-stripe::after,
+.no-device-iphone-14-pro .no-device-stripe::before {
+  border: solid rgba(1, 1, 1, .25);
+  border-width: 0 7px;
+  content: "";
+  height: 7px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 9;
+}
+
+
+.no-device-iphone-14-pro .no-device-stripe::after {
+  top: 85px;
+}
+
+
+.no-device-iphone-14-pro .no-device-stripe::before {
+  bottom: 85px;
+}
+
+
+.no-device-iphone-14-pro .no-device-header {
+  background: #010101;
+  border-radius: 20px;
+  height: 35px;
+  left: 50%;
+  margin-left: -60px;
+  position: absolute;
+  top: 29px;
+  width: 120px;
+}
+
+
+.no-device-iphone-14-pro .no-device-sensors::after,
+.no-device-iphone-14-pro .no-device-sensors::before {
+  content: "";
+  position: absolute;
+}
+
+
+.no-device-iphone-14-pro .no-device-sensors::after {
+  background: #010101;
+  border-radius: 17px;
+  height: 33px;
+  left: 50%;
+  margin-left: -60px;
+  top: 30px;
+  width: 74px;
+}
+
+
+.no-device-iphone-14-pro .no-device-sensors::before {
+  background: radial-gradient(farthest-corner at 20% 20%, #6074bf 0, transparent 40%), radial-gradient(farthest-corner at 80% 80%, #513785 0, #24555e 20%, transparent 50%);
+  border-radius: 50%;
+  box-shadow: 0 0 1px 1px rgba(255, 255, 255, .05);
+  height: 9px;
+  left: 50%;
+  margin-left: 36px;
+  top: 42px;
+  width: 9px;
+}
+
+
+.no-device-iphone-14-pro .no-device-btns {
+  background: #1b1721;
+  border-radius: 2px;
+  height: 32px;
+  left: -2px;
+  position: absolute;
+  top: 115px;
+  width: 3px;
+}
+
+
+.no-device-iphone-14-pro .no-device-btns::after,
+.no-device-iphone-14-pro .no-device-btns::before {
+  background: #1b1721;
+  border-radius: 2px;
+  content: "";
+  height: 62px;
+  left: 0;
+  position: absolute;
+  width: 3px;
+}
+
+
+.no-device-iphone-14-pro .no-device-btns::after {
+  top: 60px;
+}
+
+
+.no-device-iphone-14-pro .no-device-btns::before {
+  top: 140px;
+}
+
+
+.no-device-iphone-14-pro .no-device-power {
+  background: #1b1721;
+  border-radius: 2px;
+  height: 100px;
+  position: absolute;
+  right: -2px;
+  top: 200px;
+  width: 3px;
+}
+
+
+.no-device-iphone-14-pro .no-device-home::after,
+.no-device-iphone-14-pro .no-device-home::before {
+  border: solid rgba(1, 1, 1, .25);
+  border-width: 6px 0;
+  content: "";
+  height: 6px;
+  position: absolute;
+  width: 6px;
+  z-index: 9;
+}
+
+
+.no-device-iphone-14-pro .no-device-home::after {
+  right: 86px;
+  top: 0;
+}
+
+
+.no-device-iphone-14-pro .no-device-home::before {
+  bottom: 0;
+  left: 86px;
+}
+
+
+.no-device-iphone-14-pro.no-device-silver .no-device-frame {
+  border-color: #c8cacb;
+  box-shadow: inset 0 0 4px 2px white, inset 0 0 0 6px #e2e3e4;
+}
+
+
+.no-device-iphone-14-pro.no-device-silver .no-device-btns {
+  background: #c8cacb;
+}
+
+
+.no-device-iphone-14-pro.no-device-silver .no-device-btns::after,
+.no-device-iphone-14-pro.no-device-silver .no-device-btns::before {
+  background: #c8cacb;
+}
+
+
+.no-device-iphone-14-pro.no-device-silver .no-device-power {
+  background: #c8cacb;
+}
+
+
+.no-device-iphone-14-pro.no-device-black .no-device-frame {
+  border-color: #5c5956;
+  box-shadow: inset 0 0 4px 2px white, inset 0 0 0 6px #76726f;
+}
+
+
+.no-device-iphone-14-pro.no-device-black .no-device-btns {
+  background: #5c5956;
+}
+
+
+.no-device-iphone-14-pro.no-device-black .no-device-btns::after,
+.no-device-iphone-14-pro.no-device-black .no-device-btns::before {
+  background: #5c5956;
+}
+
+
+.no-device-iphone-14-pro.no-device-black .no-device-power {
+  background: #5c5956;
+}
+
+
+.no-device-iphone-14-pro.no-device-gold .no-device-frame {
+  border-color: #e7d19e;
+  box-shadow: inset 0 0 4px 2px white, inset 0 0 0 6px #d2ab4c;
+}
+
+
+.no-device-iphone-14-pro.no-device-gold .no-device-btns {
+  background: #e7d19e;
+}
+
+
+.no-device-iphone-14-pro.no-device-gold .no-device-btns::after,
+.no-device-iphone-14-pro.no-device-gold .no-device-btns::before {
+  background: #e7d19e;
+}
+
+
+.no-device-iphone-14-pro.no-device-gold .no-device-power {
+  background: #e7d19e;
+}
+
+
+.no-device-macbook-pro {
+  height: 434px;
+  width: 740px;
+}
+
+
+.no-device-macbook-pro .no-device-frame {
+  background: #0d0d0d;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 2px #c8cacb;
+  height: 418px;
+  margin: 0 auto;
+  padding: 9px 9px 23px 9px;
+  position: relative;
+  width: 618px;
+}
+
+
+.no-device-macbook-pro .no-device-frame::after {
+  background: linear-gradient(to bottom, #272727, #0d0d0d);
+  border-radius: 0 0 20px 20px;
+  bottom: 2px;
+  content: "";
+  height: 24px;
+  left: 2px;
+  position: absolute;
+  width: 614px;
+}
+
+
+.no-device-macbook-pro .no-device-header {
+  background: #0d0d0d;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  height: 12px;
+  left: 50%;
+  margin-left: -32px;
+  position: absolute;
+  top: 11px;
+  width: 64px;
+  z-index: 2;
+}
+
+
+.no-device-macbook-pro .no-device-header::after,
+.no-device-macbook-pro .no-device-header::before {
+  content: "";
+  height: 4px;
+  position: absolute;
+  top: 0;
+  width: 4px;
+}
+
+
+.no-device-macbook-pro .no-device-header::after {
+  background: radial-gradient(circle at bottom left, transparent 0, transparent 75%, #0d0d0d 75%, #0d0d0d 100%);
+  left: -4px;
+}
+
+
+.no-device-macbook-pro .no-device-header::before {
+  background: radial-gradient(circle at bottom right, transparent 0, transparent 75%, #0d0d0d 75%, #0d0d0d 100%);
+  right: -4px;
+}
+
+
+.no-device-macbook-pro .no-device-screen {
+  border: 2px solid #121212;
+  border-radius: 10px 10px 0 0;
+  height: 375px;
+  width: 600px;
+}
+
+
+.no-device-macbook-pro .no-device-power {
+  background: radial-gradient(circle at center, #e2e3e4 85%, #c8cacb 100%);
+  border: solid #a0a3a7;
+  border-radius: 2px 2px 12px 12px;
+  border-width: 1px 2px 0 2px;
+  box-shadow: inset 0 -2px 8px 0 #6c7074;
+  height: 24px;
+  margin-top: -10px;
+  position: relative;
+  width: 740px;
+  z-index: 9;
+}
+
+
+.no-device-macbook-pro .no-device-power::after {
+  background: #e2e3e4;
+  border-radius: 0 0 10px 10px;
+  box-shadow: inset 0 0 4px 2px #babdbf;
+  content: "";
+  height: 10px;
+  left: 50%;
+  margin-left: -60px;
+  position: absolute;
+  top: 0;
+  width: 120px;
+}
+
+
+.no-device-macbook-pro .no-device-power::before {
+  background: transparent;
+  border-radius: 0 0 3px 3px;
+  bottom: -2px;
+  box-shadow: -300px 0 #272727, 300px 0 #272727;
+  content: "";
+  height: 2px;
+  left: 50%;
+  margin-left: -20px;
+  position: absolute;
+  width: 40px;
+}
+
+
+.no-device-macbook-pro.no-device-spacegray .no-device-frame {
+  box-shadow: inset 0 0 0 2px #767a7d;
+}
+
+
+.no-device-macbook-pro.no-device-spacegray .no-device-power {
+  background: radial-gradient(circle at center, #83878a 85%, #767a7d 100%);
+  border-color: #454749;
+  box-shadow: inset 0 -2px 8px 0 #202121;
+}
+
+
+.no-device-macbook-pro.no-device-spacegray .no-device-power::after {
+  background: #b7babc;
+  box-shadow: inset 0 0 4px 2px #6a6d70;
+}
