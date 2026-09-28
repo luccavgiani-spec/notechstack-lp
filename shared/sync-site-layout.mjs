@@ -33,6 +33,11 @@ for (const [route, file] of Object.entries(pages)) {
   const url = new URL('../' + file, import.meta.url);
   const before = await readFile(url, 'utf8');
   let after = before;
+  // Declare the fixed palette before CSS loads to avoid an initial dark repaint.
+  if (!/<meta\s+name="color-scheme"/.test(after)) {
+    after = after.replace(/<meta\s+charset=["']utf-8["']\s*\/?\s*>/i, '$&\n<meta name="color-scheme" content="only light">');
+    if (!/<meta\s+name="color-scheme"/.test(after)) throw new Error(`Missing charset marker: ${file}`);
+  }
   for (const [name, html] of [['nav',nav],['footer',footer]]) {
     const pattern = new RegExp(`<!-- site-${name}:start -->[\\s\\S]*?<!-- site-${name}:end -->`);
     if (!pattern.test(after)) throw new Error(`Missing ${name} markers: ${file}`);
