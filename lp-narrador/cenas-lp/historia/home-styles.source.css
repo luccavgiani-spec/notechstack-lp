@@ -3124,7 +3124,7 @@ button.v8-lo-prod:hover img{ transform:scale(1.03) }
 .home-processo .v8-app-faixa{border-radius:18px 18px 0 0;overflow:hidden}
 .home-processo .v8-sf-bar{border-radius:12px 12px 0 0}
 .home-processo .v8-ed{border-radius:0 0 12px 12px}
-.home-processo .v8-loie-tela{height:auto;max-height:none;overflow:visible}
+
 .home-stage{min-height:0}
 .home-processo .hs-palco{background:transparent;border:0}
 @media(max-width:768px){

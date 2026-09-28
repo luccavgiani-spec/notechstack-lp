@@ -2,41 +2,6 @@
    nó Health — interactions
 ═══════════════════════════════════════════════════════ */
 
-/* ─── Custom cursor (desktop only) ─── */
-(function () {
-  if (window.matchMedia && window.matchMedia('(hover:none)').matches) return;
-  var c = document.getElementById('cur');
-  var r = document.getElementById('curR');
-  if (!c || !r) return;
-  var rx = 0, ry = 0, tx = 0, ty = 0;
-  document.addEventListener('mousemove', function (e) {
-    tx = e.clientX;
-    ty = e.clientY;
-    c.style.left = tx + 'px';
-    c.style.top = ty + 'px';
-  });
-  function loop() {
-    rx += (tx - rx) * 0.18;
-    ry += (ty - ry) * 0.18;
-    r.style.left = rx + 'px';
-    r.style.top = ry + 'px';
-    requestAnimationFrame(loop);
-  }
-  requestAnimationFrame(loop);
-  ['a', 'button', '.faq-q', '.dot', '.option-card'].forEach(function (sel) {
-    document.querySelectorAll(sel).forEach(function (el) {
-      el.addEventListener('mouseenter', function () {
-        c.style.transform = 'scale(1.6)';
-        r.style.transform = 'scale(1.4)';
-      });
-      el.addEventListener('mouseleave', function () {
-        c.style.transform = '';
-        r.style.transform = '';
-      });
-    });
-  });
-})();
-
 /* ─── Reveal on scroll ─── */
 (function () {
   var io = new IntersectionObserver(function (entries) {
