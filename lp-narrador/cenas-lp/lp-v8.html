@@ -64,6 +64,7 @@
 <link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
 <link rel="stylesheet" href="/shared/vendor/devices/devices.css">
 <link rel="stylesheet" href="/shared/prototype-devices.css?v=1">
+<link rel="stylesheet" href="/lp-narrador/cenas-lp/hero.css?v=1">
 </head>
 <body>
 <div class="brand-topbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
@@ -72,31 +73,34 @@
 <!-- site-nav:end -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap" media="print" onload="this.media='all'">
 <main id="conteudo">
-<section id="hero">
-  <div class="hero-stage">
-    <div class="hero-backdrop"></div>
+<section id="hero" class="home-intro" aria-labelledby="home-intro-title">
+  <div class="home-intro-stage hero-stage">
+    <div class="home-intro-copy">
+      <p class="home-intro-eyebrow">Sistemas e aplicativos sob medida</p>
+      <h1 id="home-intro-title"><span>Sistemas sob medida</span> <span>para sua operação e</span> <span>para os seus clientes<span class="home-intro-dot" aria-hidden="true"></span></span></h1>
+      <p class="home-intro-description">Transforme processos, planilhas e tarefas repetitivas em um sistema pensado para a sua rotina. A Nó planeja, prototipa e desenvolve com você.</p>
+      <div class="home-intro-actions">
+        <a href="#diagnostico" id="heroCtaBtn" class="home-intro-primary" onclick="abrirDiagnostico({origem:'hero'});return false">Quero tirar minha ideia do papel <img src="/agencia/assets/lucide/arrow-right.svg" width="32" height="32" alt="" aria-hidden="true"></a>
+        <a href="#como-funciona" class="home-intro-secondary">Como funciona</a>
+      </div>
+      <ul class="home-intro-benefits" aria-label="Como a nó trabalha">
+        <li><img src="/agencia/assets/lucide/chart-no-axes-combined.svg" width="32" height="32" alt="" aria-hidden="true"><span>Protótipo<br>em 3 dias</span></li>
+        <li><img src="/agencia/assets/lucide/users-round.svg" width="32" height="32" alt="" aria-hidden="true"><span>App de<br>acompanhamento</span></li>
+        <li><img src="/agencia/assets/lucide/sliders-horizontal.svg" width="32" height="32" alt="" aria-hidden="true"><span>Você pede<br>ajustes</span></li>
+      </ul>
+    </div>
+    <div class="home-intro-scene">
     <img class="hero-video hero-poster" srcset="/lp-narrador/cenas-lp/assets/video/hero-parede-mobile.webp 480w, /lp-narrador/cenas-lp/assets/video/hero-parede.webp 740w" sizes="(max-width:768px) calc(100vw - 32px), 44vw" src="/lp-narrador/cenas-lp/assets/video/hero-parede.webp" alt="" width="740" height="990" fetchpriority="high" decoding="async">
 <video class="hero-video hero-motion" poster="/lp-narrador/cenas-lp/assets/video/hero-parede.webp"
            loop muted playsinline preload="none" aria-hidden="true">
       <source src="/lp-narrador/cenas-lp/assets/video/hero-parede.mp4" type="video/mp4">
     </video>
-    <div class="hero-scrim" aria-hidden="true"></div>
-    <div class="hero-grain" aria-hidden="true"></div>
-    <div class="hero-foot">
-      <div class="hero-left">
-        <img class="hero-mark h-rise" style="animation-delay:.2s"
-             src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="1633" height="964">
-        <p class="hero-eyebrow">Sistemas e aplicativos sob medida</p>
-        <h1 class="hero-slogan" id="heroSlogan">Sistemas e aplicativos feitos sob sua medida, para você, para sua empresa ou para seus clientes.</h1>
-      </div>
-      <div class="hero-right">
-        <p class="hero-desc h-rise" style="animation-delay:.2s">Transforme planilhas e processos repetitivos em um sistema feito sob suas necessidades e preferências.</p>
-        <ul class="hero-benefits"><li>Protótipo em 3 dias</li><li>App único de acompanhamento</li><li>Você manda os ajustes, nós desenvolvemos.</li></ul>
-        <a href="#diagnostico" id="heroCtaBtn" class="pill-cta h-rise" style="animation-delay:.82s"
-           onclick="abrirDiagnostico({origem:'hero'});return false">Quero tirar minha ideia do papel
-          <span class="pill-cta-circle" aria-hidden="true">→</span>
-        </a><p class="hero-response">Pare de gastar créditos no Lovable e tempo útil no ChatGPT. Profissionalize a sua ideia.</p>
-      </div>
+
+      <ul class="home-intro-services" aria-label="Da ideia ao sistema">
+        <li class="home-intro-service home-intro-prototype"><img src="/agencia/assets/lucide/file-text.svg" width="32" height="32" alt="" aria-hidden="true"><span class="home-intro-ellipsis" aria-hidden="true">···</span><strong>Protótipo</strong><span>Valide antes de<br>desenvolver</span></li>
+        <li class="home-intro-service home-intro-system"><img src="/agencia/assets/lucide/code-xml.svg" width="32" height="32" alt="" aria-hidden="true"><span class="home-intro-ellipsis" aria-hidden="true">···</span><strong>Sistema</strong><span>Feito sob medida</span></li>
+        <li class="home-intro-service home-intro-followup"><img src="/agencia/assets/lucide/smartphone.svg" width="32" height="32" alt="" aria-hidden="true"><span class="home-intro-ellipsis" aria-hidden="true">···</span><strong>Acompanhamento</strong><span>Tudo no mesmo app</span></li>
+      </ul>
     </div>
   </div>
 </section>
