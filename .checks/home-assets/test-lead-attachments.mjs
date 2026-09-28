@@ -1,0 +1,14 @@
+import {stripTypeScriptTypes} from 'node:module';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import assert from 'node:assert/strict';
+let handler;const calls=[];
+const context={Deno:{serve:fn=>handler=fn,env:{get:k=>k==='SUPABASE_SERVICE_ROLE_KEY'?'test':k==='RESEND_API_KEY'?'test':undefined}},console,Response,Request,URL,atob,TextEncoder,crypto:globalThis.crypto,fetch:async(url,options)=>{calls.push({url,body:options?.body&&JSON.parse(options.body)});return new Response(JSON.stringify(url.includes('/leads')?[{id:'test'}]:{id:'mail'}),{status:200});}};
+vm.runInNewContext(stripTypeScriptTypes(fs.readFileSync('supabase/functions/send-lead-email/index.ts','utf8')),context);
+const run=async body=>(await handler(new Request('https://test.local',{method:'POST',body:JSON.stringify(body)}))).json();
+assert.equal((await (await handler(new Request('https://test.local?capabilities=1'))).json()).attachments,true);
+let result=await run({nome:'Teste',descricao:'Operação de teste',attachments:[{filename:'detalhes.txt',content:btoa('detalhes da operação')}]});assert.equal(result.attachmentsSent,1);assert.equal(calls.find(x=>x.url.includes('resend')).body.attachments[0].filename,'detalhes.txt');
+let count=calls.length;result=await run({attachments:[{filename:'script.exe',content:btoa('bad')}]});assert.equal(result.success,false);assert.equal(calls.length,count);
+result=await run({attachments:Array(6).fill({filename:'a.txt',content:btoa('x')})});assert.equal(result.success,false);
+result=await run({nome:'Sem arquivo'});assert.equal(result.success,true);assert.equal(result.attachmentsSent,0);
+console.log('PASS: anexos enviados, formatos e quantidade rejeitados, compatibilidade sem anexos. Nenhuma chamada real.');
