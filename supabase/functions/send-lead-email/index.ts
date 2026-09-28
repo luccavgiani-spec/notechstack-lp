@@ -128,8 +128,22 @@ async function mandarLeadCapi(o: {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
+  if (req.method === 'GET' && new URL(req.url).searchParams.has('capabilities')) return json({attachments:true})
   try {
-    const b = await req.json()
+    const raw=await req.text()
+    if(raw.length>7200000)return json({success:false,error:'Arquivos excedem o limite.'},413)
+    const b = JSON.parse(raw)
+    const attachments: {filename:string,content:string}[]=[]
+    if(b.attachments!==undefined){
+      if(!Array.isArray(b.attachments)||b.attachments.length>5)return json({success:false,error:'Até 5 arquivos.'},400)
+      let total=0
+      for(const file of b.attachments){
+        if(typeof file?.filename!=='string'||typeof file?.content!=='string'||!/^.{1,180}\.(pdf|png|jpe?g|webp|txt|csv|docx|xlsx|pptx)$/i.test(file.filename)||/[\\/\r\n]/.test(file.filename)||!file.content.length||file.content.length%4!==0||!/^[A-Za-z0-9+/]+={0,2}$/.test(file.content))return json({success:false,error:'Arquivo inválido.'},400)
+        try{total+=atob(file.content).length}catch{return json({success:false,error:'Arquivo inválido.'},400)}
+        if(total>5*1024*1024)return json({success:false,error:'Limite de 5 MB.'},413)
+        attachments.push({filename:file.filename,content:file.content})
+      }
+    }
 
     /* os oito de sempre — as LPs antigas dependem destes nomes */
     const nome         = txt(b.nome)
@@ -303,6 +317,7 @@ Deno.serve(async (req) => {
             reply_to: email || undefined,
             subject: `🚀 Novo lead: ${nome ?? 'sem nome'} — ${contexto || 'sem contexto'}`,
             html: htmlBody,
+            attachments: attachments.length ? attachments : undefined,
           }),
         })
         const data = await res.json().catch(() => ({}))
@@ -320,7 +335,7 @@ Deno.serve(async (req) => {
 
     /* 200 mesmo com e-mail falho: o lead já está gravado e o visitante não tem
        o que fazer com esse erro. Quem precisa vê-lo é o log e o front. */
-    return json({ success: saved || emailSent, saved, saveError, leadId, emailSent, emailId, emailError, capiStatus })
+    return json({ success: saved || emailSent, saved, saveError, leadId, emailSent, emailId, emailError, capiStatus, attachmentsSent:emailSent ? attachments.length : 0 })
   } catch (err) {
     console.error(err)
     return json({ success: false, error: String(err) }, 500)

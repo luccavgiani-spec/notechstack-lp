@@ -1,1640 +1,116 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<!--
-  PREVIEW LOCAL: este arquivo usa paths absolutos (/brand, /shared, /main.js)
-  que só resolvem servindo a partir da RAIZ do repo — nunca abrindo o arquivo
-  direto (file://) nem servindo de dentro de lp-narrador/cenas-lp/. Rode, na
-  raiz do repo: `npm run dev` (ou `npx serve .`) e abra
-  http://localhost:3000/lp-narrador/cenas-lp/lp-v4.html — os paths absolutos
-  são intencionais (é como o site roda em produção, ex. Vercel na raiz).
--->
 <head>
-<!-- ═══════ TELEMETRIA · um ponto de saída só ═══════
-     Nada neste arquivo chama fbq() nem gtag(): tudo vira dataLayer.push e quem
-     decide o que fazer com isso é o container GTM-NK87FH8W. Assim dá pra ligar,
-     desligar e renomear rastreamento sem republicar a home.
-
-     RODA ANTES DO gtm.js, de propósito: a primeira tag a disparar já quer o
-     `sid`, e um sid que nasce depois não deduplica nada contra o CAPI.
-
-     Mapa completo em PLANO-rastreio.md / RASTREIO-lp-v5.html.
-     As outras páginas (diagnóstico, serviços, cases, conteúdos) usam a mesma
-     lógica em /shared/telemetria.js — aqui fica inline para não custar uma ida
-     à rede na página mais visitada. Mudou um, mude o outro. -->
-<script>
-(function(){
-  var SS = window.sessionStorage, sid = '';
-  try { sid = SS.getItem('no_sid') || ''; } catch(e){}
-  if (!sid){
-    sid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
-        : Date.now().toString(36) + Math.random().toString(36).slice(2,10);
-    try { SS.setItem('no_sid', sid); } catch(e){}
-  }
-  window.leadSid = sid;
-
-  /* ORIGEM: gravada na PRIMEIRA página da sessão e nunca mais tocada. Sem isto,
-     quem chega por anúncio, lê os seis capítulos e só então preenche o
-     formulário entrega um lead sem utm nenhum — e a campanha que pagou por ele
-     fica sem crédito. */
-  var orig = null;
-  try { orig = JSON.parse(SS.getItem('no_orig') || 'null'); } catch(e){}
-  if (!orig){
-    var q = new URLSearchParams(location.search);
-    orig = {
-      utm_source:   q.get('utm_source')   || '',
-      utm_medium:   q.get('utm_medium')   || '',
-      utm_campaign: q.get('utm_campaign') || '',
-      utm_content:  q.get('utm_content')  || '',
-      utm_term:     q.get('utm_term')     || '',
-      gclid:  q.get('gclid')  || '',
-      fbclid: q.get('fbclid') || '',
-      referrer: document.referrer || '(direto)'
-    };
-    try { SS.setItem('no_orig', JSON.stringify(orig)); } catch(e){}
-  }
-  window.leadOrig  = orig;
-  window.leadEtapa = 0;          /* 0..5 — o quão longe esta sessão chegou */
-
-  /* estado do caminho na árvore, mantido pelos próprios eventos: é o que a
-     fila manda junto de cada lote pro banco costurar a sessão */
-  window.leadEstado = { folha:null, nicho:null, caminho:null, modo:null };
-
-  var vistos = Object.create(null);
-  window.dataLayer = window.dataLayer || [];
-
-  /* track(nome, params, chave)
-     `chave` presente = evento de ETAPA: dispara uma vez só por sessão. Sem essa
-     guarda o resetTerm() do scroll re-dispara diag_abrir toda vez que a pessoa
-     sobe e desce a página, e o funil vira ficção. */
-  window.track = function(nome, params, chave){
-    if (chave){
-      var k = nome + '::' + chave;
-      if (vistos[k]) return;
-      vistos[k] = 1;
-    }
-    var p = params || {};
-    p.event = nome;
-    p.lead_sid = sid;
-    if (p.etapa > window.leadEtapa) window.leadEtapa = p.etapa;
-    if (p.folha)   window.leadEstado.folha   = p.folha;
-    if (p.nicho)   window.leadEstado.nicho   = p.nicho;
-    if (p.caminho) window.leadEstado.caminho = p.caminho;
-    if (p.modo)    window.leadEstado.modo    = p.modo;
-    window.dataLayer.push(p);
-    if (window.trackFila) window.trackFila(nome, p);
-  };
-
-  /* ---------- fila do painel de percurso ----------
-     Um POST por clique competiria com a digitação do terminal pela banda e pelo
-     main thread — a experiência é o produto ali. Acumula e manda a cada 3s, ou
-     no pagehide via sendBeacon (que sobrevive ao fechamento da aba; um fetch
-     comum, não). */
-  var FN_TRACK = 'https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/track-evento';
-  var fila = [], timer = null, mandados = 0;
-  var TETO_SESSAO = 200;   /* o mesmo teto que o banco aplica: não adianta gastar
-                              rede com o que a RPC vai recusar do outro lado */
-
-  function descarrega(beacon){
-    if (timer){ clearTimeout(timer); timer = null; }
-    if (!fila.length) return;
-    var lote = fila.splice(0, 60);
-    mandados += lote.length;
-    var corpo = JSON.stringify({
-      sid: sid, orig: orig,
-      folha:   window.leadEstado.folha,
-      nicho:   window.leadEstado.nicho,
-      caminho: window.leadEstado.caminho,
-      modo:    window.leadEstado.modo,
-      fbp: (document.cookie.match(/_fbp=([^;]+)/) || [])[1] || null,
-      fbc: (document.cookie.match(/_fbc=([^;]+)/) || [])[1] || null,
-      eventos: lote
-    });
-    try {
-      if (beacon && navigator.sendBeacon){
-        navigator.sendBeacon(FN_TRACK, new Blob([corpo], { type:'text/plain' }));
-      } else {
-        fetch(FN_TRACK, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: corpo, keepalive: true
-        }).catch(function(){});   /* medição não pode derrubar a página */
-      }
-    } catch(e){}
-  }
-
-  window.trackFila = function(nome, p){
-    if (mandados + fila.length >= TETO_SESSAO) return;
-    fila.push({ evento: nome, etapa: p.etapa || 0, params: p });
-    if (fila.length >= 20) return descarrega(false);
-    if (!timer) timer = setTimeout(function(){ descarrega(false); }, 3000);
-  };
-  /* pagehide e não beforeunload: o segundo não dispara no Safari do iPhone,
-     que é justamente onde mais gente abandona no meio */
-  addEventListener('pagehide', function(){ descarrega(true); });
-  addEventListener('visibilitychange', function(){
-    if (document.visibilityState === 'hidden') descarrega(true);
-  });
-})();
-</script>
-<!-- Google Tag Manager -->
-<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
-<!-- End Google Tag Manager -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="view-transition" content="same-origin">
 <meta name="facebook-domain-verification" content="nnp34mxbka50bgauppz7inoutl6gts">
-<!-- SEO · o que o Google e as redes mostram quando alguém acha a home.
-     A home é servida em "/" por rewrite (vercel.json) — o canonical aponta
-     pra "/" e não pra este arquivo, senão o endereço interno vira o oficial. -->
 <title>Sistemas e aplicativos sob medida para empresas | Nó Tech Stack</title>
-<meta name="description" content="Sistemas, aplicativos e painéis sob medida para empresas. Comece pelo diagnóstico: roadmap + protótipo em até 3 dias por R$ 149,90, sem obrigação.">
+<link rel="preload" href="/brand/fonts/sora/sora-variable-wght.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="description" content="Sistemas, aplicativos e painéis sob medida para sua empresa. Conte sua ideia no formulário e fale com a Nó pelo WhatsApp sobre escopo, prazo e orçamento.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://www.notechstack.com.br/">
+<meta name="google-site-verification" content="StivlLxlFmi5VnhMHSGUF2SpFEOod2D3UMqJ9ezmlEA">
 <meta name="theme-color" content="#141414">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="Nó Tech Stack">
 <meta property="og:url" content="https://www.notechstack.com.br/">
 <meta property="og:title" content="Sistemas e aplicativos sob medida para empresas | Nó Tech Stack">
-<meta property="og:description" content="Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90. Você decide depois como construir.">
-<meta property="og:image" content="https://www.notechstack.com.br/brand/og/og-home.png">
+<meta property="og:description" content="Sistemas, aplicativos e painéis sob medida para sua empresa. Conte sua ideia no formulário e fale com a Nó pelo WhatsApp sobre escopo, prazo e orçamento.">
+<meta property="og:image" content="https://www.notechstack.com.br/brand/og/og-home-contato.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Nó Tech Stack — sistemas, aplicativos e painéis sob medida. Diagnóstico por R$ 149,90.">
+<meta property="og:image:alt" content="Nó Tech Stack — sistemas, aplicativos e painéis sob medida para empresas.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Sistemas e aplicativos sob medida para empresas | Nó Tech Stack">
-<meta name="twitter:description" content="Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90.">
-<meta name="twitter:image" content="https://www.notechstack.com.br/brand/og/og-home.png">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://www.notechstack.com.br/#organizacao",
-      "name": "Nó Tech Stack",
-      "alternateName": ["nó", "nó tech stack"],
-      "legalName": "60.342.339 LUCCA VICCHIATTI GIANI",
-      "taxID": "60.342.339/0001-06",
-      "url": "https://www.notechstack.com.br/",
-      "logo": { "@type": "ImageObject", "url": "https://www.notechstack.com.br/brand/favicon/favicon-512.png", "width": 512, "height": 512 },
-      "description": "Agência que planeja, desenha e constrói sistemas, aplicativos e painéis sob medida para empresas.",
-      "founder": { "@type": "Person", "name": "Lucca Giani" },
-      "areaServed": { "@type": "Country", "name": "Brasil" },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "contactType": "sales",
-        "telephone": "+55-11-93928-9413",
-        "availableLanguage": "pt-BR",
-        "areaServed": "BR"
-      }
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://www.notechstack.com.br/#site",
-      "url": "https://www.notechstack.com.br/",
-      "name": "Nó Tech Stack",
-      "inLanguage": "pt-BR",
-      "publisher": { "@id": "https://www.notechstack.com.br/#organizacao" }
-    },
-    {
-      "@type": "WebPage",
-      "@id": "https://www.notechstack.com.br/#pagina",
-      "url": "https://www.notechstack.com.br/",
-      "name": "Sistemas e aplicativos sob medida para empresas | Nó Tech Stack",
-      "description": "Sistemas, aplicativos e painéis sob medida para empresas. Comece pelo diagnóstico de sistema: roadmap + protótipo em até 3 dias por R$ 149,90.",
-      "inLanguage": "pt-BR",
-      "isPartOf": { "@id": "https://www.notechstack.com.br/#site" },
-      "about": { "@id": "https://www.notechstack.com.br/#organizacao" },
-      "primaryImageOfPage": "https://www.notechstack.com.br/brand/og/og-home.png"
-    },
-    {
-      "@type": "Service",
-      "@id": "https://www.notechstack.com.br/#diagnostico-de-sistema",
-      "name": "Diagnóstico de sistema: roadmap + protótipo em 3 dias",
-      "serviceType": "Planejamento de sistema sob medida",
-      "description": "Em até 3 dias você recebe o roadmap do sistema, um protótipo navegável e 3 opções de construção (Básico, Essencial e Completo), cada uma com prazo e valor. Sem obrigação de continuar.",
-      "provider": { "@id": "https://www.notechstack.com.br/#organizacao" },
-      "areaServed": { "@type": "Country", "name": "Brasil" },
-      "offers": {
-        "@type": "Offer",
-        "price": "149.90",
-        "priceCurrency": "BRL",
-        "availability": "https://schema.org/InStock",
-        "url": "https://www.notechstack.com.br/diagnostico-de-sistema/"
-      }
-    }
-  ]
-}
-</script>
-<!-- v7 · three.js das cenas 3D: um nome só ("three") pra todos os módulos
-     (cenas3d.js e giro.js) dividirem a mesma instância -->
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
-} }
-</script>
-<link rel="preload" href="/brand/fonts/sora/sora-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/brand/fonts/sora/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-<!-- pôster do vídeo da hero = o LCP da página -->
-<link rel="preload" href="/lp-narrador/cenas-lp/assets/video/hero-parede.jpg" as="image" fetchpriority="high">
-<link rel="preconnect" href="https://www.googletagmanager.com">
+<meta name="twitter:description" content="Sistemas, aplicativos e painéis sob medida para sua empresa. Conte sua ideia no formulário e fale com a Nó pelo WhatsApp sobre escopo, prazo e orçamento.">
+<meta name="twitter:image" content="https://www.notechstack.com.br/brand/og/og-home-contato.png">
+
+
+<link rel="preload" href="/lp-narrador/cenas-lp/assets/video/hero-parede.webp" imagesrcset="/lp-narrador/cenas-lp/assets/video/hero-parede-mobile.webp 480w, /lp-narrador/cenas-lp/assets/video/hero-parede.webp 740w" imagesizes="(max-width:768px) calc(100vw - 32px), 44vw" as="image" fetchpriority="high">
 <link rel="icon" type="image/svg+xml" href="/brand/favicon/favicon.svg">
 <link rel="icon" href="/brand/favicon/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="/brand/favicon/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/brand/favicon/favicon-16.png">
 <link rel="apple-touch-icon" href="/brand/favicon/favicon-180.png">
-<link rel="stylesheet" href="/brand/fonts/fonts.css">
-<link rel="stylesheet" href="/brand/tokens/tokens.css">
-<link rel="stylesheet" href="/shared/brand-derived.css">
-<link rel="stylesheet" href="/shared/pillnav.css">
-<link rel="stylesheet" href="/shared/transitions.css">
-<style>
-/* ─── nó brand · identidade v2 ───
-   Fonte da verdade: brand/BRAND.md + brand/tokens/tokens.css.
-   Os nomes curtos abaixo são só apelidos locais que CONSOMEM os tokens —
-   nenhum hex de marca é redeclarado aqui.
-   Contexto desta página: marca-mãe → acento ÂMBAR. */
-:root {
-  --font: var(--no-font-sans);
-  --font-mono: var(--no-font-mono);
 
-  --blue: var(--no-azul);   --red: var(--no-vermelho);
-  --yellow: var(--no-ambar); --green: var(--no-verde);
-  --blue-l: var(--no-azul-tint);   --red-l: var(--no-vermelho-tint);
-  --yellow-l: var(--no-ambar-tint); --green-l: var(--no-verde-tint);
+<link rel="preload" as="style" fetchpriority="low" href="/lp-narrador/cenas-lp/historia/home.min.css?v=1" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/home.min.css?v=1"></noscript>
 
-  /* acento de contexto da home */
-  --accent: var(--no-ambar);
-  --accent-tint: var(--no-ambar-tint);
-  --accent-ink: var(--no-ambar-escuro);
 
-  --dark: var(--no-tinta); --mid: var(--no-cinza); --light: var(--no-osso);
-  --white: #fff; --border: var(--no-borda);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
 
-/* ── Logo textual `nó.` (BRAND.md §1) ──
-   Sora ExtraBold, minúscula. A PALAVRA é sempre tinta ou branca — nunca
-   colorida, nunca gradiente. O ponto quadrado é o único elemento de cor e
-   assume o acento do contexto (âmbar na marca-mãe). */
-.logo-no{
-  font-family:var(--font);font-weight:var(--no-weight-display);
-  letter-spacing:var(--no-tracking-headline);
-  text-transform:lowercase;color:var(--dark);
-  display:inline-flex;align-items:baseline;gap:.12em;line-height:1;
-}
-.logo-no::after{
-  content:'';display:inline-block;flex:none;
-  width:.17em;height:.17em;background:var(--accent);
-}
-.logo-no.on-dark{color:#fff}
 
-/* ── Barra de 4 cores no topo da peça (BRAND.md §7) ── */
-.brand-topbar{
-  position:fixed;top:0;left:0;right:0;height:4px;z-index:1200;display:flex;
-}
-.brand-topbar span{flex:1}
-.brand-topbar span:nth-child(1){background:var(--blue)}
-.brand-topbar span:nth-child(2){background:var(--red)}
-.brand-topbar span:nth-child(3){background:var(--yellow)}
-.brand-topbar span:nth-child(4){background:var(--green)}
 
-/* ── Rodapé: 4 pontos + nó · @notechstack (BRAND.md §7) ── */
 
-/* ── Label técnico em JetBrains Mono (substitui a antiga Caveat) ── */
-/* offset do nav flutuante — a hero precisa anular isso pra o fundo
-   dela passar por baixo do nav em vez de deixar faixa branca no topo */
-:root{--nav-offset:96px}
-@media (max-width:768px){:root{--nav-offset:80px}}
-/* Superfície de estúdio — mesma família quente do osso/borda, só mais densa.
-   É o tom da hero levado pro resto da página. */
-/* Cor exata amostrada do fundo dos frames do mascote (assets/mascote/*.jpg),
-   pra ele não recortar num retângulo mais claro que a página. */
-:root{--studio:#E2D8CF}
-body{font-family:var(--font);background:var(--studio);color:var(--dark);overflow-x:hidden;padding-top:var(--nav-offset)}
 
-/* ── CURSOR ── */
-.cursor{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply}
-.cursor-ring{width:38px;height:38px;border:1.5px solid var(--accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .22s ease;opacity:.45}
-/* Cursor customizado só faz sentido onde existe mouse. Largura não serve de
-   teste — tablet em paisagem passa de 768px e mesmo assim não tem ponteiro.
-   hover/pointer detectam o dispositivo de fato. */
-@media (hover:none),(pointer:coarse){
-  .cursor,.cursor-ring{display:none!important}
-}
 
-/* ── HERO ── */
-/* hero layout now set by hw grid CSS */
-/* pílula no âmbar = fundo preto, texto branco (BRAND.md §6) */
-@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
-/* headline: CAIXA ALTA + tracking apertado (BRAND.md §5) */
 
-/* ── STATS ── */
-#stats{display:none!important}
 
-/* ── SECTIONS ── */
-section{padding:100px 60px}
-/* label de seção: JetBrains Mono UPPERCASE + linha lateral colorida (BRAND.md §5) */
-.section-label{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:var(--no-tracking-label);text-transform:uppercase;margin-bottom:14px}
-.section-label::before{content:'';width:22px;height:2px;border-radius:2px}
-.section-title{font-family:var(--font);font-size:clamp(32px,3.7vw,50px);font-weight:var(--no-weight-titulo);line-height:1.1;text-transform:uppercase;letter-spacing:var(--no-tracking-headline);margin-bottom:18px}
-.section-sub{font-family:var(--font);font-size:17px;font-weight:300;color:var(--mid);line-height:1.7;max-width:540px;margin-bottom:56px}
 
-/* ── REVEAL ── */
-.reveal{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;will-change:opacity,transform}
-.reveal.visible{opacity:1;transform:translateY(0);will-change:auto}
-.reveal-d1{transition-delay:.1s}.reveal-d2{transition-delay:.2s}.reveal-d3{transition-delay:.3s}.reveal-d4{transition-delay:.4s}
 
-/* ── HOW IT WORKS ── */
-@keyframes solIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
-/* PLATFORMS */
-#platforms{background:var(--studio);padding:80px 0;overflow:hidden}
-.plat-hdr{text-align:center;padding:0 60px;margin-bottom:48px}
-@keyframes marqueeL{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+<link rel="stylesheet" href="/shared/card-nav.css">
 
-/* ── MIND MAP ── */
-@keyframes mmPulse{0%,100%{box-shadow:0 0 40px rgba(61,99,219,.3)}50%{box-shadow:0 0 80px rgba(61,99,219,.6)}}
-@keyframes mmFloat{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,calc(-50% - 8px))}}
 
-/* ── CTA / FORM ── */
-#cta{background:var(--studio);position:relative;overflow:hidden}
-#cta::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(61,99,219,.05),transparent 70%)}
-/* coluna esquerda enxuta (só headline + subtítulo) centrada verticalmente
-   contra o formulário; a lista de features saiu a pedido de 10/08 */
-/* variante nó: o quadradinho âmbar da marca no lugar do ✦ genérico */
-@keyframes dot{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1.2);opacity:1}}
 
-/* ── FOOTER ── */
-footer{background:var(--dark);color:var(--white);padding:52px 60px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;justify-content:space-between}
-.ft-logo{font-family:var(--font);font-size:19px;font-weight:700}
-.ft-txt{font-family:var(--font);font-size:12px;color:rgba(255,255,255,.62)}  /* .24 dava 2,2:1 — reprovado no WCAG AA */
-/* mapa do site no rodapé: links de texto que o Google segue (o menu do topo é montado por JS) */
-.ft-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;max-width:520px;font-family:var(--font);font-size:13px}
-.ft-nav a{color:rgba(255,255,255,.78);text-decoration:none;border-bottom:1px solid transparent}
-.ft-nav a:hover{color:#fff;border-bottom-color:var(--accent)}
-/* links de texto dentro dos parágrafos da home (serviços e diagnóstico) */
-.v8-links-serv{margin-top:18px}
-.v8-links-serv a,#como-funciona .v8-p a,.v8-dg-mais{color:inherit;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:3px;text-decoration-thickness:2px}
-/* links legais do rodapé: legíveis sem competir com a assinatura */
-.ft-link{color:rgba(255,255,255,.5);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18)}
-.ft-link:hover{color:#fff;border-bottom-color:var(--no-ambar,#e8a33d)}
 
-/* ── alinhamento dos dois blocos do rodapé ──
-   Cada bloco alinha pela própria borda EXTERNA: a marca pela esquerda, o
-   legal pela direita. Antes o bloco da direita era texto solto encostado na
-   borda direita mas alinhado à esquerda — as duas linhas ficavam com sobra
-   desigual e lia como desalinho, não como escolha.
-   O `align-items:center` do footer cuida do eixo vertical; aqui é só o
-   horizontal de cada coluna. O gap substitui o margin-top que estava inline
-   no slogan e tinha sido calibrado para a logo antiga (38px, contra os 27
-   do lockup). */
-.ft-brand{ display:flex; flex-direction:column; align-items:flex-start; gap:9px }
-.ft-legal{ display:flex; flex-direction:column; align-items:flex-end; gap:7px; text-align:right }
-.ft-legal-links{ display:flex; align-items:center; gap:2px; flex-wrap:wrap; justify-content:flex-end }
+<link rel="stylesheet" href="/shared/clients-network.css">
 
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  #hero{padding:110px 20px 56px}
-  #stats{grid-template-columns:repeat(2,1fr);padding:0 20px}
-  section{padding:56px 20px}
-  footer{flex-direction:column;gap:18px;text-align:center;padding:36px 20px}
-  /* empilhado, os dois blocos centram junto — deixar um alinhado à esquerda e
-     outro à direita numa coluna só é o desalinho clássico de rodapé */
-  .ft-brand{ align-items:center }
-  .ft-legal{ align-items:center; text-align:center }
-  .ft-legal-links{ justify-content:center }
-}
 
-/* ══════════════════════════════════════════
-/* ══════════════════════════════════════════
-   MODULES (flip cards)
-══════════════════════════════════════════ */
-@keyframes hubProgress{0%{width:0}100%{width:100%}}
-@keyframes btnPulse{0%,100%{opacity:1}50%{opacity:.65}}
-
-/* ── SCROLL INDICATOR ── */
-@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:1}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── HERO LAYOUT 2-col ── */
-/* hero now grid — defined in hero-chat CSS */
-
-@media(max-width:1100px){#hero{padding:140px 48px 60px}}
-@media(max-width:900px){#hero{padding:140px 24px 60px}}
-
-/* ════════════════════════════════════════════════════════════
-   NÓ — MOBILE RESPONSIVE  (max-width: 768px)
-   Cobre: nav, hero, stats, how, usecases, cases, platforms,
-          mindmap, hub, pricing, cta/form, footer, cursor,
-          comparativo, sol-charts
-════════════════════════════════════════════════════════════ */
-
-/* ── GLOBAL ── */
-@media(max-width:768px){
-  /* disable custom cursor on touch */
-  .cursor,.cursor-ring{display:none!important}
-
-  /* section spacing */
-  .section-label{font-size:10px}
-  .section-title{font-size:clamp(26px,7vw,38px)!important;letter-spacing:-.5px}
-  .section-sub{font-size:14px}
-
-  /* ── HERO ── */
-  #hero{padding:110px 20px 64px;min-height:auto}
-  /* orbs: smaller, no overflow */
-
-  /* ── STATS ── */
-  #stats{grid-template-columns:repeat(2,1fr)!important;padding:0!important}
-
-  /* ── HOW IT WORKS ── */
-  /* flow steps: vertical stack */
-  /* tech-stack tree: scroll horizontally */
-  /* maintenance node */
-
-  /* ── CASES ── */
-
-  /* ── PLATFORMS marquee ── */
-  #platforms{padding:60px 0}
-  .plat-hdr{padding:0 20px;margin-bottom:32px}
-
-  /* ── MIND MAP ── */
-
-  /* ── CTA / FORM ── */
-  #cta{padding:72px 20px}
-
-  /* ── FOOTER ── */
-  footer{padding:40px 20px}
-  .ft-logo img{height:40px}
-
-  /* ── SCROLL INDICATOR ── */
-}
-
-/* ── SMALL PHONES (< 375px) ── */
-@media(max-width:375px){
-  .section-title{font-size:24px!important}
-}
-
-/* ── TABLET (769px–1024px) ── */
-@media(min-width:769px) and (max-width:1024px){
-  nav{padding:10px 30px}
-  #hero{padding:130px 40px 80px}
-  #stats{padding:0 40px!important}
-  #cta{padding:80px 40px}
-  footer{padding:60px 40px}
-}
-
-/* ── TOUCH: disable hover effects that cause layout shift ── */
-
-/* ── PREVENT HORIZONTAL OVERFLOW everywhere ──
-   Só o body clampa: html+body com overflow-x:hidden fazia o body virar
-   scroll container próprio e o scroll da janela TRAVAVA no meio da página
-   em viewport estreito. */
-@media(max-width:1024px){
-  body{max-width:100vw;overflow-x:hidden}
-  footer,nav{max-width:100vw;overflow-x:hidden}
-  /* orb blur: reduce filter cost on mobile */
-}
-
-/* ── iOS SAFE AREA ── */
-@supports(padding: max(0px)){
-  nav{padding-left:max(20px, env(safe-area-inset-left));padding-right:max(20px, env(safe-area-inset-right))}
-}
-
-/* ══════════════════════════════════════════════
-   MOBILE HOW-IT-WORKS — Chat + Mindmap
-   (max-width: 768px only)
-══════════════════════════════════════════════ */
-@media(max-width:768px){
-  /* Hide desktop flowchart, show mobile version */
-  @keyframes mTypingBounce{
-    0%,60%,100%{transform:translateY(0);opacity:.4}
-    30%{transform:translateY(-5px);opacity:1}
-  }
-
-  /* ── Transition phrase ── */
-
-  /* ── Mindmap — responsive SVG canvas w/ percentage-positioned nodes ── */
-  /* NOTE: classes prefixed "hw-" to avoid collision with existing .mm-* used elsewhere */
-  @keyframes hwMarch{from{stroke-dashoffset:0}to{stroke-dashoffset:-20}}
-  /* SVG já é a versão branca com ponto âmbar — sem filtro, senão o ponto some */
-
-  /* ── Thought bubble ── */
-  @keyframes mThoughtFloat{
-    0%,100%{transform:translateY(0) rotate(-.5deg)}
-    40%{transform:translateY(-10px) rotate(.8deg)}
-    70%{transform:translateY(-5px) rotate(-.3deg)}
-  }
-  @keyframes mDotPop{0%,100%{transform:scale(1);opacity:.45}50%{transform:scale(1.25);opacity:1}}
-}
-
-@media(max-width:768px){
-  /* Hide the sidebar completely — use only category tabs */
-}
-
-/* ── HERO AI CHAT ── */
-/* ══════════════════════════════════════════
-   HERO — coluna única sobre vídeo de fundo
-   O conteúdo desce: label borrado → frase digitada → pills →
-   chat, que expande no lugar logo abaixo das pills.
-══════════════════════════════════════════ */
-/* v5 · a hero deixou de ser uma faixa que encosta nas bordas e virou um
-   PALCO EMOLDURADO: respiro em volta, cantos arredondados, e tudo que é da
-   hero (fundo, vídeo, grão, conteúdo) vive dentro dele. */
-#hero{
-  display:flex;
-  min-height:100vh; min-height:100svh;   /* svh evita o pulo da barra no mobile */
-  margin-top:calc(-1 * var(--nav-offset));
-  padding:calc(var(--nav-offset) + 14px) 14px 14px;
-  position:relative;isolation:isolate
-}
-@media(min-width:768px){ #hero{ padding:calc(var(--nav-offset) + 22px) 22px 22px } }
-.hero-stage{
-  position:relative;flex:1;display:flex;align-items:flex-end;
-  border-radius:22px;overflow:hidden;isolation:isolate;
-  background:#D5C4AF;
-  /* onde cai a linha parede/chão. Com o vídeo em altura cheia, a linha dele
-     (88,8% da própria altura) cai exatamente aqui — as duas viram uma só. */
-  --linha:88.8%;
-  /* folga entre o rodapé do conteúdo e a linha do chão */
-  --piso:4.5%;
-}
-@media(min-width:768px){ .hero-stage{ border-radius:30px } }
-
-/* Seções em superfície de estúdio.
-   Sobre o osso quase branco, o cinza secundário #6B6F76 dá 4.8:1; sobre o
-   estúdio cai pra 4.0:1, abaixo do AA. Por isso --mid é escurecido dentro
-   dessas seções (5.2:1) em vez de aplicar só o background. */
-
-/* Fundo de estúdio: cinza quente chapado com queda de luz suave, como papel
-   seamless de fotografia. O ponto claro fica em 68%/42% pra bater com o
-   object-position do vídeo (70%), onde o assunto vai entrar.
-   Os cinzas são da família quente do osso/borda — mesma matiz, só mais densos. */
-/* v5.2 · O FUNDO DA HERO É A PRÓPRIA PAREDE DO VÍDEO.
-   As paradas abaixo não foram escolhidas a olho: são a leitura pixel a pixel
-   da COLUNA DA BORDA ESQUERDA de `geral-mascote-encostado-parede-vira-cabeca`
-   (a parede tem queda de luz da esquerda pra direita, então é essa coluna —
-   e não o centro — que precisa casar, porque é ali que a emenda acontece).
-   No material a linha parede/chão está em y=984 de 1108 = 88,8%; --linha
-   guarda esse valor pra CSS e vídeo apontarem pro mesmo lugar. */
-.hero-backdrop{
-  position:absolute;inset:0;z-index:0;pointer-events:none;
-  background:linear-gradient(to bottom,
-    #D5C4AF 0%,
-    #DCCCB9 calc(var(--linha) * .20),
-    #D6C5AF calc(var(--linha) * .41),
-    #CBB39B calc(var(--linha) * .61),
-    #AF9578 calc(var(--linha) * .81),
-    #A08466 calc(var(--linha) * .99),
-    /* fio de sombra do encontro parede/chão */
-    #92795D var(--linha),
-    #B2997D calc(var(--linha) + .4%),
-    #C2A98E 100%);
-}
-/* quando o vídeo entra, ele cobre o backdrop — que segue como cor de espera */
-#hero.has-video .hero-backdrop{opacity:0;transition:opacity .8s ease}
-
-/* v5 · o conteúdo da hero agora mora no rodapé do palco, em 12 colunas:
-   marca gigante à esquerda, texto + CTA à direita (referência Prisma). */
-/* NB: o nome .hero-content já existe no CSS antigo desta página, com
-   max-width:600px — daí o nome próprio .hero-foot, pra não herdar aquilo. */
-/* O conteúdo POUSA NA PAREDE, não no chão: fica ancorado acima da linha
-   parede/chão, como quem pinta o letreiro na parede em vez de deixá-lo
-   caído no piso. Por isso o posicionamento é absoluto — só assim o `bottom`
-   em porcentagem conta a altura do palco, e a distância até a linha continua
-   certa em qualquer tela. --piso é a folga entre o conteúdo e a linha. */
-.hero-foot{
-  position:absolute;left:0;right:0;z-index:3;
-  bottom:calc(100% - var(--linha) + var(--piso));
-  display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;
-  padding:0 24px;
-}
-@media(min-width:768px){ .hero-foot{ padding:0 40px;gap:24px } }
-.hero-left{ grid-column:1/span 12;position:relative }
-.hero-right{ grid-column:1/span 12;display:flex;flex-direction:column;gap:18px;align-items:flex-start }
-/* duas colunas sempre que houver largura OU sempre que a tela estiver
-   deitada — num tablet em paisagem empilhar joga a marca gigante em cima
-   do rosto do mascote */
-@media(min-width:1000px), (min-width:720px) and (orientation:landscape){
-  /* grid-row:1 explícito nos dois — as faixas de coluna se sobrepõem (a
-     caixa do logo tem folga à direita) e sem isso o grid joga cada um numa
-     linha, desancorando a marca do rodapé do palco */
-  .hero-left{ grid-column:1/span 7;grid-row:1 }
-  /* colunas 6–9 e não 9–12: da 10 em diante é território do mascote */
-  .hero-right{ grid-column:6/span 4;grid-row:1;padding-bottom:10px }
-}
-@media(min-width:1500px){ .hero-right{ grid-column:7/span 4 } }
-
-/* vídeo do mascote — encostado na direita, altura cheia e proporção
-   preservada (o material é vertical; esticar cortaria cabeça ou pés).
-   O fundo creme do próprio vídeo é quase o --studio do palco, então ele
-   se dissolve na moldura em vez de virar um retângulo colado por cima. */
-/* v5.1 · o vídeo OCUPA O PALCO INTEIRO. O material é o close do mascote
-   (`_arquivo_backup/video_hero_amarelo`, 3212×2580): giro de cabeça que
-   volta ao ponto de partida, remontado em palíndromo — emenda perfeita,
-   sem corte perceptível no loop. object-position mira o rosto: 56% na
-   horizontal deixa a coluna da esquerda livre pra marca gigante. */
-/* o vídeo mora no canto direito, em altura cheia e proporção natural —
-   é isso que mantém a linha do chão dele alinhada com a do fundo.
-   aspect-ratio evita o pulo de layout antes do metadado carregar. */
-.hero-video{
-  position:absolute;right:0;top:0;height:100%;width:auto;
-  aspect-ratio:828/1108;object-fit:cover;
-  z-index:1;pointer-events:none;
-  /* a borda esquerda se dissolve: por mais que as paradas de cor batam, um
-     corte reto denunciaria os dois planos. 14% não encosta no mascote,
-     que só começa por volta de 21% do quadro. */
-  -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 14%);
-  mask-image:linear-gradient(to right, transparent 0%, #000 14%);
-}
-/* sem véu: ele lavaria justamente a parede que a gente foi copiar.
-   A leitura do texto passa a vir da cor da tinta, não de uma cortina. */
-.hero-scrim{ display:none }
-/* slogan sob a marca — duas linhas em caixa alta, tracking apertado
-   (BRAND.md §5). O único elemento de cor é o ponto final, em âmbar, que
-   ecoa o ponto quadrado do logo: nenhuma palavra é colorida. */
-/* pendurado ABAIXO do bloco da marca, em posição absoluta, e não em fluxo:
-   em fluxo ele aumentaria a altura de .hero-left e — como o bloco é alinhado
-   pela base — empurraria a marca pra cima, desfazendo a calibragem do painel
-   (que foi feita antes do slogan existir). */
-.hero-slogan{
-  position:absolute;top:100%;left:0;
-  margin:0;padding-top:22px;
-  font-family:var(--font);
-  font-size:clamp(15px,1.55vw,25px);
-  font-weight:var(--no-weight-titulo);
-  line-height:1.16;
-  text-transform:uppercase;
-  letter-spacing:var(--no-tracking-headline);
-  color:var(--dark);
-}
-/* o fade VARRE da esquerda pra direita, uma linha de cada vez.
-   A máscara é um degradê opaco→transparente 2,5× mais largo que a linha:
-   parada em 100% ela cobre a frase com a ponta transparente; deslizando até
-   0% a parte opaca entra pela esquerda e descobre o texto no caminho — o
-   próprio degradê é o fade, então cada letra acende em vez de piscar.
-   A opacidade acompanha só como rede de segurança: em browser sem `mask` a
-   linha ainda entra em fade, em vez de nascer visível. */
-.hero-slogan > span{
-  display:block;
-  opacity:0;
-  -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 46%,transparent 76%);
-          mask-image:linear-gradient(90deg,#000 0%,#000 46%,transparent 76%);
-  -webkit-mask-size:250% 100%;   mask-size:250% 100%;
-  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  -webkit-mask-position:100% 0;  mask-position:100% 0;
-  transition:opacity .55s ease,
-             -webkit-mask-position 1.5s cubic-bezier(.22,1,.36,1),
-                     mask-position 1.5s cubic-bezier(.22,1,.36,1);
-}
-/* as linhas entram uma depois da outra (eram 2 com 1s; o H1 tem 3 linhas
-   pra não encostar no parágrafo da direita no desktop) */
-.hero-slogan > span:nth-child(2){ transition-delay:.6s }
-.hero-slogan > span:nth-child(3){ transition-delay:1.2s }
-.hero-slogan.in > span{ opacity:1; -webkit-mask-position:0 0; mask-position:0 0 }
-/* movimento reduzido: sem varredura, a frase só aparece */
-@media (prefers-reduced-motion: reduce){
-  .hero-slogan > span{ transition:none; -webkit-mask-image:none; mask-image:none }
-}
-/* Em tela estreita volta pro fluxo: fora dele, o slogan (que fica pendurado
-   abaixo do bloco da marca) cairia por cima do parágrafo, que no empilhado
-   vem logo em seguida. */
-@media(max-width:999px){
-  .hero-slogan{ position:static;padding-top:0;margin-top:16px }
-}
-
-/* marca gigante — arquivo oficial do logo, nunca palavra recriada
-   (BRAND.md §3: outra fonte e recriação são uso incorreto).
-   Esta é a definição base; os ajustes por tela vêm logo abaixo, todos
-   juntos — antes estavam espalhados e um sobrescrevia o outro. */
-.hero-mark{ display:block;width:min(58vw,700px);height:auto }
-
-/* ── ajustes por tela ──
-   O vídeo tem proporção fixa: em altura cheia, a largura dele é 75% da
-   altura do palco. Num palco estreito isso vira um mascote gigante em cima
-   do texto. Então nas telas estreitas ele encolhe, e --linha acompanha:
-   a linha do chão continua sendo a DELE, só que noutra altura. */
-
-/* CELULAR EM PÉ — o mascote desce pro canto e o texto sobe pra parede
-   inteira acima dele. Empilhado do jeito antigo o subtítulo caía em cima
-   do corpo e ficava ilegível. */
-@media(orientation:portrait){
-  .hero-video{
-    height:54%;top:auto;bottom:0;
-    /* aqui o vídeo não tem altura cheia, então a parede DELE está numa
-       escala diferente da parede do CSS. A borda de cima precisa dissolver
-       também — sem isso aparece um corte reto atravessando a parede. */
-    -webkit-mask-image:linear-gradient(to right, transparent 0%, #000 14%),
-                       linear-gradient(to bottom, transparent 0%, #000 24%);
-    -webkit-mask-composite:source-in;
-    mask-image:linear-gradient(to right, transparent 0%, #000 14%),
-               linear-gradient(to bottom, transparent 0%, #000 24%);
-    mask-composite:intersect;
-  }
-  /* topo do vídeo em 46% + 88,8% da altura dele = 93,9% */
-  .hero-stage{ --linha:93.9% }
-  /* O CONTEÚDO PARA ACIMA DA CABEÇA DO MASCOTE — mas só até onde o palco
-     deixa. Antes isto era `bottom:44%` fixo, e num palco curto o bloco
-     (marca + slogan + parágrafo + CTA) ficava mais alto que os 56% restantes:
-     o topo da marca saía pra fora e o `overflow:hidden` do palco cortava o
-     "nó" pela metade. Medido no harness: 76px de corte num 375×667.
-
-     Por que aparecia no celular real e não no harness em tamanho nominal: a
-     barra do navegador come ~90px de altura. Um iPhone 14 tem 844 no papel e
-     ~750 na mão — e é nos 750 que o corte começa.
-
-     `min()` resolve os dois casos com uma regra só: normalmente 41% do palco,
-     mas nunca tão alto que sobre menos de 392px acima (a altura do bloco).
-     Em tela alta o comportamento é praticamente o de antes; em tela curta o
-     bloco desce o quanto for preciso pra caber. */
-  .hero-stage{
-    --palco: calc(100svh - 148px);   /* 100 e 48 de padding do #hero, fixos */
-    --alto:  min(calc(var(--palco) * 0.41), calc(var(--palco) - 392px));
-  }
-  .hero-foot{ bottom: var(--alto) }
-  .hero-mark{ width:min(46vw,178px) }
-  .hero-slogan{ font-size:clamp(13px,3.6vw,17px) }
-  .hero-right{ gap:13px }
-  .hero-desc{ font-size:14px;max-width:none }
-  /* O CTA DESCE PRA ALTURA DOS PÉS (14/08).
-     Medido num iPhone 14 (390x844): o bloco de conteúdo termina em y=490 e a
-     cabeça de TV do mascote começa em y≈492 — o botão tampava exatamente o
-     rosto da marca. Junto dos sapatos a figura é estreita e escura, então a
-     pílula clara ganha contraste em vez de esconder alguma coisa.
-     É `top` (o botão já nasce position:relative) e NÃO `transform`: a entrada
-     .h-rise roda @keyframes fadeUp com fill `both`, que termina em
-     translateY(0) e sobrescreveria qualquer transform declarado aqui.
-     ERA `33.5vh`, E ISSO DERIVAVA. O deslocamento tem que ser a distância
-     entre o rodapé do bloco e a linha do chão — e os dois são % do PALCO,
-     enquanto `vh` é % da JANELA. As duas escalas não são proporcionais: o
-     #hero tem 148px de padding fixo, que pesa muito mais num palco curto (o
-     palco é 78% da janela num 667 e 84% num 915). Resultado medido: o botão
-     caía 30px abaixo da linha do chão num 390×750.
-
-     Agora sai da MESMA expressão do bloco, em comprimento e sem porcentagem,
-     então acompanha sozinho: `--alto` menos os 6,1% do piso. Os 12px a mais
-     enviesam o botão pra CIMA da linha de propósito — errar pra cima deixa
-     ele nos pés do mascote, errar pra baixo encosta na borda do palco.
-     Verificado em 375×667, 390×750, 390×844 e 412×915: o centro cai entre
-     8px e 38px acima da linha nos quatro. */
-  #heroCtaBtn{ top: calc(var(--alto) - var(--palco) * 0.061 - 12px) }
-}
-
-/* TABLET DEITADO — palco largo e baixo: marca e texto empilham na metade
-   esquerda e o mascote fica com a direita inteira. Lado a lado não cabe. */
-@media(max-width:999px) and (orientation:landscape){
-  .hero-left{ grid-column:1/span 6;grid-row:1 }
-  .hero-right{ grid-column:1/span 6;grid-row:2;gap:12px;padding-bottom:0 }
-  .hero-mark{ width:min(34vw,200px) }
-  .hero-desc{ font-size:13.5px }
-}
-.hero-desc{
-  font-family:var(--font);font-size:clamp(13.5px,1.05vw,15.5px);
-  font-weight:var(--no-weight-corpo);line-height:1.55;
-  /* quase tinta, em tom quente. O cinza secundário da marca sobre a parede
-     dá 2,5:1 — reprovado; este dá 4,8:1 sobre o trecho mais escuro dela. */
-  color:#1F1C19;
-  max-width:36ch;margin:0;
-}
-/* a oferta abre o parágrafo, em peso de subtítulo — é o que a pessoa precisa
-   ler primeiro; o resto do texto segue em corpo */
-.hero-preco{ display:block;margin-bottom:4px;font-weight:var(--no-weight-subtitulo);color:var(--dark) }
-
-/* CTA em pílula com círculo — pílula sólida tinta + ponto âmbar é a receita
-   da marca (BRAND.md §6), no lugar da pílula creme da referência */
-.pill-cta{
-  display:inline-flex;align-items:center;gap:14px;
-  background:var(--dark);color:#fff;border:none;
-  padding:7px 7px 7px 24px;border-radius:999px;
-  font-family:var(--font);font-size:15px;font-weight:var(--no-weight-subtitulo);
-  cursor:pointer;text-decoration:none;white-space:nowrap;
-  transition:gap .25s ease,background .25s ease;
-}
-.pill-cta:hover{ gap:20px;background:var(--no-tinta-alt2) }
-.pill-cta-circle{
-  width:38px;height:38px;border-radius:50%;flex:none;
-  background:var(--yellow);color:var(--dark);
-  display:grid;place-items:center;font-size:17px;line-height:1;
-  transition:transform .25s ease;
-}
-.pill-cta:hover .pill-cta-circle{ transform:scale(1.1) }
-/* entrada escalonada da hero (equivalente ao FadeIn da referência) */
-.h-rise{ animation:fadeUp .9s cubic-bezier(.16,1,.3,1) both }
-
-/* grão fino por cima do fundo — o mockup tem textura de papel, não cor chapada */
-.hero-grain{
-  position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.32;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.5'/></svg>");
-}
-
-/* 1 · headline — Sora 800 caixa alta, tracking apertado (BRAND.md §5) */
-
-/* 2 · lead */
-
-/* 3 · botões — sólido tinta + contornados */
-/* as sugestões de pergunta pesam menos que o CTA principal — corpo menor,
-   respiro menor, pra caberem mais por linha e não competirem com ele */
-
-/* Quebra que só existe no mobile. O <br> mora dentro de um <span> porque
-   solto num flex container ele viraria item do flex; dentro do span ele é
-   quebra de linha normal. O espaço antes dele mantém a frase correta no
-   desktop, onde o <br> some. */
-@media(max-width:768px){
-  /* sem isso o nowrap do .btn-pill corta a frase fora da tela */
-}
-
-/* `nó.` em pílula dentro da headline — logo oficial (palavra branca, ponto
-   azul), nunca texto recriado. O ponto quadrado do SVG é o ponto final da frase. */
-
-/* controles herdados do chat antigo que o mockup não mostra.
-   Ficam no DOM porque main.js os referencia sem checar null. */
-@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
-
-@media(max-width:900px){#hero{padding:120px 20px 60px}}
-
-/* scroll-indicator centered */
-
-/* ── Gradiente fixo no topo ── */
-body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;background:linear-gradient(to bottom,rgba(255,255,255,.97) 0%,rgba(255,255,255,.6) 45%,rgba(255,255,255,0) 100%);pointer-events:none;z-index:199}
-@keyframes hubProgress{from{width:0%}to{width:100%}}
-
-/* ── Hero mobile: chat abaixo + conteúdo centralizado ── */
-@media(max-width:1100px){#hero{padding:130px 48px 60px}}
-@media(max-width:768px){
-  #hero{padding:100px 20px 48px;gap:24px}
-}
-
-/* ── Stats hidden ── */
-#stats{display:none!important}
-
-/* ── Flow-node spacing ── */
-
-/* ── Logos: garantir visibilidade em fundos escuros ── */
-/* Logos escuros (GitHub, Vercel, Cal.com, Notion) ficam visíveis com fundo claro */
-}</style>
-<link rel="stylesheet" href="/shared/products-nav.css">
+<style>@font-face{font-family:Sora;font-style:normal;font-weight:100 800;font-display:swap;src:url('/brand/fonts/sora/sora-variable-wght.woff2') format('woff2')}@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:100 800;font-display:swap;src:url('/brand/fonts/jetbrains-mono/jetbrains-mono-variable-wght.woff2') format('woff2')}:root{--no-azul:#3D63DB;--no-vermelho:#E0543C;--no-ambar:#EDA33B;--no-verde:#30A46C;--no-azul-tint:#E9EEFB;--no-vermelho-tint:#FBEAE5;--no-ambar-tint:#FCF3E0;--no-verde-tint:#E5F4EC;--no-tinta:#141414;--no-osso:#FAFAF7;--no-cinza:#6B6F76;--no-borda:#ECEBE6;--no-font-sans:'Sora',system-ui,-apple-system,sans-serif;--no-font-mono:'JetBrains Mono',ui-monospace,monospace;--no-weight-display:800;--no-weight-titulo:700;--no-weight-subtitulo:600;--no-weight-corpo:300;--no-tracking-headline:-0.03em;--no-tracking-label:0.16em;--no-shadow-card:0 8px 24px rgba(20, 20, 20, 0.07)}:root{--no-azul-escuro:#3452AF;--no-azul-claro:#92A7E9;--no-vermelho-escuro:#B34633;--no-vermelho-claro:#EC9F92;--no-ambar-escuro:#805C28;--no-ambar-claro:#F3CA91;--no-verde-escuro:#2A8459;--no-verde-claro:#8BCBAC;--no-cinza-claro:#A4A7AB;--no-osso-alt:#F3F2ED;--no-tinta-alt:#1F1F1D;--no-tinta-alt2:#2A2A27;--no-borda-dark:#3A3A36;--no-shadow-sm:0 4px 12px rgba(20, 20, 20, 0.05);--no-shadow-lg:0 20px 48px rgba(20, 20, 20, 0.07)}@view-transition{navigation:auto}::view-transition-old(root){animation:fade-slide-out .4s cubic-bezier(.4,0,.2,1) both}::view-transition-new(root){animation:fade-slide-in .4s cubic-bezier(.4,0,.2,1) both}@keyframes fade-slide-out{to{opacity:0;transform:translateY(-20px)}}@keyframes fade-slide-in{from{opacity:0;transform:translateY(20px)}}::view-transition-new(pill-nav),::view-transition-old(pill-nav){animation:none}:root{--font:var(--no-font-sans);--font-mono:var(--no-font-mono);--blue:var(--no-azul);--red:var(--no-vermelho);--yellow:var(--no-ambar);--green:var(--no-verde);--blue-l:var(--no-azul-tint);--red-l:var(--no-vermelho-tint);--yellow-l:var(--no-ambar-tint);--green-l:var(--no-verde-tint);--accent:var(--no-ambar);--accent-tint:var(--no-ambar-tint);--accent-ink:var(--no-ambar-escuro);--dark:var(--no-tinta);--mid:var(--no-cinza);--light:var(--no-osso);--white:#fff;--border:var(--no-borda)}*,::after,::before{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}.brand-topbar{position:fixed;top:0;left:0;right:0;height:4px;z-index:1200;display:flex}.brand-topbar span{flex:1}.brand-topbar span:first-child{background:var(--blue)}.brand-topbar span:nth-child(2){background:var(--red)}.brand-topbar span:nth-child(3){background:var(--yellow)}.brand-topbar span:nth-child(4){background:var(--green)}:root{--nav-offset:96px}@media (max-width:768px){:root{--nav-offset:80px}}:root{--studio:#E2D8CF}body{font-family:var(--font);background:var(--studio);color:var(--dark);overflow-x:hidden;padding-top:var(--nav-offset)}section{padding:100px 60px}@media(max-width:900px){#hero{padding:110px 20px 56px}section{padding:56px 20px}}@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@media(max-width:1100px){#hero{padding:140px 48px 60px}}@media(max-width:900px){#hero{padding:140px 24px 60px}}@media(max-width:768px){#hero{padding:110px 20px 64px;min-height:auto}}@media(min-width:769px) and (max-width:1024px){nav{padding:10px 30px}#hero{padding:130px 40px 80px}}@media(max-width:1024px){body{max-width:100vw;overflow-x:hidden}nav{max-width:100vw;overflow-x:hidden}}@supports(padding:max(0px)){nav{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}}#hero{display:flex;min-height:100vh;min-height:100svh;margin-top:calc(-1 * var(--nav-offset));padding:calc(var(--nav-offset) + 14px) 14px 14px;position:relative;isolation:isolate}@media(min-width:768px){#hero{padding:calc(var(--nav-offset) + 22px) 22px 22px}}.hero-stage{position:relative;flex:1;display:flex;align-items:flex-end;border-radius:22px;overflow:hidden;isolation:isolate;background:#d5c4af;--linha:88.8%;--piso:4.5%}@media(min-width:768px){.hero-stage{border-radius:30px}}.hero-backdrop{position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(to bottom,#d5c4af 0,#dcccb9 calc(var(--linha) * .2),#d6c5af calc(var(--linha) * .41),#cbb39b calc(var(--linha) * .61),#af9578 calc(var(--linha) * .81),#a08466 calc(var(--linha) * .99),#92795d var(--linha),#b2997d calc(var(--linha) + .4%),#c2a98e 100%)}.hero-foot{position:absolute;left:0;right:0;z-index:3;bottom:calc(100% - var(--linha) + var(--piso));display:grid;grid-template-columns:repeat(12,1fr);gap:18px;align-items:end;padding:0 24px}@media(min-width:768px){.hero-foot{padding:0 40px;gap:24px}}.hero-left{grid-column:1/span 12;position:relative}.hero-right{grid-column:1/span 12;display:flex;flex-direction:column;gap:18px;align-items:flex-start}@media(min-width:1000px),(min-width:720px) and (orientation:landscape){.hero-left{grid-column:1/span 7;grid-row:1}.hero-right{grid-column:6/span 4;grid-row:1;padding-bottom:10px}}@media(min-width:1500px){.hero-right{grid-column:7/span 4}}.hero-video{position:absolute;right:0;top:0;height:100%;width:auto;aspect-ratio:828/1108;object-fit:cover;z-index:1;pointer-events:none;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 14%);mask-image:linear-gradient(to right,transparent 0%,#000 14%)}.hero-scrim{display:none}.hero-slogan{position:absolute;top:100%;left:0;margin:0;padding-top:22px;font-family:var(--font);font-size:clamp(15px,1.55vw,25px);font-weight:var(--no-weight-titulo);line-height:1.16;text-transform:uppercase;letter-spacing:var(--no-tracking-headline);color:var(--dark)}.hero-slogan>span{display:block;opacity:0;-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 46%,transparent 76%);mask-image:linear-gradient(90deg,#000 0%,#000 46%,transparent 76%);-webkit-mask-size:250% 100%;mask-size:250% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:100% 0;mask-position:100% 0;transition:opacity .55s ease,-webkit-mask-position 1.5s cubic-bezier(.22,1,.36,1),mask-position 1.5s cubic-bezier(.22,1,.36,1)}.hero-slogan>span:nth-child(2){transition-delay:.6s}.hero-slogan>span:nth-child(3){transition-delay:1.2s}.hero-slogan.in>span{opacity:1;-webkit-mask-position:0 0;mask-position:0 0}@media (prefers-reduced-motion:reduce){.hero-slogan>span{transition:none;-webkit-mask-image:none;mask-image:none}}@media(max-width:999px){.hero-slogan{position:static;padding-top:0;margin-top:16px}}.hero-mark{display:block;width:min(58vw,700px);height:auto}@media(orientation:portrait){.hero-video{height:54%;top:auto;bottom:0;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 14%),linear-gradient(to bottom,transparent 0%,#000 24%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 0%,#000 14%),linear-gradient(to bottom,transparent 0%,#000 24%);mask-composite:intersect}.hero-stage{--linha:93.9%}.hero-stage{--palco:calc(100svh - 148px);--alto:min(calc(var(--palco) * 0.41), calc(var(--palco) - 392px))}.hero-foot{bottom:var(--alto)}.hero-mark{width:min(46vw,178px)}.hero-slogan{font-size:clamp(13px,3.6vw,17px)}.hero-right{gap:13px}.hero-desc{font-size:14px;max-width:none}#heroCtaBtn{top:calc(var(--alto) - var(--palco) * .061 - 12px)}}@media(max-width:999px) and (orientation:landscape){.hero-left{grid-column:1/span 6;grid-row:1}.hero-right{grid-column:1/span 6;grid-row:2;gap:12px;padding-bottom:0}.hero-mark{width:min(34vw,200px)}.hero-desc{font-size:13.5px}}.hero-desc{font-family:var(--font);font-size:clamp(13.5px,1.05vw,15.5px);font-weight:var(--no-weight-corpo);line-height:1.55;color:#1f1c19;max-width:36ch;margin:0}.pill-cta{display:inline-flex;align-items:center;gap:14px;background:var(--dark);color:#fff;border:none;padding:7px 7px 7px 24px;border-radius:999px;font-family:var(--font);font-size:15px;font-weight:var(--no-weight-subtitulo);cursor:pointer;text-decoration:none;white-space:nowrap;transition:gap .25s ease,background .25s ease}.pill-cta:hover{gap:20px;background:var(--no-tinta-alt2)}.pill-cta-circle{width:38px;height:38px;border-radius:50%;flex:none;background:var(--yellow);color:var(--dark);display:grid;place-items:center;font-size:17px;line-height:1;transition:transform .25s ease}.pill-cta:hover .pill-cta-circle{transform:scale(1.1)}.h-rise{animation:fadeUp .9s cubic-bezier(.16,1,.3,1) both}.hero-grain{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.32;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/><feColorMatrix type='saturate' values='0'/></filter><rect width='140' height='140' filter='url(%23n)' opacity='.5'/></svg>")}@media(max-width:900px){#hero{padding:120px 20px 60px}}body::before{content:'';position:fixed;top:0;left:0;right:0;height:88px;background:linear-gradient(to bottom,rgba(255,255,255,.97) 0,rgba(255,255,255,.6) 45%,rgba(255,255,255,0) 100%);pointer-events:none;z-index:199}@media(max-width:1100px){#hero{padding:130px 48px 60px}}@media(max-width:768px){#hero{padding:100px 20px 48px;gap:24px}}.no-products-nav{position:fixed;top:24px;left:40px;right:40px;z-index:1000;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-family:Sora,sans-serif;pointer-events:none}nav.no-products-nav{overflow:visible;padding:0;max-width:none}.no-products-nav *{box-sizing:border-box}.no-products-brand{justify-self:start;pointer-events:auto}.no-products-brand img{display:block;width:76px;height:76px;border-radius:50%}.no-products-pills{grid-column:2;display:flex;gap:4px;padding:4px;background:#141414;border-radius:999px;pointer-events:auto}.no-products-dropdown>button,.no-products-pills>a{display:block;border:0;border-radius:999px;background:#fafaf7;color:#141414;padding:15px 24px;font:700 13px/1.3 Sora,sans-serif;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;cursor:pointer;white-space:nowrap}.no-products-dropdown>button:hover,.no-products-dropdown>button[aria-expanded=true],.no-products-pills>a:hover{background:#eda33b;color:#141414}.no-products-pills>a[aria-current=page]{box-shadow:inset 0 -4px #eda33b}.no-products-dropdown{position:relative}.no-products-menu{position:absolute;top:100%;left:50%;transform:translateX(-50%);padding:12px 6px 6px;min-width:230px;background:#141414;border-radius:0 0 26px 26px;box-shadow:0 16px 40px #0003}.no-products-menu a{display:flex;align-items:center;gap:11px;padding:14px 20px;color:#fafaf7;border-radius:999px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-decoration:none}.no-products-menu a:before{content:'';width:8px;height:8px;flex:none;border-radius:50%;background:var(--product-color)}.no-products-menu a:hover,.no-products-menu a[aria-current=page]{background:#333;color:#fff}.no-products-nav a:focus-visible,.no-products-nav button:focus-visible{outline:3px solid #EDA33B;outline-offset:3px}@media(max-width:768px){.no-products-nav{top:16px;left:16px;right:16px;grid-template-columns:auto 1fr;gap:10px}.no-products-brand img{width:44px;height:44px}.no-products-pills{justify-self:end}.no-products-dropdown>button,.no-products-pills>a{font-size:10px;padding:12px 13px}.no-products-menu{min-width:205px}}@media(prefers-reduced-motion:no-preference){.no-products-menu:not([hidden]){animation:no-products-in .18s ease-out}@keyframes no-products-in{from{opacity:0;margin-top:-5px}to{opacity:1;margin-top:0}}}:root{--mh:clamp(160px, 20vw, 320px)}@media(max-width:640px){:root{--mh:clamp(120px, 30vw, 210px)}}#heroCtaBtn{position:relative}:root{--lp-bege:#E2D8CF;--lp-marrom:#241A11;--lp-preto:#141414}:root{--hs-branco:#FAFAF7;--hs-bege:#E2D8CF}#diagnostico{position:relative;background:var(--hs-branco);padding-top:clamp(14px,2.2vw,28px);padding-bottom:180px;padding-inline:clamp(10px,1.8vw,28px);--dg-tinta:#141414;--dg-azul:var(--no-azul, #3D63DB);--dg-ambar:var(--no-ambar, #EDA33B);--dg-fosforo:#F4E3C2;--dg-fosforo-2:rgba(244,227,194,.62)}@media (max-width:760px){#diagnostico{padding-top:0;padding-bottom:0;padding-inline:0}}.hero-motion{opacity:0;transition:opacity .3s}.hero-motion.playing{opacity:1}.hero-poster{pointer-events:none}.hero-slogan{opacity:1!important;transform:none!important}.hero-slogan>span{opacity:1;mask-image:none;-webkit-mask-image:none;transition:none}#hero{min-height:0;margin-top:calc(-1 * var(--nav-offset));padding:112px 22px 22px}#hero .hero-stage{min-height:640px;width:100%;display:flex;align-items:center;--linha:88.8%}#hero .hero-foot{position:relative;inset:auto;display:flex;flex-direction:column;align-self:center;align-items:flex-start;width:61%;padding:44px clamp(28px,4vw,64px);gap:22px}#hero .hero-left,#hero .hero-right{width:100%;padding:0;grid-column:auto;grid-row:auto}#hero .hero-mark{width:116px;height:auto}#hero .hero-eyebrow{font:500 10px/1.5 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-top:20px}#hero .hero-slogan{position:static;padding:0;margin:12px 0 0;font-size:clamp(27px,2.45vw,38px);line-height:1.13;letter-spacing:-.04em;text-transform:none;max-width:640px}#hero .hero-right{display:flex;flex-direction:column;gap:18px;align-items:flex-start}#hero .hero-desc{font-size:15px;line-height:1.6;max-width:490px}.hero-benefits{display:grid;gap:8px;list-style:none;margin:0;padding:0;font-size:12px;line-height:1.5}.hero-benefits li:before{content:'✓';color:#345b3f;margin-right:8px;font-weight:700}#hero #heroCtaBtn{position:relative;top:auto;font-size:13px;padding:7px 7px 7px 20px;gap:12px;white-space:normal}#hero #heroCtaBtn .pill-cta-circle{width:34px;height:34px;flex-shrink:0}#hero .hero-response{font-size:11px;line-height:1.6;max-width:400px;color:#514437}#hero .hero-video{height:100%;width:auto;max-width:44%;aspect-ratio:740/990;object-fit:contain;object-position:right bottom;top:auto;bottom:0;right:0;mask-image:linear-gradient(to right,transparent,#000 15%);-webkit-mask-image:linear-gradient(to right,transparent,#000 15%)}@media(max-width:768px){#hero{padding:92px 16px 24px}#hero .hero-stage{display:block;min-height:0;padding-bottom:300px}#hero .hero-foot{width:100%;padding:28px 24px;gap:18px}#hero .hero-mark{width:88px}#hero .hero-eyebrow{font-size:9px;margin-top:18px}#hero .hero-slogan{font-size:26px;line-height:1.16;max-width:none}#hero .hero-desc{font-size:13px;max-width:none}#hero .hero-right{gap:16px}.hero-benefits{font-size:11px;gap:7px}#hero #heroCtaBtn{font-size:11px;padding-left:14px;gap:8px}#hero .hero-response{font-size:11px;max-width:none}#hero .hero-video{height:280px;width:210px;max-width:100%;top:auto;bottom:0;mask-image:linear-gradient(to right,transparent,#000 15%),linear-gradient(to bottom,transparent,#000 20%);-webkit-mask-image:linear-gradient(to right,transparent,#000 15%),linear-gradient(to bottom,transparent,#000 20%);mask-composite:intersect;-webkit-mask-composite:source-in}}@media(max-width:768px){#hero .hero-stage{padding-bottom:0}#hero .hero-stage::after{content:'';display:block;width:100%;aspect-ratio:740/990}#hero .hero-foot{padding-bottom:0}#hero .hero-video{width:100%;height:auto;max-width:none;aspect-ratio:740/990;object-fit:contain;object-position:center bottom;left:0;right:0;bottom:0;top:auto;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 22%);mask-image:linear-gradient(to bottom,transparent 0%,#000 22%);-webkit-mask-composite:source-over;mask-composite:add}#hero .hero-backdrop{background:linear-gradient(180deg,#d5c4af 0,#cbb79e 62%,#b2997d 100%)}}</style>
 </head>
 <body>
-<!-- Google Tag Manager (noscript) -->
-<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK87FH8W"
-height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
-
-<!-- barra de 4 cores no topo da peça (BRAND.md §7) -->
 <div class="brand-topbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-
-
-<!-- PILL NAV (floating, primary navigation) -->
-<!-- menu já no HTML (links rastreáveis); o products-nav.js só liga os dropdowns -->
-<div id="pill-nav-root"><nav class="no-products-nav" aria-label="Navegação principal">
-    <a class="no-products-brand" href="/" aria-label="Nó Tech Stack — página inicial"><img src="/brand/favicon/favicon-dark.svg" alt="nó." width="64" height="64"></a>
-    <div class="no-products-pills">
-      <div class="no-products-dropdown">
-        <button type="button" aria-expanded="false" aria-controls="no-servicos-menu">Serviços <span aria-hidden="true">⌄</span></button>
-        <div id="no-servicos-menu" class="no-products-menu" hidden><a href="/diagnostico-de-sistema/" style="--product-color:#EDA33B">Diagnóstico de sistema</a><a href="/sistemas-sob-medida/" style="--product-color:#3D63DB">Sistemas sob medida</a><a href="/desenvolvimento-de-aplicativos/" style="--product-color:#E0543C">Aplicativos</a><a href="/paineis-empresariais/" style="--product-color:#30A46C">Painéis empresariais</a><a href="/integracoes-e-automacoes/" style="--product-color:#EDA33B">Integrações e automações</a><a href="/cases/" style="--product-color:#3D63DB">Cases</a><a href="/conteudos/" style="--product-color:#E0543C">Conteúdos</a></div>
-      </div>
-      <div class="no-products-dropdown">
-        <button type="button" aria-expanded="false" aria-controls="no-products-menu">Produtos <span aria-hidden="true">⌄</span></button>
-        <div id="no-products-menu" class="no-products-menu" hidden><a href="/colaboradores-digitais/" style="--product-color:#EDA33B">Agentes</a><a href="/roteador/" style="--product-color:#3D63DB">Roteador</a><a href="/health/" style="--product-color:#30A46C">Nó Health</a></div>
-      </div>
-      <a href="/#diagnostico">Contato</a>
-    </div>
-  </nav></div>
-
-<style>
-/* ════════════════════════════════════════════════════════════
-   LP-V3 — extras sobre a base oficial (não redeclara tokens)
-════════════════════════════════════════════════════════════ */
-
-/* ── mascote de sprite: referência de altura independente do h1,
-   pensada pra um personagem sentado ao lado de um botão, não de um título ── */
-:root{ --mh: clamp(160px, 20vw, 320px); }
-@media(max-width:640px){ :root{ --mh: clamp(120px, 30vw, 210px); } }
-
-#heroCtaBtn{ position:relative }
-
-/* ── navbar: transparência total, só a logo e os botões em evidência —
-   sem nenhum fundo/máscara própria (o container em si já é transparente;
-   o resto do ajuste é não deixar os fades das seções vazarem atrás dela) ── */
-/* v7 (14/09): no celular a marca ocupava demais o topo — 20% menor (92 → 74) */
-
-/* ── paleta intercalada entre seções (bege / marrom / preto) — os três tons
-   são ajustáveis ao vivo no painel de calibragem, por isso vivem em variáveis
-   próprias em vez de reusar --studio/--dark diretamente ── */
-:root{
-  --lp-bege: #E2D8CF;
-  --lp-marrom: #241A11;
-  --lp-preto: #141414;
-}
-#ia{
-  background:var(--lp-preto); --mid:rgba(255,255,255,.62); position:relative;
-  padding-top:120px; padding-bottom:120px;
-}
-#ia .section-title,#ia .section-label{ color:#fff }
-/* limite hero → como usamos ia: metade fica em #hero::after (acima),
-   metade aqui — as duas pontas se encontram no meio pra um degradê mais largo */
-#ia::before{ content:''; position:absolute; left:0; right:0; top:-1px; height:80px; opacity:.4; pointer-events:none; background:linear-gradient(var(--lp-bege), transparent); z-index:1 }
-#ia::after{ content:''; position:absolute; left:0; right:0; bottom:-1px; height:80px; opacity:.4; pointer-events:none; background:linear-gradient(transparent, var(--lp-marrom)); z-index:1 }
-/* limite como usamos ia → o que fazemos: preto vai cedendo lugar pro marrom */
-
-/* ── seção 2 · defesa do uso de IA ── */
-
-/* ── seção 3 · o que a nó faz ── */
-
-/* ═══════════════════════════════════════════════════════════════════════
-   v5 · SEÇÃO "QUEM É A NÓ" — o miolo de conteúdo que a página não tinha.
-   Forma vinda da referência Prisma: título em blocos que sobem palavra a
-   palavra e um parágrafo que ACENDE letra a letra conforme a rolagem.
-   O que não veio junto: a fonte itálica serifada de ênfase (BRAND.md §3
-   proíbe outra fonte) — no lugar dela, a pílula sólida do §6.
-   ═══════════════════════════════════════════════════════════════════════ */
-/* a emenda bege → preto que antes saía do #hero: agora é esta seção que
-   faz fronteira com o #ia (a outra metade do degradê segue em #ia::before) */
-.qs-head{
-  font-family:var(--font);font-weight:var(--no-weight-titulo);
-  font-size:clamp(25px,3.5vw,47px);
-  /* entrelinha folgada de propósito: a pílula tem respiro vertical próprio e
-     com 1.08 ela encavalava nas linhas de cima e de baixo */
-  line-height:1.26;
-  letter-spacing:var(--no-tracking-headline);text-transform:uppercase;
-  color:var(--dark);max-width:19ch;margin:0 auto 40px;
-}
-/* cada palavra sobe do y+20 com atraso escalonado */
-.qs-head .w{
-  display:inline-block;opacity:0;transform:translateY(20px);
-  transition:opacity .5s ease,transform .5s cubic-bezier(.16,1,.3,1);
-}
-.qs-head.in .w{ opacity:1;transform:translateY(0) }
-.qs-body{
-  font-family:var(--font);font-weight:var(--no-weight-corpo);
-  font-size:clamp(15px,1.35vw,19px);line-height:1.8;
-  max-width:62ch;margin:0 auto;color:var(--dark);
-}
-/* cada caractere começa apagado e acende quando a rolagem chega nele */
-.qs-body .ch{ opacity:.16 }
-
-/* ── v5 · #ia · itens numerados no lugar dos emoji ──
-   número em JetBrains Mono é a "voz de engenharia" da marca (BRAND.md §5);
-   emoji não existe no sistema visual da nó. */
-
-/* ── v5 · #oquefaz · grade de cartões da referência Prisma ──
-   um painel de vídeo alto à esquerda + as quatro frentes em 2×2. Assim o
-   vídeo entra como cartão (igual à referência) sem sacrificar nenhuma das
-   quatro frentes, que lá não existiam. */
-
-/* ── fade entre seções: suaviza o corte duro na troca bege/estúdio ── */
-#platforms{ position:relative; padding-top:96px !important; padding-bottom:96px !important }
-
-/* as regras de fronteira do antigo #cta saíram com a seção (13/08) */
-
-/* ── CTA: formulário começa fechado — botão em dobro, centralizado dentro
-   da coluna direita (a coluna em si segue alinhada à direita na seção) ── */
-
-/* ── mascote (sprite sheet) — mesma mecânica do protótipo ── */
-#mascot{
-  position:fixed; left:0; top:0; z-index:60; pointer-events:none; opacity:0;
-  will-change:transform,filter; transform:translate3d(-999px,-999px,0);
-}
-#sprite{ width:100%; height:100%; background-repeat:no-repeat; image-rendering:auto }
-/* enquanto o dedo segura o mascote (ver o módulo `brinca` no script): nada de
-   seleção de texto nem de realce azul de toque acidental. O #mascot segue com
-   pointer-events:none de propósito — o alvo é testado na mão, pra não abrir um
-   buraco de 150x200px onde a rolagem morre quando ninguém quer brincar. */
-html.brincando, html.brincando *{
-  user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
-}
-html.brincando, html.brincando *{ cursor:grabbing!important }
-html.mascote-mira, html.mascote-mira body{ cursor:grab }
-#lines{ position:fixed; inset:0; z-index:55; pointer-events:none; opacity:0; transition:opacity .5s }
-#sizer{ position:absolute; left:-9999px; top:0; width:0; height:var(--mh); pointer-events:none }
-
-/* profundímetro — tinta escura translúcida, quase subliminar sobre o bege */
-.depth{
-  position:fixed; right:clamp(12px,2.4vw,30px); top:50%; transform:translateY(-50%);
-  z-index:70; pointer-events:none; opacity:0; transition:opacity .45s;
-  font-family:var(--font-mono); color:rgba(20,20,20,.5); text-align:right;
-}
-.depth b{ display:block; font-size:clamp(20px,2.6vw,32px); font-weight:600; letter-spacing:-.02em; font-variant-numeric:tabular-nums }
-.depth i{ display:block; font-style:normal; font-size:9px; letter-spacing:.2em; opacity:.7; margin-top:2px; text-transform:uppercase }
-.depth .ticks{ margin-top:12px; width:30px; height:110px; margin-left:auto; overflow:hidden; -webkit-mask-image:linear-gradient(transparent,#000 25%,#000 75%,transparent) }
-.depth .ticks div{ height:11px; border-top:1px solid rgba(20,20,20,.16); width:100% }
-.depth .ticks div:nth-child(odd){ width:60%; margin-left:auto }
-
-@media (prefers-reduced-motion: reduce){
-  #lines,.depth{ display:none !important }
-}
-
-/* ════════════════════════════════════════════════════════════
-   PAINEL DE CONTROLE — só existe em ?edit=1 ou tecla D
-   Uma pasta por seção da página (ver o bloco PAINEL DE CONTROLE
-   no JS, que é onde as pastas são declaradas).
-════════════════════════════════════════════════════════════ */
-#calibPanel{
-  position:fixed; right:16px; bottom:16px; z-index:9999;
-  width:300px; max-height:min(84vh,720px); overflow-y:auto;
-  background:rgba(20,20,20,.92); backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.12); border-radius:16px;
-  padding:16px; font-family:var(--font-mono); color:#fff;
-  box-shadow:0 24px 60px rgba(0,0,0,.4);
-  display:none;
-}
-#calibPanel.open{ display:block }
-#calibPanel h3{ font-size:11px; letter-spacing:.1em; text-transform:uppercase; margin:0; color:rgba(255,255,255,.5) }
-/* cabeçalho fixo: o painel é longo, o "fechar" não pode rolar pra fora */
-#calibPanel .cp-head{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  position:sticky; top:-16px; z-index:2; margin:-16px -16px 12px; padding:16px;
-  background:rgba(20,20,20,.96); border-radius:16px 16px 0 0;
-}
-#calibPanel .cp-x{ padding:4px 9px; line-height:1; font-size:12px }
-/* pastas recolhíveis — uma por seção; só a primeira abre por padrão */
-.cp-group{ margin-bottom:10px; border:1px solid rgba(255,255,255,.1); border-radius:8px; padding:4px 8px }
-.cp-group summary{
-  cursor:pointer; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
-  color:rgba(255,255,255,.65); padding:6px 2px; user-select:none;
-}
-.cp-group[open] summary{ color:#fff; margin-bottom:6px }
-/* divisórias DENTRO da pasta: textos · cores · respiro */
-#calibPanel .cp-sub{
-  font-size:9.5px; letter-spacing:.09em; text-transform:uppercase;
-  color:rgba(255,255,255,.42); margin:14px 0 7px;
-  padding-top:9px; border-top:1px solid rgba(255,255,255,.08);
-}
-#calibPanel .cp-nota{ font-size:10px; line-height:1.45; color:rgba(255,255,255,.42); margin:0 0 10px }
-#calibPanel .cp-row{ margin-bottom:10px }
-#calibPanel .cp-lbl{ display:flex; justify-content:space-between; font-size:10.5px; margin-bottom:4px; color:rgba(255,255,255,.85) }
-#calibPanel .cp-lbl b{ color:var(--blue); font-weight:600 }
-#calibPanel input[type=range]{ width:100%; accent-color:var(--blue) }
-#calibPanel .cp-actions{ display:flex; flex-wrap:wrap; gap:6px; margin:12px 0 }
-#calibPanel button{
-  font-family:var(--font-mono); font-size:10px; padding:7px 10px; border-radius:7px;
-  border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:#fff;
-  cursor:pointer; transition:background .2s;
-}
-#calibPanel button:hover{ background:rgba(255,255,255,.16) }
-#calibPanel .cp-check{ display:flex; align-items:center; gap:8px; font-size:11px; margin:10px 0; color:rgba(255,255,255,.85) }
-#calibPanel select{
-  width:100%; margin-bottom:10px; padding:6px 8px; border-radius:6px;
-  background:rgba(255,255,255,.1); color:#fff; font:inherit; font-size:11px;
-  border:1px solid rgba(255,255,255,.18);
-}
-#calibPanel input[type=number]{
-  width:64px; padding:1px 5px; border-radius:5px;
-  background:rgba(255,255,255,.1); color:#fff; font:inherit; font-size:10.5px;
-  border:1px solid rgba(255,255,255,.18);
-}
-/* blocos de texto realçados enquanto o modo de arrastar está ligado */
-html.txt-edit [data-txtk]{ outline:1px dashed rgba(61,240,200,.7); outline-offset:5px; cursor:grab }
-html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
-#calibPanel textarea{
-  width:100%; height:110px; margin-top:8px; font-family:var(--font-mono); font-size:9.5px;
-  background:rgba(0,0,0,.35); color:#8bcbac; border:1px solid rgba(255,255,255,.14); border-radius:8px; padding:8px;
-  resize:vertical;
-}
-#calibPanel textarea:focus{ outline:1.5px solid var(--blue) }
-#calibPanel .cp-color-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; font-size:10.5px; color:rgba(255,255,255,.85) }
-#calibPanel .cp-color-row input[type=color]{
-  width:36px; height:24px; padding:0; border:1px solid rgba(255,255,255,.2); border-radius:5px;
-  background:none; cursor:pointer;
-}
-
-/* ── textos editáveis — só fica ativo com o painel aberto (?edit=1 ou tecla D) ──
-   Com o painel aberto os blocos também ganham ALÇA DE REDIMENSIONAR (canto
-   inferior direito): arrasta pra alargar/encolher a janela do texto. */
-.lp-editable{ outline:1px dashed transparent; outline-offset:3px; border-radius:3px; transition:outline-color .15s; cursor:text }
-.lp-editable:hover{ outline-color:rgba(61,99,219,.55) }
-.lp-editable:focus{ outline:2px solid var(--blue); outline-offset:3px }
-.lp-editable[contenteditable="true"]{ resize:both; overflow:auto; max-width:none }
-
-/* ── convite de scroll na hero: "saiba mais" com seta quicando ── */
-@keyframes shBounce{ 0%,100%{ transform:translateY(-2px); opacity:.55 } 50%{ transform:translateY(4px); opacity:1 } }
-
-/* ═══════════════════════════════════════════════════════════════════════
-   v5.1 · #fluxo — SEÇÃO 2: os seis capítulos que se rolam de um fôlego só
-   Forma aprovada no Claude Design ("LP Nó × F+"): fundo preto contínuo,
-   cada capítulo em ~88vh, texto de um lado e uma "prova" animada do outro.
-   Tudo aqui é classe .fx-* justamente pra não colidir com as seções claras
-   (.section-title, .oq-*, .ia-*) que sobreviveram da v5.
-   Ordem: quem é a nó · feito com IA · agentes · dashboards · marketing ·
-   como usamos IA.  A queda do mascote cobre este bloco inteiro.
-   ═══════════════════════════════════════════════════════════════════════ */
-#fluxo{ background:var(--lp-preto); position:relative; --mid:rgba(255,255,255,.62) }
-/* emenda hero (bege) → fluxo (preto): metade do degradê aqui */
-#fluxo::before{
-  content:''; position:absolute; left:0; right:0; top:-1px; height:110px;
-  opacity:.4; pointer-events:none; z-index:3;
-  background:linear-gradient(var(--lp-bege), transparent);
-}
-.fx-sec{ position:relative; overflow:hidden; box-sizing:border-box; padding:80px 6vw }
-/* capítulo invertido: a prova vem à esquerda, o texto à direita */
-@media(max-width:900px){
-  /* minmax(0,1fr), NUNCA 1fr: "1fr" é minmax(auto,1fr), e aí o min-content do
-     filho manda na largura da coluna. Com a pílula de destaque em nowrap isso
-     esticava a coluna pra 441px dentro de um viewport de 386px — o
-     overflow-x:hidden do body só escondia o estrago em vez de evitá-lo. */
-  /* no empilhamento o texto sempre vem antes da prova */
-}
-
-/* (as palavras-fantasma de contorno no fundo dos capítulos saíram em 14/08 —
-   competiam com o texto e sujavam o preto) */
-.fx-lbl{
-  display:inline-flex; align-items:center; gap:10px;
-  font-family:var(--font-mono); font-size:11px; font-weight:500;
-  letter-spacing:var(--no-tracking-label); text-transform:uppercase;
-}
-@keyframes fxCaret{ 0%,49%{ opacity:1 } 50%,100%{ opacity:0 } }
-.fx-h2{
-  margin:20px 0 22px; font-family:var(--font); font-weight:var(--no-weight-titulo);
-  font-size:clamp(30px,3.6vw,58px); line-height:1.28;
-  letter-spacing:var(--no-tracking-headline); text-transform:uppercase; color:#fff;
-}
-.fx-p{
-  margin:0; max-width:560px; font-family:var(--font);
-  font-size:15.5px; font-weight:var(--no-weight-corpo); line-height:1.8;
-  color:rgba(255,255,255,.62);
-}
-.fx-meta{
-  margin-top:24px; font-family:var(--font-mono); font-size:12px;
-  letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.38);
-}
-.fx-more{
-  display:inline-block; margin-top:24px; background:none; border:0; padding:0; cursor:pointer;
-  font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
-  transition:opacity .2s;
-}
-.fx-more:hover{ opacity:.7 }
-/* destaque = a MESMA pílula sólida do "quase ninguém fica" (.qs-pill), só que
-   na cor do capítulo (--mk, inline). A faixa translúcida de marca-texto que
-   estava aqui saiu em 14/08: sobre o preto ela virava um borrão marrom.
-   box-decoration-break:clone pra pílula quebrar direito em duas linhas. */
-
-/* ── provas: cartão genérico ── */
-.fx-tag{ font-family:var(--font-mono); font-size:10px; letter-spacing:.18em; text-transform:uppercase }
-.fx-note{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:10px; color:rgba(255,255,255,.4) }
-@keyframes fxBlink{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
-
-/* ── prova 1: terminal "o que dá pra fazer com IA" ── */
-.fx-term-path{ margin-left:10px; font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,.45) }
-.fx-term-body{
-  padding:22px 22px 26px; font-family:var(--font-mono);
-  font-size:clamp(11px,.92vw,12.5px); line-height:2.1; color:rgba(255,255,255,.82);
-}
-.fx-term-body .pr{ color:#6B6F76 }
-.fx-term-body > div{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
-/* seis linhas com entrada escalonada num ciclo de 14s (step-end: o terminal
-   "imprime", não desliza) */
-@keyframes fxT1{ 0%,3%{opacity:0} 4%,95%{opacity:1} 99%,100%{opacity:0} }
-@keyframes fxT2{ 0%,15%{opacity:0} 16%,95%{opacity:1} 99%,100%{opacity:0} }
-@keyframes fxT3{ 0%,29%{opacity:0} 30%,95%{opacity:1} 99%,100%{opacity:0} }
-@keyframes fxT4{ 0%,43%{opacity:0} 44%,95%{opacity:1} 99%,100%{opacity:0} }
-@keyframes fxT5{ 0%,57%{opacity:0} 58%,95%{opacity:1} 99%,100%{opacity:0} }
-@keyframes fxT6{ 0%,73%{opacity:0} 74%,95%{opacity:1} 99%,100%{opacity:0} }
-
-/* colunas "marketing / programação" do capítulo 1 */
-.fx-two-hd{
-  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
-  padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,.12);
-}
-.fx-list{ margin:12px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:9px }
-.fx-list li{ font-family:var(--font); font-size:13.5px; line-height:1.5; color:rgba(255,255,255,.75) }
-
-/* ── prova 2: conversa de trabalho com os agentes ──
-   A thread ACUMULA (não é balão que pisca): as mensagens entram uma a uma e
-   ficam, e o container rola pra cima quando enche — é isso que faz parecer
-   conversa. Quem marca o compasso é o JS (fxChatInit); o CSS só define os
-   dois estados. */
-/* Altura LIVRE (14/08). Com janela fixa de 326px a thread (524px) rolava pra
-   cima e as três primeiras trocas sumiam antes de alguém chegar nelas — a
-   seção prometia uma conversa e entregava o fim dela. Agora o cartão tem a
-   altura da conversa inteira: os slots já nascem reservados, então cada balão
-   acende no lugar, sem reflow, e nada nunca sai de quadro. */
-.fx-msg-in{
-  align-self:flex-start; max-width:80%; background:rgba(255,255,255,.07);
-  border-radius:4px 14px 14px 14px; padding:10px 14px;
-  font-family:var(--font); font-size:13.5px; line-height:1.55; color:rgba(255,255,255,.85);
-}
-.fx-msg-out{
-  align-self:flex-end; max-width:86%; background:color-mix(in srgb, var(--green) 16%, transparent);
-  border:1px solid color-mix(in srgb, var(--green) 40%, transparent);
-  border-radius:14px 4px 14px 14px; padding:10px 14px;
-  font-family:var(--font); font-size:13.5px; line-height:1.55; color:rgba(255,255,255,.88);
-}
-/* a "chamada de ferramenta": mostra QUAL agente pegou o pedido — é o que tira
-   a seção do lugar de chatbot de atendimento */
-.fx-tool{
-  align-self:flex-end; display:inline-flex; align-items:center; gap:8px;
-  padding:5px 12px; border-radius:100px; border:1px dashed rgba(255,255,255,.22);
-  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em;
-  color:rgba(255,255,255,.5);
-}
-.fx-tool i{ width:5px; height:5px; border-radius:50%; background:var(--green); flex-shrink:0; animation:fxBlink 1.4s ease-in-out infinite }
-.fx-chat-done{ align-self:center; margin-top:4px }
-.fx-chat-done span{
-  display:inline-block; border:1px solid color-mix(in srgb, var(--green) 50%, transparent);
-  border-radius:100px; padding:6px 16px; font-family:var(--font-mono);
-  font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--green);
-}
-
-/* ── prova 3: painel de segunda de manhã ── */
-.fx-kpi-lbl{ font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4) }
-.fx-kpi-num{ font-family:var(--font); font-weight:var(--no-weight-titulo); font-size:40px; color:#fff; margin-top:4px; line-height:1 }
-.fx-kpi-delta{ display:inline-flex; align-items:center; gap:6px; margin-top:6px; font-family:var(--font-mono); font-size:11px; color:var(--green) }
-@keyframes fxSpark{ 0%{ stroke-dashoffset:240 } 55%,100%{ stroke-dashoffset:0 } }
-@keyframes fxBar{ 0%{ transform:scaleY(.3) } 100%{ transform:scaleY(1) } }
-
-/* ── prova 4: a conferência painel × extrato ──
-   Sem gráfico: o que a seção promete é que os dois números batem, então a
-   peça é o próprio fechamento, linha a linha. Números em mono, alinhados
-   à direita, como saem de um sistema — não como saem de um infográfico. */
-/* migalha do funil: uma linha, no lugar das quatro barras */
-.fx-trail{
-  display:flex; align-items:center; flex-wrap:wrap; gap:8px 10px; margin-top:18px;
-  font-family:var(--font-mono); font-size:11px; color:rgba(255,255,255,.5);
-}
-.fx-trail i{ font-style:normal; color:rgba(255,255,255,.34) }
-.fx-trail b{ color:rgba(255,255,255,.22); font-weight:400 }
-.fx-trail .on{ color:var(--green) } .fx-trail .on i{ color:color-mix(in srgb, var(--green) 62%, transparent) }
-.fx-led-k{ font-family:var(--font); font-size:13.5px; color:rgba(255,255,255,.78) }
-.fx-led-a,.fx-led-b{ font-family:var(--font-mono); font-size:13px; color:rgba(255,255,255,.62); text-align:right; font-variant-numeric:tabular-nums }
-.fx-led-b{ color:#fff }
-/* os ✓ acendem um a um na entrada — a única animação que sobrou, e ela
-   significa alguma coisa: é a conferência acontecendo */
-@media(max-width:520px){
-  .fx-led-a,.fx-led-b{ font-size:11.5px }
-}
-.fx-capi{ display:flex; align-items:center; gap:12px; margin-top:20px }
-@keyframes fxMarch{ to{ background-position:22px 0 } }
-.fx-capi span{ font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.4) }
-
-/* ── capítulo 0 (quem é a nó) e 5 (como usamos IA): blocos centrados ── */
-
-/* ── "como usamos IA": o log da nossa própria operação ──
-   Linha por linha, em mono, com a última REPROVADA. Nada de cards: a lista é
-   a prova, e o item riscado é o que impede que ela vire vitrine. */
-.fx-log-t{ font-family:var(--font); font-size:15px; color:#fff; line-height:1.45 }
-.fx-log-m{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:rgba(255,255,255,.36); text-align:right }
-@media(max-width:640px){
-  .fx-log-m{ grid-column:2; text-align:left }
-}
-.fx-log-foot{
-  margin:30px auto 0; max-width:680px; font-family:var(--font);
-  font-size:15px; font-weight:var(--no-weight-corpo); line-height:1.75; color:rgba(255,255,255,.62);
-}
-.fx-log-foot strong{ color:#fff; font-weight:600 }
-
-/* stats do capítulo 0: o #stats existe desde a v2 (main.js observa esse id
-   pra disparar os contadores) e vinha escondido — aqui ele volta a aparecer,
-   agora dentro do fluxo, sem a faixa preta de borda a borda da v2 */
-#fluxo #stats{
-  display:flex!important; flex-wrap:wrap; justify-content:center;
-  gap:clamp(24px,4vw,56px); margin-top:52px; background:none;
-}
-/* o 3º item é o gráfico de receita incremental: número em cima, curva embaixo
-   como faixa própria — atrás do número a linha cortava o texto no meio */
-
-/* ── neutralização das regras da v5 que assumiam a ORDEM ANTIGA das seções ──
-   #quemsomos e #ia eram seções soltas (bege e preta) com degradês próprios de
-   fronteira; agora as duas são capítulos DENTRO do #fluxo, que já pinta o
-   preto contínuo e cuida das emendas. Só as bordas mudam — o conteúdo delas
-   (inclusive a animação letra a letra do #qsBody) segue igual. */
-/* último capítulo do fluxo: respiro grande embaixo. O CTA final tem o mesmo
-   preto, então sem esse vão o "como usamos IA" e o CTA leem como uma seção
-   só. As duas metades do intervalo ficam uma em cada seção pra continuarem
-   ajustáveis separadamente pelo "Respiro" do painel. */
-#fluxo #ia{ background:none; padding-top:120px; padding-bottom:180px }
-#fluxo #ia::before,#fluxo #ia::after{ display:none }
-#fluxo .qs-head{ color:#fff; max-width:22ch; margin-bottom:26px }
-#fluxo .qs-body{ color:#fff; max-width:64ch }
-
-/* ── emendas da ordem (14/08, revista quando as ferramentas subiram) ──
-   hero(bege) → fluxo(preto) → FERRAMENTAS(bege) → cta final(preto) →
-   diagnóstico(bege) → footer(preto).
-   O que mudou: o #platforms deixou de ser a última seção e passou a viver
-   ENTRE dois pretos. Ganhou com isso — o vizinho de cima agora é sempre o
-   preto do #fluxo, chova ou faça sol, então a rampa do topo não depende mais
-   do estado da porta do diagnóstico (a regra que a desligava com
-   html.diag-aberto saiu junto). */
-#platforms{ position:relative; overflow:hidden }
-/* ── FIO CLARO NAS DUAS EMENDAS ──
-   As duas bordas das ferramentas caem em pixel FRACIONÁRIO (medido: 5695.734
-   e 6218.516). Quando isso acontece, a última linha de cada seção é composta
-   com o que está ATRÁS dela — e atrás é o body, que é bege (#E2D8CF). Nas
-   duas emendas o que encosta é preto com preto (o gradiente das ferramentas
-   fecha em preto dos dois lados, e os vizinhos são o #fluxo e o #ctafinal),
-   então o bege do body aparece no meio como um fio claro.
-   O -1px de sangria que os pseudo-elementos já tinham não resolve: o
-   overflow:hidden da seção corta justamente essa sangria.
-   Um pixel de sobreposição fecha a fresta. Os dois são position:relative, e
-   irmão posterior pinta por cima, então cada um cobre a borda do anterior. */
-#platforms{ margin-top:-1px }
-
-/* Rampa QUENTE, não neutra: preto → bege em linha reta passa por um cinza
-   morto no meio. Passando pelos marrons da marca (a mesma família do estúdio
-   do "Senta aí"), a emenda vira anoitecer em vez de sujeira. */
-#platforms::before{
-  content:''; position:absolute; left:0; right:0; top:-1px; height:150px;
-  pointer-events:none; z-index:1;
-  background:linear-gradient(to bottom,
-    var(--lp-preto) 0%, #241C16 24%, #56463A 52%, #9E8E7E 76%, var(--lp-bege) 100%);
-}
-
-/* o degradê do topo é uma camada por cima da seção — sem isto o rótulo e o
-   título das ferramentas nascem lavados por baixo dele */
-#platforms .plat-hdr{ position:relative; z-index:2 }
-/* ferramentas(bege) → cta final(preto). Antes esta rampa levava ao rodapé,
-   que é uma faixa fina; agora ela entrega numa seção preta de tela inteira,
-   e a emenda pesa mais no olho. Por isso ela fecha de verdade (opacidade 1)
-   em vez dos .4 de antes, e é mais alta: o preto do CTA começa a nascer
-   ainda dentro do bege, como o topo faz do outro lado. */
-#platforms::after{
-  content:''; position:absolute; left:0; right:0; bottom:-1px; height:150px;
-  pointer-events:none; z-index:1;
-  background:linear-gradient(to bottom,
-    transparent 0%, #9E8E7E 30%, #56463A 58%, #241C16 80%, var(--lp-preto) 100%);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   MOBILE (≤640px) — mesma página, não uma página menor.
-   O que muda aqui é só o que a medição num viewport de 386px mostrou
-   quebrado; o resto já se vira sozinho com as grades fluidas.
-   ═══════════════════════════════════════════════════════════════════════ */
-@media(max-width:640px){
-  /* respiro: os 120/180px de topo e base dos capítulos centrados foram
-     calibrados no desktop e no celular viram tela em branco */
-  #fluxo #ia{ padding:84px 24px 110px }
-
-  /* MARGEM DIREITA (14/08) — a pílula de destaque tem white-space:nowrap pra
-     não partir em pedaços ("o seu?" virava um "o" solto numa linha). Em 390px
-     a frase mais longa do #fluxo, "fecham com o caixa", mede 363px numa
-     coluna de 342 e vazava 21px pra fora: era a ÚNICA seção da página
-     estourando a margem (medido elemento a elemento, o resto está em 24px).
-     Aqui ela volta a quebrar — box-decoration-break:clone, que já está
-     ligado, desenha cada linha como uma pílula inteira, que é exatamente o
-     propósito dele. */
-
-  /* "SAIBA MAIS" COM PESO DE BOTÃO (14/08) — era texto mono de 12px sem
-     moldura. No celular cada capítulo ocupa a tela toda, e o chamado sumia no
-     rodapé do bloco: a seção acabava sem nada pedindo o próximo passo.
-     A borda usa currentColor de propósito — cada capítulo já traz a própria
-     cor num style inline (--red/--green/--blue/--yellow), então a pílula
-     herda o acento do capítulo sem precisar de uma regra por cor.
-     min-height:46px é alvo de toque (a WCAG pede 44). */
-  .fx-more{
-    display:inline-flex; align-items:center; gap:9px;
-    margin-top:28px; padding:0 22px; min-height:46px;
-    border:1.5px solid currentColor; border-radius:999px;
-    font-size:12.5px; letter-spacing:.12em;
-    background:transparent;
-    background:color-mix(in srgb, currentColor 14%, transparent);
-  }
-
-  /* TERMINAL — o sufixo ("· 12 min", "· 6 dias") é o desfecho de cada linha,
-     e com nowrap+ellipsis ele era exatamente o que sumia: das 7 linhas, 6
-     passavam de 277px visíveis. Aqui elas quebram, com recuo pendente pra
-     continuação alinhar sob o comando e não sob o "$". */
-  .fx-term-body{ font-size:10.5px; line-height:1.85; padding:18px 15px 20px }
-  .fx-term-body > div{
-    white-space:normal; overflow:visible; text-overflow:clip;
-    padding-left:13px; text-indent:-13px;
-  }
-
-  /* CONFERÊNCIA — com 63px a coluna do nome quebrava "Google Ads" em duas
-     linhas. Números um pouco menores devolvem ~35px pro rótulo. */
-  .fx-led-a,.fx-led-b{ font-size:11px }
-  /* o total em 15px estourava os 74px e quebrava "R$ 41.240" em duas linhas */
-  .fx-led-k{ font-size:12.5px }
-
-  /* provas: nada de altura fixa nem número gigante espremido */ .fx-kpi-num{ font-size:32px }
-  .fx-msg-in,.fx-msg-out{ max-width:92% }
-
-  /* CONVERSA DOS AGENTES — A JANELA VOLTA A SER JANELA (14/08).
-     Em 14/08 a altura fixa foi removida pra que nenhum balão saísse de quadro,
-     e o cartão passou a ter a altura da conversa inteira. No desktop isso
-     coube; em 390x844 virou um cartão de 831px — a seção toda foi pra 1772px,
-     mais de dois telefones. E como a cadência leva ~18s pra encher (1800ms
-     por pedido, 1500 pelo chip do agente, 2600 pela resposta), o que se vê ao
-     chegar é um retângulo preto quase vazio: lê-se como página carregando,
-     não como conversa.
-     Com a janela de volta, o primeiro balão já ocupa parte visível do quadro e
-     a thread rola sozinha — o rolar() do script existe exatamente pra isso e
-     estava órfão desde que a altura saiu.
-     O medo de 14/08 (perder as primeiras trocas) não se aplica mais: o
-     IntersectionObserver REINICIA a conversa do primeiro balão toda vez que a
-     seção entra em quadro, então ninguém pega o meio. */
-  .fx-msg-in,.fx-msg-out{ font-size:12.5px; line-height:1.45; padding:8px 12px }
-  .fx-tool{ font-size:10px; padding:4px 10px }
-
-  /* PROFUNDÍMETRO FORA DO CELULAR (14/08). Ele é position:fixed no meio da
-     borda direita: no desktop sobra corredor pra ele, no celular ele cai em
-     cima do conteúdo — apareceu por cima do cartão dos agentes. Numa tela de 390px não há margem pra um elemento decorativo
-     flutuando, então ele fica só onde tem espaço. */
-  .depth{ display:none }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .fx-tool i{ animation:none!important }
-  /* a thread inteira aparece de uma vez, sem encenação */
-}
-</style>
-<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/historia.css?v=62">
-<!-- Kalam (só a anotação à mão do formulário, no fim da página): não bloqueia a pintura -->
+<nav class="no-card-nav" aria-label="Navegação principal"><div class="no-card-top"><button class="no-card-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="no-card-panel"><span></span><span></span></button><a class="no-card-brand" href="/" aria-label="Nó — página inicial"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="46" height="30"></a><div class="no-card-toplinks"><a href="/" aria-current="page">Home</a><a href="/agencia/">Agência</a><a href="/contato/">Contato</a></div></div><div id="no-card-panel" class="no-card-panel" aria-hidden="true" inert><div class="no-card-panel-inner"><div class="no-card-grid"></div></div></div></nav>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400&display=swap" media="print" onload="this.media='all'">
-<link rel="stylesheet" href="/lp-narrador/cenas-lp/historia/v8.css?v=17">
-<!-- HERO -->
+<main id="conteudo">
 <section id="hero">
-  <!-- Fundo em vídeo, avançado/retrocedido pelo movimento horizontal do mouse.
-       Sem autoplay de propósito: quem controla o tempo é o cursor.
-       Enquanto o arquivo não existir, o gradiente + orbs abaixo seguem valendo. -->
   <div class="hero-stage">
     <div class="hero-backdrop"></div>
-    <!-- Mascote encostado na parede, virando a cabeça, em loop contínuo
-         (palíndromo: o clipe roda pra frente e volta, emenda exata).
-         O fundo do palco reproduz a parede e o chão DESTE vídeo, então ele
-         não é uma imagem colada num canto: é a continuação do mesmo espaço. -->
-    <!-- O PÔSTER é o maior elemento da primeira tela (o LCP): ele vem com
-         prioridade alta (preload no <head>) e o vídeo só começa a descer
-         depois do load — ver "vídeo da hero" no fim da página. -->
-    <video class="hero-video" poster="/lp-narrador/cenas-lp/assets/video/hero-parede.jpg"
+    <img class="hero-video hero-poster" srcset="/lp-narrador/cenas-lp/assets/video/hero-parede-mobile.webp 480w, /lp-narrador/cenas-lp/assets/video/hero-parede.webp 740w" sizes="(max-width:768px) calc(100vw - 32px), 44vw" src="/lp-narrador/cenas-lp/assets/video/hero-parede.webp" alt="" width="740" height="990" fetchpriority="high" decoding="async">
+<video class="hero-video hero-motion" poster="/lp-narrador/cenas-lp/assets/video/hero-parede.webp"
            loop muted playsinline preload="none" aria-hidden="true">
       <source src="/lp-narrador/cenas-lp/assets/video/hero-parede.mp4" type="video/mp4">
     </video>
     <div class="hero-scrim" aria-hidden="true"></div>
     <div class="hero-grain" aria-hidden="true"></div>
-
     <div class="hero-foot">
       <div class="hero-left">
         <img class="hero-mark h-rise" style="animation-delay:.2s"
              src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="1633" height="964">
-        <!-- slogan = o H1 da página (o assunto principal pro Google).
-             Entra logo depois que a hero pinta — ver o script do slogan no fim. -->
-        <h1 class="hero-slogan" id="heroSlogan">
-          <span>Sistemas, aplicativos</span>
-          <span>e painéis sob medida</span>
-          <span>para empresas.</span>
-        </h1>
+        <p class="hero-eyebrow">Sistemas e aplicativos sob medida</p>
+        <h1 class="hero-slogan" id="heroSlogan">Sistemas e aplicativos feitos sob sua medida, para você, para sua empresa ou para seus clientes.</h1>
       </div>
       <div class="hero-right">
-        <!-- o preço mora aqui, na primeira dobra: quem chega por busca ou anúncio
-             precisa ver o que custa começar antes de rolar -->
-        <p class="hero-desc h-rise" style="animation-delay:.62s"><strong class="hero-preco">Roadmap + protótipo em até 3 dias
-        por R$&nbsp;149,90.</strong> Você recebe o plano, um protótipo para testar e 3 opções de construção,
-        com prazo e valor.</p>
+        <p class="hero-desc h-rise" style="animation-delay:.2s">Transforme planilhas e processos repetitivos em um sistema feito sob suas necessidades e preferências.</p>
+        <ul class="hero-benefits"><li>Protótipo em 3 dias</li><li>App único de acompanhamento</li><li>Você manda os ajustes, nós desenvolvemos.</li></ul>
         <a href="#diagnostico" id="heroCtaBtn" class="pill-cta h-rise" style="animation-delay:.82s"
-           onclick="abrirDiagnostico({origem:'hero'});return false">Comprar diagnóstico
+           onclick="abrirDiagnostico({origem:'hero'});return false">Quero tirar minha ideia do papel
           <span class="pill-cta-circle" aria-hidden="true">→</span>
-        </a>
+        </a><p class="hero-response">Pare de gastar créditos no Lovable e tempo útil no ChatGPT. Profissionalize a sua ideia.</p>
       </div>
     </div>
   </div>
 </section>
-
-<!-- ══════════════════════════════════════════════════════════════════════
-     LP v8 (18/09/2026) · o que é → ferramentas → como funciona → app →
-     editor → cronograma → clientes → formulário.
-     #fluxo continua envolvendo o miolo: a queda do mascote começa nele e
-     termina em #ctafinal (logo antes do formulário).
-     CSS: historia/v8.css · JS: historia/v8.js (galerias, fluxograma, app,
-     cronograma) · editor: historia.js · cenas 3D: cenas3d.js.
-     ══════════════════════════════════════════════════════════════════════ -->
 <div id="fluxo">
-
-<!-- 02 · O QUE É A NÓ -->
-<section id="o-que-e" class="fx-sec v8-sec v8-claro" data-etapa="o-que-e">
-  <div class="v8-in v8-split">
-    <div class="v8-col">
-      <p class="v8-k reveal">o que é a nó</p>
-      <h2 class="v8-h reveal reveal-d1">A Nó cria o sistema que a sua empresa usa no dia a dia.</h2>
-      <p class="v8-p reveal reveal-d2">Sistema é uma ferramenta digital feita sob medida para o seu negócio. A gente planeja, desenha e constrói. Você acompanha tudo por um app, do primeiro dia até a entrega.</p>
-      <ul class="v8-servicos reveal reveal-d3">
-        <li><i style="--c:var(--blue)"></i><b>Sites</b><span>A página da sua empresa na internet, com formulário, agenda ou loja.</span></li>
-        <li><i style="--c:var(--yellow)"></i><b>Apps</b><span>Um aplicativo para os seus clientes ou a sua equipe usarem no celular.</span></li>
-        <li><i style="--c:var(--green)"></i><b>Painéis</b><span>Uma tela que junta pedidos, vendas e números da empresa num lugar só.</span></li>
-      </ul>
-      <!-- links de texto para as páginas de serviço (SEO: cada serviço tem URL própria) -->
-      <p class="v8-p v8-links-serv reveal reveal-d3">Veja cada serviço: <a href="/sistemas-sob-medida/">sistemas sob medida</a>, <a href="/desenvolvimento-de-aplicativos/">aplicativos</a>, <a href="/paineis-empresariais/">painéis</a> e <a href="/integracoes-e-automacoes/">integrações</a>.</p>
-    </div>
-    <figure class="hs-palco hs-palco-3d v8-palco-3d reveal reveal-d1" id="cenaIdeia" data-zoom=".86" aria-label="Animação: as informações soltas de uma empresa se organizam num plano">
-      <div class="hs-cena"><canvas class="hs-canvas" aria-hidden="true"></canvas></div>
-      <div class="hs-palco-rot" data-fases="sua ideia sendo organizada|ideia organizada"><i></i>sua ideia sendo organizada</div>
-      <figcaption class="hs-palco-leg"><span>o problema</span><span>quem usa</span><span>onde trava</span><span>ferramentas</span><span>prioridades</span></figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- 03 · FERRAMENTAS — galeria curva, 2 linhas em sentidos opostos -->
 <section id="ferramentas" class="fx-sec v8-sec v8-branco v8-sec-galeria" data-etapa="ferramentas">
   <div class="v8-in v8-topo-centro">
     <p class="v8-k reveal">ferramentas que já conectamos</p>
     <h2 class="v8-h reveal reveal-d1">Seu sistema conversa com o que você já usa.</h2>
     <p class="v8-p reveal reveal-d2">WhatsApp, planilhas, pagamentos, agenda, e-mail. Estas são as ferramentas que já ligamos aos sistemas que entregamos.</p>
   </div>
-  <div class="v8-galeria reveal reveal-d2" data-galeria="ferramentas" data-linha="0" data-curva="-1" aria-label="Ferramentas, linha 1"></div>
-  <div class="v8-galeria reveal reveal-d3" data-galeria="ferramentas" data-linha="1" data-curva="1" data-sentido="-1" aria-label="Ferramentas, linha 2"></div>
+  <div class="v8-galeria reveal reveal-d2" data-galeria="ferramentas" data-linha="0" data-curva="-1" role="group" aria-label="Ferramentas, linha 1"></div>
+  <div class="v8-galeria reveal reveal-d3" data-galeria="ferramentas" data-linha="1" data-curva="1" data-sentido="-1" role="group" aria-label="Ferramentas, linha 2"></div>
 </section>
-
-<!-- 04 · COMO FUNCIONA — fluxograma animado pela rolagem -->
-<section id="como-funciona" class="fx-sec v8-sec v8-escuro" data-etapa="como-funciona">
-  <div class="v8-in v8-topo-centro">
-    <p class="v8-k reveal">como funciona</p>
-    <h2 class="v8-h reveal reveal-d1">Do diagnóstico à entrega, em 7 passos.</h2>
-    <p class="v8-p reveal reveal-d2">Você começa pagando só o <a href="/diagnostico-de-sistema/">diagnóstico de sistema</a>: R$ 149,90. Ele inclui o roadmap (o plano), um protótipo para testar e 3 opções de como construir. A partir daí, cada passo tem prazo.</p>
-  </div>
-
-  <div class="v8-fluxo" id="v8Fluxo">
-    <svg class="v8-fluxo-fio" aria-hidden="true" preserveAspectRatio="none"><path class="v8-fio-base"/><path class="v8-fio-cheio"/></svg>
-    <i class="v8-fluxo-ponto" aria-hidden="true"></i>
-    <ol class="v8-passos">
-      <li class="v8-passo" data-cor="azul">
-        <span class="v8-n">01</span>
-        <div class="v8-card">
-          <small class="v8-quando">hoje</small>
-          <h3>Você compra o diagnóstico de sistema</h3>
-          <p>R$ 149,90, por Pix ou cartão, direto no formulário desta página.</p>
-          <ul class="v8-inclui"><li>plano do passo a passo</li><li>protótipo para testar</li><li>3 opções de construção</li></ul>
-        </div>
-      </li>
-      <li class="v8-passo" data-cor="vermelho">
-        <span class="v8-n">02</span>
-        <div class="v8-card">
-          <small class="v8-quando">dia 1</small>
-          <h3>A gente te chama no WhatsApp</h3>
-          <p>Conversamos para entender a ideia e pedimos as suas referências: a marca da empresa e sites ou apps que você gosta.</p>
-        </div>
-      </li>
-      <li class="v8-passo" data-cor="ambar">
-        <span class="v8-n">03</span>
-        <div class="v8-card">
-          <small class="v8-quando">até o dia 3</small>
-          <h3>Você recebe o acesso ao app da Nó</h3>
-          <p>Lá estão o plano, o protótipo para clicar e as 3 opções, cada uma com o que entra, prazo e valor.</p>
-        </div>
-      </li>
-      <li class="v8-passo v8-decisao" data-cor="verde">
-        <span class="v8-n">04</span>
-        <div class="v8-card">
-          <small class="v8-quando">15 dias para decidir</small>
-          <h3>Você escolhe qual opção seguir</h3>
-          <p>Teste o protótipo com calma, mostre para quem trabalha com você e escolha uma das 3 opções.</p>
-          <div class="v8-opcoes" aria-label="As 3 opções">
-            <span style="--c:var(--blue)">Básico</span><span style="--c:var(--yellow)">Essencial</span><span style="--c:var(--green)">Completo</span>
-          </div>
-          <p class="v8-nota">Se decidir não seguir, o plano e o protótipo continuam seus.</p>
-        </div>
-      </li>
-      <li class="v8-passo" data-cor="azul">
-        <span class="v8-n">05</span>
-        <div class="v8-card">
-          <small class="v8-quando">30 dias</small>
-          <h3>A gente divide o trabalho e constrói</h3>
-          <p>A opção escolhida vira uma lista de tarefas com datas. Você vê no app o que está pronto, o que está sendo feito e o que vem depois.</p>
-        </div>
-      </li>
-      <li class="v8-passo" data-cor="vermelho">
-        <span class="v8-n">06</span>
-        <div class="v8-card">
-          <small class="v8-quando">primeira versão pronta</small>
-          <h3>O editor é liberado para você</h3>
-          <p>Com a primeira versão no ar, você mesmo muda textos, cores e tamanhos, e manda os ajustes para a Nó aplicar.</p>
-        </div>
-      </li>
-      <li class="v8-passo v8-fim" data-cor="ambar">
-        <span class="v8-n">07</span>
-        <div class="v8-card">
-          <small class="v8-quando">fim dos 30 dias</small>
-          <h3>Entrega</h3>
-          <p>O sistema fica pronto, funcionando e no nome da sua empresa.</p>
-        </div>
-      </li>
-    </ol>
-  </div>
-
-  <div class="v8-in v8-cta-linha reveal">
-    <a href="#diagnostico" class="pill-cta hs-cta v8-cta-cinza" data-cta="como_funciona" onclick="abrirDiagnostico({origem:'como_funciona'});return false">Começar pelo diagnóstico
-      <span class="pill-cta-circle" aria-hidden="true">→</span>
-    </a>
-  </div>
-</section>
-
-<!-- 05 · O APP — réplica do painel do cliente (app.notechstack.com.br) -->
-<section id="app" class="fx-sec v8-sec v8-claro" data-etapa="app">
-  <div class="v8-in v8-split v8-split-largo">
-    <div class="v8-col">
-      <p class="v8-k reveal">o app da nó</p>
-      <h2 class="v8-h reveal reveal-d1">Tudo do seu projeto num lugar só.</h2>
-      <p class="v8-p reveal reveal-d2">Ao comprar o diagnóstico, você ganha um acesso próprio ao app da Nó. É por ele que você recebe as entregas e acompanha o andamento. Ao lado, o exemplo de uma loja online.</p>
-      <ul class="v8-abas-lista reveal reveal-d3" id="v8AppLista">
-        <li><button type="button" data-aba="0" aria-pressed="true"><b>Como funciona</b><span>As 3 opções, do Básico ao Completo: o que cada uma entrega, as ferramentas usadas, o valor da implementação e a mensalidade.</span></button></li>
-        <li><button type="button" data-aba="1" aria-pressed="false"><b>Protótipo</b><span>Uma versão de teste do seu sistema. Dá para clicar e navegar como se já estivesse pronto.</span></button></li>
-        <li><button type="button" data-aba="2" aria-pressed="false"><b>Etapas</b><span>As tarefas do projeto em três colunas: a fazer, em andamento e concluído.</span></button></li>
-      </ul>
-      <p class="v8-nota-clara reveal reveal-d4">A mensalidade cobre o suporte da Nó e o custo das plataformas que o sistema usa, como hospedagem, inteligência artificial e anúncios.</p>
-    </div>
-    <figure class="hs-palco hs-palco-ui v8-palco-app reveal reveal-d1" aria-label="Demonstração do app da Nó com o caso de uma loja online">
+<section id="como-funciona" class="fx-sec v8-sec home-processo" data-etapa="como-funciona">
+  <div class="v8-in">
+    <header class="home-processo-topo"><p class="v8-k">como funciona</p><h2 class="v8-h">Da ideia ao sistema. Juntos.</h2><p>Navegue pelos cards abaixo - entenda como funciona nosso fluxo de trabalho.</p></header>
+    <div class="home-stepper" role="tablist" aria-label="Etapas do projeto">
+<button type="button" role="tab" id="passo-app" aria-controls="app" aria-selected="true" tabindex="0"><span class="home-step-number">1</span><span class="home-step-card"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="M7 3h8l5 5v17H7zM15 3v6h5M11 14h5M11 19h5"/></svg><b>Planeje</b></span></button>
+<button type="button" role="tab" id="passo-cronograma" aria-controls="cronograma" aria-selected="false" tabindex="-1"><span class="home-step-number">2</span><span class="home-step-card"><svg viewBox="0 0 30 30" aria-hidden="true"><rect x="5" y="6" width="18" height="20" rx="2"/><path d="M10 6V3h8v3M9 13h10M9 18h10M9 23h6"/></svg><b>Acompanhe</b></span></button>
+<button type="button" role="tab" id="passo-editor" aria-controls="editor" aria-selected="false" tabindex="-1"><span class="home-step-number">3</span><span class="home-step-card"><svg viewBox="0 0 30 30" aria-hidden="true"><path d="m6 22 1-6L20 3l5 5-13 13-6 1zM17 6l5 5M5 27h20"/></svg><b>Ajuste</b></span></button>
+</div><div class="home-stage">
+<div id="app" class="home-step-panel" role="tabpanel" aria-labelledby="passo-app" tabindex="0"><p class="home-step-caption">Em 3 dias te enviamos um roadmap, um protótipo navegável e as etapas de desenvolvimento.</p><figure class="hs-palco hs-palco-ui v8-palco-app" aria-label="Demonstração do app da Nó com o caso de uma loja online">
       <div class="v8-app" id="v8App">
         <div class="v8-app-faixa" aria-hidden="true"></div>
         <aside class="v8-app-lado" aria-hidden="true">
@@ -1652,7 +128,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
           <p class="v8-app-janela">acesso de análise · <b>12 dias</b> restantes</p>
         </aside>
         <div class="v8-app-tela">
-          <!-- aba 0 · como funciona: 3 opções (ordem fixa: Básico → Essencial → Completo) -->
           <div class="v8-app-pan" data-pan="0">
             <small class="v8-app-k">01 · como funciona</small>
             <h3>Escolha como construir a sua loja.</h3>
@@ -1684,7 +159,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
             </div>
             <p class="v8-app-ok" hidden>✓ preferência registrada: <b>Essencial</b></p>
           </div>
-          <!-- aba 1 · protótipo da loja em moldura de celular -->
           <div class="v8-app-pan" data-pan="1" hidden>
             <div class="v8-proto-topo">
               <div><small class="v8-app-k">02 · protótipo</small><h3>Navegue pela loja.</h3></div>
@@ -1737,7 +211,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
               <div class="v8-lo-toast" hidden>Caramelo adicionado à sacola ✓</div>
             </div>
           </div>
-          <!-- aba 2 · etapas: kanban -->
           <div class="v8-app-pan" data-pan="2" hidden>
             <small class="v8-app-k">03 · etapas do plano</small>
             <h3>O que já foi feito e o que falta.</h3>
@@ -1757,26 +230,42 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
         <div class="hs-cursor" aria-hidden="true"></div>
       </div>
       <figcaption class="hs-legenda">Caso fictício de uma loja online · o app real fica em app.notechstack.com.br</figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- 06 · O EDITOR — o mockup do editor da v7 (historia.js · editor) -->
-<section id="editor" class="fx-sec v8-sec v8-branco" data-etapa="editor">
-  <div class="v8-in v8-split v8-split-largo v8-rev">
-    <div class="v8-col">
-      <p class="v8-k reveal">o editor</p>
-      <h2 class="v8-h reveal reveal-d1">Você ajusta o sistema sem precisar pedir.</h2>
-      <p class="v8-p reveal reveal-d2">Quando a primeira versão fica pronta, o app libera o editor. Ele abre no navegador, com o seu site do lado. Você clica no que quer mudar e ajusta. Os ajustes vão para a Nó, que aplica na versão seguinte.</p>
-      <ol class="v8-lista-num reveal reveal-d3">
-        <li>Clique na logo, no texto ou no botão.</li>
-        <li>Mude o tamanho e a cor.</li>
-        <li>Veja o resultado na hora, no próprio site.</li>
-        <li>Envie. Cada envio vira uma versão nova, com histórico.</li>
-      </ol>
-      <p class="hs-dica reveal reveal-d4">Experimente ao lado: clique num elemento do site e mexa nos controles.</p>
-    </div>
-    <figure class="hs-palco hs-palco-ui v8-palco-safari reveal reveal-d1" aria-label="Demonstração do editor aberto no navegador Safari">
+    </figure></div>
+<div id="cronograma" class="home-step-panel" role="tabpanel" aria-labelledby="passo-cronograma" tabindex="0" hidden><p class="home-step-caption">Veja o que está pronto e acompanhe as próximas entregas.</p><figure class="hs-palco hs-palco-ui v8-palco-app" aria-label="Demonstração da aba cronograma do app">
+      <div class="v8-app v8-kb" id="v8Crono">
+        <div class="v8-app-faixa" aria-hidden="true"></div>
+        <aside class="v8-app-lado" aria-hidden="true">
+          <b class="v8-kb-marca">oi, amiga<i>!</i></b>
+          <small>projeto</small>
+          <b class="v8-app-proj">App da comunidade</b>
+          <ol class="v8-app-menu">
+            <li><em>01</em>Como funciona</li>
+            <li><em>02</em>Protótipo</li>
+            <li class="on"><em>03</em>Cronograma</li>
+            <li><em>04</em>Editor</li>
+            <li><em>05</em>Versões</li>
+            <li><em>06</em>Marca & arquivos</li>
+          </ol>
+          <p class="v8-app-janela">construção · <b id="v8KbSemana">semana 1</b> de 4</p>
+        </aside>
+        <div class="v8-app-tela">
+          <small class="v8-app-k v8-kb-k">progresso do projeto</small>
+          <div class="v8-kb-topo">
+            <h3><span id="v8KbPct">0</span>% concluído</h3>
+            <span class="v8-kb-dia" id="v8KbDia">dia 1</span>
+          </div>
+          <p class="v8-kb-sub"><b id="v8KbFeitos">0</b> de <b id="v8KbTotal">0</b> itens entregues. A equipe da Nó move os cartões; você acompanha por aqui.</p>
+          <div class="v8-kb-barra" aria-hidden="true"><span class="feito" id="v8KbBarraF"></span><span class="andando" id="v8KbBarraA"></span></div>
+          <div class="v8-kb-marcos" aria-hidden="true"><span style="left:50%">V1 · dia 15</span><span style="left:73.3%">V2 · dia 22</span><span style="left:96.6%">V3</span></div>
+          <div class="v8-kb-grade">
+            <section class="v8-kb-col" data-col="a_fazer"><header><h4>A fazer</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="em_andamento"><header><h4>Em andamento</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
+            <section class="v8-kb-col" data-col="concluido"><header><h4>Concluído</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
+          </div>
+        </div>
+      </div>
+    </figure></div>
+<div id="editor" class="home-step-panel" role="tabpanel" aria-labelledby="passo-editor" tabindex="0" hidden><p class="home-step-caption">Clique, mude e envie seus ajustes pelo editor.</p><figure class="hs-palco hs-palco-ui v8-palco-safari" aria-label="Demonstração do editor aberto no navegador Safari">
       <div class="v8-safari" id="v8Editor">
         <div class="v8-sf-bar">
           <span class="v8-sf-luzes" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -1817,12 +306,12 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
             </label>
             <div class="v8-ed-ctl">cor
               <div class="v8-ed-cores" role="radiogroup" aria-label="Cor">
-                <button type="button" role="radio" data-cor="#141414" style="--c:#141414" aria-label="preto"></button>
-                <button type="button" role="radio" data-cor="#3D63DB" style="--c:#3D63DB" aria-label="azul"></button>
-                <button type="button" role="radio" data-cor="#E0543C" style="--c:#E0543C" aria-label="vermelho"></button>
-                <button type="button" role="radio" data-cor="#EDA33B" style="--c:#EDA33B" aria-label="âmbar"></button>
-                <button type="button" role="radio" data-cor="#30A46C" style="--c:#30A46C" aria-label="verde"></button>
-                <button type="button" role="radio" data-cor="#B0567E" style="--c:#B0567E" aria-label="rosa"></button>
+                <button type="button" role="radio" aria-checked="true" data-cor="#141414" style="--c:#141414" aria-label="preto"></button>
+                <button type="button" role="radio" aria-checked="false" data-cor="#3D63DB" style="--c:#3D63DB" aria-label="azul"></button>
+                <button type="button" role="radio" aria-checked="false" data-cor="#E0543C" style="--c:#E0543C" aria-label="vermelho"></button>
+                <button type="button" role="radio" aria-checked="false" data-cor="#EDA33B" style="--c:#EDA33B" aria-label="âmbar"></button>
+                <button type="button" role="radio" aria-checked="false" data-cor="#30A46C" style="--c:#30A46C" aria-label="verde"></button>
+                <button type="button" role="radio" aria-checked="false" data-cor="#B0567E" style="--c:#B0567E" aria-label="rosa"></button>
               </div>
             </div>
             <small>ajustes <em id="v8EdConta">0</em></small>
@@ -1834,133 +323,38 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
         <div class="hs-cursor" aria-hidden="true"></div>
       </div>
       <figcaption class="hs-legenda">Demonstração · no app, o editor abre com as telas do seu sistema</figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- 07 · CRONOGRAMA — acompanhamento semanal -->
-<section id="cronograma" class="fx-sec v8-sec v8-claro" data-etapa="cronograma">
-  <div class="v8-in v8-split v8-split-largo">
-    <div class="v8-col">
-      <p class="v8-k reveal">acompanhamento semanal</p>
-      <h2 class="v8-h reveal reveal-d1">Toda semana você sabe em que pé está.</h2>
-      <p class="v8-p reveal reveal-d2">Os 30 dias de construção ficam numa aba do app chamada cronograma. Cada tarefa tem data e versão. A cada semana você vê o que foi entregue, o que está sendo feito e o que vem depois.</p>
-      <ul class="v8-marcos reveal reveal-d3">
-        <li><b>dia 15</b><span>primeira versão pronta e editor liberado</span></li>
-        <li><b>dia 22</b><span>segunda versão, com os seus ajustes</span></li>
-        <li><b>dia 29</b><span>versão final, revisada para a entrega</span></li>
-      </ul>
-    </div>
-    <figure class="hs-palco hs-palco-ui v8-palco-app reveal reveal-d1" aria-label="Demonstração da aba cronograma do app">
-      <div class="v8-app v8-kb" id="v8Crono">
-        <div class="v8-app-faixa" aria-hidden="true"></div>
-        <aside class="v8-app-lado" aria-hidden="true">
-          <b class="v8-kb-marca">oi, amiga<i>!</i></b>
-          <small>projeto</small>
-          <b class="v8-app-proj">App da comunidade</b>
-          <ol class="v8-app-menu">
-            <li><em>01</em>Como funciona</li>
-            <li><em>02</em>Protótipo</li>
-            <li class="on"><em>03</em>Cronograma</li>
-            <li><em>04</em>Editor</li>
-            <li><em>05</em>Versões</li>
-            <li><em>06</em>Marca & arquivos</li>
-          </ol>
-          <p class="v8-app-janela">construção · <b id="v8KbSemana">semana 1</b> de 4</p>
-        </aside>
-        <div class="v8-app-tela">
-          <small class="v8-app-k v8-kb-k">progresso do projeto</small>
-          <div class="v8-kb-topo">
-            <h3><span id="v8KbPct">0</span>% concluído</h3>
-            <span class="v8-kb-dia" id="v8KbDia">dia 1</span>
-          </div>
-          <p class="v8-kb-sub"><b id="v8KbFeitos">0</b> de <b id="v8KbTotal">0</b> itens entregues. A equipe da Nó move os cartões; você acompanha por aqui.</p>
-          <div class="v8-kb-barra" aria-hidden="true"><span class="feito" id="v8KbBarraF"></span><span class="andando" id="v8KbBarraA"></span></div>
-          <div class="v8-kb-marcos" aria-hidden="true"><span style="left:50%">V1 · dia 15</span><span style="left:73.3%">V2 · dia 22</span><span style="left:96.6%">V3</span></div>
-          <div class="v8-kb-grade">
-            <section class="v8-kb-col" data-col="a_fazer"><header><h4>A fazer</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
-            <section class="v8-kb-col" data-col="em_andamento"><header><h4>Em andamento</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
-            <section class="v8-kb-col" data-col="concluido"><header><h4>Concluído</h4><span>0</span></header><div class="v8-kb-lista"></div></section>
-          </div>
-        </div>
-      </div>
-      <figcaption class="hs-legenda">Réplica do quadro de etapas do app · marca e projeto fictícios</figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- 08 · CLIENTES — galeria curva de 1 linha -->
-<section id="clientes" class="fx-sec v8-sec v8-branco v8-sec-galeria" data-etapa="clientes">
-  <div class="v8-in v8-topo-centro">
-    <p class="v8-k reveal">quem já trabalhou com a gente</p>
-    <h2 class="v8-h reveal reveal-d1">Empresas que já têm um sistema da Nó.</h2>
-  </div>
-  <div class="v8-galeria v8-galeria-logos reveal reveal-d2" data-galeria="clientes" data-curva="1" aria-label="Logos de clientes"></div>
-</section>
-
-</div><!-- /#fluxo -->
-
-<!-- ÂNCORA #ctafinal — fim da queda do mascote e alvo do goTo('ctafinal') -->
+    </figure></div>
+</div></div></section>
+<section id="clientes" class="fx-sec v8-sec home-clientes-beam" data-etapa="clientes" data-client-network></section>
+</div>
 <div id="ctafinal" class="hs-ancora-crt" aria-hidden="true"></div>
-
-<!-- 09 · FORMULÁRIO — o mesmo diagnóstico/checkout (diagnostico.js), sem o CRT -->
-<section id="diagnostico" class="dg dg-v8" aria-labelledby="dgTitulo">
-  <div class="dg-palco">
-    <div class="dg-conteudo">
-      <div class="dg-texto">
-        <p class="v8-k">diagnóstico de sistema</p>
-        <h2 class="dg-h" id="dgTitulo">Conte a sua ideia. <span>R$ 149,90.</span></h2>
-        <p class="dg-sub">São 5 perguntas rápidas. No fim, você paga por Pix ou cartão. No dia seguinte, a Nó te chama no WhatsApp. <a class="v8-dg-mais" href="/diagnostico-de-sistema/">Veja o que vem no diagnóstico e as perguntas frequentes</a>.</p>
-        <ul class="dg-lista v8-dg-lista">
-          <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></i>
-            <div><b>Até o dia 3</b><span>acesso ao app com plano, protótipo e 3 opções</span></div></li>
-          <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M12 14h2M16 14h.01M8 17h2M12 17h2"/></svg></i>
-            <div><b>15 dias</b><span>para testar e decidir como continuar</span></div></li>
-          <li><i class="v8-dg-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/><path d="m8 12.5 3 3 5.5-6"/></svg></i>
-            <div><b>Sem obrigação</b><span>se não seguir, o plano e o protótipo são seus</span></div></li>
-        </ul>
-        <p class="v8-dg-nota" aria-hidden="true">Da sua ideia<br>a um sistema real.
-          <svg viewBox="0 0 120 40"><path d="M4 30 C 40 38, 80 30, 112 12"/><path d="M100 10 L113 11 L108 23"/></svg>
-        </p>
-      </div>
-    </div>
-
-    <div class="dg-tela" role="region" aria-label="Formulário do diagnóstico em cinco etapas">
-      <div class="dg-nav">
-        <button type="button" data-nav="voltar">‹ voltar</button>
-        <span class="dg-fase" aria-live="polite">01 / 05</span>
-        <span class="dg-barra" aria-hidden="true"><i></i></span>
-        <button type="button" data-nav="proximo">próximo →</button>
-      </div>
-      <form class="dg-corpo" novalidate autocomplete="on"></form>
-      <!-- vai para a primeira tela do formulário, entre o título e o campo do nome: diagnostico.js -->
-      <figure class="hs-palco hs-palco-3d dg-oferta-cena" id="cenaSistema" hidden aria-label="Animação: as partes do seu sistema sendo encaixadas e conferidas">
-        <div class="hs-cena"><canvas class="hs-canvas" aria-hidden="true"></canvas></div>
-        <div class="hs-palco-rot" data-fases="em apenas 5 minutos|em apenas 5 minutos|em apenas 5 minutos"><i></i>em apenas 5 minutos</div>
-        <ol class="hs-qa" id="hsQa" aria-hidden="true"><li data-i="0"></li><li data-i="1"></li><li data-i="2"></li><li data-i="3"></li><li data-i="4"></li></ol>
-      </figure>
-      <div class="dg-pe">
-        <span class="dg-dica">↵ enter avança</span>
-        <span class="v8-seguro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.3 3 7.8 7 9.5 4-1.7 7-5.2 7-9.5V6z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>pagamento seguro<br>pix ou cartão</span>
-        <button type="button" class="dg-bt" data-nav="acao">avançar →</button>
-      </div>
-    </div>
+<section id="diagnostico" class="home-contato" aria-labelledby="dgTitulo">
+  <div class="v8-in home-contato-grid">
+    <div><p class="v8-k">vamos conversar</p><h2 class="v8-h" id="dgTitulo">Conte sua ideia.<br>A gente te chama.</h2><p class="v8-p">Responda 5 perguntas rápidas para entendermos melhor sua ideia. Entremos em contato pelo WhatsApp em até 3 dias.</p></div>
+    <form id="homeLeadForm" class="home-form" action="https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email" method="post">
+      <div class="home-form-nav" hidden><button type="button" id="leadVoltar">← voltar</button><span id="leadProgresso" aria-live="polite">1 de 5</span></div>
+      <progress id="leadBarra" max="5" value="1" aria-label="Progresso do formulário" hidden></progress>
+<fieldset class="home-pergunta"><legend>1. Como podemos te chamar?</legend><label for="lead-nome">Seu nome</label><input id="lead-nome" name="nome" autocomplete="name" minlength="2" maxlength="80" required></fieldset>
+<fieldset class="home-pergunta"><legend>2. Qual é o seu WhatsApp?</legend><label for="lead-whatsapp">Número com DDD</label><input id="lead-whatsapp" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999" maxlength="20" required><p class="home-ajuda">É por aqui que a Nó vai falar com você.</p></fieldset>
+<fieldset class="home-pergunta"><legend>3. Qual é o seu negócio?</legend><label for="lead-negocio">Empresa ou área de atuação</label><input id="lead-negocio" name="negocio" autocomplete="organization" minlength="2" maxlength="120" placeholder="Ex.: clínica, loja, escritório" required></fieldset>
+<fieldset class="home-pergunta"><legend>4. O que você quer criar ou melhorar?</legend><label for="lead-objetivo">Tipo de projeto</label><select id="lead-objetivo" name="objetivo" required><option value="">Selecione uma opção</option><option>Sistema sob medida</option><option>Aplicativo</option><option>Painel empresarial</option><option>Integração ou automação</option><option>Site ou loja online</option><option>Ainda preciso de orientação</option></select></fieldset>
+<fieldset class="home-pergunta"><legend>5. Conte como sua operação funciona</legend><label for="lead-descricao">Explique com o máximo de detalhes possível</label><p class="home-ajuda" id="lead-detalhes-ajuda">O que sua empresa faz? Como é a rotina, quem participa, quais ferramentas vocês usam e onde estão as dificuldades? Conte tudo que pode ajudar a Nó a entender sua operação e o que você quer melhorar.</p><textarea id="lead-descricao" name="descricao" rows="7" minlength="10" maxlength="20000" aria-describedby="lead-detalhes-ajuda" placeholder="Descreva processos, equipe, clientes, volumes, ferramentas, problemas e o resultado que você espera…" required></textarea><label for="lead-links">Links de referência (opcional)</label><textarea id="lead-links" name="links" rows="3" maxlength="4000" placeholder="Cole um link por linha: site, sistema atual, pasta ou referências."></textarea><label for="lead-arquivos">Arquivos que ajudam a explicar (opcional)</label><input id="lead-arquivos" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.docx,.xlsx,.pptx" aria-describedby="lead-arquivos-ajuda"><p class="home-ajuda" id="lead-arquivos-ajuda">Até 5 arquivos, somando 5 MB. PDFs, imagens, documentos e planilhas. Para arquivos maiores, compartilhe um link acima.</p><ul id="lead-arquivos-lista" class="home-arquivos-lista" aria-live="polite"></ul><p class="home-ajuda">Ao enviar, você autoriza a Nó a entrar em contato sobre este projeto. <a href="/privacidade/">Política de privacidade</a>.</p></fieldset>
+      <p id="leadErro" role="alert" hidden></p>
+      <button class="home-enviar" id="leadEnviar" type="submit">Enviar minha ideia</button>
+      <p id="leadStatus" role="status" tabindex="-1" hidden></p>
+      <noscript><p>Para enviar este formulário, ative o JavaScript ou <a href="https://wa.me/5511939289413">fale com a Nó pelo WhatsApp</a>.</p></noscript>
+    </form>
   </div>
 </section>
-
-<!-- FOOTER -->
+</main>
 <footer>
   <div class="ft-brand">
-    <!-- lockup completo (nó tech stack), não só a marca. É 7060x964 = 7.3:1,
-         muito mais largo que a logo isolada que estava aqui: por isso a altura
-         é fluida e a largura vem do aspect-ratio, senão estoura os 370px de um
-         celular. -->
     <div class="ft-logo"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="7060" height="964" style="height:clamp(19px,4.6vw,27px);width:auto;object-fit:contain;display:block"></div>
     <div class="ft-txt">IA que arquiteta, integra e opera.</div>
     <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
   </div>
   <nav class="ft-nav" aria-label="Mapa do site">
-    <a href="/diagnostico-de-sistema/">Diagnóstico de sistema</a>
+    <a href="#diagnostico">Conte sua ideia</a>
     <a href="/sistemas-sob-medida/">Sistemas sob medida</a>
     <a href="/desenvolvimento-de-aplicativos/">Aplicativos</a>
     <a href="/paineis-empresariais/">Painéis empresariais</a>
@@ -1972,10 +366,6 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     <a href="/roteador/">Roteador</a>
     <a href="/health/">Nó Health</a>
   </nav>
-  <!-- Os dois links também vivem no aceite do formulário. Aqui eles existem
-       porque uma política de privacidade alcançável só de dentro de um
-       formulário é, na prática, uma política escondida: quem ainda não decidiu
-       se vai deixar contato é justamente quem precisa lê-la antes. -->
   <div class="ft-legal ft-txt">
     <div class="ft-legal-links">
       <a href="/termos/" class="ft-link">Termos de uso</a>
@@ -1985,24 +375,13 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     <div>© 2026 <span class="logo-no on-dark" style="font-size:1.05em">nó</span>. Todos os direitos reservados.</div>
   </div>
 </footer>
-<!-- mascote de sprite (fixo, sobrepõe a página inteira) -->
 <canvas id="lines" aria-hidden="true"></canvas>
-
 <div class="depth" id="depth" aria-hidden="true">
   <b><span id="depthN">0</span>m</b><i>profundidade</i>
   <div class="ticks" id="ticks"></div>
 </div>
-
 <div id="sizer" aria-hidden="true"></div>
 <div id="mascot" aria-hidden="true"><div id="sprite"></div></div>
-
-<!-- painel de calibragem — escondido por padrão; abre com tecla D ou ?edit=1 -->
-<!-- painel de controle — escondido por padrão; abre com tecla D ou ?edit=1.
-     Uma pasta por seção da página, na ordem em que se rola: cada pasta reúne
-     TODOS os controles do que se vê naquela seção (textos, posição, tamanho,
-     cor de fundo, respiro, atalho pra rolar até lá). Só duas pastas fogem
-     disso, e ficam no topo: as animações do mascote, que atravessa a página
-     de ponta a ponta, e o tempo. -->
 <div id="calibPanel">
   <div class="cp-head">
     <h3>Painel de controle</h3>
@@ -2016,56 +395,222 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   </div>
   <textarea id="cpExport" placeholder="Exportar CFG aparece aqui — também editável na mão"></textarea>
 </div>
+<script>
+(function(){
+  var SS; try { SS = window.sessionStorage; } catch(e) { SS = {getItem:function(){return null},setItem:function(){}}; } var sid = '';
+  try { sid = SS.getItem('no_sid') || ''; } catch(e){}
+  if (!sid){
+    sid = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : Date.now().toString(36) + Math.random().toString(36).slice(2,10);
+    try { SS.setItem('no_sid', sid); } catch(e){}
+  }
+  window.leadSid = sid;
+  /* ORIGEM: gravada na PRIMEIRA página da sessão e nunca mais tocada. Sem isto,
+     quem chega por anúncio, lê os seis capítulos e só então preenche o
+     formulário entrega um lead sem utm nenhum — e a campanha que pagou por ele
+     fica sem crédito. */
+  var orig = null;
+  try { orig = JSON.parse(SS.getItem('no_orig') || 'null'); } catch(e){}
+  if (!orig){
+    var q = new URLSearchParams(location.search);
+    orig = {
+      utm_source:   q.get('utm_source')   || '',
+      utm_medium:   q.get('utm_medium')   || '',
+      utm_campaign: q.get('utm_campaign') || '',
+      utm_content:  q.get('utm_content')  || '',
+      utm_term:     q.get('utm_term')     || '',
+      gclid:  q.get('gclid')  || '',
+      fbclid: q.get('fbclid') || '',
+      referrer: document.referrer || '(direto)'
+    };
+    try { SS.setItem('no_orig', JSON.stringify(orig)); } catch(e){}
+  }
+  if (!orig.utm_source && !orig.gclid && !orig.fbclid){
+    try {
+      var sourceHost = new URL(orig.referrer).hostname;
+      var search = sourceHost.match(/(?:^|\.)(google|bing|duckduckgo|yahoo|ecosia)\./);
+      if (search){ orig.utm_source=search[1]; orig.utm_medium='organic'; SS.setItem('no_orig',JSON.stringify(orig)); }
+    } catch(e){}
+  }
+  window.leadOrig  = orig;
+  window.leadEtapa = 0;          /* 0..5 — o quão longe esta sessão chegou */
+  /* estado do caminho na árvore, mantido pelos próprios eventos: é o que a
+     fila manda junto de cada lote pro banco costurar a sessão */
+  window.leadEstado = { folha:null, nicho:null, caminho:null, modo:null };
+  var vistos = Object.create(null);
+  window.dataLayer = window.dataLayer || [];
+  /* track(nome, params, chave)
+     `chave` presente = evento de ETAPA: dispara uma vez só por sessão. Sem essa
+     guarda o resetTerm() do scroll re-dispara diag_abrir toda vez que a pessoa
+     sobe e desce a página, e o funil vira ficção. */
+  window.track = function(nome, params, chave){
+    if (chave){
+      var k = nome + '::' + chave;
+      if (vistos[k]) return;
+      vistos[k] = 1;
+    }
+    var p = params || {};
+    p.event = nome;
+    p.lead_sid = sid;
+    if (p.etapa > window.leadEtapa) window.leadEtapa = p.etapa;
+    if (p.folha)   window.leadEstado.folha   = p.folha;
+    if (p.nicho)   window.leadEstado.nicho   = p.nicho;
+    if (p.caminho) window.leadEstado.caminho = p.caminho;
+    if (p.modo)    window.leadEstado.modo    = p.modo;
+    window.dataLayer.push(p);
+    if (window.trackFila) window.trackFila(nome, p);
+  };
+  /* ---------- fila do painel de percurso ----------
+     Um POST por clique competiria com a digitação do terminal pela banda e pelo
+     main thread — a experiência é o produto ali. Acumula e manda a cada 3s, ou
+     no pagehide via sendBeacon (que sobrevive ao fechamento da aba; um fetch
+     comum, não). */
+  var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var FN_TRACK = 'https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/track-evento';
+  var fila = [], timer = null, mandados = 0;
+  var TETO_SESSAO = 200;   /* o mesmo teto que o banco aplica: não adianta gastar
+                              rede com o que a RPC vai recusar do outro lado */
+  function descarrega(beacon){
+    if (timer){ clearTimeout(timer); timer = null; }
+    if (!fila.length || LOCAL) return;
+    var lote = fila.splice(0, 60);
+    mandados += lote.length;
+    var corpo = JSON.stringify({
+      sid: sid, orig: orig,
+      folha:   window.leadEstado.folha,
+      nicho:   window.leadEstado.nicho,
+      caminho: window.leadEstado.caminho,
+      modo:    window.leadEstado.modo,
+      fbp: (document.cookie.match(/_fbp=([^;]+)/) || [])[1] || null,
+      fbc: (document.cookie.match(/_fbc=([^;]+)/) || [])[1] || null,
+      eventos: lote
+    });
+    try {
+      if (beacon && navigator.sendBeacon){
+        navigator.sendBeacon(FN_TRACK, new Blob([corpo], { type:'text/plain' }));
+      } else {
+        fetch(FN_TRACK, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: corpo, keepalive: true
+        }).catch(function(){});   /* medição não pode derrubar a página */
+      }
+    } catch(e){}
+  }
+  window.trackFila = function(nome, p){
+    if (mandados + fila.length >= TETO_SESSAO) return;
+    fila.push({ evento: nome, etapa: p.etapa || 0, params: p });
+    if (fila.length >= 20) return descarrega(false);
+    if (!timer) timer = setTimeout(function(){ descarrega(false); }, 3000);
+  };
+  /* pagehide e não beforeunload: o segundo não dispara no Safari do iPhone,
+     que é justamente onde mais gente abandona no meio */
+  addEventListener('pagehide', function(){ descarrega(true); });
+  addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') descarrega(true);
+  });
+})();
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.notechstack.com.br/#organizacao",
+      "name": "Nó Tech Stack",
+      "alternateName": [
+        "nó",
+        "nó tech stack"
+      ],
+      "legalName": "60.342.339 LUCCA VICCHIATTI GIANI",
+      "taxID": "60.342.339/0001-06",
+      "url": "https://www.notechstack.com.br/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.notechstack.com.br/brand/favicon/favicon-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "description": "Agência que planeja, desenha e constrói sistemas, aplicativos e painéis sob medida para empresas.",
+      "founder": {
+        "@type": "Person",
+        "name": "Lucca Giani"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Brasil"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "telephone": "+55-11-93928-9413",
+        "availableLanguage": "pt-BR",
+        "areaServed": "BR"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.notechstack.com.br/#site",
+      "url": "https://www.notechstack.com.br/",
+      "name": "Nó Tech Stack",
+      "inLanguage": "pt-BR",
+      "publisher": {
+        "@id": "https://www.notechstack.com.br/#organizacao"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.notechstack.com.br/#pagina",
+      "url": "https://www.notechstack.com.br/",
+      "name": "Sistemas e aplicativos sob medida para empresas | Nó Tech Stack",
+      "description": "Sistemas, aplicativos e painéis sob medida para sua empresa. Conte sua ideia no formulário e fale com a Nó pelo WhatsApp sobre escopo, prazo e orçamento.",
+      "inLanguage": "pt-BR",
+      "isPartOf": {
+        "@id": "https://www.notechstack.com.br/#site"
+      },
+      "about": {
+        "@id": "https://www.notechstack.com.br/#organizacao"
+      },
+      "primaryImageOfPage": "https://www.notechstack.com.br/brand/og/og-home-contato.png"
+    },
+    {
+      "@type": "Service",
+      "@id": "https://www.notechstack.com.br/#sistemas-sob-medida",
+      "name": "Sistemas e aplicativos sob medida",
+      "serviceType": "Desenvolvimento de sistemas, aplicativos, painéis e integrações",
+      "description": "Sistemas, aplicativos e painéis sob medida para sua empresa. Conte sua ideia no formulário e fale com a Nó pelo WhatsApp sobre escopo, prazo e orçamento.",
+      "provider": {
+        "@id": "https://www.notechstack.com.br/#organizacao"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Brasil"
+      }
+    }
+  ]
+}
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
 <script type="module">
   /* ─── HERO: vídeo de fundo controlado pelo mouse ───
      (a hero tem um CTA só, o #heroCtaBtn, e ele leva ao #ctafinal. Os
      botões-pergunta saíram junto com o chat que alimentavam) */
-  (function(){
-    /* Vídeo de fundo: o mouse é a linha do tempo.
-       delta horizontal → offset de tempo; o onSeeked reenfileira o próximo
-       seek só se o alvo mudou, senão o browser afoga em seeks. */
-    var v = document.getElementById('heroVideo');
-    var hero = document.getElementById('hero');
-    if(v){
-      var SENSITIVITY = 0.8, prevX = null, target = 0, seeking = false;
-      var media = document.getElementById('heroMedia');
-      v.addEventListener('loadeddata', function(){
-        hero.classList.add('has-video');
-        if(media) media.classList.add('ready');
-      });
-      /* sem arquivo ainda → o bloco inteiro sai do layout, sem buraco */
-      v.addEventListener('error', function(){ if(media) media.remove(); });
-
-      window.addEventListener('mousemove', function(e){
-        if(prevX === null){ prevX = e.clientX; return; }
-        var delta = e.clientX - prevX; prevX = e.clientX;
-        if(!v.duration || !isFinite(v.duration)) return;
-        target += (delta / window.innerWidth) * SENSITIVITY * v.duration;
-        target = Math.max(0, Math.min(v.duration, target));
-        if(!seeking){ seeking = true; v.currentTime = target; }
-      }, {passive:true});
-
-      v.addEventListener('seeked', function(){
-        if(Math.abs(v.currentTime - target) > 0.01) v.currentTime = target;
-        else seeking = false;
-      });
-    }
-  })();
-
-  import { initProductsNav } from '/shared/products-nav.js';
-  initProductsNav(document.getElementById('pill-nav-root'));
 
   /* Contato: a seção #cta (formulário) saiu na reestruturação de 13/08 e o
      formulário vai renascer dentro do "Senta aí". Até lá, todo link de contato
      — inclusive o /#cta que a nav compartilhada e as outras páginas usam —
      aterrissa no CTA final. */
-  const CONTATO = '#ctafinal';
+  const CONTATO = '#diagnostico';
   if (window.location.hash === '#cta' || window.location.hash === '#ctafinal') {
     setTimeout(() => {
       document.querySelector(CONTATO)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   }
-
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href="/#cta"], a[href="#cta"]');
     if (!link) return;
@@ -2076,13 +621,8 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
     }
   });
 </script>
-<!-- base da página (reveal, âncoras e a lista de ferramentas): era o /main.js
-     inteiro, 2,3 MB, para usar três trechos -->
 <script src="/lp-narrador/cenas-lp/historia/base-v8.js?v=2" defer></script>
-<!-- mascote de sprite + painel de calibragem (tecla D, só em localhost): era um
-     <script> inline de 66 KB que rodava no meio do parse e segurava a primeira
-     pintura da hero -->
-<script src="/lp-narrador/cenas-lp/historia/mascote-v8.js?v=1" defer></script>
+
 <script>
 /* ── slogan da hero (o H1): entra logo depois que a hero pinta ──
    Até 25/09 ele esperava o vídeo de fundo carregar + 3s. Virou o H1 da
@@ -2113,31 +653,23 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
    do que se vê (o 1º quadro é o próprio pôster). Movimento reduzido: fica o
    pôster parado. */
 (function(){
-  const v = document.querySelector('.hero-video');
+  const v = document.querySelector('video.hero-video');
   if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   function toca(){
     v.preload = 'auto';
     const p = v.play();
     if (p && p.catch) p.catch(function(){});
   }
-  if (document.readyState === 'complete') setTimeout(toca, 600);
-  else addEventListener('load', function(){ setTimeout(toca, 600); }, { once:true });
+  let started=false;
+  function start(){if(started)return;started=true;toca();}
+  v.addEventListener('playing',()=>{v.classList.add('playing');v.closest('.hero-stage').classList.add('video-ready');});
+  v.addEventListener('error',()=>{v.classList.remove('playing');v.closest('.hero-stage').classList.remove('video-ready');});
+  ['pointerdown','keydown','scroll'].forEach(event=>addEventListener(event,start,{once:true,passive:true}));
 })();
 </script>
-<!-- O loader adiado de 2 s saiu daqui em 14/08/2026: subiu pro <head>, no
-     formato padrão. Os dois segundos eram economia de performance numa home
-     institucional; numa LP que vai receber tráfego pago é conversão jogada
-     fora — quem sai antes não conta em lugar nenhum, e o gclid da URL vai
-     embora junto. Se o LCP voltar a incomodar, o caminho é fetchpriority nas
-     mídias, não atrasar a medição. -->
-
-<!-- ═══ RASTREIO · o que se mede fora do monitor ═══
-     Os cliques e a leitura da página. Fica aqui no fim, e por delegação, pra
-     não espalhar onclick por cinco elementos que a sessão de front ainda mexe. -->
 <script>
 (function(){
   if (!window.track) return;
-
   /* ---------- cliques de CTA ----------
      Delegado: o "Saiba mais" dos capítulos virou pílula no mobile e pode virar
      outra coisa amanhã; enquanto a classe continuar `.fx-more`, isto segue
@@ -2154,17 +686,14 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
       track('cta_click', { cta:'saiba_mais', capitulo: (sec && sec.id) || '?' });
     }
   }, true);
-
   /* ---------- leitura da página ----------
      60% visível por 2s: rolar rápido por cima não conta como ler. Sem o tempo,
      qualquer scroll até o rodapé marcaria os seis capítulos como lidos e o
      dado não serviria pra nada.
-
      A ordem sai do DOM, não de uma lista fixa: #platforms subiu pra antes do
      #ctafinal em 14/08 e uma lista chumbada aqui teria mentido em silêncio. */
   var alvos = document.querySelectorAll('.fx-sec, #platforms');
   if (!('IntersectionObserver' in window) || !alvos.length) return;
-
   var relogios = new WeakMap();
   var obs = new IntersectionObserver(function(ents){
     ents.forEach(function(ent){
@@ -2182,13 +711,10 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
       }
     });
   }, { threshold:[0, 0.6, 1] });
-
   Array.prototype.forEach.call(alvos, function(el){ obs.observe(el); });
 })();
 </script>
 <script src="/shared/glow-cursor.js?v=1" defer></script>
-<!-- v8 · editor (historia.js), cenas 3D, galerias/fluxograma/app/cronograma (v8.js) e o diagnóstico -->
-<script src="/lp-narrador/cenas-lp/historia/historia.js?v=49" defer></script>
 <script>
 /* cenas 3D sob demanda: three.js (~260 KB) + cenas3d.js só descem depois que
    a pessoa começa a rolar e a primeira cena está a menos de 600px da tela.
@@ -2223,9 +749,11 @@ html.txt-edit [data-txtk].is-sel{ outline:2px solid #3df0c8 }
   addEventListener('load', function(){ if (scrollY > 0 || location.hash) arma(); }, { once:true });
 })();
 </script>
-<script src="/lp-narrador/cenas-lp/historia/v8.js?v=9" defer></script>
-<script src="/lp-narrador/cenas-lp/historia/pagarme-public-config.js?v=1" defer></script>
-<script src="/lp-narrador/cenas-lp/historia/roadmap-checkout.js?v=4" defer></script>
-<script src="/lp-narrador/cenas-lp/historia/diagnostico.js?v=70" defer></script>
+<script>window.track?.('site_visit',{pagina:location.pathname},'pagina');</script>
+<script src="/lp-narrador/cenas-lp/historia/home-contato.js?v=1" defer></script>
+<script src="/shared/clients-network.js" defer></script>
+<script src="/lp-narrador/cenas-lp/historia/home-stepper.js" defer></script>
+<script src="/lp-narrador/cenas-lp/historia/home-lazy.js?v=1" defer></script>
+<script src="/shared/card-nav.js" defer></script>
 </body>
 </html>
