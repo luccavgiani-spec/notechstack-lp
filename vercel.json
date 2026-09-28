@@ -74,6 +74,11 @@
   ],
   "redirects": [
     {
+      "source": "/diagnostico-de-sistema/",
+      "destination": "/contato/",
+      "permanent": true
+    },
+    {
       "source": "/diagnostico-de-sistema/:path*",
       "destination": "/contato/",
       "permanent": true
