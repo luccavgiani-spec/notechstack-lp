@@ -20,4 +20,7 @@ footer.no-site-footer{box-sizing:border-box;background:#141414;color:#fff;paddin
 .no-card-nav~.lg-wrap{padding-top:110px}
 html.lg-embed .no-card-nav,html.lg-embed .no-site-footer{display:none}
 html.lg-embed .no-card-nav~.lg-wrap{padding-top:0}
+/* The digital collaborators runtime otherwise fixes its root to one viewport,
+   leaving the shared footer underneath overflowing page content. */
+body #dc-root,body #dc-root>.sc-host{height:auto}
 @media(max-width:900px){footer.no-site-footer{flex-direction:column;gap:22px;text-align:center;padding:36px 20px}.no-site-footer .ft-brand,.no-site-footer .ft-legal{align-items:center;text-align:center}.no-site-footer .ft-legal-links{justify-content:center}}
