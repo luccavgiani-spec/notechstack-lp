@@ -84,12 +84,22 @@
       "permanent": true
     },
     {
+      "source": "/servicos/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
       "source": "/sistemas-sob-medida/",
       "destination": "/agencia/#solucoes",
       "permanent": true
     },
     {
       "source": "/sistemas-sob-medida/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/sistemas-sob-medida/:path*/",
       "destination": "/agencia/#solucoes",
       "permanent": true
     },
@@ -104,12 +114,22 @@
       "permanent": true
     },
     {
+      "source": "/desenvolvimento-de-aplicativos/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
       "source": "/paineis-empresariais/",
       "destination": "/agencia/#solucoes",
       "permanent": true
     },
     {
       "source": "/paineis-empresariais/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/paineis-empresariais/:path*/",
       "destination": "/agencia/#solucoes",
       "permanent": true
     },
@@ -124,12 +144,22 @@
       "permanent": true
     },
     {
+      "source": "/integracoes-e-automacoes/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
       "source": "/cases/",
       "destination": "/#clientes",
       "permanent": true
     },
     {
       "source": "/cases/:path*",
+      "destination": "/#clientes",
+      "permanent": true
+    },
+    {
+      "source": "/cases/:path*/",
       "destination": "/#clientes",
       "permanent": true
     },
@@ -144,12 +174,22 @@
       "permanent": true
     },
     {
+      "source": "/conteudos/:path*/",
+      "destination": "/#como-funciona",
+      "permanent": true
+    },
+    {
       "source": "/roteador/",
       "destination": "/health/",
       "permanent": true
     },
     {
       "source": "/roteador/:path*",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/roteador/:path*/",
       "destination": "/health/",
       "permanent": true
     },
@@ -164,12 +204,22 @@
       "permanent": true
     },
     {
+      "source": "/Roteador/:path*/",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
       "source": "/diagnostico-de-sistema/",
       "destination": "/contato/",
       "permanent": true
     },
     {
       "source": "/diagnostico-de-sistema/:path*",
+      "destination": "/contato/",
+      "permanent": true
+    },
+    {
+      "source": "/diagnostico-de-sistema/:path*/",
       "destination": "/contato/",
       "permanent": true
     }
