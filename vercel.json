@@ -74,8 +74,48 @@
   ],
   "redirects": [
     {
-      "source": "/diagnostico-de-sistema/",
-      "destination": "/contato/",
+      "source": "/servicos/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/sistemas-sob-medida/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/desenvolvimento-de-aplicativos/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/paineis-empresariais/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/integracoes-e-automacoes/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/cases/:path*",
+      "destination": "/#clientes",
+      "permanent": true
+    },
+    {
+      "source": "/conteudos/:path*",
+      "destination": "/#como-funciona",
+      "permanent": true
+    },
+    {
+      "source": "/roteador/:path*",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/Roteador/:path*",
+      "destination": "/health/",
       "permanent": true
     },
     {
