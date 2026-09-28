@@ -23,7 +23,7 @@
   <meta name="twitter:description" content="Amplie o que sua agência entrega sem contratar uma equipe de desenvolvimento.">
   <meta name="twitter:image" content="https://www.notechstack.com.br/brand/og/og-home-contato.png">
   <link rel="preload" href="/brand/fonts/sora/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/lp-narrador/cenas-lp/assets/video/hero-parede.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="/agencia/assets/bg-agencias.png" as="image" fetchpriority="high">
   <link rel="stylesheet" href="/brand/fonts/fonts.css">
 
 
@@ -43,6 +43,7 @@
 <link rel="stylesheet" href="/shared/site-layout.css">
 <script src="/shared/card-nav.js" defer></script>
 <link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
+<link rel="stylesheet" href="/agencia/hero.css?v=1">
 </head>
 <body>
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK87FH8W" height="0" width="0" style="display:none;visibility:hidden" title="Google Tag Manager"></iframe></noscript>
@@ -54,14 +55,29 @@
 <!-- site-nav:end -->
 
   <main id="conteudo">
-    <section class="agency-hero" id="inicio">
-      <div class="agency-hero-stage">
-        <div class="agency-hero-backdrop"></div>
-        <video class="agency-hero-video" poster="/lp-narrador/cenas-lp/assets/video/hero-parede.webp" loop muted playsinline preload="none" aria-hidden="true"><source src="/lp-narrador/cenas-lp/assets/video/hero-parede.mp4" type="video/mp4"></video>
-        <div class="agency-grain" aria-hidden="true"></div>
-        <div class="agency-hero-content">
-          <div class="agency-hero-brand"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="1633" height="964"><h1><span>Aumente o ticket</span><span>da sua agência.</span></h1></div>
-          <div class="agency-hero-offer"><p><strong>Você não precisa saber programar.</strong> Venda sites, landing pages, dashboards e sistemas. A nó desenvolve com você — e a sua agência continua na frente do cliente.</p><a href="#solucoes" class="pill-cta magnetic" data-track="hero_solucoes">Conhecer nó.agência <span class="pill-cta-circle" aria-hidden="true">→</span></a></div>
+    <section class="agency-intro" id="inicio" aria-labelledby="agency-intro-title">
+      <div class="agency-intro-stage">
+        <div class="agency-intro-copy">
+          <p class="agency-intro-eyebrow">Sistemas para agências</p>
+          <h1 id="agency-intro-title"><span>Aumente o ticket</span> <span>da sua agência</span> <span>com sistemas<span class="agency-intro-dot" aria-hidden="true"></span></span></h1>
+          <p class="agency-intro-description">Venda sites, landing pages, dashboards e sistemas sem precisar programar sozinho. A nó desenvolve com você — e a sua agência continua na frente do cliente.</p>
+          <div class="agency-intro-actions">
+            <a class="agency-intro-primary" href="#contato" data-track="hero_contato">Falar com um especialista <img src="/agencia/assets/lucide/arrow-right.svg" width="32" height="32" alt="" aria-hidden="true"></a>
+            <a class="agency-intro-secondary" href="#solucoes" data-track="hero_solucoes">Conheça a agência</a>
+          </div>
+          <ul class="agency-intro-benefits" aria-label="Vantagens para sua agência">
+            <li><img src="/agencia/assets/lucide/chart-no-axes-combined.svg" width="32" height="32" alt="" aria-hidden="true"><span>Mais valor<br>por projeto</span></li>
+            <li><img src="/agencia/assets/lucide/users-round.svg" width="32" height="32" alt="" aria-hidden="true"><span>Foco no<br>seu cliente</span></li>
+            <li><img src="/agencia/assets/lucide/zap.svg" width="32" height="32" alt="" aria-hidden="true"><span>Tecnologia<br>sem complicação</span></li>
+          </ul>
+        </div>
+        <div class="agency-intro-scene">
+          <img class="agency-intro-background" src="/agencia/assets/bg-agencias.png" width="1672" height="941" alt="" fetchpriority="high" decoding="async">
+          <ul class="agency-intro-services" aria-label="Soluções da nó">
+            <li class="agency-intro-service agency-intro-sites"><img src="/agencia/assets/lucide/globe.svg" width="32" height="32" alt="" aria-hidden="true"><span class="agency-intro-ellipsis" aria-hidden="true">···</span><strong>Sites</strong><span>Institucionais<br>e landing pages</span></li>
+            <li class="agency-intro-service agency-intro-panels"><img src="/agencia/assets/lucide/chart-column-increasing.svg" width="32" height="32" alt="" aria-hidden="true"><span class="agency-intro-ellipsis" aria-hidden="true">···</span><strong>Painéis</strong><span>Dashboards<br>personalizados</span></li>
+            <li class="agency-intro-service agency-intro-systems"><img src="/agencia/assets/lucide/database.svg" width="32" height="32" alt="" aria-hidden="true"><span class="agency-intro-ellipsis" aria-hidden="true">···</span><strong>Sistemas</strong><span>Soluções sob<br>medida</span></li>
+          </ul>
         </div>
       </div>
     </section>

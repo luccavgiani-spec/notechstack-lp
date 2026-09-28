@@ -3,9 +3,6 @@
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 
-  var video=document.querySelector('.agency-hero-video');
-  if(video){let started=false;const play=function(){if(started||reduce)return;started=true;video.play().catch(function(){});};['pointerdown','keydown','scroll'].forEach(function(event){window.addEventListener(event,play,{once:true,passive:true});});}
-
   var agencyDemoVideo=document.querySelector('.agency-video-player');
   if(agencyDemoVideo){
     const playButton=document.querySelector('[data-demo-play]');
