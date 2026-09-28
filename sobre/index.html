@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="/brand/fonts/fonts.css">
 <link rel="stylesheet" href="/brand/tokens/tokens.css">
 <link rel="stylesheet" href="/shared/brand-derived.css">
-<link rel="stylesheet" href="/shared/products-nav.css">
+
 <link rel="stylesheet" href="/shared/site.css?v=1">
 <script src="/shared/telemetria.js?v=1"></script>
 <!-- Google Tag Manager (mesmo container da home) -->
@@ -108,6 +108,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
  ]
 }
 </script>
+<link rel="stylesheet" href="/shared/card-nav.css">
+<link rel="stylesheet" href="/shared/site-layout.css">
+<script src="/shared/card-nav.js" defer></script>
 <link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
 </head>
 <body>
@@ -115,20 +118,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK87FH8W" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <a class="st-pular" href="#conteudo">Pular para o conteúdo</a>
 <div class="st-barra" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-<div id="products-nav-root"><nav class="no-products-nav" aria-label="Navegação principal">
-    <a class="no-products-brand" href="/" aria-label="Nó Tech Stack — página inicial"><img src="/brand/favicon/favicon-dark.svg" alt="nó." width="64" height="64"></a>
-    <div class="no-products-pills">
-      <div class="no-products-dropdown">
-        <button type="button" aria-expanded="false" aria-controls="no-servicos-menu">Serviços <span aria-hidden="true">⌄</span></button>
-        <div id="no-servicos-menu" class="no-products-menu" hidden><a href="/contato/" style="--product-color:#EDA33B">Contato</a><a href="/sistemas-sob-medida/" style="--product-color:#3D63DB">Sistemas sob medida</a><a href="/desenvolvimento-de-aplicativos/" style="--product-color:#E0543C">Aplicativos</a><a href="/paineis-empresariais/" style="--product-color:#30A46C">Painéis empresariais</a><a href="/integracoes-e-automacoes/" style="--product-color:#EDA33B">Integrações e automações</a><a href="/cases/" style="--product-color:#3D63DB">Cases</a><a href="/conteudos/" style="--product-color:#E0543C">Conteúdos</a></div>
-      </div>
-      <div class="no-products-dropdown">
-        <button type="button" aria-expanded="false" aria-controls="no-products-menu">Produtos <span aria-hidden="true">⌄</span></button>
-        <div id="no-products-menu" class="no-products-menu" hidden><a href="/colaboradores-digitais/" style="--product-color:#EDA33B">Agentes</a><a href="/roteador/" style="--product-color:#3D63DB">Roteador</a><a href="/health/" style="--product-color:#30A46C">Nó Health</a></div>
-      </div>
-      <a href="/contato/">Contato</a>
-    </div>
-  </nav></div>
+<!-- site-nav:start -->
+<nav class="no-card-nav" aria-label="Navegação principal"><div class="no-card-top"><button class="no-card-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="no-card-panel"><span></span><span></span></button><a class="no-card-brand" href="/" aria-label="Nó — página inicial"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="46" height="30"></a><div class="no-card-toplinks"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/contato/">Contato</a></div></div><div id="no-card-panel" class="no-card-panel" aria-hidden="true" inert><div class="no-card-panel-inner"><div class="no-card-grid"><div class="no-card"><b>Home</b><div><a href="/">Conheça a Nó</a><a href="/#como-funciona">Como funciona</a><a href="/#clientes">Nossos clientes</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/health/">nó.health</a></div></div><div class="no-card"><b>Agência</b><div><a href="/agencia/#solucoes">Soluções</a><a href="/agencia/#como-funciona">Como funciona</a><a href="/agencia/#organizacao">Organização</a><a href="/agencia/#acompanhamento">Acompanhamento</a><a href="/agencia/#empresas">Empresas</a></div></div><div class="no-card"><b>Contato</b><div><a href="/contato/">Conte sua ideia</a><a href="/agencia/#contato">Parceria com agências</a></div></div></div></div></div></nav>
+<!-- site-nav:end -->
 
 <main id="conteudo">
 <section class="st-hero">
@@ -165,7 +157,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <p class="st-rot">quem já trabalhou com a gente</p>
     <h2 class="st-h2" id="clientes">Empresas que têm um sistema da Nó</h2>
     <p class="st-sub">Plantão Digital, Consulta de Casa, SOS Telemedicina, Loiê Sala Aromática, Gazeta Bragantina, Maisis Marketing Digital, Pesqueiro Xocó, Prontia Saúde e Palladio.</p>
-    <p style="display:flex;flex-wrap:wrap;gap:10px 24px;margin:0"><a class="st-link" href="/cases/">Ver os cases</a><a class="st-link" href="/servicos/">Ver os serviços</a><a class="st-link" href="/colaboradores-digitais/">Colaboradores digitais</a></p>
+    <p style="display:flex;flex-wrap:wrap;gap:10px 24px;margin:0"><a class="st-link" href="/#clientes">Ver os cases</a><a class="st-link" href="/agencia/#solucoes">Ver os serviços</a><a class="st-link" href="/colaboradores-digitais/">Colaboradores digitais</a></p>
   </div>
 </section>
 
@@ -186,57 +178,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </section>
 </main>
 
-<footer class="st-rodape">
-  <div class="st-in">
-    <div class="st-rodape-grade">
-      <div>
-        <a href="/" aria-label="Nó Tech Stack — página inicial"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="190" height="26" loading="lazy"></a>
-        <p style="margin:14px 0 16px;max-width:34ch">Sistemas, aplicativos e painéis sob medida para empresas. Planejados, desenhados e construídos com você acompanhando tudo pelo app da Nó.</p>
-        <a href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer">WhatsApp: (11) 93928-9413 ↗</a>
-      </div>
-      <nav aria-label="Serviços">
-        <h2>Serviços</h2>
-        <ul>
-          <li><a href="/contato/">Contato</a></li>
-          <li><a href="/sistemas-sob-medida/">Sistemas sob medida</a></li>
-          <li><a href="/desenvolvimento-de-aplicativos/">Desenvolvimento de aplicativos</a></li>
-          <li><a href="/paineis-empresariais/">Painéis empresariais</a></li>
-          <li><a href="/integracoes-e-automacoes/">Integrações e automações</a></li>
-          <li><a href="/servicos/">Todos os serviços</a></li>
-        </ul>
-      </nav>
-      <nav aria-label="Cases e conteúdos">
-        <h2>Cases e conteúdos</h2>
-        <ul>
-          <li><a href="/cases/">Cases</a></li>
-          <li><a href="/cases/prontia-saude/">Prontia Saúde</a></li>
-          <li><a href="/cases/consulta-de-casa/">Consulta de Casa</a></li>
-          <li><a href="/cases/loie/">Loiê</a></li>
-          <li><a href="/conteudos/">Conteúdos</a></li>
-        </ul>
-      </nav>
-      <nav aria-label="Empresa e produtos">
-        <h2>Empresa</h2>
-        <ul>
-          <li><a href="/sobre/">Sobre a Nó</a></li>
-          <li><a href="/colaboradores-digitais/">Colaboradores digitais</a></li>
-          <li><a href="/roteador/">Roteador</a></li>
-          <li><a href="/health/">Nó Health</a></li>
-          <li><a href="/termos/">Termos de uso</a></li>
-          <li><a href="/privacidade/">Privacidade e cookies</a></li>
-        </ul>
-      </nav>
-    </div>
-    <div class="st-rodape-pe">
-      <span>© 2026 nó tech stack · CNPJ 60.342.339/0001-06</span>
-      <span>Atendimento em todo o Brasil, 100% online.</span>
-    </div>
+<!-- site-footer:start -->
+<footer class="no-site-footer">
+  <div class="ft-brand">
+    <a class="ft-logo" href="/" aria-label="Nó — página inicial"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="198" height="27"></a>
+    <div class="ft-txt">IA que arquiteta, integra e opera.</div>
+    <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
   </div>
+  <nav class="ft-nav" aria-label="Mapa do site"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/health/">nó.health</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/sobre/">Sobre a Nó</a><a href="/contato/">Conte sua ideia</a></nav>
+  <div class="ft-legal ft-txt"><div class="ft-legal-links"><a href="/termos/" class="ft-link">Termos de uso</a><span aria-hidden="true"> · </span><a href="/privacidade/" class="ft-link">Privacidade e cookies</a></div><div>© 2026 nó. Todos os direitos reservados.</div></div>
 </footer>
-<script type="module">
-  import { initProductsNav } from '/shared/products-nav.js';
-  initProductsNav(document.getElementById('products-nav-root'));
-</script>
+<!-- site-footer:end -->
+
 <script>
 /* cliques de CTA: mesmo evento da home (cta_click), com a página junto */
 document.addEventListener('click', function(e){

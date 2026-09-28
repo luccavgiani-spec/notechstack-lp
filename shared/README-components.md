@@ -10,3 +10,9 @@ As 25 páginas públicas do sitemap carregam `smooth-cursor.css` e `smooth-curso
 
 A seção Organização da Agência usa largura total e enquadra as margens do vídeo; o diálogo oferece reprodução, zoom e rolagem para ler o painel em telas pequenas. As regras de layout estão em `agencia.css` e na versão servida `agencia.min.css`.
 `prototype-devices.css` adapta iPhone 14 Pro e MacBook Pro da biblioteca pública Devices.css (MIT), com fontes/licença em `shared/vendor/devices/`. O protótipo usa proporções fixas, escala conforme o espaço e rolagem interna; não restaurar height:auto/overflow:visible na tela Loiê.
+
+## Navegação pública e sitemap
+
+As oito páginas do sitemap usam navbar e footer estáticos gerados por `shared/sync-site-layout.mjs`. Edite os grupos e links nessa fonte e execute `npm run sync:layout`; `npm run check:layout` detecta divergências. A interação do menu fica em `card-nav.js`, o visual em `card-nav.css` e `site-layout.css`. As páginas legais escondem a navegação somente no modo de iframe `?embed=1`.
+
+Validação: `python .checks/seo/audit.py` e `node .checks/seo/test-site-layout.cjs` (usa o Playwright instalado em `app/`). Para verificar produção, defina `SITE_URL` com a origem publicada. As rotas retiradas têm redirecionamentos permanentes em `vercel.json`; Colaboradores Digitais mantém `/colaboradores-digitais/`.
