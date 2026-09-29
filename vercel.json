@@ -74,6 +74,16 @@
   ],
   "redirects": [
     {
+      "source": "/lp-narrador/cenas-lp/lp-v7.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/lp-narrador/cenas-lp/lp-v7.html/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/servicos/",
       "destination": "/agencia/#solucoes",
       "permanent": true

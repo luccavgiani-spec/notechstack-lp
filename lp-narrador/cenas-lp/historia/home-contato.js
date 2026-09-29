@@ -12,6 +12,7 @@
   const status = document.getElementById('leadStatus');
   const nav = form.querySelector('.home-form-nav');
   const mode = form.dataset.mode || 'contato_home';
+  const draft = window.createLeadProgress?.(form, mode);
   const track = (event, params, key) => window.track?.(event, {modo:mode, ...params}, key);
   const fileInput=document.getElementById('lead-arquivos');
   const fileList=document.getElementById('lead-arquivos-lista');
@@ -59,6 +60,8 @@
     if (sending || sent || !validate(step)) return;
     error.hidden = true;
     track('form_pergunta_concluida', {pergunta:step+1}, String(step+1));
+    track('form_etapa', {etapa:step+1,passo:step+1}, String(step+1));
+    draft?.advance(step+1);
     if (step < 4) { step++; render(true); return; }
     for (let i=0;i<steps.length;i++) if (!validate(i)) return;
     const references=links.value.trim().split(/\r?\n/).filter(Boolean);
@@ -91,6 +94,7 @@
       const response = await fetch(form.action, {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
       const result = await response.json();
       if (!response.ok || result.success !== true || !(result.saved === true || result.emailSent === true)) throw new Error('lead_not_accepted');
+      draft?.finish();
       track('lead_submit', {etapa:5,valor:0}, 'home');
       if(files.length && result.attachmentsSent!==files.length){
         sent=true; steps.forEach(item=>{item.hidden=true;});nav.hidden=true;bar.hidden=true;next.hidden=true;
