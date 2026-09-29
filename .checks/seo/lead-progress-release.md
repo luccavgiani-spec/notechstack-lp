@@ -1,6 +1,6 @@
 # Salvamento parcial e retirada da v7 — 29/09/2026
 
-Estado em 29/09: publicação autorizada. Migração 20260929173008 aplicada e save-lead-progress v1 ACTIVE. Teste sintético confirmou nome + WhatsApp na etapa 2; leitura por anon/authenticated e execução pública da RPC negadas. Frontend/redirecionamento em publicação via PR.
+Estado em 29/09: publicação autorizada. Migração 20260929173008 aplicada e save-lead-progress v1 ACTIVE. Teste sintético confirmou nome + WhatsApp na etapa 2; leitura por anon/authenticated e execução pública da RPC negadas. Frontend/redirecionamento publicados pelo PR #46, commit 849263c8, deployment dpl_2SyYhxKp7p9dYicJnEKrLkoKZ2Qk READY. Rascunhos Home/Contato confirmados por teste de navegador. Ajuste de checkbox final em publicação.
 
 ## Comportamento
 
@@ -10,7 +10,7 @@ Estado em 29/09: publicação autorizada. Migração 20260929173008 aplicada e s
 - Uma linha por sessão/modo. Versão monotônica evita que requisições atrasadas sobrescrevam respostas novas. O rascunho é a versão mais recente, não um histórico de edições.
 - `leads_para_retomar` mostra rascunhos sem envio concluído, sem lead correspondente e sem atualização há 30 minutos. Nome sem telefone permite identificar o rascunho, mas não permite entrar em contato.
 - RLS e permissões impedem leitura/escrita por `anon` e `authenticated`; a função pública permite apenas gravação e retorna somente confirmação. Não existe endpoint público de consulta.
-- Aviso no início do formulário e política explicam o salvamento durante o preenchimento.
+- Por solicitação do usuário, não há aviso no início do formulário. A última etapa exige checkbox desmarcado por padrão com links para Termos de Uso e Política de Privacidade; a política explica o salvamento parcial. O checkbox valida somente o envio final, sem impedir a recuperação de rascunhos.
 - Encerramento abrupto/offline pode impedir o último salvamento; há tentativas limitadas e beacon ao sair, sem promessa de entrega garantida. Não há armazenamento local de respostas nem retomada automática no navegador.
 - v7 e variante com barra final redirecionam permanentemente à home (308 na Vercel), preservando o destino de links antigos. Não apagar o HTML de referência nesta etapa.
 

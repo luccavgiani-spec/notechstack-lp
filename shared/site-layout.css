@@ -26,3 +26,7 @@ html.lg-embed .no-card-nav~.lg-wrap{padding-top:0}
    leaving the shared footer underneath overflowing page content. */
 body #dc-root,body #dc-root>.sc-host{height:auto}
 @media(max-width:900px){footer.no-site-footer{flex-direction:column;gap:22px;text-align:center;padding:36px 20px}.no-site-footer .ft-brand,.no-site-footer .ft-legal{align-items:center;text-align:center}.no-site-footer .ft-legal-links{justify-content:center}}
+
+.home-form .home-consent{display:flex;align-items:flex-start;gap:10px;margin:20px 0 0;font-size:12px;line-height:1.6;font-weight:400}
+.home-form .home-consent input[type="checkbox"]{appearance:auto;width:18px;height:18px;min-height:0;flex:0 0 18px;margin:3px 0 0;padding:0;accent-color:var(--no-verde,#30A46C)}
+.home-form .home-consent a{color:inherit;text-decoration:underline;text-underline-offset:3px}

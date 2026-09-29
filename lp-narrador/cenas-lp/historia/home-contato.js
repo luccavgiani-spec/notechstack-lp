@@ -64,6 +64,11 @@
     draft?.advance(step+1);
     if (step < 4) { step++; render(true); return; }
     for (let i=0;i<steps.length;i++) if (!validate(i)) return;
+    const consent = form.querySelector('#lead-consentimento');
+    if (!consent?.checked) {
+      error.textContent = 'Marque a concordância com os termos e a política de privacidade para enviar.';
+      error.hidden = false; consent?.focus(); consent?.reportValidity(); return;
+    }
     const references=links.value.trim().split(/\r?\n/).filter(Boolean);
     if(references.some(link=>{try{return !['https:','http:'].includes(new URL(link).protocol);}catch{return true;}})){
       error.textContent='Use links completos, começando com https://, um por linha.';error.hidden=false;links.focus();return;
