@@ -36,12 +36,6 @@
     addEventListener('pagehide', () => save(true));
     addEventListener('online', () => { attempts = 0; save(false); });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(true); });
-    const notice = document.createElement('p');
-    notice.className = 'home-ajuda';
-    notice.textContent = 'Ao preencher, suas respostas são salvas para que a Nó possa retomar seu atendimento, mesmo se você não concluir o envio.';
-    const privacy = document.createElement('a');
-    privacy.href = '/privacidade/'; privacy.textContent = ' Política de privacidade.'; notice.append(privacy);
-    form.prepend(notice);
     return {
       advance(number){ interacted = true; completed = Math.max(completed, number); save(false); },
       finish(){ finalized = true; save(false); }

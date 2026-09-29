@@ -69,7 +69,8 @@ for (const filename of ['lp-narrador/cenas-lp/lp-v8.html','contato/index.html'])
   for (const input of inputs) { input.setCustomValidity=()=>{}; input.checkValidity=()=>true; input.reportValidity=()=>{}; input.focus=()=>{}; if(input.tagName==='SELECT')Object.defineProperty(input,'value',{value:'Sistema sob medida',writable:true}); }
   form.dataset.mode=filename.startsWith('contato')?'contato':'contato_home';
   const timers=new Map(), listeners={}, calls=[], events=[]; let timerId=0;
-  const window={leadSid:'browser-test-session-'+form.dataset.mode,leadOrig:{utm_source:'google'},track:(event,params)=>events.push({event,...params})};
+  const seen=new Set();
+  const window={leadSid:'browser-test-session-'+form.dataset.mode,leadOrig:{utm_source:'google'},track:(event,params,key)=>{if(key&&seen.has(event+key))return;if(key)seen.add(event+key);events.push({event,...params});}};
   const context={window,document,URL,Blob,TextEncoder,Date,console,AbortController,
     FormData:class {get(name){return form.elements.namedItem(name)?.value;}},
     setTimeout:(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId;}, clearTimeout:id=>timers.delete(id),
@@ -97,6 +98,14 @@ for (const filename of ['lp-narrador/cenas-lp/lp-v8.html','contato/index.html'])
   set('whatsapp','11987654322'); listeners.pagehide();
   assert.equal(JSON.parse(await calls.at(-1).beacon.text()).respostas.whatsapp,'11987654322');
   await submit(); set('negocio','Empresa'); await submit(); await submit(); set('descricao','Rotina e processos detalhados'); await submit();
+  assert.equal(calls.filter(c=>c.url.endsWith('send-lead-email')).length,0,'unchecked consent must prevent final submission');
+  assert.ok(document.getElementById('leadErro').textContent.includes('Marque'));
+  assert.ok(!form.textContent.includes('Ao preencher, suas respostas são salvas'));
+  const consent=document.getElementById('lead-consentimento');
+  assert.ok(consent.hasAttribute('required')); assert.ok(!consent.hasAttribute('checked'));
+  assert.equal(consent.closest('fieldset'),form.querySelectorAll('fieldset')[4]);
+  assert.equal(form.querySelectorAll('.home-consent a').length,2);
+  consent.checked=true; await submit();
   assert.ok(calls.some(c=>c.url.endsWith('save-lead-progress')&&c.data?.finalizado));
   assert.equal(events.filter(e=>e.event==='form_etapa').length,5);
   assert.ok(events.some(e=>e.event==='lead_submit'));
