@@ -84,3 +84,8 @@ verify_jwt = true
 
 [functions.project-publish-version]
 verify_jwt = true
+
+# marketing-hub valida a sessão ela mesma (papel + aal2 via auth.getUser) e a rota
+# /internal/publish-due é chamada pelo pg_cron com x-cron-secret, sem JWT.
+[functions.marketing-hub]
+verify_jwt = false
