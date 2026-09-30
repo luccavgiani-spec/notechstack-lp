@@ -21,7 +21,8 @@ esses dados.
 `estado observado` → o site emite tudo (GTM, GA4, Google Ads, Pixel + CAPI), mas
 nada volta consolidado; cada leitura é feita dentro de um painel diferente.
 `mecanismo` → o acesso é por login interativo pessoal. Um agente só alcança isso
-por automação de navegador, que é frágil e não deixa rastro.
+por automação de navegador **nos painéis de terceiros** (2FA, telas que mudam,
+sessão pessoal), que é frágil e não deixa rastro.
 `consequência` → o Lucca não consegue organizar tráfego, conversão e social media
 num só planner. Análise e operação ficam presas ao tempo dele.
 `impacto` → o planejamento de marketing da nó não tem visão única e não pode ser
@@ -77,8 +78,8 @@ grant de E4.
 
 ## Resultado desejado
 
-O Lucca, e agentes autorizados por ele, têm **um lugar só** onde, sem sessão de
-navegador:
+O Lucca, e agentes autorizados por ele, têm **um lugar só** onde, sem depender
+das sessões pessoais do Lucca nas plataformas:
 
 1. veem juntos tráfego pago (Meta Ads, Google Ads), conversão (GA4, leads) e social
    media (IG/FB orgânico e Search Console);
@@ -132,7 +133,7 @@ navegador:
 | P1 — de quem são as contas | só da nó | Token de System User do Business Manager e app em modo desenvolvimento; sem App Review. |
 | P2 — a dor | organizar tráfego, conversão e social num só planner | O problema central é a **consolidação**; a operação por agente vem em cima dela. |
 | P3 — autonomia | sem teto de verba; libera tudo com confirmação expressa | Toda escrita que publica ou gasta passa por um passo de confirmação do Lucca. |
-| P4 — agente | dots da OpenAI | A interface para agentes precisa ser um servidor MCP remoto com OAuth (E9). |
+| P4 — agente | dots da OpenAI | O dot opera o planner pelo próprio navegador, com login próprio, como uma pessoa. Revisão de 30/09: isso substitui a ideia inicial de MCP. |
 | P5 — Google Ads | entra; Lucca acha que "por GTM é melhor" | Correção em E10: o GTM não lê nem opera. Leitura via GA4 (se vinculado) ou API do Google Ads. |
 | P6 — piloto de abril | abandonado por escolha; reaproveitar tudo | Ponto de partida do Gate 2 é o backend existente. |
 
@@ -148,3 +149,7 @@ Q1–Q3 foram respondidas em 30/09/2026:
 ## Decisão do gate
 
 **Aprovado** pelo Lucca em 30/09/2026. Segue para o Gate 2 (`spec.md`).
+
+Revisão pós-aprovação (30/09): esclarecido que "sem sessão" se refere às
+sessões pessoais do Lucca nas plataformas. O canal do agente passou a ser o
+próprio planner, pelo navegador do dot. Resultado e escopo não mudaram.
