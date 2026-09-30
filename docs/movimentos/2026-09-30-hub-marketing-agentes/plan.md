@@ -447,6 +447,57 @@ Candidato a movimento próprio.
   **Não usar** `no-hub-generator` nem `no-brand-pitch`: carregam a identidade v1,
   arquivada.
 
+## Notas técnicas da execução (30/09/2026)
+
+Registradas pelo Executor. São ajustes técnicos; nenhum muda problema, resultado,
+escopo ou decisão aprovada. Detalhe e evidências em `execution.md`.
+
+1. **Quem faz o Passo 0.** O Executor (Claude) não cria contas (System User, MCC),
+   não gera nem digita tokens em campos, não concede OAuth. Isso vale mesmo com
+   autorização. Além disso, autorização escrita em arquivo não substitui a
+   autorização dada no chat. O Passo 0.1/0.2 fica com o Lucca. Por isso a ordem
+   inverteu: Passos 1–4 e 6 foram construídos e provados no local antes do Passo 0,
+   sem tocar em produção.
+2. **"Testes Deno" rodam no Vitest do app**, no padrão que o repo já usa para
+   `_shared/`. O Deno não está instalado. Para isso, `app/tsconfig.app.json` ganhou
+   `allowImportingTsExtensions`. O `index.ts`/`store.ts` foram provados no runtime Deno
+   real via `supabase functions serve` (`supabase/tests/hub_marketing_edge.mjs`).
+3. **Fixtures reais anonimizadas de V1–V6** dependem dos secrets. Até lá, os testes
+   usam o formato documentado de cada API. Trocar depois do Passo 0.
+4. **Google Ads na Visão geral via GAQL** (fonte de verdade, com conversões), com o
+   `advertiserAdCost` do GA4 exibido como conferência cruzada. O adaptador GAQL já
+   era exigido pela escrita.
+5. **V7 resolvida por documentação**: a Marketing API v21.0 expirou em 09/09/2025.
+   `_shared/meta.ts` passou para `v25.0`. `meta-capi`, `pagarme-webhook-no` e
+   `send-lead-email` não foram tocados. Google Ads REST em `v25` (jul/2026).
+6. **Meta**: a campanha nasce `PAUSED`, com conjunto e anúncio `ACTIVE` dentro dela.
+   Ativar a campanha é o único passo que libera gasto, conforme C3. A criação envia
+   `is_adset_budget_sharing_enabled=false` e `targeting_automation.advantage_audience=0`
+   (público exato, como revisado).
+7. **`scheduled_posts`** ganhou `created_by`, `created_by_role`, `publish_attempts`,
+   `meta_container_id` e o status `cancelled`. Tudo isso é necessário para cancelar,
+   dar 3 tentativas e publicar reels assíncronos.
+8. **Segredo do cron**: gerado dentro do banco pela migration e conferido por RPC
+   (`marketing_cron_secret_ok`), então nunca sai do Vault. A URL da função fica no
+   Vault (`marketing_hub_url`), criada no deploy, porque muda por ambiente.
+9. **Seed de `ad_accounts`**: a linha `no-tech-stack` em `clients` entrou na
+   migration. As três linhas da Meta entram em migration própria quando os ids do
+   0.1 existirem, para não inventar id.
+10. **Convite do dot** usa `generateLink` e devolve o link só na tela do NO_ADMIN,
+    no mesmo padrão do `skill-01`. A senha é criada em `/no/marketing/acesso`, e o
+    `/acesso` do CLIENT ficou intocado.
+11. **`app/src/auth/aal.ts`** (arquivo novo, fora da lista de escopo): leitura do claim
+    `aal`, separada do `RoleRoute.tsx` por causa da regra `react-refresh` do lint.
+12. **AC7**: em `list_admin_projects`, `list_archive_assets` e `leads`, a conta do dot
+    recebe **200 com lista vazia** (a RLS filtra). Em saldos e nas tabelas do marketing,
+    recebe 403/42501. Chegar a 403 literal exigiria mexer nas policies do R1, que são
+    escopo proibido.
+13. **Rollback do bucket** é pela Storage API: o Supabase bloqueia `DELETE` direto em
+    `storage.*`.
+14. **E2E preexistentes**: `r1-05`, a parte CLIENT de `f2-09`, `f2-10` e `r1-07` já
+    falhavam no commit base `4c053e61` (provado num worktree temporário). O gate de
+    MFA não causa essas falhas.
+
 ## Decisão do gate
 
 **ready_for_execution**: aprovado pelo Lucca em 30/09/2026.
