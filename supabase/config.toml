@@ -45,6 +45,15 @@ additional_redirect_urls = ["https://*.notechstack.com.br", "http://localhost:*/
 jwt_expiry = 3600
 enable_signup = false
 
+# MFA TOTP obrigatório para NO_ADMIN (hub-marketing-agentes, C2): o app exige aal2
+# em /no/* e a marketing-hub recusa sessão aal1 do NO_ADMIN.
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
 [edge_runtime]
 enabled = true
 policy = "per_worker"

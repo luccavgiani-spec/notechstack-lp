@@ -2,10 +2,12 @@ import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { cadastrarTotp } from './mfa'
 
 export type R107Fixture = {
   admin: SupabaseClient
   adminEmail: string
+  adminTotp: string
   gazetaEmail: string
   helloEmail: string
   password: string
@@ -88,7 +90,9 @@ export async function createR107Fixture(): Promise<R107Fixture> {
   })
   if (activationError) throw activationError
 
-  return { admin, adminEmail, gazetaEmail, helloEmail, password, userIds, gazetaClientId, helloClientId, gazetaProjectId, helloProjectId }
+  // NO_ADMIN precisa de TOTP desde o hub de marketing (C2).
+  const adminTotp = await cadastrarTotp(adminEmail, password)
+  return { admin, adminEmail, adminTotp, gazetaEmail, helloEmail, password, userIds, gazetaClientId, helloClientId, gazetaProjectId, helloProjectId }
 }
 
 export async function setHelloAccessOffset(fixture: R107Fixture, offsetMilliseconds: number) {
