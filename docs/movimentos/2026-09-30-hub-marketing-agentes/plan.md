@@ -3,7 +3,7 @@ movement_id: hub-marketing-agentes
 intent: ./intent.md
 spec: ./spec.md
 spec_revision: 96c9b7f (rev. 3; correção de fato 3.1 no mesmo commit deste plano)
-status: draft
+status: ready_for_execution
 updated: 2026-09-30
 ---
 
@@ -58,7 +58,18 @@ updated: 2026-09-30
 
 ### Passo 0 — Pré-requisitos do Lucca e provas de viabilidade
 
-**0.1 · Meta (Lucca, no Business Manager da nó — portfólio `990413650211777`, a
+**Quem executa 0.1 e 0.2.** Em 30/09 o Lucca autorizou o Executor a fazer 0.1 e
+0.2 **no Chrome dele** (Claude in Chrome), com a conta Google
+`notechstack@gmail.com` já logada. Se o login falhar, o Executor para e pede ao
+Lucca que entre. Os tokens gerados vão **direto** para os secrets do Supabase pela
+aba do painel: nunca em chat, arquivo ou commit. O Lucca vai rotacioná-los
+depois da validação.
+
+- Se a `notechstack@gmail.com` não for admin do Business Manager, do GA4, do
+  Search Console ou do Google Ads da nó, parar e perguntar.
+- Não aceitar cobrança, cartão ou upgrade de plano em nenhuma tela.
+
+**0.1 · Meta (Business Manager da nó — portfólio `990413650211777`, a
 confirmar):**
 
 1. Em developers.facebook.com, ver o tipo do app `1590026522084626`. Se não for
@@ -78,7 +89,7 @@ confirmar):**
 7. Anotar os ids (não são segredo): conta de anúncios `act_…`, Page id, IG user
    id.
 
-**0.2 · Google (Lucca):**
+**0.2 · Google (conta `notechstack@gmail.com`):**
 
 1. Criar o projeto Google Cloud "no-hub" e ativar: Google Analytics Data API,
    Google Search Console API e Google Ads API.
@@ -424,8 +435,13 @@ Candidato a movimento próprio.
   - as evidências AC1–AC11, com prints das plataformas nos AC2–AC4;
   - diff por passo, em commits separados;
   - confirmação de que nenhum segredo entrou no repo.
+- **Onde rodar**: no computador do Lucca (Claude Code ou Claude Desktop), com
+  Claude in Chrome conectado, porque o Passo 0 usa o Chrome dele. Fazer checkout
+  da branch `claude/windsor-ai-nó-integration-y64r9w`, onde estão estes
+  arquivos.
 - **Skills obrigatórias**:
   - `executar-grande-movimento`;
+  - `chrome-browser`, para o Passo 0;
   - `dataviz`, se disponível, para os gráficos da Visão geral.
   
   **Não usar** `no-hub-generator` nem `no-brand-pitch`: carregam a identidade v1,
@@ -433,4 +449,4 @@ Candidato a movimento próprio.
 
 ## Decisão do gate
 
-Pendente: aprovação expressa do Lucca.
+**ready_for_execution**: aprovado pelo Lucca em 30/09/2026.
