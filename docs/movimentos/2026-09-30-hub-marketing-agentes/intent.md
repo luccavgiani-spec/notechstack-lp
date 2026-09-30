@@ -1,6 +1,6 @@
 ---
 movement_id: hub-marketing-agentes
-status: in_review
+status: approved
 owner: Lucca
 created: 2026-09-30
 updated: 2026-09-30
@@ -138,16 +138,13 @@ navegador:
 
 ## Perguntas abertas
 
-Nenhuma bloqueia o Gate 1; todas ficam para o Gate 2:
+Q1–Q3 foram respondidas em 30/09/2026:
 
-- **Q1 — Plano do ChatGPT.** Sua conta é Pro ou Business Premium? Os dots só
-  existem nesses planos (E9).
-- **Q2 — Google Ads na primeira entrega.** Basta ler gasto e conversões (via GA4),
-  ou o agente já precisa criar e editar campanhas Google? A escrita exige API +
-  developer token.
-- **Q3 — Vínculo Google Ads ↔ GA4.** O Google Ads da nó está vinculado ao GA4
-  `G-1YEB89RVER`? Isso define se a leitura do Google Ads sai sem a API dele.
+- **Q1 — Plano do ChatGPT:** Pro de US$ 100.
+- **Q2 — Google Ads:** o sistema já precisa **criar** campanhas Google. Se o
+  sistema consegue, o agente também consegue pelo mesmo caminho.
+- **Q3 — Vínculo Google Ads ↔ GA4:** sim, está vinculado ao `G-1YEB89RVER`.
 
 ## Decisão do gate
 
-Aguardando aprovação expressa do Lucca para passar ao Gate 2 (spec).
+**Aprovado** pelo Lucca em 30/09/2026. Segue para o Gate 2 (`spec.md`).
