@@ -64,12 +64,12 @@ async function sha256(v: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-/* Telefone precisa ir com código do país. O formulário coleta "(11) 99999-9999";
-   sem o 55 na frente o hash não casa com nada e o dado enviado é lixo. */
+/* Código do país tanto no CAPI quanto no link do e-mail. Números nacionais
+   têm 10/11 dígitos, inclusive os de DDD 55; com + o DDI já é explícito. */
 function normFone(v: string): string {
   const d = (v || '').replace(/\D/g, '')
   if (!d) return ''
-  if (d.startsWith('55')) return d
+  if ((v || '').trim().startsWith('+')) return d
   if (d.length >= 10 && d.length <= 11) return '55' + d
   return d
 }
@@ -270,6 +270,7 @@ Deno.serve(async (req) => {
     const linha = (rot: string, val: string | null) =>
       val ? `<tr><td style="padding:8px 0;font-weight:700;color:#5f6368;width:150px">${rot}</td><td style="padding:8px 0;color:#1a1a1a">${val}</td></tr>` : ''
 
+    const whatsappFone = normFone(whatsapp || '')
     const htmlBody = `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
   <div style="background:#4285F4;padding:24px;border-radius:12px 12px 0 0">
@@ -290,9 +291,9 @@ Deno.serve(async (req) => {
     </table>
     ${descricao ? `<div style="margin-top:20px;padding:16px;background:#fff;border-radius:8px;border-left:4px solid #EDA33B"><h3 style="margin-top:0;color:#B0731A">O que ele contou</h3><p style="color:#1a1a1a;white-space:pre-wrap;margin:0">${descricao}</p></div>` : ''}
     ${aiAnalysis ? `<div style="margin-top:16px;padding:16px;background:#e8f0fe;border-radius:8px;border-left:4px solid #4285F4"><h3 style="margin-top:0;color:#4285F4">✦ Leitura da nó</h3><p style="color:#1a1a1a;white-space:pre-wrap;margin:0">${aiAnalysis}</p></div>` : ''}
-    <div style="margin-top:24px;padding:12px;background:#fff;border-radius:8px;text-align:center">
-      <a href="https://wa.me/55${(whatsapp || '').replace(/\D/g, '')}" style="background:#25D366;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block">💬 Responder no WhatsApp</a>
-    </div>
+    ${whatsappFone ? `<div style="margin-top:24px;padding:12px;background:#fff;border-radius:8px;text-align:center">
+      <a href="https://wa.me/${whatsappFone}" style="background:#25D366;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block">💬 Responder no WhatsApp</a>
+    </div>` : ''}
     ${sid ? `<p style="color:#9aa0a6;font-size:11px;margin:16px 0 0;font-family:monospace">sid ${sid}</p>` : ''}
   </div>
 </div>`
