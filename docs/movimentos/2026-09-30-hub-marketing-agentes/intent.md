@@ -96,8 +96,8 @@ das sessões pessoais do Lucca nas plataformas:
   Console", com números que batem com os painéis nativos (tolerância a definir no
   Gate 2).
 - Um post agendado por agente sai no horário marcado.
-- Uma campanha criada por agente fica parada até o Lucca confirmar, e só depois
-  passa a veicular.
+- Uma campanha criada por agente nasce pausada e só passa a veicular depois que o
+  Lucca autoriza.
 - Toda escrita tem registro de quem, quando, o quê, quem confirmou e o resultado.
 - Nenhuma credencial em HTML, frontend, arquivo, chat ou commit.
 
@@ -106,8 +106,9 @@ das sessões pessoais do Lucca nas plataformas:
 - **Só ativos da nó** (P1). Nada de OAuth de terceiros nem App Review como
   pré-requisito.
 - **Sem teto de verba**, mas nenhuma ação que publique ou gaste roda sem
-  confirmação expressa do Lucca (P3). A confirmação precisa ser garantida pelo
-  servidor, não só pelo agente ou pelo modal do ChatGPT.
+  confirmação expressa do Lucca (P3). No planner, a confirmação é a tela de
+  revisão. Para o dot, é o Lucca autorizando no chat. Isso não é verificável pelo
+  servidor e foi aceito pelo Lucca (spec, C1 = a).
 - Credenciais só no servidor (secrets do Supabase ou Vault), no mesmo padrão do
   `painel-dados`. O risco E4 precisa estar resolvido antes de qualquer token cair
   em `ad_accounts`.
@@ -152,4 +153,6 @@ Q1–Q3 foram respondidas em 30/09/2026:
 
 Revisão pós-aprovação (30/09): esclarecido que "sem sessão" se refere às
 sessões pessoais do Lucca nas plataformas. O canal do agente passou a ser o
-próprio planner, pelo navegador do dot. Resultado e escopo não mudaram.
+próprio planner, pelo navegador do dot. Resultado e escopo não mudaram. Na mesma data, a restrição de confirmação foi
+ajustada à decisão C1 = (a) da spec: o dot tem o mesmo poder do Lucca, e a
+confirmação dele acontece no chat.
