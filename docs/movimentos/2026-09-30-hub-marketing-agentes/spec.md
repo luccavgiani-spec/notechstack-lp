@@ -1,10 +1,10 @@
 ---
 movement_id: hub-marketing-agentes
 intent: ./intent.md
-intent_revision: e7826fc
+intent_revision: 96c9b7f
 status: approved
 updated: 2026-09-30
-revision: 3 — decisões C1–C4 do Lucca incorporadas (C1 = a: dot com o mesmo poder do Lucca)
+revision: 3.1 — decisões C1–C4 do Lucca (C1 = a); correção de fato em 30/09 (fonte do sync-meta-organic está no repo; `clients` não é legado)
 ---
 
 # Spec: marketing da nó num lugar só, operável por agentes
@@ -25,13 +25,14 @@ planner único onde tudo se vê e tudo se faz**.
 
 - **Backend Meta de abril** (`supabase/functions/`, `supabase/README.md`):
   - `oauth-callback` (público, `verify_jwt=false`), `sync-meta-ads`,
-    `refresh-tokens`; `sync-meta-organic` está **implantado, mas o código-fonte não
-    está no repo**.
+    `sync-meta-organic`, `refresh-tokens`: fonte no repo e implantados em
+    produção.
   - Cliente Graph reutilizável em `_shared/meta.ts` (retry/backoff, `v21.0`, app
     `1590026522084626`).
   - `sync-meta-ads` só conta **purchase** como conversão (`parseInsightsRow`). A nó
     converte em **lead**, então, do jeito que está, reportaria 0 conversões.
-- **Tabelas** (migration `20260423195849`): `clients`, `ad_accounts`
+- **Tabelas** (migration `20260423195849`): `clients` (também é base do modelo
+  de clientes atual, com FKs desde o R1-01, então **não é legado**), `ad_accounts`
   (`access_token NOT NULL`), `ad_metrics_daily`, `social_metrics_daily`,
   `scheduled_posts` (fila com `media_type`, `caption`, `media_urls`, `status`,
   `external_post_id`), `sync_logs`. Todas vazias em produção.
@@ -157,11 +158,11 @@ dinamicamente.
 | Tabela `marketing_actions` (quem fez, papel, status: executando / ok / erro; `payload`, `result`, `external_ids`) | R6. Sem fila de aprovação, porque C1 = (a). |
 | Reuso de `scheduled_posts` + job `pg_cron` a cada 5 min | R4. A tabela já tem a forma certa; falta o publicador. |
 | Reuso de `ad_accounts` como cadastro de ativos, com `access_token` passando a nullable (o token fica no secret) | R8; reaproveitamento (P6); FK de `scheduled_posts`. |
-| Migration de segurança: revogar grants de `anon`/`authenticated` nas tabelas Meta legadas e novas | R8; risco E4. |
+| Migration de segurança: revogar grants de `anon`/`authenticated` em `ad_accounts`, `ad_accounts_public`, `ad_metrics_daily`, `social_metrics_daily`, `scheduled_posts`, `sync_logs` e nas tabelas novas. `clients` fica como está. | R8; risco E4. |
 | Planner em `app/src/marketing/`: Visão geral, Campanhas (Meta e Google), Calendário, Registro | R1–R7. |
 | MFA (TOTP do Supabase) obrigatório na conta `NO_ADMIN` do Lucca: cadastro e checagem de `aal2` nas rotas `/no/*` | C2. Protege se a sessão do Lucca for aberta no navegador do dot. |
 | Supabase Storage (bucket de mídia com URL assinada) | R2 e R4. A Meta busca a mídia por URL; o dot sobe arquivos pelo mesmo formulário. |
-| Aposentar `oauth-callback`, `refresh-tokens`, `sync-meta-ads` e `sync-meta-organic`, arquivando antes a fonte do `sync-meta-organic` no repo | R8. São endpoints sem uso; `oauth-callback` é público e grava com service role. |
+| Aposentar `oauth-callback`, `refresh-tokens`, `sync-meta-ads` e `sync-meta-organic` em produção, movendo a fonte para uma pasta de arquivo fora de `supabase/functions/` | R8. São endpoints sem uso; `oauth-callback` é público e grava com service role. |
 
 ## Fluxo e contratos afetados
 
@@ -216,8 +217,9 @@ dinamicamente.
 9. `anon` e `authenticated` sem grants nas tabelas de marketing. Nenhum token no
    bundle do app, no repo ou nos logs. O advisor de segurança não aponta nada novo.
 10. Os endpoints legados estão desativados, com a fonte arquivada no repo.
-11. Sem MFA concluído, a conta do Lucca não entra em `/no/*` (sessão `aal1` recebe
-    bloqueio no app e 403 nas funções que exigem `NO_ADMIN`).
+11. Sem MFA concluído, a conta do Lucca não entra em `/no/*`: sessão `aal1` recebe
+    bloqueio no app e 403 na `marketing-hub`. As demais funções e policies
+    `NO_ADMIN` ficam fora deste movimento; é o risco residual registrado no plano.
 
 ## Preocupações e perguntas abertas
 
@@ -227,8 +229,7 @@ Decisões do Lucca em 30/09/2026:
   acontece no chat com o dot. Risco aceito e registrado acima.
 - **C2 — Segundo fator:** sim. MFA obrigatório na conta do Lucca.
 - **C3 — Campanha nasce pausada:** sim. Ativar é sempre um segundo passo.
-- **C4 — Aposentar o legado de abril:** sim, depois de arquivar a fonte do
-  `sync-meta-organic`.
+- **C4 — Aposentar o legado de abril:** sim, com a fonte arquivada no repo.
 
 Aberto para o plano: nome e e-mail da conta do dot (o Lucca cria a caixa, ou usa
 um alias).
