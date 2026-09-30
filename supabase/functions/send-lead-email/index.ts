@@ -342,4 +342,3 @@ Deno.serve(async (req) => {
     return json({ success: false, error: String(err) }, 500)
   }
 })
-
