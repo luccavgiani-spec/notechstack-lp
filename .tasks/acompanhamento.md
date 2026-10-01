@@ -113,3 +113,12 @@ o formato do Decided, com mocks, até B entregar.
 - Cada agente deve preservar mudanças herdadas, entregar commits locais e provas por critério. Integração e reexecução das provas ficam com o coordenador.
 - Os estados antigos da tabela acima são históricos até a revisão das entregas herdadas; nenhum critério é considerado concluído apenas por existir código.
 - Gates e autorização permanente deste documento continuam vigentes, com os mesmos limites.
+
+### Contratos de retomada C (antes da implementação)
+
+- Escopo C ampliado pelo coordenador para `app/src/marketingGoogleOAuth.test.ts`, isolando provas de OAuth dos testes B.
+- T1:17: consentimento com escopos exatos e redirect de sucesso; T1:18: state ausente, expirado, repetido e concorrente sem troca ou gravação; T1:19: cancelamento/falha preservam token; T1:20: dot 403 e admin aal1 403; T1:21: Vault primeiro, falha do Vault não provoca fallback; T1:22: token e auditoria em transação única.
+- Landing: consumo de state por `DELETE RETURNING` em RPC atômica (read/delete separado permitiria replay concorrente); gravação Vault e auditoria na mesma transação (evita sucesso parcial).
+- Skill localizada: `C:/Users/lucca/.claude/skills/tlc-implement/SKILL.md`; perfil light. Verificador independente será despachado pelo coordenador depois da última integração. Um lote por agente nos limites de contexto, C estima ~20k tokens de leitura.
+- Baseline de produção só leitura nesta retomada: leads 27; lead_sessoes 947; lead_eventos 898; backfill 10; marketing_actions 0; dots 0. Funções protegidas meta-capi/track-evento/painel-dados ACTIVE v17; marketing-hub ACTIVE v1; quatro legadas ACTIVE v18.
+- Advisors anteriores à mudança: INFO RLS sem policy 12; WARN extensão pg_net pública 1, security definer anon 2, authenticated 32, proteção de senha vazada desativada 1. Revalidar imediatamente antes e depois de qualquer aplicação.

@@ -4,12 +4,22 @@ plan: ./plan.md
 status: needs_verification
 started: 2026-09-30T21:45:00-03:00
 updated: 2026-10-01T17:45:00-03:00
-executor: Claude (Claude Code, desktop, worktree windsor-ai-no-integration-10aae2)
+executor: Codex (coordenador atual, worktree suspicious-hypatia-6f295c)
 branch: claude/windsor-ai-nó-integration-y64r9w (squash na main em 5f0d1aee, PR #49); continuação em claude/hub-marketing-continuacao
 handoff: ./HANDOFF.md
 ---
 
 # Execution: marketing da nó num lugar só, operável por agentes
+
+## Retomada coordenada pelo Codex — 01/10/2026
+
+O Lucca pediu neste chat para seguir `.tasks/acompanhamento.md`, retomar os agentes e transferir a gerência. O painel é a fonte atual de estados e gates. As seções abaixo são o registro histórico dos passos anteriores, incluindo pendências que já foram superadas; não representam um novo pedido de autorização.
+
+A/B/C retomados nos próprios worktrees, preservando commits e alterações herdados. D entra na próxima vaga. Critérios locais serão revisitados após integração e por verificador independente (`tlc-implement`, perfil light); produção e contas continuam com provas separadas.
+
+Baseline de produção consultado somente em leitura: 27 leads, 947 sessões, 898 eventos; exatamente 10 leads no intervalo do backfill, zero ações e zero contas dot. Função marketing-hub v1; funções protegidas meta-capi, track-evento e painel-dados v17; quatro funções legadas v18, todas ACTIVE.
+
+Diagnóstico C, navegador somente leitura: projeto Google no-hub em Testando, zero usuários de teste; Publicar app bloqueado por branding incompleto. Campos Política de Privacidade e Termos vazios. Nenhuma conta/configuração foi alterada.
 
 ## Estado em 01/10/2026, 20:30 UTC (fim da sessão do primeiro Executor)
 
@@ -239,3 +249,4 @@ Resumo:
 1. O Lucca faz o Passo 0 e roda as provas V1–V6.
 2. Com V1–V6 verdes e os ids no chat: seed, fixtures reais e **autorização explícita do Lucca para o Passo 7**, que exige migration, deploy e publicação em produção.
 3. Depois: AC1–AC11 em produção, delete do legado e registro no Bot-vault.
+
