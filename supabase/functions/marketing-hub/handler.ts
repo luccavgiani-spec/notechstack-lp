@@ -7,7 +7,9 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { MetaApiError } from "../_shared/meta.ts";
 import { adsAlterarStatus, adsAtualizarOrcamento, adsCampanhaDetalhe, adsCampanhas, adsCriarCampanhaPesquisa, adsResumo, adsSugerirLocais, type AdsCtx } from "../_shared/marketing/google-ads.ts";
-import { GoogleApiError, googleAccessToken } from "../_shared/marketing/google-auth.ts";
+import { type EscritaOk, diagnosticarConexoes } from "../_shared/marketing/conexoes.ts";
+import { type EstadoMetrica, Registro, type Valores, calcularEstados, semPermissao, semSegredo } from "../_shared/marketing/estados.ts";
+import { GoogleApiError, googleAccessToken, limparCacheGoogle } from "../_shared/marketing/google-auth.ts";
 import { ga4Resumo } from "../_shared/marketing/ga4.ts";
 import { gscResumo } from "../_shared/marketing/gsc.ts";
 import { COLUNAS_ORIGEM_LEAD, type LeadOrigem, leadsResumo } from "../_shared/marketing/leads.ts";
@@ -28,7 +30,7 @@ import {
   publicarFacebook,
   publicarInstagram,
 } from "../_shared/marketing/meta.ts";
-import { type Periodo, addDias, hojeSaoPaulo, parsePeriodo, ttlSegundos } from "../_shared/marketing/normalize.ts";
+import { type MetricasPagas, type Periodo, addDias, hojeSaoPaulo, parsePeriodo, ttlSegundos } from "../_shared/marketing/normalize.ts";
 import {
   caminhoMidia,
   requestId as validarRequestId,
@@ -101,6 +103,8 @@ export interface MarketingStore {
   }): Promise<{ id: string } | { existente: AcaoRow }>;
   acaoFinalizar(id: string, fim: { status: "ok" | "erro"; result?: unknown; external_ids?: unknown; error?: string | null }): Promise<void>;
   acoesListar(limite: number): Promise<AcaoRow[]>;
+  // Escritas `ok` desde a data, para provar publicação/escrita em /connections.
+  escritasOk(desdeUtc: string): Promise<EscritaOk[]>;
   ativos(): Promise<Ativos>;
   postsListar(deUtc: string, ateUtc: string): Promise<PostRow[]>;
   postInserir(linha: Omit<PostRow, "id" | "published_at" | "external_post_id" | "error_message" | "publish_attempts" | "meta_container_id"> & { client_id: string }): Promise<PostRow>;
@@ -193,7 +197,24 @@ function mensagemDe(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
 
-type Bloco<T> = { ok: true; dados: T; cache: boolean } | { ok: false; motivo: "nao_configurado" | "falha"; mensagem: string };
+// `estados` (T2 Decided 1–2): só as métricas que não estão `disponivel`.
+type Bloco<T> =
+  | { ok: true; dados: T; cache: boolean; estados: Record<string, EstadoMetrica> }
+  | { ok: false; motivo: "nao_configurado" | "falha" | "sem_permissao"; mensagem: string };
+
+type Leitura<T> = {
+  ler: (reg: Registro) => Promise<T | null>;
+  metricas?: (dados: T) => { periodo?: Valores; fixas?: Valores };
+  atrasado: boolean;
+};
+
+// v2 = { v, dados, estados }. Entrada mais antiga (só `dados`) conta como cache vazio.
+const VERSAO_CACHE = 2;
+const CHAVE_CONEXOES = "conexoes";
+const TTL_CONEXOES = 15 * 60;
+const JANELA_ESCRITA_MS = 30 * 86_400_000;
+
+const pagas = (d: { total: MetricasPagas }) => ({ periodo: { ...d.total } });
 
 // ------------------------------------------------------------------- Handler
 
@@ -247,55 +268,143 @@ export function criarHandler(deps: Deps) {
   }
 
   // Um bloco que falha não derruba a visão geral: vira "indisponível" com o motivo.
-  async function bloco<T>(chave: string, ttl: number, fresco: boolean, ler: () => Promise<T | null>): Promise<Bloco<T>> {
+  // Sub-consulta que falha não derruba o bloco: entra em `estados` e no log.
+  async function bloco<T>(chave: string, ttl: number, fresco: boolean, leitura: Leitura<T>): Promise<Bloco<T>> {
+    const nome = chave.split(":")[0];
     if (!fresco) {
-      const emCache = await store.cacheLer(chave).catch(() => null);
-      if (emCache !== null) return { ok: true, dados: emCache as T, cache: true };
+      const emCache = await store.cacheLer(chave).catch(() => null) as { v?: unknown; dados?: T; estados?: Record<string, EstadoMetrica> } | null;
+      if (emCache?.v === VERSAO_CACHE && emCache.dados !== undefined) {
+        return { ok: true, dados: emCache.dados, cache: true, estados: emCache.estados ?? {} };
+      }
     }
+    const reg = new Registro();
     try {
-      const dados = await ler();
+      const dados = await leitura.ler(reg);
       if (dados === null) return { ok: false, motivo: "nao_configurado", mensagem: "Integração ainda não configurada." };
-      await store.cacheGravar(chave, dados, ttl).catch(() => undefined);
-      return { ok: true, dados, cache: false };
+      const estados = calcularEstados({ ...(leitura.metricas?.(dados) ?? {}), atrasado: leitura.atrasado }, reg);
+      await store.cacheGravar(chave, { v: VERSAO_CACHE, dados, estados }, ttl).catch(() => undefined);
+      return { ok: true, dados, cache: false, estados };
     } catch (e) {
-      const mensagem = mensagemDe(e);
-      deps.log("warn", "marketing_bloco_falhou", { chave: chave.split(":")[0], mensagem: mensagem.slice(0, 300) });
-      return { ok: false, motivo: mensagem.startsWith("Ativo Meta não configurado") ? "nao_configurado" : "falha", mensagem };
+      const mensagem = semSegredo(mensagemDe(e));
+      deps.log("warn", "marketing_bloco_falhou", { chave: nome, mensagem: mensagem.slice(0, 300) });
+      const motivo = mensagem.startsWith("Ativo Meta não configurado") ? "nao_configurado" : semPermissao(e) ? "sem_permissao" : "falha";
+      return { ok: false, motivo, mensagem };
+    } finally {
+      // `variante` diz qual forma da consulta a plataforma recusou (ex.: posts do Facebook).
+      for (const f of reg.falhas) {
+        deps.log("warn", "marketing_subconsulta_falhou", { chave: nome, metricas: f.chaves, estado: f.estado, variante: f.variante, mensagem: f.mensagem });
+      }
     }
   }
 
   function blocos(p: Periodo, fresco: boolean) {
     const ttl = ttlSegundos(p, deps.agora());
     const k = (nome: string) => `${nome}:${p.de}:${p.ate}`;
+    const hoje = hojeSaoPaulo(deps.agora());
+    // T2-9: atrasado quando o período inclui hoje; no Search Console, os últimos 3 dias.
+    const atrasado = p.ate >= hoje;
+    const atrasadoGsc = p.ate >= addDias(hoje, -3);
     return {
-      meta_ads: () => bloco(k("meta_ads"), ttl, fresco, async () => {
-        const ctx = await metaCtx();
-        return ctx?.adAccountId ? await metaResumo(ctx, p) : null;
+      meta_ads: () => bloco(k("meta_ads"), ttl, fresco, {
+        atrasado,
+        ler: async (reg) => {
+          const ctx = await metaCtx();
+          return ctx?.adAccountId ? await metaResumo(ctx, p, reg) : null;
+        },
+        metricas: pagas,
       }),
-      google_ads: () => bloco(k("google_ads"), ttl, fresco, async () => {
-        const ctx = await adsCtx();
-        return ctx ? await adsResumo(ctx, p) : null;
+      google_ads: () => bloco(k("google_ads"), ttl, fresco, {
+        atrasado,
+        ler: async () => {
+          const ctx = await adsCtx();
+          return ctx ? await adsResumo(ctx, p) : null;
+        },
+        metricas: pagas,
       }),
-      ga4: () => bloco(k("ga4"), ttl, fresco, async () => {
-        const cred = googleCred();
-        if (!cred || !config.google.ga4PropertyId) return null;
-        return await ga4Resumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.ga4PropertyId, p);
+      ga4: () => bloco(k("ga4"), ttl, fresco, {
+        atrasado,
+        ler: async () => {
+          const cred = googleCred();
+          if (!cred || !config.google.ga4PropertyId) return null;
+          return await ga4Resumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.ga4PropertyId, p);
+        },
+        metricas: (d) => ({ periodo: { sessoes: d.sessoes, eventos_chave: d.eventos_chave } }),
       }),
-      search_console: () => bloco(k("gsc"), ttl, fresco, async () => {
-        const cred = googleCred();
-        if (!cred || !config.google.gscSiteUrl) return null;
-        return await gscResumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.gscSiteUrl, p);
+      search_console: () => bloco(k("gsc"), ttl, fresco, {
+        atrasado: atrasadoGsc,
+        ler: async () => {
+          const cred = googleCred();
+          if (!cred || !config.google.gscSiteUrl) return null;
+          return await gscResumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.gscSiteUrl, p);
+        },
+        metricas: (d) => ({ periodo: { cliques: d.cliques, impressoes: d.impressoes, ctr: d.ctr } }),
       }),
-      instagram: () => bloco(k("instagram"), ttl, fresco, async () => {
-        const ctx = await metaCtx();
-        return ctx?.igUserId ? await instagramOrganico(ctx, p) : null;
+      instagram: () => bloco(k("instagram"), ttl, fresco, {
+        atrasado,
+        ler: async (reg) => {
+          const ctx = await metaCtx();
+          return ctx?.igUserId ? await instagramOrganico(ctx, p, reg) : null;
+        },
+        metricas: (d) => ({
+          periodo: { alcance: d.alcance, visualizacoes: d.visualizacoes, contas_engajadas: d.contas_engajadas, interacoes: d.interacoes },
+          fixas: { seguidores: d.seguidores },
+        }),
       }),
-      facebook: () => bloco(k("facebook"), ttl, fresco, async () => {
-        const ctx = await metaCtx();
-        return ctx?.pageId ? await facebookOrganico(ctx, p) : null;
+      facebook: () => bloco(k("facebook"), ttl, fresco, {
+        atrasado,
+        ler: async (reg) => {
+          const ctx = await metaCtx();
+          return ctx?.pageId ? await facebookOrganico(ctx, p, reg) : null;
+        },
+        metricas: (d) => ({ periodo: { visualizacoes: d.visualizacoes, interacoes: d.interacoes }, fixas: { seguidores: d.seguidores } }),
       }),
-      leads: () => bloco(k("leads"), Math.min(ttl, 15 * 60), fresco, () => leadsResumo((i, f) => store.leadsOrigem(i, f), p)),
+      leads: () => bloco(k("leads"), Math.min(ttl, 15 * 60), fresco, {
+        atrasado,
+        ler: () => leadsResumo((i, f) => store.leadsOrigem(i, f), p),
+        metricas: (d) => ({ periodo: { total: d.total } }),
+      }),
     };
+  }
+
+  // T2 critérios 10–13. Mesmo padrão de cache do `bloco()`: 15 min, `fresco=1` refaz.
+  async function conexoes(fresco: boolean) {
+    if (!fresco) {
+      const emCache = await store.cacheLer(CHAVE_CONEXOES).catch(() => null) as Record<string, unknown> | null;
+      if (emCache?.v === VERSAO_CACHE) {
+        const { v: _v, ...corpo } = emCache;
+        return { ...corpo, cache: true };
+      }
+    } else {
+      // O teste de OAuth precisa renovar de verdade, não reaproveitar o access token do worker.
+      limparCacheGoogle();
+    }
+    const agora = deps.agora();
+    const desde = new Date(agora.getTime() - JANELA_ESCRITA_MS).toISOString();
+    const [meta, escritas] = await Promise.all([
+      metaCtx(),
+      store.escritasOk(desde).catch((e) => {
+        deps.log("warn", "marketing_conexoes_registro_falhou", { mensagem: semSegredo(mensagemDe(e)).slice(0, 300) });
+        return [] as EscritaOk[];
+      }),
+    ]);
+    const g = config.google;
+    const diagnostico = await diagnosticarConexoes({
+      meta,
+      google: {
+        cred: googleCred(), developerToken: g.developerToken, customerId: g.customerId, loginCustomerId: g.loginCustomerId,
+        ga4PropertyId: g.ga4PropertyId, gscSiteUrl: g.gscSiteUrl, criacaoLiberada: config.googleCriacaoLiberada,
+      },
+      escritas,
+      agora,
+    });
+    for (const c of diagnostico.capacidades) {
+      if (c.estado === "erro" || c.estado === "sem_permissao") {
+        deps.log("warn", "marketing_conexao_falhou", { capacidade: c.id, estado: c.estado, mensagem: c.detalhe });
+      }
+    }
+    const corpo = { gerado_em: agora.toISOString(), ...diagnostico };
+    await store.cacheGravar(CHAVE_CONEXOES, { v: VERSAO_CACHE, ...corpo }, TTL_CONEXOES).catch(() => undefined);
+    return { ...corpo, cache: false };
   }
 
   // Contrato de toda escrita (R6): registra `executando` antes de chamar a API,
@@ -460,13 +569,21 @@ export function criarHandler(deps: Deps) {
         const plataforma = url.searchParams.get("plataforma") ?? "todas";
         const ttl = ttlSegundos(p, deps.agora());
         const k = (n: string) => `campanhas_${n}:${p.de}:${p.ate}`;
-        const meta = plataforma === "google" ? null : await bloco(k("meta"), ttl, fresco, async () => {
-          const ctx = await metaCtx();
-          return ctx?.adAccountId ? await metaCampanhas(ctx, p) : null;
+        // Nas linhas de campanha, métrica `null` (ex.: lpv) = `indisponivel`; o bloco só marca parcial/atrasado.
+        const atrasado = p.ate >= hojeSaoPaulo(deps.agora());
+        const meta = plataforma === "google" ? null : await bloco(k("meta"), ttl, fresco, {
+          atrasado,
+          ler: async () => {
+            const ctx = await metaCtx();
+            return ctx?.adAccountId ? await metaCampanhas(ctx, p) : null;
+          },
         });
-        const google = plataforma === "meta" ? null : await bloco(k("google"), ttl, fresco, async () => {
-          const ctx = await adsCtx();
-          return ctx ? await adsCampanhas(ctx, p) : null;
+        const google = plataforma === "meta" ? null : await bloco(k("google"), ttl, fresco, {
+          atrasado,
+          ler: async () => {
+            const ctx = await adsCtx();
+            return ctx ? await adsCampanhas(ctx, p) : null;
+          },
         });
         return json(req, 200, { periodo: p, blocos: { meta, google } });
       }
@@ -507,6 +624,7 @@ export function criarHandler(deps: Deps) {
           })),
         });
       }
+      if (r0 === "connections" && partes.length === 1) return json(req, 200, await conexoes(fresco));
       if (r0 === "actions" && partes.length === 1) {
         const limite = Math.min(Math.max(Number(url.searchParams.get("limite") ?? 100) || 100, 1), 500);
         return json(req, 200, { acoes: await store.acoesListar(limite) });

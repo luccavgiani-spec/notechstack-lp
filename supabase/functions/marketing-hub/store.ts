@@ -2,6 +2,7 @@
 // `marketing-media` e Auth admin para a conta do dot. Só service role.
 
 import { createClient, type SupabaseClient, type User } from "jsr:@supabase/supabase-js@2";
+import type { EscritaOk } from "../_shared/marketing/conexoes.ts";
 import { COLUNAS_ORIGEM_LEAD, type LeadOrigem } from "../_shared/marketing/leads.ts";
 import {
   type AcaoRow,
@@ -119,6 +120,13 @@ export function criarStore(admin: SupabaseClient): MarketingStore {
       const { data, error } = await admin.from("marketing_actions").select("*").order("created_at", { ascending: false }).limit(limite);
       if (error) falhar("marketing_actions", error);
       return (data ?? []) as AcaoRow[];
+    },
+
+    async escritasOk(desde) {
+      const { data, error } = await admin.from("marketing_actions").select("kind, payload, created_at")
+        .eq("status", "ok").gte("created_at", desde).order("created_at", { ascending: false }).limit(1000);
+      if (error) falhar("marketing_actions", error);
+      return (data ?? []) as EscritaOk[];
     },
 
     async ativos(): Promise<Ativos> {

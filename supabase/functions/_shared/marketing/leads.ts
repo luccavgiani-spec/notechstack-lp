@@ -58,3 +58,25 @@ export async function leadsResumo(
   const { inicio, fimExclusivo } = limitesUtc(p);
   return contarLeads(await carregar(inicio, fimExclusivo), p);
 }
+
+// ------------------------------------------------- Classificação (preparo)
+// Ainda não ligada: onde a classe mora é T2-Unresolved 1. Recebe a classe mais
+// recente de cada lead já resolvida por quem chamar; `null` = a classificar.
+
+export type ClasseLead = "real" | "teste" | "invalido" | "duplicado";
+
+export type ContagemClassificada = {
+  validos: number;
+  por_classe: Record<ClasseLead | "a_classificar", number>;
+  por_canal_validos: Record<CanalLead, number>;
+};
+
+export function contarClassificados(itens: { origem: LeadOrigem; classe: ClasseLead | null }[]): ContagemClassificada {
+  const por_classe: ContagemClassificada["por_classe"] = { real: 0, teste: 0, invalido: 0, duplicado: 0, a_classificar: 0 };
+  const por_canal_validos: Record<CanalLead, number> = { meta: 0, google: 0, organico: 0, direto: 0, outros: 0 };
+  for (const { origem, classe } of itens) {
+    por_classe[classe ?? "a_classificar"] += 1;
+    if (classe === "real") por_canal_validos[canalDoLead(origem)] += 1;
+  }
+  return { validos: por_classe.real, por_classe, por_canal_validos };
+}
