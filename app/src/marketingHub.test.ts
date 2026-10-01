@@ -214,13 +214,13 @@ describe('marketing-hub — autorização por papel (R9, AC7, AC11)', () => {
     const { chamar } = montar()
     const response = await chamar('GET', '/overview?periodo=2026-09-22..2026-09-23', 'dot')
     expect(response.status).toBe(200)
-    expect(await response.json()).toMatchObject({ periodo: { de: '2026-09-22', ate: '2026-09-23', dias: 2 } })
+    expect(response.body).toMatchObject({ periodo: { de: '2026-09-22', ate: '2026-09-23', dias: 2 } })
   })
   it.each(['2026-99-01..2026-09-23', '2026-09-22..2026-13-01', '2026-02-30..2026-03-01', '2026-09-00..2026-09-23'])('T2-19: data impossível %s responde 422 em vez de 500', async periodo => {
     const { chamar } = montar()
     const response = await chamar('GET', `/overview?periodo=${periodo}`, 'dot')
     expect(response.status).toBe(422)
-    expect(await response.json()).toMatchObject({ error_code: 'PERIODO_INVALIDO' })
+    expect(response.body).toMatchObject({ error_code: 'PERIODO_INVALIDO' })
   })
 })
 
@@ -752,3 +752,4 @@ it('T1-3: erro de escrita remove segredos da resposta, registro e logs', async (
   for (const prefixo of PREFIXOS_TOKEN) expect(canais).not.toContain(prefixo)
   expect(acoes[0].error).toContain('[removido]')
 })
+
