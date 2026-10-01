@@ -26,8 +26,35 @@ import { META_LEAD_ACTION_TYPES, parsePeriodo } from '../functions/_shared/marke
 const args = process.argv.slice(2)
 const escrever = args.includes('--executar-escritas')
 const pastaFixtures = args.includes('--fixtures') ? args[args.indexOf('--fixtures') + 1] : null
-const env = (n) => process.env[n]?.trim() || null
+// Colar num prompt mascarado pode trazer os marcadores invisíveis do "bracketed paste"
+// (ESC[200~ … ESC[201~), quebras de linha ou aspas: tudo isso sai antes do uso.
+const SUJEIRA = /\u001b\[20[01]~|\[20[01]~|[\u0000-\u001f\u007f]/g
+const env = (n) => process.env[n]?.replace(SUJEIRA, '').trim().replace(/^["']|["']$/g, '') || null
 const resultados = []
+
+// Confere o formato sem nunca mostrar o valor: só tamanho e se bate com o esperado.
+const FORMATOS = {
+  META_SYSTEM_USER_TOKEN: [/^EAA[A-Za-z0-9]+$/, 'começa com EAA'],
+  META_AD_ACCOUNT_ID: [/^act_\d+$/, 'act_ seguido de números'],
+  META_IG_USER_ID: [/^\d{10,20}$/, 'só números'],
+  GOOGLE_OAUTH_CLIENT_ID: [/^\d+-[a-z0-9]+\.apps\.googleusercontent\.com$/, 'termina com .apps.googleusercontent.com'],
+  GOOGLE_OAUTH_CLIENT_SECRET: [/^GOCSPX-[A-Za-z0-9_-]+$/, 'começa com GOCSPX-'],
+  GOOGLE_OAUTH_REFRESH_TOKEN: [/^1\/\/[A-Za-z0-9_-]+$/, 'começa com 1//'],
+  GOOGLE_ADS_DEVELOPER_TOKEN: [/^[A-Za-z0-9_-]{15,40}$/, 'letras e números, sem espaço'],
+  GOOGLE_ADS_CUSTOMER_ID: [/^\d{3}-?\d{3}-?\d{4}$/, '10 dígitos (xxx-xxx-xxxx)'],
+  GOOGLE_ADS_LOGIN_CUSTOMER_ID: [/^\d{3}-?\d{3}-?\d{4}$/, '10 dígitos (xxx-xxx-xxxx)'],
+  GA4_PROPERTY_ID: [/^\d{6,12}$/, 'só números'],
+  GSC_SITE_URL: [/^(sc-domain:[a-z0-9.-]+|https?:\/\/\S+\/)$/, 'sc-domain:… ou https://…/ com barra no fim'],
+}
+console.log('Formato das variáveis (valores nunca são mostrados):')
+for (const [nome, [re, esperado]] of Object.entries(FORMATOS)) {
+  const bruto = process.env[nome]
+  const v = env(nome)
+  if (!v) { console.log(`  —        ${nome}: vazio`); continue }
+  const limpou = bruto !== v ? ' (limpei caracteres invisíveis/aspas da colagem)' : ''
+  console.log(`  ${re.test(v) ? 'ok      ' : 'PROBLEMA'} ${nome}: ${v.length} caracteres${re.test(v) ? '' : `; esperado: ${esperado}`}${limpou}`)
+}
+console.log('')
 
 function registrar(id, prova, status, detalhe) {
   resultados.push({ id, prova, status, detalhe })

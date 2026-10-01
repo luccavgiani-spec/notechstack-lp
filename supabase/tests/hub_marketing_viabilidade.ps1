@@ -7,17 +7,24 @@ param([switch]$ExecutarEscritas)
 $ErrorActionPreference = 'Stop'
 $raiz = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 
+# Remove os marcadores do "bracketed paste" (ESC[200~ / ESC[201~), controles e aspas.
+function Limpar([string]$Valor) {
+  $esc = [char]27
+  $v = $Valor -replace "$esc\[20[01]~", '' -replace '\[20[01]~', '' -replace '[\x00-\x1F\x7F]', ''
+  return $v.Trim().Trim('"', "'")
+}
+
 function Ler-Segredo([string]$Nome) {
   $seguro = Read-Host "$Nome (colar; não aparece)" -AsSecureString
   $ptr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($seguro)
-  try { [Environment]::SetEnvironmentVariable($Nome, [Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr), 'Process') }
+  try { [Environment]::SetEnvironmentVariable($Nome, (Limpar ([Runtime.InteropServices.Marshal]::PtrToStringBSTR($ptr))), 'Process') }
   finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ptr) }
 }
 
 function Ler-Valor([string]$Nome, [string]$Padrao = '') {
   $texto = Read-Host "$Nome$(if ($Padrao) { " [$Padrao]" })"
   if (-not $texto) { $texto = $Padrao }
-  [Environment]::SetEnvironmentVariable($Nome, $texto, 'Process')
+  [Environment]::SetEnvironmentVariable($Nome, (Limpar $texto), 'Process')
 }
 
 Write-Host 'Segredos (Enter vazio pula a prova que depende dele):'
