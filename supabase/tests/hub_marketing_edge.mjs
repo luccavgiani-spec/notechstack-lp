@@ -79,7 +79,7 @@ async function entrar(email) {
 const aal = (token) => JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString()).aal
 
 let clienteNo = null
-const contasTeste = []
+const postsTeste = []
 
 try {
   const [uAdmin, uDot, uCliente] = await Promise.all([criarUsuario('NO_ADMIN'), criarUsuario('MARKETING_AGENT'), criarUsuario('CLIENT')])
@@ -124,11 +124,9 @@ try {
     ok(r.status === 401 || r.status === 403, `E14 dot sem acesso direto a ${tabela} (${r.status}, ${r.body?.code})`)
   }
 
-  // Ativos locais de teste para exercitar a fila de posts.
+  // Ativos da nó vêm do seed (20261001000937); o teste só usa, não cria.
   clienteNo = psql("select id from public.clients where slug = 'no-tech-stack'")
-  for (const [plataforma, ext] of [['meta_page', `pg-${nonce}`], ['meta_instagram', `ig-${nonce}`]]) {
-    contasTeste.push(psql(`insert into public.ad_accounts (client_id, platform, external_id, external_name) values ('${clienteNo}', '${plataforma}', '${ext}', 'teste local') returning id`).split('\n')[0])
-  }
+  ok(psql(`select count(*) from public.ad_accounts where client_id = '${clienteNo}' and access_token is null`) === '3', 'E14b seed com os 3 ativos Meta da nó, sem token')
 
   const post = {
     request_id: `req-${nonce}-post1`, rede: 'instagram', tipo: 'feed_image', legenda: '[teste hub] local',
@@ -141,6 +139,7 @@ try {
   const linha = psql(`select actor_role || '|' || status || '|' || kind from public.marketing_actions where request_id = 'req-${nonce}-post1'`)
   ok(linha === 'MARKETING_AGENT|ok|post.agendar', 'E17 registro com papel MARKETING_AGENT', linha)
   const postId = agendado.body.resultado.post_id
+  postsTeste.push(postId)
   const cancelado = await http('DELETE', `${FN}/posts/${postId}`, { token: tAdmin2, corpo: { request_id: `req-${nonce}-cancel` } })
   ok(cancelado.status === 200 && psql(`select status from public.scheduled_posts where id = '${postId}'`) === 'cancelled', 'E18 cancelamento antes de sair')
 
@@ -182,10 +181,7 @@ try {
   console.log(`\n${passes.length} verificações passaram.`)
 } finally {
   psql("delete from vault.secrets where name = 'marketing_hub_url'")
-  if (contasTeste.length) {
-    psql(`delete from public.scheduled_posts where account_id in (${contasTeste.map((c) => `'${c}'`).join(',')})`)
-    psql(`delete from public.ad_accounts where id in (${contasTeste.map((c) => `'${c}'`).join(',')})`)
-  }
+  if (postsTeste.length) psql(`delete from public.scheduled_posts where id in (${postsTeste.map((id) => `'${id}'`).join(',')})`)
   psql(`delete from public.marketing_actions where request_id like 'req-${nonce}-%'`)
   for (const id of criados) await admin('DELETE', `/auth/v1/admin/users/${id}`)
 }

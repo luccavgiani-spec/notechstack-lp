@@ -133,6 +133,12 @@ select is(
   'H5 no storage policy opens marketing-media'
 );
 select ok(exists (select 1 from public.clients where slug = 'no-tech-stack'), 'H5 nó client exists');
+select results_eq(
+  $$select a.platform, a.external_id from public.ad_accounts a join public.clients c on c.id = a.client_id
+    where c.slug = 'no-tech-stack' and a.access_token is null and a.external_id <> 'hub-page' order by a.platform$$,
+  $$values ('meta_ads', 'act_1415926037237997'), ('meta_instagram', '17841441508079164'), ('meta_page', '1132533626610077')$$,
+  'H5 seed has the three nó Meta assets without token'
+);
 select ok(
   (select relrowsecurity from pg_class where oid = 'public.marketing_actions'::regclass)
   and (select relrowsecurity from pg_class where oid = 'public.marketing_cache'::regclass),
