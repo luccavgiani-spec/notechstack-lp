@@ -27,7 +27,8 @@ export function addDias(data: string, dias: number): string {
 
 function dataValida(data: string): boolean {
   if (!DATA_ISO.test(data)) return false;
-  return new Date(`${data}T12:00:00Z`).toISOString().slice(0, 10) === data;
+  const parsed = new Date(`${data}T12:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === data;
 }
 
 function diasEntre(de: string, ate: string): number {
@@ -132,6 +133,15 @@ export function metaLeads(actions: MetaAction[] | undefined): number {
   return 0;
 }
 
+// Resultado que um conjunto otimizado para LANDING_PAGE_VIEWS entrega. A Meta
+// omite o tipo quando não houve LPV, então ausente vira `null`, nunca 0.
+export const META_LPV_ACTION_TYPE = "landing_page_view";
+
+export function metaLpv(actions: MetaAction[] | undefined): number | null {
+  const achado = actions?.find((a) => a.action_type === META_LPV_ACTION_TYPE);
+  return achado ? inteiro(achado.value) : null;
+}
+
 export type MetaInsightRow = {
   date_start?: string;
   campaign_id?: string;
@@ -151,6 +161,7 @@ export type MetricasPagas = {
   cliques: number;
   cliques_link: number | null;
   conversoes: number;
+  lpv: number | null;
 };
 
 export function parseMetaInsight(row: MetaInsightRow): MetricasPagas {
@@ -161,6 +172,7 @@ export function parseMetaInsight(row: MetaInsightRow): MetricasPagas {
     cliques: inteiro(row.clicks),
     cliques_link: row.inline_link_clicks === undefined ? null : inteiro(row.inline_link_clicks),
     conversoes: metaLeads(row.actions),
+    lpv: metaLpv(row.actions),
   };
 }
 
@@ -181,6 +193,7 @@ export function parseGoogleAdsMetrics(m: GoogleAdsMetrics | undefined): Metricas
     cliques: inteiro(m?.clicks),
     cliques_link: null,
     conversoes: decimal(m?.conversions, 2),
+    lpv: null,
   };
 }
 
@@ -196,6 +209,8 @@ export function somarMetricas(linhas: MetricasPagas[]): MetricasPagas {
     cliques: soma((m) => m.cliques) ?? 0,
     cliques_link: soma((m) => m.cliques_link),
     conversoes: decimal(soma((m) => m.conversoes) ?? 0, 2),
+    // Dia sem LPV devolvido não anula os outros; só sem nenhum o total é `null`.
+    lpv: linhas.some((m) => m.lpv !== null) ? linhas.reduce((a, m) => a + (m.lpv ?? 0), 0) : null,
   };
 }
 

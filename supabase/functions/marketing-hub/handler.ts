@@ -7,10 +7,13 @@
 import { corsHeaders } from "../_shared/cors.ts";
 import { MetaApiError } from "../_shared/meta.ts";
 import { adsAlterarStatus, adsAtualizarOrcamento, adsCampanhaDetalhe, adsCampanhas, adsCriarCampanhaPesquisa, adsResumo, adsSugerirLocais, type AdsCtx } from "../_shared/marketing/google-ads.ts";
-import { GoogleApiError, googleAccessToken } from "../_shared/marketing/google-auth.ts";
+import { type EscritaOk, diagnosticarConexoes } from "../_shared/marketing/conexoes.ts";
+import { type EstadoMetrica, Registro, type Valores, calcularEstados, semPermissao, semSegredo } from "../_shared/marketing/estados.ts";
+import { googleConsentimento, googleState, googleTrocarCodigo } from "../_shared/marketing/google-oauth.ts";
+import { GoogleApiError, googleAccessToken, limparCacheGoogle } from "../_shared/marketing/google-auth.ts";
 import { ga4Resumo } from "../_shared/marketing/ga4.ts";
 import { gscResumo } from "../_shared/marketing/gsc.ts";
-import { COLUNAS_ORIGEM_LEAD, type LeadOrigem, leadsResumo } from "../_shared/marketing/leads.ts";
+import { COLUNAS_ORIGEM_LEAD, type LeadOrigem, type LeadAdmin, type ClasseLead, leadsResumo } from "../_shared/marketing/leads.ts";
 import {
   type MetaCtx,
   MetaEscritaError,
@@ -28,7 +31,7 @@ import {
   publicarFacebook,
   publicarInstagram,
 } from "../_shared/marketing/meta.ts";
-import { type Periodo, addDias, hojeSaoPaulo, parsePeriodo, ttlSegundos } from "../_shared/marketing/normalize.ts";
+import { type MetricasPagas, type Periodo, addDias, hojeSaoPaulo, parsePeriodo, ttlSegundos, limitesUtc } from "../_shared/marketing/normalize.ts";
 import {
   caminhoMidia,
   requestId as validarRequestId,
@@ -93,6 +96,9 @@ export type AgenteRow = { id: string; email: string | null; banido: boolean; cri
 export class ConflitoError extends Error {}
 
 export interface MarketingStore {
+  googleStateConsumir?(state: string): Promise<{ user_id: string } | null>;
+  googleRefreshLer?(): Promise<string | null>;
+  googleConexaoSalvar?(userId: string, refreshToken: string, requestId: string): Promise<void>;
   cacheLer(chave: string): Promise<unknown | null>;
   cacheGravar(chave: string, valor: unknown, ttlSegundos: number): Promise<void>;
   cacheLimpar(prefixo: string): Promise<void>;
@@ -101,6 +107,8 @@ export interface MarketingStore {
   }): Promise<{ id: string } | { existente: AcaoRow }>;
   acaoFinalizar(id: string, fim: { status: "ok" | "erro"; result?: unknown; external_ids?: unknown; error?: string | null }): Promise<void>;
   acoesListar(limite: number): Promise<AcaoRow[]>;
+  // Escritas `ok` desde a data, para provar publicação/escrita em /connections.
+  escritasOk(desdeUtc: string): Promise<EscritaOk[]>;
   ativos(): Promise<Ativos>;
   postsListar(deUtc: string, ateUtc: string): Promise<PostRow[]>;
   postInserir(linha: Omit<PostRow, "id" | "published_at" | "external_post_id" | "error_message" | "publish_attempts" | "meta_container_id"> & { client_id: string }): Promise<PostRow>;
@@ -108,6 +116,9 @@ export interface MarketingStore {
   postAtualizar(id: string, patch: Partial<PostRow>): Promise<void>;
   postsReservarVencidos(limite: number): Promise<PostRow[]>;
   leadsOrigem(inicioUtc: string, fimExclusivoUtc: string): Promise<LeadOrigem[]>;
+  leadsListar(inicioUtc: string, fimExclusivoUtc: string): Promise<LeadAdmin[]>;
+  leadExiste(id: string): Promise<boolean>;
+  leadClassificar(linha: { lead_id: string; classe: ClasseLead; motivo: string | null; classificado_por: string; papel: string }): Promise<void>;
   cronSecretOk(segredo: string): Promise<boolean>;
   urlUpload(caminho: string): Promise<{ signedUrl: string; token: string; path: string }>;
   urlLeitura(caminho: string, segundos: number): Promise<string>;
@@ -187,13 +198,31 @@ function base64(bytes: Uint8Array): string {
 }
 
 function mensagemDe(e: unknown): string {
-  if (e instanceof MetaEscritaError) return e.message;
-  if (e instanceof GoogleApiError) return `Google: ${e.message}`;
-  if (e instanceof MetaApiError) return mensagemMeta(e);
-  return e instanceof Error ? e.message : String(e);
+  const mensagem = e instanceof MetaEscritaError ? e.message
+    : e instanceof GoogleApiError ? `Google: ${e.message}`
+    : e instanceof MetaApiError ? mensagemMeta(e)
+    : e instanceof Error ? e.message : String(e);
+  return semSegredo(mensagem);
 }
 
-type Bloco<T> = { ok: true; dados: T; cache: boolean } | { ok: false; motivo: "nao_configurado" | "falha"; mensagem: string };
+// `estados` (T2 Decided 1–2): só as métricas que não estão `disponivel`.
+type Bloco<T> =
+  | { ok: true; dados: T; cache: boolean; estados: Record<string, EstadoMetrica> }
+  | { ok: false; motivo: "nao_configurado" | "falha" | "sem_permissao"; mensagem: string };
+
+type Leitura<T> = {
+  ler: (reg: Registro) => Promise<T | null>;
+  metricas?: (dados: T) => { periodo?: Valores; fixas?: Valores };
+  atrasado: boolean;
+};
+
+// v3 acrescenta classificação dos leads; caches anteriores são refeitos.
+const VERSAO_CACHE = 3;
+const CHAVE_CONEXOES = "conexoes";
+const TTL_CONEXOES = 15 * 60;
+const JANELA_ESCRITA_MS = 30 * 86_400_000;
+
+const pagas = (d: { total: MetricasPagas }) => ({ periodo: { ...d.total } });
 
 // ------------------------------------------------------------------- Handler
 
@@ -227,15 +256,16 @@ export function criarHandler(deps: Deps) {
     };
   }
 
-  function googleCred() {
+  async function googleCred() {
     const g = config.google;
-    return g.clientId && g.clientSecret && g.refreshToken
-      ? { clientId: g.clientId, clientSecret: g.clientSecret, refreshToken: g.refreshToken }
+    const refreshToken = (await store.googleRefreshLer?.()) || g.refreshToken;
+    return g.clientId && g.clientSecret && refreshToken
+      ? { clientId: g.clientId, clientSecret: g.clientSecret, refreshToken }
       : null;
   }
 
   async function adsCtx(): Promise<AdsCtx | null> {
-    const cred = googleCred();
+    const cred = await googleCred();
     const g = config.google;
     if (!cred || !g.developerToken || !g.customerId) return null;
     return {
@@ -247,55 +277,143 @@ export function criarHandler(deps: Deps) {
   }
 
   // Um bloco que falha não derruba a visão geral: vira "indisponível" com o motivo.
-  async function bloco<T>(chave: string, ttl: number, fresco: boolean, ler: () => Promise<T | null>): Promise<Bloco<T>> {
+  // Sub-consulta que falha não derruba o bloco: entra em `estados` e no log.
+  async function bloco<T>(chave: string, ttl: number, fresco: boolean, leitura: Leitura<T>): Promise<Bloco<T>> {
+    const nome = chave.split(":")[0];
     if (!fresco) {
-      const emCache = await store.cacheLer(chave).catch(() => null);
-      if (emCache !== null) return { ok: true, dados: emCache as T, cache: true };
+      const emCache = await store.cacheLer(chave).catch(() => null) as { v?: unknown; dados?: T; estados?: Record<string, EstadoMetrica> } | null;
+      if (emCache?.v === VERSAO_CACHE && emCache.dados !== undefined) {
+        return { ok: true, dados: emCache.dados, cache: true, estados: emCache.estados ?? {} };
+      }
     }
+    const reg = new Registro();
     try {
-      const dados = await ler();
+      const dados = await leitura.ler(reg);
       if (dados === null) return { ok: false, motivo: "nao_configurado", mensagem: "Integração ainda não configurada." };
-      await store.cacheGravar(chave, dados, ttl).catch(() => undefined);
-      return { ok: true, dados, cache: false };
+      const estados = calcularEstados({ ...(leitura.metricas?.(dados) ?? {}), atrasado: leitura.atrasado }, reg);
+      await store.cacheGravar(chave, { v: VERSAO_CACHE, dados, estados }, ttl).catch(() => undefined);
+      return { ok: true, dados, cache: false, estados };
     } catch (e) {
-      const mensagem = mensagemDe(e);
-      deps.log("warn", "marketing_bloco_falhou", { chave: chave.split(":")[0], mensagem: mensagem.slice(0, 300) });
-      return { ok: false, motivo: mensagem.startsWith("Ativo Meta não configurado") ? "nao_configurado" : "falha", mensagem };
+      const mensagem = semSegredo(mensagemDe(e));
+      deps.log("warn", "marketing_bloco_falhou", { chave: nome, mensagem: mensagem.slice(0, 300) });
+      const motivo = mensagem.startsWith("Ativo Meta não configurado") ? "nao_configurado" : semPermissao(e) ? "sem_permissao" : "falha";
+      return { ok: false, motivo, mensagem };
+    } finally {
+      // `variante` diz qual forma da consulta a plataforma recusou (ex.: posts do Facebook).
+      for (const f of reg.falhas) {
+        deps.log("warn", "marketing_subconsulta_falhou", { chave: nome, metricas: f.chaves, estado: f.estado, variante: f.variante, mensagem: f.mensagem });
+      }
     }
   }
 
   function blocos(p: Periodo, fresco: boolean) {
     const ttl = ttlSegundos(p, deps.agora());
     const k = (nome: string) => `${nome}:${p.de}:${p.ate}`;
+    const hoje = hojeSaoPaulo(deps.agora());
+    // T2-9: atrasado quando o período inclui hoje; no Search Console, os últimos 3 dias.
+    const atrasado = p.ate >= hoje;
+    const atrasadoGsc = p.ate >= addDias(hoje, -3);
     return {
-      meta_ads: () => bloco(k("meta_ads"), ttl, fresco, async () => {
-        const ctx = await metaCtx();
-        return ctx?.adAccountId ? await metaResumo(ctx, p) : null;
+      meta_ads: () => bloco(k("meta_ads"), ttl, fresco, {
+        atrasado,
+        ler: async (reg) => {
+          const ctx = await metaCtx();
+          return ctx?.adAccountId ? await metaResumo(ctx, p, reg) : null;
+        },
+        metricas: pagas,
       }),
-      google_ads: () => bloco(k("google_ads"), ttl, fresco, async () => {
-        const ctx = await adsCtx();
-        return ctx ? await adsResumo(ctx, p) : null;
+      google_ads: () => bloco(k("google_ads"), ttl, fresco, {
+        atrasado,
+        ler: async () => {
+          const ctx = await adsCtx();
+          return ctx ? await adsResumo(ctx, p) : null;
+        },
+        metricas: pagas,
       }),
-      ga4: () => bloco(k("ga4"), ttl, fresco, async () => {
-        const cred = googleCred();
-        if (!cred || !config.google.ga4PropertyId) return null;
-        return await ga4Resumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.ga4PropertyId, p);
+      ga4: () => bloco(k("ga4"), ttl, fresco, {
+        atrasado,
+        ler: async () => {
+          const cred = await googleCred();
+          if (!cred || !config.google.ga4PropertyId) return null;
+          return await ga4Resumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.ga4PropertyId, p);
+        },
+        metricas: (d) => ({ periodo: { sessoes: d.sessoes, eventos_chave: d.eventos_chave } }),
       }),
-      search_console: () => bloco(k("gsc"), ttl, fresco, async () => {
-        const cred = googleCred();
-        if (!cred || !config.google.gscSiteUrl) return null;
-        return await gscResumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.gscSiteUrl, p);
+      search_console: () => bloco(k("gsc"), ttl, fresco, {
+        atrasado: atrasadoGsc,
+        ler: async () => {
+          const cred = await googleCred();
+          if (!cred || !config.google.gscSiteUrl) return null;
+          return await gscResumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.gscSiteUrl, p);
+        },
+        metricas: (d) => ({ periodo: { cliques: d.cliques, impressoes: d.impressoes, ctr: d.ctr } }),
       }),
-      instagram: () => bloco(k("instagram"), ttl, fresco, async () => {
-        const ctx = await metaCtx();
-        return ctx?.igUserId ? await instagramOrganico(ctx, p) : null;
+      instagram: () => bloco(k("instagram"), ttl, fresco, {
+        atrasado,
+        ler: async (reg) => {
+          const ctx = await metaCtx();
+          return ctx?.igUserId ? await instagramOrganico(ctx, p, reg) : null;
+        },
+        metricas: (d) => ({
+          periodo: { alcance: d.alcance, visualizacoes: d.visualizacoes, contas_engajadas: d.contas_engajadas, interacoes: d.interacoes },
+          fixas: { seguidores: d.seguidores },
+        }),
       }),
-      facebook: () => bloco(k("facebook"), ttl, fresco, async () => {
-        const ctx = await metaCtx();
-        return ctx?.pageId ? await facebookOrganico(ctx, p) : null;
+      facebook: () => bloco(k("facebook"), ttl, fresco, {
+        atrasado,
+        ler: async (reg) => {
+          const ctx = await metaCtx();
+          return ctx?.pageId ? await facebookOrganico(ctx, p, reg) : null;
+        },
+        metricas: (d) => ({ periodo: { visualizacoes: d.visualizacoes, interacoes: d.interacoes }, fixas: { seguidores: d.seguidores } }),
       }),
-      leads: () => bloco(k("leads"), Math.min(ttl, 15 * 60), fresco, () => leadsResumo((i, f) => store.leadsOrigem(i, f), p)),
+      leads: () => bloco(k("leads"), Math.min(ttl, 15 * 60), fresco, {
+        atrasado,
+        ler: () => leadsResumo((i, f) => store.leadsOrigem(i, f), p),
+        metricas: (d) => ({ periodo: { total: d.total, validos: d.validos } }),
+      }),
     };
+  }
+
+  // T2 critérios 10–13. Mesmo padrão de cache do `bloco()`: 15 min, `fresco=1` refaz.
+  async function conexoes(fresco: boolean) {
+    if (!fresco) {
+      const emCache = await store.cacheLer(CHAVE_CONEXOES).catch(() => null) as Record<string, unknown> | null;
+      if (emCache?.v === VERSAO_CACHE) {
+        const { v: _v, ...corpo } = emCache;
+        return { ...corpo, cache: true };
+      }
+    } else {
+      // O teste de OAuth precisa renovar de verdade, não reaproveitar o access token do worker.
+      limparCacheGoogle();
+    }
+    const agora = deps.agora();
+    const desde = new Date(agora.getTime() - JANELA_ESCRITA_MS).toISOString();
+    const [meta, escritas] = await Promise.all([
+      metaCtx(),
+      store.escritasOk(desde).catch((e) => {
+        deps.log("warn", "marketing_conexoes_registro_falhou", { mensagem: semSegredo(mensagemDe(e)).slice(0, 300) });
+        return [] as EscritaOk[];
+      }),
+    ]);
+    const g = config.google;
+    const diagnostico = await diagnosticarConexoes({
+      meta,
+      google: {
+        cred: await googleCred(), developerToken: g.developerToken, customerId: g.customerId, loginCustomerId: g.loginCustomerId,
+        ga4PropertyId: g.ga4PropertyId, gscSiteUrl: g.gscSiteUrl, criacaoLiberada: config.googleCriacaoLiberada,
+      },
+      escritas,
+      agora,
+    });
+    for (const c of diagnostico.capacidades) {
+      if (c.estado === "erro" || c.estado === "sem_permissao") {
+        deps.log("warn", "marketing_conexao_falhou", { capacidade: c.id, estado: c.estado, mensagem: c.detalhe });
+      }
+    }
+    const corpo = { gerado_em: agora.toISOString(), ...diagnostico };
+    await store.cacheGravar(CHAVE_CONEXOES, { v: VERSAO_CACHE, ...corpo }, TTL_CONEXOES).catch(() => undefined);
+    return { ...corpo, cache: false };
   }
 
   // Contrato de toda escrita (R6): registra `executando` antes de chamar a API,
@@ -415,13 +533,73 @@ export function criarHandler(deps: Deps) {
       return json(req, 200, await publicarVencidos());
     }
 
+    if (m === "GET" && r0 === "google" && r1 === "callback" && partes.length === 2) {
+      const voltar = (motivo?: string) => {
+        const destino = new URL("/no/marketing/conexoes", config.appUrl);
+        destino.searchParams.set("google", motivo ? "erro" : "ok");
+        if (motivo) destino.searchParams.set("motivo", motivo);
+        return new Response(null, { status: 303, headers: { Location: destino.toString(),
+          "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" } });
+      };
+      const state = url.searchParams.get("state") ?? "";
+      if (!/^[a-f0-9]{64}$/.test(state)) return voltar("state_invalido");
+      let dono: { user_id: string } | null;
+      try { dono = await store.googleStateConsumir?.(state) ?? null; }
+      catch { return voltar("state_invalido"); }
+      if (!dono) return voltar("state_invalido");
+      if (url.searchParams.get("error") === "access_denied") return voltar("access_denied");
+      const code = url.searchParams.get("code");
+      if (url.searchParams.has("error") || !code || !config.google.clientId || !config.google.clientSecret || !store.googleConexaoSalvar) return voltar("troca_falhou");
+      try {
+        const refreshToken = await googleTrocarCodigo(config.google.clientId, config.google.clientSecret, code);
+        await store.googleConexaoSalvar(dono.user_id, refreshToken, deps.uuid());
+        limparCacheGoogle();
+        for (const prefix of ["ga4:", "gsc:", "google_ads:", "campanhas_google:", "connections:", CHAVE_CONEXOES]) {
+          await store.cacheLimpar(prefix).catch(() => undefined);
+        }
+        return voltar();
+      } catch { return voltar("troca_falhou"); }
+    }
+
     const token = bearer(req);
     const ch = token ? await deps.autenticar(token) : null;
-    const soAdmin = r0 === "agent";
+    const soAdmin = r0 === "agent" || r0 === "leads" || (r0 === "google" && r1 === "connect");
     autorizar(ch, soAdmin);
     const chamador = ch as Chamador;
     const fresco = url.searchParams.get("fresco") === "1";
-    const corpo = m === "GET" ? {} : await req.json().catch(() => ({})) as Record<string, unknown>;
+    const recebido: unknown = m === "GET" ? {} : await req.json().catch(() => ({}));
+    const corpo = recebido && typeof recebido === "object" && !Array.isArray(recebido) ? recebido as Record<string, unknown> : {};
+
+    if (r0 === "leads" && m === "GET" && partes.length === 1) {
+      const { inicio, fimExclusivo } = limitesUtc(periodo(url));
+      return json(req, 200, { leads: await store.leadsListar(inicio, fimExclusivo) });
+    }
+    if (r0 === "leads" && m === "POST" && partes.length === 3 && partes[2] === "classificacao") {
+      const id = partes[1];
+      const campos: string[] = [];
+      if (!validarUuid(id)) campos.push("lead_id");
+      if (typeof corpo.classe !== "string" || !["real", "teste", "invalido", "duplicado"].includes(corpo.classe)) campos.push("classe");
+      if (corpo.motivo !== undefined && (typeof corpo.motivo !== "string" || [...corpo.motivo].length > 500)) campos.push("motivo");
+      if (!campos.includes("lead_id") && !(await store.leadExiste(id))) campos.push("lead_id");
+      if (campos.length) return erro(req, 422, "INVALID_REQUEST", "Classificação inválida.", { campos });
+      const payload = { lead_id: id, classe: corpo.classe as ClasseLead, motivo: (corpo.motivo as string | undefined) ?? null };
+      return acao(req, chamador, corpo, "lead.classificar", id, payload, async () => {
+        await store.leadClassificar({ ...payload, classificado_por: chamador.userId, papel: chamador.role! });
+        await store.cacheLimpar("leads:").catch(() => undefined);
+        return { result: { lead_id: id, classe: payload.classe } };
+      });
+    }
+
+    if (m === "POST" && r0 === "google" && r1 === "connect" && partes.length === 2) {
+      if (!config.google.clientId || !config.google.clientSecret || !store.googleStateConsumir || !store.googleConexaoSalvar) {
+        return erro(req, 503, "NAO_CONFIGURADO", "Conexão Google ainda não configurada.");
+      }
+      const state = googleState();
+      await store.cacheGravar(`google_oauth_state:${state}`, { user_id: chamador.userId }, 600);
+      const resposta = json(req, 200, { url: googleConsentimento(config.google.clientId, state) });
+      resposta.headers.set("Cache-Control", "no-store");
+      return resposta;
+    }
 
     // ----------------------------------------------------------------- Leitura
     if (m === "GET") {
@@ -432,7 +610,7 @@ export function criarHandler(deps: Deps) {
           papel: chamador.role,
           meta: { token: Boolean(config.metaToken), conta_anuncios: a.metaAds?.externalId ?? null, pagina: a.metaPage?.externalId ?? null, instagram: a.metaInstagram?.externalId ?? null },
           google: {
-            credenciais: Boolean(googleCred()), ads: Boolean(g.developerToken && g.customerId), ga4: Boolean(g.ga4PropertyId),
+            credenciais: Boolean(await googleCred()), ads: Boolean(g.developerToken && g.customerId), ga4: Boolean(g.ga4PropertyId),
             search_console: g.gscSiteUrl, criacao_liberada: config.googleCriacaoLiberada,
           },
         });
@@ -460,13 +638,21 @@ export function criarHandler(deps: Deps) {
         const plataforma = url.searchParams.get("plataforma") ?? "todas";
         const ttl = ttlSegundos(p, deps.agora());
         const k = (n: string) => `campanhas_${n}:${p.de}:${p.ate}`;
-        const meta = plataforma === "google" ? null : await bloco(k("meta"), ttl, fresco, async () => {
-          const ctx = await metaCtx();
-          return ctx?.adAccountId ? await metaCampanhas(ctx, p) : null;
+        // Nas linhas de campanha, métrica `null` (ex.: lpv) = `indisponivel`; o bloco só marca parcial/atrasado.
+        const atrasado = p.ate >= hojeSaoPaulo(deps.agora());
+        const meta = plataforma === "google" ? null : await bloco(k("meta"), ttl, fresco, {
+          atrasado,
+          ler: async () => {
+            const ctx = await metaCtx();
+            return ctx?.adAccountId ? await metaCampanhas(ctx, p) : null;
+          },
         });
-        const google = plataforma === "meta" ? null : await bloco(k("google"), ttl, fresco, async () => {
-          const ctx = await adsCtx();
-          return ctx ? await adsCampanhas(ctx, p) : null;
+        const google = plataforma === "meta" ? null : await bloco(k("google"), ttl, fresco, {
+          atrasado,
+          ler: async () => {
+            const ctx = await adsCtx();
+            return ctx ? await adsCampanhas(ctx, p) : null;
+          },
         });
         return json(req, 200, { periodo: p, blocos: { meta, google } });
       }
@@ -507,6 +693,7 @@ export function criarHandler(deps: Deps) {
           })),
         });
       }
+      if (r0 === "connections" && partes.length === 1) return json(req, 200, await conexoes(fresco));
       if (r0 === "actions" && partes.length === 1) {
         const limite = Math.min(Math.max(Number(url.searchParams.get("limite") ?? 100) || 100, 1), 500);
         return json(req, 200, { acoes: await store.acoesListar(limite) });
@@ -673,3 +860,4 @@ export function criarHandler(deps: Deps) {
     }
   };
 }
+

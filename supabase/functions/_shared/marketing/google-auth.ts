@@ -27,7 +27,8 @@ export function limparCacheGoogle(): void {
 }
 
 export async function googleAccessToken(cred: GoogleCredenciais, now = Date.now()): Promise<string> {
-  const chave = `${cred.clientId}:${cred.refreshToken.slice(-8)}`;
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`${cred.clientId}:${cred.clientSecret}:${cred.refreshToken}`));
+  const chave = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, "0")).join("");
   if (cache && cache.chave === chave && cache.expiraEm - MARGEM_MS > now) return cache.token;
 
   const resp = await fetch(TOKEN_URL, {
@@ -43,7 +44,9 @@ export async function googleAccessToken(cred: GoogleCredenciais, now = Date.now(
   const body = await resp.json().catch(() => ({})) as { access_token?: string; expires_in?: number; error?: string };
   if (!resp.ok || !body.access_token) {
     // Nunca inclui o token nem o segredo na mensagem.
-    throw new GoogleApiError(resp.status, { error: body.error }, `Google OAuth ${resp.status}: ${body.error ?? "sem access_token"}`);
+    const codigo = ["invalid_client", "invalid_grant", "unauthorized_client", "invalid_request", "invalid_scope", "temporarily_unavailable"].includes(body.error ?? "")
+      ? body.error : "sem access_token";
+    throw new GoogleApiError(resp.status, { error: codigo }, `Google OAuth ${resp.status}: ${codigo}`);
   }
   cache = { token: body.access_token, expiraEm: now + (body.expires_in ?? 3600) * 1000, chave };
   return body.access_token;

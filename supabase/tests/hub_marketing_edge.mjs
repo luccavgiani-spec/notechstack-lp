@@ -107,6 +107,14 @@ try {
   const visaoDot = await http('GET', `${FN}/overview?periodo=30d`, { token: tDot })
   ok(visaoDot.status === 200, 'E7 MARKETING_AGENT → 200 na visão geral')
   ok((await http('GET', `${FN}/overview`, { token: tCliente })).status === 403, 'E8 CLIENT → 403')
+  // T2-10 a 13: conexões por capacidade, no runtime Deno real.
+  const conexoes = await http('GET', `${FN}/connections?fresco=1`, { token: tDot })
+  ok(conexoes.status === 200 && conexoes.body.capacidades?.length === 11, 'E8b dot → 200 em /connections com 11 capacidades', conexoes.body)
+  // Prefixos montados por partes: a busca de segredos no diff (T1-3) não acha falso positivo aqui.
+  const prefixos = ['ya' + '29.', '1/' + '/0', 'GOC' + 'SPX-', 'E' + 'AA']
+  ok(prefixos.every((p) => !JSON.stringify(conexoes.body).includes(p)), 'E8c /connections sem prefixo de token')
+  ok((await http('GET', `${FN}/connections`, { token: tCliente })).status === 403 && (await http('GET', `${FN}/connections`)).status === 401,
+    'E8d /connections: CLIENT → 403, sem sessão → 401')
   ok((await http('GET', `${FN}/agent`, { token: tDot })).status === 403, 'E9 dot → 403 em /agent')
   ok((await http('POST', `${FN}/agent/disable`, { token: tDot, corpo: { request_id: `req-${nonce}-dd`, user_id: uDot.id } })).status === 403, 'E10 dot não se desliga')
 

@@ -2,7 +2,8 @@
 // Reaproveita o cliente Graph de abril (`metaFetch`). Escritas rodam sem retry,
 // porque repetir um POST de criação duplica o objeto na conta.
 
-import { MetaApiError, metaFetch } from "../meta.ts";
+import { GRAPH_BASE, MetaApiError, extractMetaError, metaFetch } from "../meta.ts";
+import { Registro, mensagemMeta, semPermissao, tentar } from "./estados.ts";
 import {
   type MetaInsightRow,
   type MetricasPagas,
@@ -10,8 +11,9 @@ import {
   addDias,
   inteiro,
   parseMetaInsight,
-  somarMetricas,
 } from "./normalize.ts";
+
+export { mensagemMeta };
 
 export const META_PIXEL_ID = "1753619075655271";
 
@@ -28,16 +30,6 @@ export class MetaEscritaError extends Error {
     super(message);
     this.externalIds = externalIds;
   }
-}
-
-export function mensagemMeta(e: unknown): string {
-  if (e instanceof MetaApiError) {
-    const err = (e.body as { error?: { message?: string; error_user_title?: string; error_user_msg?: string; code?: number } })?.error;
-    if (err?.error_user_msg) return `${err.error_user_title ?? "Meta"}: ${err.error_user_msg}`;
-    if (err?.message) return `Meta ${err.code ?? e.status}: ${err.message}`;
-    return `Meta HTTP ${e.status}`;
-  }
-  return e instanceof Error ? e.message : String(e);
 }
 
 function exigir<T>(valor: T | null | undefined, nome: string): T {
@@ -66,15 +58,42 @@ const CAMPOS_INSIGHT = "spend,impressions,reach,clicks,inline_link_clicks,action
 
 // ------------------------------------------------------------------ Leitura
 
+export type ContaMeta = {
+  id: string;
+  moeda: string | null;
+  fuso: string | null;
+  versao_api: string | null;
+};
+
 export type MetaResumo = {
   total: MetricasPagas;
   por_dia: ({ dia: string } & MetricasPagas)[];
+  conta: ContaMeta;
 };
 
-// Alcance não soma entre dias: o total vem de uma chamada sem quebra diária.
-export async function metaResumo(ctx: MetaCtx, p: Periodo): Promise<MetaResumo> {
+// Moeda, fuso e versão vêm da Graph a cada leitura, nunca de constante do app.
+// A versão é o cabeçalho `facebook-api-version`, que a Graph manda em toda
+// resposta; `metaFetch` só devolve o corpo, por isso o fetch é direto aqui.
+export async function metaConta(ctx: MetaCtx): Promise<ContaMeta> {
   const conta = exigir(ctx.adAccountId, "conta de anúncios");
-  const [total, diario] = await Promise.all([
+  const url = new URL(`${GRAPH_BASE}/${conta}`);
+  url.searchParams.set("fields", "id,currency,timezone_name");
+  url.searchParams.set("access_token", ctx.token);
+  const resp = await fetch(url.toString());
+  const corpo = await resp.json().catch(() => ({})) as { id?: string; currency?: string; timezone_name?: string };
+  if (!resp.ok) throw new MetaApiError(resp.status, corpo, extractMetaError(corpo) ?? `Meta API ${resp.status}`);
+  return {
+    id: corpo.id ?? conta,
+    moeda: corpo.currency ?? null,
+    fuso: corpo.timezone_name ?? null,
+    versao_api: resp.headers.get("facebook-api-version"),
+  };
+}
+
+// Alcance não soma entre dias: o total vem de uma chamada sem quebra diária.
+export async function metaResumo(ctx: MetaCtx, p: Periodo, reg = new Registro()): Promise<MetaResumo> {
+  const conta = exigir(ctx.adAccountId, "conta de anúncios");
+  const [total, diario, dadosConta] = await Promise.all([
     metaFetch<{ data?: MetaInsightRow[] }>(`/${conta}/insights`, {
       access_token: ctx.token, level: "account", time_range: timeRange(p), fields: CAMPOS_INSIGHT,
     }),
@@ -82,12 +101,17 @@ export async function metaResumo(ctx: MetaCtx, p: Periodo): Promise<MetaResumo> 
       access_token: ctx.token, level: "account", time_range: timeRange(p), time_increment: "1",
       fields: CAMPOS_INSIGHT, limit: "100",
     }),
+    tentar(reg, ["conta"], () => metaConta(ctx)),
   ]);
   const vazio = parseMetaInsight({});
   const porDia = new Map(diario.map((r) => [r.date_start ?? "", parseMetaInsight(r)]));
   const dias: ({ dia: string } & MetricasPagas)[] = [];
   for (let d = p.de; d <= p.ate; d = addDias(d, 1)) dias.push({ dia: d, ...(porDia.get(d) ?? { ...vazio, alcance: 0, cliques_link: 0 }) });
-  return { total: total.data?.[0] ? parseMetaInsight(total.data[0]) : { ...vazio, alcance: 0, cliques_link: 0 }, por_dia: dias };
+  return {
+    total: total.data?.[0] ? parseMetaInsight(total.data[0]) : { ...vazio, alcance: 0, cliques_link: 0 },
+    por_dia: dias,
+    conta: dadosConta ?? { id: conta, moeda: null, fuso: null, versao_api: null },
+  };
 }
 
 export type CampanhaResumo = {
@@ -239,14 +263,6 @@ function janelas(p: Periodo, tamanho = 30): { de: string; ate: string }[] {
   return lista;
 }
 
-async function tentar<T>(f: () => Promise<T>): Promise<T | null> {
-  try {
-    return await f();
-  } catch (_) {
-    return null;
-  }
-}
-
 export type PostOrganico = {
   id: string;
   rede: "instagram" | "facebook";
@@ -264,7 +280,13 @@ export type PostOrganico = {
 
 const IG_METRICAS_CONTA = ["reach", "views", "accounts_engaged", "total_interactions"] as const;
 
-export async function instagramOrganico(ctx: MetaCtx, p: Periodo) {
+// Chave de `estados` de cada métrica de conta do IG (nome do campo devolvido).
+const IG_CAMPO: Record<(typeof IG_METRICAS_CONTA)[number], string> = {
+  reach: "alcance", views: "visualizacoes", accounts_engaged: "contas_engajadas", total_interactions: "interacoes",
+};
+const IG_CAMPOS_POST = ["posts.alcance", "posts.visualizacoes", "posts.interacoes", "posts.compartilhamentos"];
+
+export async function instagramOrganico(ctx: MetaCtx, p: Periodo, reg = new Registro()) {
   const ig = exigir(ctx.igUserId, "conta do Instagram");
   const perfil = await metaFetch<{ followers_count?: number; media_count?: number; username?: string }>(`/${ig}`, {
     access_token: ctx.token, fields: "followers_count,media_count,username",
@@ -273,31 +295,31 @@ export async function instagramOrganico(ctx: MetaCtx, p: Periodo) {
   const totais: Record<string, number | null> = Object.fromEntries(IG_METRICAS_CONTA.map((m) => [m, 0]));
   const partes = janelas(p);
   for (const j of partes) {
-    const resp = await tentar(() => metaFetch<{ data?: Metrica[] }>(`/${ig}/insights`, {
+    const resp = await tentar(reg, Object.values(IG_CAMPO), () => metaFetch<{ data?: Metrica[] }>(`/${ig}/insights`, {
       access_token: ctx.token, metric: IG_METRICAS_CONTA.join(","), metric_type: "total_value", period: "day",
       since: unix(j.de), until: unix(j.ate, true),
-    }));
+    }), `janela ${j.de}..${j.ate}`);
     for (const m of IG_METRICAS_CONTA) {
       const valor = resp?.data?.find((d) => d.name === m)?.total_value?.value;
       totais[m] = valor === undefined || totais[m] === null ? null : (totais[m] ?? 0) + valor;
     }
   }
 
-  const midias = await paginar<{
+  const midias = await tentar(reg, ["posts"], () => paginar<{
     id: string; caption?: string; media_type?: string; media_product_type?: string; timestamp?: string;
     permalink?: string; like_count?: number; comments_count?: number;
   }>(`/${ig}/media`, {
     access_token: ctx.token,
     fields: "id,caption,media_type,media_product_type,timestamp,permalink,like_count,comments_count",
     since: unix(p.de), until: unix(p.ate, true), limit: "50",
-  }, 2);
+  }, 2)) ?? [];
   const noPeriodo = midias.filter((m) => {
     const dia = m.timestamp ? new Date(new Date(m.timestamp).getTime() - 3 * 3600_000).toISOString().slice(0, 10) : "";
     return dia >= p.de && dia <= p.ate;
   }).slice(0, 25);
 
   const posts: PostOrganico[] = await Promise.all(noPeriodo.map(async (m) => {
-    const ins = await tentar(() => metaFetch<{ data?: Metrica[] }>(`/${m.id}/insights`, {
+    const ins = await tentar(reg, IG_CAMPOS_POST, () => metaFetch<{ data?: Metrica[] }>(`/${m.id}/insights`, {
       access_token: ctx.token, metric: "reach,views,total_interactions,shares",
     }));
     const val = (nome: string) => {
@@ -332,14 +354,64 @@ export async function instagramOrganico(ctx: MetaCtx, p: Periodo) {
   };
 }
 
-async function tokenDaPagina(ctx: MetaCtx): Promise<string> {
+export async function tokenDaPagina(ctx: MetaCtx): Promise<string> {
   const pagina = exigir(ctx.pageId, "Página do Facebook");
   const resp = await metaFetch<{ access_token?: string }>(`/${pagina}`, { access_token: ctx.token, fields: "access_token" });
   if (!resp.access_token) throw new Error("O usuário do sistema não tem acesso de publicação à Página.");
   return resp.access_token;
 }
 
-export async function facebookOrganico(ctx: MetaCtx, p: Periodo) {
+type PostFacebookApi = {
+  id: string; message?: string; created_time?: string; permalink_url?: string;
+  shares?: { count?: number }; reactions?: { summary?: { total_count?: number } };
+  comments?: { summary?: { total_count?: number } };
+};
+
+const FB_CAMPOS_POST = "id,message,created_time,permalink_url,shares";
+const FB_REACOES = "reactions.summary(true).limit(0)";
+const FB_COMENTARIOS = "comments.summary(true).limit(0)";
+
+// Em 01/10/2026 o `/posts` de 30 dias voltou "(#10) This endpoint requires the
+// 'pages_read_user_content' permission". A doc da Graph exige essa permissão no
+// feed da Página sem dizer qual campo a dispara; `comments` herda a permissão do
+// objeto e `reactions` pede `pages_read_engagement`. Por isso a consulta sonda
+// variantes, da mais completa à mais enxuta, só em erro de permissão, e cada
+// variante recusada vai ao log com o nome: o log de produção prova o campo.
+// Decisão padrão (T1-Unresolved 4): não pedir permissão nova.
+export const FB_VARIANTES_POSTS = [
+  { nome: "completa", campos: [FB_CAMPOS_POST, FB_REACOES, FB_COMENTARIOS], sem: [] },
+  { nome: "sem_comentarios", campos: [FB_CAMPOS_POST, FB_REACOES], sem: ["comentarios"] },
+  { nome: "sem_reacoes", campos: [FB_CAMPOS_POST, FB_COMENTARIOS], sem: ["curtidas"] },
+  { nome: "sem_engajamento", campos: [FB_CAMPOS_POST], sem: ["curtidas", "comentarios"] },
+] as const;
+
+async function postsDaPagina(pagina: string, tokenPagina: string, p: Periodo, reg: Registro) {
+  let recusa: unknown = null;
+  for (const v of FB_VARIANTES_POSTS) {
+    try {
+      const brutos = await paginar<PostFacebookApi>(`/${pagina}/posts`, {
+        access_token: tokenPagina, fields: v.campos.join(","),
+        since: unix(p.de), until: unix(p.ate, true), limit: "50",
+      }, 2);
+      if (recusa && v.sem.length) {
+        reg.falhou([...v.sem.map((c) => `posts.${c}`), "posts.interacoes"], recusa, v.nome);
+      }
+      return { brutos, sem: new Set<string>(v.sem) };
+    } catch (e) {
+      if (!semPermissao(e)) {
+        reg.falhou(["posts"], e, v.nome);
+        return null;
+      }
+      // Tentativa recusada por permissão: vai ao log, mas ainda não muda número.
+      reg.falhou([], e, v.nome);
+      recusa = e;
+    }
+  }
+  reg.falhou(["posts"], recusa, "sem_engajamento");
+  return null;
+}
+
+export async function facebookOrganico(ctx: MetaCtx, p: Periodo, reg = new Registro()) {
   const pagina = exigir(ctx.pageId, "Página do Facebook");
   const tokenPagina = await tokenDaPagina(ctx);
   const perfil = await metaFetch<{ followers_count?: number; name?: string }>(`/${pagina}`, {
@@ -347,7 +419,7 @@ export async function facebookOrganico(ctx: MetaCtx, p: Periodo) {
   });
 
   // page_impressions saiu em 15/11/2025; page_media_view é o substituto.
-  const insights = await tentar(() => metaFetch<{ data?: Metrica[] }>(`/${pagina}/insights`, {
+  const insights = await tentar(reg, ["visualizacoes", "interacoes"], () => metaFetch<{ data?: Metrica[] }>(`/${pagina}/insights`, {
     access_token: tokenPagina, metric: "page_media_view,page_post_engagements", period: "day",
     since: p.de, until: addDias(p.ate, 1),
   }));
@@ -356,19 +428,11 @@ export async function facebookOrganico(ctx: MetaCtx, p: Periodo) {
     return serie ? serie.reduce((a, v) => a + (v.value ?? 0), 0) : null;
   };
 
-  const brutos = await paginar<{
-    id: string; message?: string; created_time?: string; permalink_url?: string;
-    shares?: { count?: number }; reactions?: { summary?: { total_count?: number } };
-    comments?: { summary?: { total_count?: number } };
-  }>(`/${pagina}/posts`, {
-    access_token: tokenPagina,
-    fields: "id,message,created_time,permalink_url,shares,reactions.summary(true).limit(0),comments.summary(true).limit(0)",
-    since: unix(p.de), until: unix(p.ate, true), limit: "50",
-  }, 2);
-
-  const posts: PostOrganico[] = brutos.slice(0, 25).map((b) => {
-    const curtidas = b.reactions?.summary?.total_count ?? null;
-    const comentarios = b.comments?.summary?.total_count ?? null;
+  const lidos = await postsDaPagina(pagina, tokenPagina, p, reg);
+  const sem = lidos?.sem ?? new Set<string>();
+  const posts: PostOrganico[] = (lidos?.brutos ?? []).slice(0, 25).map((b) => {
+    const curtidas = sem.has("curtidas") ? null : b.reactions?.summary?.total_count ?? null;
+    const comentarios = sem.has("comentarios") ? null : b.comments?.summary?.total_count ?? null;
     const compartilhamentos = b.shares?.count ?? 0;
     return {
       id: b.id,
@@ -379,7 +443,8 @@ export async function facebookOrganico(ctx: MetaCtx, p: Periodo) {
       link: b.permalink_url ?? null,
       alcance: null,
       visualizacoes: null,
-      interacoes: (curtidas ?? 0) + (comentarios ?? 0) + compartilhamentos,
+      // Sem curtidas ou comentários a soma sairia menor que a real: fica sem valor.
+      interacoes: curtidas === null || comentarios === null ? null : curtidas + comentarios + compartilhamentos,
       curtidas,
       comentarios,
       compartilhamentos,

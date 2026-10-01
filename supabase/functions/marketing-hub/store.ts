@@ -2,7 +2,8 @@
 // `marketing-media` e Auth admin para a conta do dot. Só service role.
 
 import { createClient, type SupabaseClient, type User } from "jsr:@supabase/supabase-js@2";
-import { COLUNAS_ORIGEM_LEAD, type LeadOrigem } from "../_shared/marketing/leads.ts";
+import type { EscritaOk } from "../_shared/marketing/conexoes.ts";
+import { COLUNAS_ORIGEM_LEAD, type LeadOrigem, type ClasseLead, canalDoLead } from "../_shared/marketing/leads.ts";
 import {
   type AcaoRow,
   type AgenteRow,
@@ -76,6 +77,25 @@ export function criarStore(admin: SupabaseClient): MarketingStore {
   }
 
   return {
+    async googleStateConsumir(state) {
+      const { data, error } = await admin.rpc("marketing_google_state_consume", { p_state: state });
+      if (error) throw new Error("Google OAuth state indisponível.");
+      return typeof data === "string" ? { user_id: data } : null;
+    },
+
+    async googleRefreshLer() {
+      const { data, error } = await admin.rpc("marketing_google_refresh_read");
+      if (error) throw new Error("Google OAuth Vault indisponível.");
+      return typeof data === "string" && data ? data : null;
+    },
+
+    async googleConexaoSalvar(userId, refreshToken, requestId) {
+      const { error } = await admin.rpc("marketing_google_connection_save", {
+        p_user_id: userId, p_refresh_token: refreshToken, p_request_id: requestId,
+      });
+      if (error) throw new Error("Google OAuth não foi salvo.");
+    },
+
     async cacheLer(chave) {
       const { data, error } = await admin.from("marketing_cache").select("payload, expires_at").eq("key", chave).maybeSingle();
       if (error || !data) return null;
@@ -119,6 +139,13 @@ export function criarStore(admin: SupabaseClient): MarketingStore {
       const { data, error } = await admin.from("marketing_actions").select("*").order("created_at", { ascending: false }).limit(limite);
       if (error) falhar("marketing_actions", error);
       return (data ?? []) as AcaoRow[];
+    },
+
+    async escritasOk(desde) {
+      const { data, error } = await admin.from("marketing_actions").select("kind, payload, created_at")
+        .eq("status", "ok").gte("created_at", desde).order("created_at", { ascending: false }).limit(1000);
+      if (error) falhar("marketing_actions", error);
+      return (data ?? []) as EscritaOk[];
     },
 
     async ativos(): Promise<Ativos> {
@@ -170,10 +197,31 @@ export function criarStore(admin: SupabaseClient): MarketingStore {
     },
 
     async leadsOrigem(inicio, fim) {
-      const { data, error } = await admin.from("leads").select(COLUNAS_ORIGEM_LEAD)
+      const { data, error } = await admin.from("leads").select(`${COLUNAS_ORIGEM_LEAD},lead_classificacao(classe,criado_em,id)`)
         .gte("created_at", inicio).lt("created_at", fim).limit(10_000);
       if (error) falhar("leads", error);
-      return (data ?? []) as unknown as LeadOrigem[];
+      return (data ?? []).map((row: unknown) => {
+        const { lead_classificacao, ...origem } = row as LeadOrigem & { lead_classificacao: Classificacao[] };
+        return { ...origem, classe: classeVigente(lead_classificacao) };
+      });
+    },
+    async leadsListar(inicio, fim) {
+      const { data, error } = await admin.from("leads").select(`${COLUNAS_ORIGEM_LEAD},nome,email,lead_classificacao(classe,criado_em,id)`)
+        .gte("created_at", inicio).lt("created_at", fim).order("created_at", { ascending: false }).limit(10_000);
+      if (error) falhar("leads", error);
+      return (data ?? []).map((row: unknown) => {
+        const l = row as LeadOrigem & { id: string; nome: string; email: string; lead_classificacao: Classificacao[] };
+        return { id: l.id, criado_em: l.created_at, canal: canalDoLead(l), nome: l.nome, email: l.email, classe: classeVigente(l.lead_classificacao) };
+      });
+    },
+    async leadExiste(id) {
+      const { data, error } = await admin.from("leads").select("id").eq("id", id).maybeSingle();
+      if (error) falhar("leads", error);
+      return Boolean(data);
+    },
+    async leadClassificar(linha) {
+      const { error } = await admin.from("lead_classificacao").insert(linha);
+      if (error) falhar("lead_classificacao", error);
     },
 
     async cronSecretOk(segredo) {
@@ -248,4 +296,9 @@ export function criarStore(admin: SupabaseClient): MarketingStore {
       if (error) falhar("auth.ban", error);
     },
   };
+}
+
+type Classificacao = { id: number; classe: ClasseLead; criado_em: string };
+function classeVigente(linhas: Classificacao[] | null): ClasseLead | null {
+  return [...(linhas ?? [])].sort((a, b) => b.criado_em.localeCompare(a.criado_em) || b.id - a.id)[0]?.classe ?? null;
 }

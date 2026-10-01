@@ -22,6 +22,8 @@ const NewGoogleCampaignPage = lazy(() => import('./marketing/NewGoogleCampaignPa
 const CalendarPage = lazy(() => import('./marketing/CalendarPage').then(m => ({ default: m.CalendarPage })))
 const LogPage = lazy(() => import('./marketing/LogPage').then(m => ({ default: m.LogPage })))
 const AgentPage = lazy(() => import('./marketing/AgentPage').then(m => ({ default: m.AgentPage })))
+const LeadsPage = lazy(() => import('./marketing/LeadsPage').then(m => ({ default: m.LeadsPage })))
+const ConnectionsPage = lazy(() => import('./marketing/ConnectionsPage').then(m => ({ default: m.ConnectionsPage })))
 const MarketingAccessPage = lazy(() => import('./marketing/MarketingAccessPage').then(m => ({ default: m.MarketingAccessPage })))
 
 const AgencyConsolePage = lazy(() => import('./agency/AgencyConsolePage').then(m => ({ default: m.AgencyConsolePage })))
@@ -62,8 +64,10 @@ export function AppRoutes() {
             <Route path="campanhas/:plataforma/:campaignId" element={<CampaignDetailPage />} />
             <Route path="calendario" element={<CalendarPage />} />
             <Route path="registro" element={<LogPage />} />
+            <Route path="conexoes" element={<ConnectionsPage />} />
             <Route element={<RoleRoute roles={['NO_ADMIN']} requireAal2 />}>
               <Route path="dot" element={<AgentPage />} />
+              <Route path="leads" element={<LeadsPage />} />
             </Route>
             <Route path="*" element={<Navigate to="visao-geral" replace />} />
           </Route>

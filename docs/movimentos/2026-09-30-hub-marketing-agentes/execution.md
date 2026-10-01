@@ -1,14 +1,68 @@
 ---
 movement_id: hub-marketing-agentes
 plan: ./plan.md
-status: blocked
+status: needs_verification
 started: 2026-09-30T21:45:00-03:00
-updated: 2026-09-30T23:30:00-03:00
-executor: Claude (Claude Code, desktop, worktree windsor-ai-no-integration-10aae2)
-branch: claude/windsor-ai-nó-integration-y64r9w
+updated: 2026-10-01T17:45:00-03:00
+executor: Codex (coordenador atual, worktree suspicious-hypatia-6f295c)
+branch: claude/windsor-ai-nó-integration-y64r9w (squash na main em 5f0d1aee, PR #49); continuação em claude/hub-marketing-continuacao
+handoff: ./HANDOFF.md
 ---
 
 # Execution: marketing da nó num lugar só, operável por agentes
+
+## Retomada coordenada pelo Codex — 01/10/2026
+
+O Lucca pediu neste chat para seguir `.tasks/acompanhamento.md`, retomar os agentes e transferir a gerência. O painel é a fonte atual de estados e gates. As seções abaixo são o registro histórico dos passos anteriores, incluindo pendências que já foram superadas; não representam um novo pedido de autorização.
+
+A/B/C retomados nos próprios worktrees, preservando commits e alterações herdados. D entra na próxima vaga. Critérios locais serão revisitados após integração e por verificador independente (`tlc-implement`, perfil light); produção e contas continuam com provas separadas.
+
+Baseline de produção consultado somente em leitura: 27 leads, 947 sessões, 898 eventos; exatamente 10 leads no intervalo do backfill, zero ações e zero contas dot. Função marketing-hub v1; funções protegidas meta-capi, track-evento e painel-dados v17; quatro funções legadas v18, todas ACTIVE.
+
+Diagnóstico C, navegador somente leitura: projeto Google no-hub em Testando, zero usuários de teste; Publicar app bloqueado por branding incompleto. Campos Política de Privacidade e Termos vazios. Nenhuma conta/configuração foi alterada.
+
+## Estado em 01/10/2026, 20:30 UTC (fim da sessão do primeiro Executor)
+
+Status `needs_verification`: tudo está em produção, mas faltam provas obrigatórias
+(V1–V6 completas, AC1–AC8 e AC10 em produção) e 3 bloqueios descobertos no uso real.
+O próximo Executor começa por [HANDOFF.md](./HANDOFF.md).
+
+| Item | Estado verificado (só leitura, 01/10 ~20:30 UTC) |
+|---|---|
+| App | publicado (merge do PR #49, `5f0d1aee`); MFA ligado; o TOTP do Lucca está verificado (1 fator) |
+| `marketing-hub` | ACTIVE v1; o cron chama a cada 5 min e recebe **HTTP 200** |
+| Leitura Meta Ads | **funciona**: a revisão do Lucca + dot leu a campanha "TRAF - 20d - Agencias" (R$172,64; 20.084 impressões; 1.499 cliques, de 31/08 a 29/09) |
+| Leitura Google (GA4 e Search Console; Google Ads provável) | **falha** com `OAuth 401 unauthorized_client` → V4, V5 e V6 não passaram |
+| Orgânico Facebook | **parcial**: erro de permissão (`pages_read_user_content` / Page Public Content Access) em parte da consulta |
+| Conta do dot | **não existe** (0 usuários `MARKETING_AGENT`); a revisão usou a sessão admin do Lucca |
+| Escritas | **nenhuma** (0 linhas em `marketing_actions`; 0 em `scheduled_posts`) → AC2, AC3, AC4, AC6 e AC8 pendentes |
+| Legado de abril | as 4 funções seguem **ACTIVE** em produção → AC10 pendente |
+| Funil | 10 dos registros são testes (zero leads reais), o que distorce o CPL. Isso é a melhoria P0-1 |
+
+Documento de melhorias do Lucca + dot: [melhorias-2026-10-01.md](./melhorias-2026-10-01.md)
+(o original `.docx` está ao lado). É **escopo novo**: entra como movimento próprio
+depois de fechar as pendências deste.
+
+## Produção — 01/10/2026 (Passo 7, autorizado pelo Lucca no chat)
+
+Autorização: "Tudo, nessa ordem" (migrations → Vault → função → PR/merge do app →
+MFA do Lucca → provas pelo planner). E-mail do dot: `notechstack+dot@gmail.com`.
+As provas V1–V6 passaram a rodar **pelo hub depois do deploy**, porque o Lucca não
+quis rodar o script local de novo (desvio de ordem registrado aqui).
+
+| Etapa | Resultado | Evidência |
+|---|---|---|
+| Passo 0 (Lucca) | secrets no Supabase. Ids: `act_1415926037237997`, Página `1132533626610077`, IG `17841441508079164`, Ads `930-207-4409`, MCC com 10 dígitos, GA4 `531794428`, GSC `https://www.notechstack.com.br/` | ids lidos nas configurações do portfólio e no GA4 (só leitura); `no-hub` com acesso total aos 3 ativos Meta |
+| Funil antes | leads 27, lead_sessoes 699, lead_eventos 877 | `execute_sql` às 00:12 UTC |
+| Migration `hub_marketing` | aplicada | `apply_migration` ok |
+| Migration `hub_marketing_seed_ativos` (repo `20261001000937`) | aplicada; 3 ativos da nó | `ad_accounts` com os 3 ids |
+| Funil depois | **27 / 699 / 877 (igual)** | mesma consulta |
+| Grants | 0 em tabela e 0 por coluna para anon/authenticated | `role_table_grants`, `column_privileges` |
+| Cron / Vault / bucket | `marketing-publish-due */5` ativo; `MARKETING_CRON_SECRET` no Vault; bucket privado | `cron.job`, `vault.secrets`, `storage.buckets` |
+| Advisors de segurança | **nenhum WARN novo**; INFO "RLS sem policy" de 10 → 12 (`marketing_actions`, `marketing_cache`, só service role, intencional) | `get_advisors` antes e depois |
+| Deploy `marketing-hub` | ACTIVE v1, `verify_jwt=false` | sem sessão 401; token inválido 401; cron sem/errado 401; preflight 204 |
+| `marketing_hub_url` no Vault | criado (migration só de produção `hub_marketing_url_vault`) | — |
+| PR do app | [luccavgiani-spec/notechstack-lp#49](https://github.com/luccavgiani-spec/notechstack-lp/pull/49) | — |
 
 ## Resultado
 
@@ -195,3 +249,10 @@ Resumo:
 1. O Lucca faz o Passo 0 e roda as provas V1–V6.
 2. Com V1–V6 verdes e os ids no chat: seed, fixtures reais e **autorização explícita do Lucca para o Passo 7**, que exige migration, deploy e publicação em produção.
 3. Depois: AC1–AC11 em produção, delete do legado e registro no Bot-vault.
+
+
+## Prova da regressão de datas — T2 20
+
+Causa no código anterior: `aplicar()` retornava sem mensagem quando input date produzia string vazia por data incompleta; links do menu descartavam `periodo`; campos De/Até liam URL apenas na montagem e ficavam desatualizados ao voltar/avançar.
+
+O coordenador extraiu os arquivos do commit `6aded586` (testes presentes, correção ausente) em `%TEMP%/codex-hub-datas-regressao/app` e executou `vitest run src/marketingPlanner.test.tsx -t "reproduz a falha de 30/09"`: dois testes falharam, por ausência de role alert e por URL perder `?periodo=2026-09-22..2026-09-23`. No conjunto integrado, ambos passaram. A prova antes/depois não usa contas, .env ou alterações de produção.
