@@ -1,6 +1,6 @@
 # Acompanhamento: agentes do hub de marketing
 
-Painel do coordenador (Claude central). Ele é a memória entre turnos e sessões: o chat de 01/10 vai
+Painel do coordenador (Codex, chat atual; assumido em 01/10/2026). Ele é a memória entre turnos e sessões: o chat de 01/10 vai
 ser apagado pelo Lucca. Atualize depois de cada relatório de agente.
 
 ## Tarefas (fonte da verdade dos critérios)
@@ -101,3 +101,15 @@ o formato do Decided, com mocks, até B entregar.
 
 - 01/10/2026: Lucca respondeu G1 (botão Google no planner) e G2 (tabela `lead_classificacao`). Agentes A–D despachados.
 - 01/10/2026: plano criado com tlc-plan. Estado de produção conferido às 20:37 UTC (só leitura): 0 dots, 0 `marketing_actions`, 4 funções legadas ACTIVE, Google em `unauthorized_client`, Facebook de 30 dias com erro (#10) `pages_read_user_content`.
+
+## Coordenação atual — retomada Codex em 01/10/2026
+
+- Gerenciador: Codex `/root`, por pedido direto do Lucca para seguir este painel e disparar os agentes.
+- Checkout de integração preservado: `suspicious-hypatia-6f295c`, branch `claude/hub-marketing-continuacao`.
+- A retomado como `/root/frontend`, no worktree existente `hubmkt-frontend`; revisão do trabalho herdado e conclusão de T2 frontend/T1 botão Google.
+- B retomado como `/root/backend`, no worktree existente `hubmkt-supabase`; revisão do trabalho herdado e conclusão de T2 backend/T1 Facebook.
+- C retomado como `/root/google`, no worktree existente `hubmkt-google`; revisão do trabalho herdado, OAuth e diagnóstico/rotação.
+- D (dot e mercado) na fila: será despachado assim que uma das três vagas de subagente liberar. Limite desta sessão: coordenador + três agentes.
+- Cada agente deve preservar mudanças herdadas, entregar commits locais e provas por critério. Integração e reexecução das provas ficam com o coordenador.
+- Os estados antigos da tabela acima são históricos até a revisão das entregas herdadas; nenhum critério é considerado concluído apenas por existir código.
+- Gates e autorização permanente deste documento continuam vigentes, com os mesmos limites.
