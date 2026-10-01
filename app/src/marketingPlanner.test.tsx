@@ -1,15 +1,17 @@
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { Session } from '@supabase/supabase-js'
 import { BrowserRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRoutes } from './App'
 import { AuthProvider } from './auth/AuthProvider'
+import { hojeSaoPaulo, somarDias } from './marketing/format'
 import type { VisaoGeral } from './marketing/marketing-service'
 
 const mocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   listFactors: vi.fn(),
+  invoke: vi.fn(),
   marketing: {
     configuracao: vi.fn(),
     visaoGeral: vi.fn(),
@@ -48,6 +50,7 @@ vi.mock('./lib/supabase', () => ({
     },
     from: vi.fn(),
     rpc: vi.fn(async () => ({ data: [], error: null })),
+    functions: { invoke: mocks.invoke },
   },
 }))
 
@@ -295,6 +298,152 @@ describe('nova campanha Google', () => {
         { texto: 'automação', correspondencia: 'BROAD' },
       ],
     })
+  })
+})
+
+// Período devolvido pela função para o valor pedido (eco), como faz parsePeriodo.
+function periodoDe(valor: string) {
+  if (!valor.includes('..')) return periodo
+  const [de, ate] = valor.split('..')
+  const br = (d: string) => d.split('-').reverse().join('/')
+  const dias = Math.round((Date.parse(`${ate}T12:00:00Z`) - Date.parse(`${de}T12:00:00Z`)) / 86_400_000) + 1
+  return { id: valor, de, ate, dias, rotulo: `${br(de)} a ${br(ate)}` }
+}
+
+const CUSTOM = '2026-09-22..2026-09-23'
+
+// O erro do período aparece em texto dentro do próprio formulário (19).
+async function erroDoFormulario() {
+  const alerta = await screen.findByRole('alert')
+  expect(alerta.closest('form')).toHaveAccessibleName('Período personalizado')
+  return alerta
+}
+
+describe('período (T2 17–21)', () => {
+  beforeEach(() => {
+    mocks.marketing.visaoGeral.mockImplementation(async (p: string) => ({ ...visao(), periodo: periodoDe(p) }))
+    mocks.marketing.campanhas.mockImplementation(async (p: string) => ({ periodo: periodoDe(p), blocos: { meta: { ok: true, cache: false, dados: [
+      { plataforma: 'meta', id: '555', nome: 'TRAF - 20d - Agencias', status: 'ACTIVE', status_efetivo: 'ACTIVE', objetivo: 'OUTCOME_TRAFFIC', orcamento_diario_centavos: 2000, orcamento_total_centavos: null, metricas: { ...vazio, gasto_centavos: 17264 } },
+    ] }, google: null } }))
+  })
+
+  it('17: De 22/09/2026 e Até 23/09/2026 → URL, pedido e título com o mesmo intervalo', async () => {
+    abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+    const u = userEvent.setup()
+    await screen.findByRole('region', { name: 'Tráfego pago' })
+    await u.type(screen.getByLabelText('Data inicial'), '2026-09-22')
+    await u.type(screen.getByLabelText('Data final'), '2026-09-23')
+    await u.click(screen.getByRole('button', { name: 'Aplicar período' }))
+    await waitFor(() => expect(window.location.search).toBe(`?periodo=${CUSTOM}`))
+    await waitFor(() => expect(mocks.marketing.visaoGeral).toHaveBeenLastCalledWith(CUSTOM, false))
+    expect(await screen.findByRole('heading', { name: '22/09/2026 a 23/09/2026' })).toBeVisible()
+  })
+
+  it('17: o pedido à marketing-hub leva periodo=2026-09-22..2026-09-23 sem codificar', async () => {
+    const real = await vi.importActual<typeof import('./marketing/marketing-service')>('./marketing/marketing-service')
+    mocks.invoke.mockResolvedValue({ data: { periodo: periodoDe(CUSTOM) }, error: null })
+    await real.marketing.visaoGeral(CUSTOM)
+    expect(mocks.invoke).toHaveBeenCalledWith(`marketing-hub/overview?periodo=${CUSTOM}`, { method: 'GET' })
+  })
+
+  it('20: reproduz a falha de 30/09 — data incompleta no campo não aplica e precisa dizer por quê', async () => {
+    abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+    const u = userEvent.setup()
+    await screen.findByRole('region', { name: 'Tráfego pago' })
+    const chamadas = mocks.marketing.visaoGeral.mock.calls.length
+    // Digitação parcial: o <input type="date"> devolve '' até a data estar completa.
+    await u.type(screen.getByLabelText('Data inicial'), '2026-09')
+    await u.type(screen.getByLabelText('Data final'), '2026-09-23')
+    await u.click(screen.getByRole('button', { name: 'Aplicar período' }))
+    expect(await erroDoFormulario()).toHaveTextContent('Preencha De e Até com datas completas')
+    expect(window.location.search).toBe('')
+    expect(mocks.marketing.visaoGeral).toHaveBeenCalledTimes(chamadas)
+  })
+
+  it('20/18: reproduz a falha de 30/09 — o menu leva o período para Campanhas, Registro e de volta', async () => {
+    abrir(`/no/marketing/visao-geral?periodo=${CUSTOM}`, sessao('MARKETING_AGENT'))
+    const u = userEvent.setup()
+    await screen.findByRole('region', { name: 'Tráfego pago' })
+    const menu = screen.getByRole('navigation', { name: 'Telas do planner' })
+    await u.click(within(menu).getByRole('link', { name: 'Campanhas' }))
+    await waitFor(() => expect(window.location.pathname).toBe('/no/marketing/campanhas'))
+    expect(window.location.search).toBe(`?periodo=${CUSTOM}`)
+    await waitFor(() => expect(mocks.marketing.campanhas).toHaveBeenCalledWith(CUSTOM))
+    expect(mocks.marketing.campanhas).not.toHaveBeenCalledWith('7d')
+    await u.click(within(menu).getByRole('link', { name: 'Registro' }))
+    await waitFor(() => expect(window.location.pathname).toBe('/no/marketing/registro'))
+    expect(window.location.search).toBe(`?periodo=${CUSTOM}`)
+    await u.click(within(menu).getByRole('link', { name: 'Visão geral' }))
+    await waitFor(() => expect(window.location.pathname).toBe('/no/marketing/visao-geral'))
+    expect(mocks.marketing.visaoGeral).toHaveBeenLastCalledWith(CUSTOM, false)
+    expect(mocks.marketing.visaoGeral).not.toHaveBeenCalledWith('7d', false)
+  })
+
+  it('18: recarregar e voltar/avançar mantêm o período e os campos De e Até', async () => {
+    abrir(`/no/marketing/visao-geral?periodo=${CUSTOM}`, sessao('MARKETING_AGENT'))
+    const u = userEvent.setup()
+    await screen.findByRole('region', { name: 'Tráfego pago' })
+    expect(screen.getByLabelText('Data inicial')).toHaveValue('2026-09-22')
+    expect(screen.getByLabelText('Data final')).toHaveValue('2026-09-23')
+
+    await u.click(screen.getByRole('link', { name: 'Últimos 7 dias' }))
+    await waitFor(() => expect(window.location.search).toBe('?periodo=7d'))
+    expect(screen.getByLabelText('Data inicial')).toHaveValue('')
+    expect(screen.getByLabelText('Data final')).toHaveValue('')
+
+    act(() => window.history.back())
+    await waitFor(() => expect(window.location.search).toBe(`?periodo=${CUSTOM}`))
+    await waitFor(() => expect(screen.getByLabelText('Data inicial')).toHaveValue('2026-09-22'))
+    expect(screen.getByLabelText('Data final')).toHaveValue('2026-09-23')
+    await waitFor(() => expect(mocks.marketing.visaoGeral).toHaveBeenLastCalledWith(CUSTOM, false))
+
+    act(() => window.history.forward())
+    await waitFor(() => expect(window.location.search).toBe('?periodo=7d'))
+    await waitFor(() => expect(screen.getByLabelText('Data inicial')).toHaveValue(''))
+    await waitFor(() => expect(mocks.marketing.visaoGeral).toHaveBeenLastCalledWith('7d', false))
+  })
+
+  it.each([
+    ['De vazio', '', '2026-09-23', 'Preencha De e Até com datas completas'],
+    ['Até vazio', '2026-09-22', '', 'Preencha De e Até com datas completas'],
+    ['De maior que Até', '2026-09-23', '2026-09-22', 'De precisa ser igual ou anterior a Até'],
+    ['Até depois de hoje', '2026-09-22', somarDias(hojeSaoPaulo(), 1), 'Até não pode ser depois de hoje'],
+    ['mais de 366 dias', '2025-01-01', '2026-09-23', 'no máximo 366 dias'],
+  ])('19: %s → erro em texto no formulário e nenhuma requisição', async (_caso, de, ate, mensagem) => {
+    abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+    const u = userEvent.setup()
+    await screen.findByRole('region', { name: 'Tráfego pago' })
+    const chamadas = mocks.marketing.visaoGeral.mock.calls.length
+    if (de) await u.type(screen.getByLabelText('Data inicial'), de)
+    if (ate) await u.type(screen.getByLabelText('Data final'), ate)
+    await u.click(screen.getByRole('button', { name: 'Aplicar período' }))
+    expect(await erroDoFormulario()).toHaveTextContent(mensagem)
+    expect(window.location.search).toBe('')
+    expect(mocks.marketing.visaoGeral).toHaveBeenCalledTimes(chamadas)
+  })
+
+  it('19: exatamente 366 dias é aceito e o erro some', async () => {
+    abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+    const u = userEvent.setup()
+    await screen.findByRole('region', { name: 'Tráfego pago' })
+    await u.click(screen.getByRole('button', { name: 'Aplicar período' }))
+    expect(await erroDoFormulario()).toBeVisible()
+    await u.type(screen.getByLabelText('Data inicial'), '2025-09-23')
+    await u.type(screen.getByLabelText('Data final'), '2026-09-23')
+    await u.click(screen.getByRole('button', { name: 'Aplicar período' }))
+    await waitFor(() => expect(window.location.search).toBe('?periodo=2025-09-23..2026-09-23'))
+    expect(within(screen.getByRole('form', { name: 'Período personalizado' })).queryByRole('alert')).toBeNull()
+  })
+
+  it.each(['7d', '30d', 'mes-passado', CUSTOM])('21: menu e link de detalhe usam periodo=%s', async (valor) => {
+    abrir(`/no/marketing/campanhas?periodo=${valor}`, sessao('NO_ADMIN', 'aal2'))
+    const link = await screen.findByRole('link', { name: 'TRAF - 20d - Agencias' })
+    expect(link).toHaveAttribute('href', `/no/marketing/campanhas/meta/555?periodo=${valor}`)
+    const menu = screen.getByRole('navigation', { name: 'Telas do planner' })
+    for (const nome of ['Visão geral', 'Campanhas', 'Calendário', 'Registro', 'Dot']) {
+      expect(within(menu).getByRole('link', { name: nome }).getAttribute('href')).toMatch(new RegExp(`\\?periodo=${valor.replace(/\./g, '\\.')}$`))
+    }
+    expect(mocks.marketing.campanhas).toHaveBeenCalledWith(valor)
   })
 })
 
