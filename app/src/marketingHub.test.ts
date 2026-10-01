@@ -210,6 +210,12 @@ describe('marketing-hub — autorização por papel (R9, AC7, AC11)', () => {
     const { chamar } = montar()
     expect((await chamar('GET', '/overview?periodo=2026-09-10..2026-09-01', 'dot')).status).toBe(422)
   })
+  it('T2-17: resposta HTTP preserva exatamente 22 a 23 de setembro de 2026', async () => {
+    const { chamar } = montar()
+    const response = await chamar('GET', '/overview?periodo=2026-09-22..2026-09-23', 'dot')
+    expect(response.status).toBe(200)
+    expect(await response.json()).toMatchObject({ periodo: { de: '2026-09-22', ate: '2026-09-23', dias: 2 } })
+  })
   it.each(['2026-99-01..2026-09-23', '2026-09-22..2026-13-01', '2026-02-30..2026-03-01', '2026-09-00..2026-09-23'])('T2-19: data impossível %s responde 422 em vez de 500', async periodo => {
     const { chamar } = montar()
     const response = await chamar('GET', `/overview?periodo=${periodo}`, 'dot')

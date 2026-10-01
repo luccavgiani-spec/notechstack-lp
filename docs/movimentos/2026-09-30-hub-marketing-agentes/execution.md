@@ -250,3 +250,9 @@ Resumo:
 2. Com V1–V6 verdes e os ids no chat: seed, fixtures reais e **autorização explícita do Lucca para o Passo 7**, que exige migration, deploy e publicação em produção.
 3. Depois: AC1–AC11 em produção, delete do legado e registro no Bot-vault.
 
+
+## Prova da regressão de datas — T2 20
+
+Causa no código anterior: `aplicar()` retornava sem mensagem quando input date produzia string vazia por data incompleta; links do menu descartavam `periodo`; campos De/Até liam URL apenas na montagem e ficavam desatualizados ao voltar/avançar.
+
+O coordenador extraiu os arquivos do commit `6aded586` (testes presentes, correção ausente) em `%TEMP%/codex-hub-datas-regressao/app` e executou `vitest run src/marketingPlanner.test.tsx -t "reproduz a falha de 30/09"`: dois testes falharam, por ausência de role alert e por URL perder `?periodo=2026-09-22..2026-09-23`. No conjunto integrado, ambos passaram. A prova antes/depois não usa contas, .env ou alterações de produção.

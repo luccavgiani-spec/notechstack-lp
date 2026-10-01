@@ -55,7 +55,11 @@ describe('Google OAuth T1', () => {
     expect(result.status).toBe(200)
     expect(result.headers.get('cache-control')).toBe('no-store')
     expect(url.origin).toBe('https://accounts.google.com')
-    expect(url.searchParams.get('scope')?.split(' ')).toEqual([...GOOGLE_ESCOPOS])
+    expect(url.searchParams.get('scope')?.split(' ')).toEqual([
+      'https://www.googleapis.com/auth/adwords',
+      'https://www.googleapis.com/auth/analytics.readonly',
+      'https://www.googleapis.com/auth/webmasters.readonly',
+    ])
     expect(url.searchParams.get('access_type')).toBe('offline')
     expect(url.searchParams.get('prompt')).toBe('consent')
     expect(url.searchParams.get('redirect_uri')).toBe(GOOGLE_CALLBACK)
