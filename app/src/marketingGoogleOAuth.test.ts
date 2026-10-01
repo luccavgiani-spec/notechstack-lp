@@ -98,6 +98,7 @@ describe('Google OAuth T1', () => {
       expect(response.headers.get('referrer-policy')).toBe('no-referrer')
     }
     expect(m.store.cacheLimpar).toHaveBeenCalledWith('connections:')
+    expect(m.store.cacheLimpar).toHaveBeenCalledWith('conexoes')
   })
   it.each(['access_denied', 'http-error', 'network-error', 'no-refresh', 'partial-scopes'])('19 %s preserva conexão anterior e consome state', async kind => {
     const m = montar()

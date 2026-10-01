@@ -554,7 +554,7 @@ export function criarHandler(deps: Deps) {
         const refreshToken = await googleTrocarCodigo(config.google.clientId, config.google.clientSecret, code);
         await store.googleConexaoSalvar(dono.user_id, refreshToken, deps.uuid());
         limparCacheGoogle();
-        for (const prefix of ["ga4:", "gsc:", "google_ads:", "campanhas_google:", CHAVE_CONEXOES]) {
+        for (const prefix of ["ga4:", "gsc:", "google_ads:", "campanhas_google:", "connections:", CHAVE_CONEXOES]) {
           await store.cacheLimpar(prefix).catch(() => undefined);
         }
         return voltar();
