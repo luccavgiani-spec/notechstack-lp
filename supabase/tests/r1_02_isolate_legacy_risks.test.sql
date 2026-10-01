@@ -191,17 +191,16 @@ from pg_policy as pol where pol.polname = 'scheduled_posts_update_own' and pol.p
 select ok(strpos(lower(pg_get_expr(pol.polqual, pol.polrelid)), 'select auth.jwt()') > 0, 'C5 ad_accounts_read_own uses select auth.jwt()')
 from pg_policy as pol where pol.polname = 'ad_accounts_read_own' and pol.polrelid = 'public.ad_accounts'::regclass;
 
--- C6: the rewritten policies retain the X/Y tenant boundary on both required tables.
+-- C6: desde o hub de marketing (20260930215739), authenticated não tem grant nenhum
+-- nessas tabelas; nem o tenant X lê a própria linha. As policies ficam inertes.
 set local role authenticated;
 select set_config(
   'request.jwt.claims',
   '{"sub":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","role":"authenticated","client_id":"75d5ccc3-054a-452d-9dc0-cbf87ddd0758"}',
   true
 );
-select is((select count(*)::integer from public.ad_metrics_daily), 1, 'C6 tenant X sees one ad_metrics_daily row');
-select is((select campaign_id from public.ad_metrics_daily), 'r1-02-campaign-x', 'C6 tenant X sees no Y ad metric');
-select is((select count(*)::integer from public.scheduled_posts), 1, 'C6 tenant X sees one scheduled_posts row');
-select is((select id from public.scheduled_posts), '74000000-0000-4000-8000-000000000001'::uuid, 'C6 tenant X sees no Y scheduled post');
+select throws_ok($$select 1 from public.ad_metrics_daily$$, '42501'::character(5), null, 'C6 tenant X cannot read ad_metrics_daily');
+select throws_ok($$select 1 from public.scheduled_posts$$, '42501'::character(5), null, 'C6 tenant X cannot read scheduled_posts');
 reset role;
 
 select * from finish();

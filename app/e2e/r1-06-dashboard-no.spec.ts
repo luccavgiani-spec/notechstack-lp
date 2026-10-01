@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { cleanupR106Fixture, createR106Fixture, type R106Fixture } from './r1-06-fixture'
+import { concluirMfa } from './mfa'
 
 test.describe('R1-06 · dashboard operacional da Nó', () => {
   test.setTimeout(120_000)
@@ -25,6 +26,7 @@ test.describe('R1-06 · dashboard operacional da Nó', () => {
     await page.getByLabel('E-mail').fill(fixture.adminEmail)
     await page.getByLabel('Senha').fill(fixture.password)
     await page.getByRole('button', { name: 'Entrar' }).click()
+    await concluirMfa(page, fixture.adminTotp)
     await expect(page).toHaveURL(/\/no\/projetos$/)
     await expect(page.getByRole('heading', { name: 'Todos os projetos.' })).toBeVisible()
     await expect(page.getByText('Cliente E2E R1-06').first()).toBeVisible()

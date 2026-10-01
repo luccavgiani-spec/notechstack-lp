@@ -1,4 +1,65 @@
-# nó hub — backend core de integração Meta (Fase 1)
+# Supabase da nó — hub de marketing e histórico da Fase 1
+
+Projeto Supabase: `sdeowbqmwkwseyktyemn` (sa-east-1). Produção compartilhada com o
+funil de leads, o checkout, os dashboards de clientes e o console de agências.
+
+## Hub de marketing (movimento `hub-marketing-agentes`, 30/09/2026)
+
+Planner `/no/marketing` no app → Edge Function `marketing-hub` → Meta / Google.
+Documentos: `docs/movimentos/2026-09-30-hub-marketing-agentes/` (intent, spec, plan, execution).
+
+- **Quem entra**: `NO_ADMIN` só com sessão `aal2` (TOTP obrigatório) e a conta do dot
+  (`MARKETING_AGENT`), que só enxerga o planner. A função decide por papel em toda rota.
+- **Leitura ao vivo** com cache em `marketing_cache` (15 min para dias abertos, 60 min
+  para períodos fechados). `?fresco=1` ignora o cache.
+- **Escrita**: toda ação grava `marketing_actions` antes de chamar a API, idempotente por
+  `request_id`. Campanhas nascem `PAUSED`.
+- **Posts**: fila em `scheduled_posts`; o `pg_cron` (`marketing-publish-due`, a cada 5 min)
+  chama `marketing-hub/internal/publish-due` com o segredo `MARKETING_CRON_SECRET` do Vault.
+- **Mídia**: bucket privado `marketing-media`, só por URL assinada da função.
+
+### Secrets da `marketing-hub` (nomes; valores só no painel do Supabase)
+
+| Nome | O que é |
+| --- | --- |
+| `META_SYSTEM_USER_TOKEN` | token do usuário do sistema "nó-hub" (Business Manager da nó) |
+| `GOOGLE_OAUTH_CLIENT_ID` / `GOOGLE_OAUTH_CLIENT_SECRET` | cliente OAuth do projeto Google Cloud "no-hub" |
+| `GOOGLE_OAUTH_REFRESH_TOKEN` | refresh token com os escopos Ads, Analytics (leitura) e Search Console (leitura) |
+| `GOOGLE_ADS_DEVELOPER_TOKEN` | developer token da conta de administrador (MCC) |
+| `GOOGLE_ADS_CUSTOMER_ID` / `GOOGLE_ADS_LOGIN_CUSTOMER_ID` | conta de anúncios da nó / MCC (não são segredo) |
+| `GA4_PROPERTY_ID` / `GSC_SITE_URL` | propriedade GA4 numérica / site do Search Console (não são segredo) |
+| `GOOGLE_ADS_CREATE_ENABLED` | `true` só depois da prova V6 (Explorer Access cria campanha) |
+| `APP_URL` | já existente; base do link de convite do dot |
+
+No Vault do banco: `MARKETING_CRON_SECRET` (criado pela migration, nunca sai do banco) e
+`marketing_hub_url` (URL da função, criada no deploy).
+
+Os ids da Meta (conta de anúncios `act_…`, Página, Instagram) ficam em `ad_accounts`
+(cliente `no-tech-stack`), com `access_token` nulo.
+
+### Provas locais
+
+```bash
+supabase db reset --local
+supabase test db
+supabase functions serve marketing-hub
+node supabase/tests/hub_marketing_edge.mjs
+```
+
+## Histórico — Fase 1 de abril (arquivada)
+
+O backend Meta de abril (OAuth por cliente, sync diário, refresh de tokens) nunca chegou
+a ter conta conectada. As quatro funções foram arquivadas em
+`supabase/functions-archive/meta-2026-04/` e saíram do `config.toml`. As tabelas ficaram:
+`ad_accounts` virou o cadastro de ativos do hub e `scheduled_posts` virou a fila de posts.
+Desde a migration `20260930215739`, `anon` e `authenticated` não têm privilégio nenhum
+nessas tabelas.
+
+O texto original da Fase 1 segue abaixo como referência.
+
+---
+
+### Texto original: nó hub — backend core de integração Meta (Fase 1)
 
 Backend centralizado que alimenta todos os hubs da nó com dados de **Meta Ads**
 e **Instagram/FB orgânico**. Multi-tenant via Row Level Security — cada cliente

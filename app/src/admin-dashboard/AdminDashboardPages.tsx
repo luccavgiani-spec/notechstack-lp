@@ -345,6 +345,7 @@ export function AdminProjectsPage() {
             </h2>
           </div>
           <div className="flex flex-wrap gap-3">
+          <Link to="/no/marketing" className="rounded-xl border border-borda bg-white px-4 py-2.5 text-sm font-semibold hover:border-azul">Marketing</Link>
           <Link to="/no/agencias" className="rounded-xl border border-borda bg-white px-4 py-2.5 text-sm font-semibold hover:border-azul">Agências</Link>
           <Link
             to="/no/atividade"

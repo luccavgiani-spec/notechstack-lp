@@ -2,10 +2,12 @@ import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { cadastrarTotp } from './mfa'
 
 export type F209Fixture = {
   admin: SupabaseClient
   adminEmail: string
+  adminTotp: string
   clientEmail: string
   password: string
   adminId: string
@@ -80,7 +82,9 @@ export async function createF209Fixture(): Promise<F209Fixture> {
   if (roadmapError) throw roadmapError
   await admin.from('activity_events').delete().eq('project_id', projectId)
 
-  return { admin, adminEmail, clientEmail, password, adminId, clientUserId, clientId, projectId }
+  // NO_ADMIN precisa de TOTP desde o hub de marketing (C2).
+  const adminTotp = await cadastrarTotp(adminEmail, password)
+  return { admin, adminEmail, adminTotp, clientEmail, password, adminId, clientUserId, clientId, projectId }
 }
 
 export async function cleanupF209Fixture(fixture: F209Fixture | undefined) {

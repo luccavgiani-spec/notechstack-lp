@@ -1,12 +1,14 @@
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
 import { cleanupF209Fixture, createF209Fixture, type F209Fixture } from './f2-09-fixture'
+import { concluirMfa } from './mfa'
 
-async function login(page: Page, email: string, password: string) {
+async function login(page: Page, email: string, password: string, totpSecret?: string) {
   await page.goto('/login')
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill(password)
   await page.getByRole('button', { name: 'Entrar' }).click()
+  if (totpSecret) await concluirMfa(page, totpSecret)
   await expect(page).not.toHaveURL(/\/login$/)
 }
 async function publish(page: Page, label: string, macro: string, build: string) {
@@ -45,7 +47,7 @@ test.describe('F2-10 · cenário B', () => {
     if (preparationError) throw preparationError
     const { error: termsError } = await f.admin.from('commercial_terms').insert({ project_id: f.projectId, tier: 'basico', amount_cents: 120000, payment_method: 'pix', installments: 1, deadline_days: 30 })
     if (termsError) throw termsError
-    await login(page, f.adminEmail, f.password)
+    await login(page, f.adminEmail, f.password, f.adminTotp)
     await page.goto(`/no/projetos/${f.projectId}`)
     await page.getByRole('button', { name: 'Converter', exact: true }).click()
     await page.getByRole('button', { name: 'Confirmar', exact: true }).click()
@@ -100,7 +102,7 @@ test.describe('F2-10 · cenário B', () => {
     expect(objects).toHaveLength(4)
     const { data: immutable } = await f.admin.from('project_versions').select('build_reference').eq('id', version.id).single()
     expect(immutable?.build_reference).toBe(build)
-    await login(page, f.adminEmail, f.password)
+    await login(page, f.adminEmail, f.password, f.adminTotp)
     await page.goto(`/no/projetos/${f.projectId}`)
     await page.getByRole('button', { name: 'Ingerir no Kanban' }).click()
     await expect(page.getByText('Estado atual: Alterações recebidas')).toBeVisible()
