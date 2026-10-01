@@ -129,3 +129,11 @@ o formato do Decided, com mocks, até B entregar.
 - B: commits de origem `eb43ae71`, `226cc4a7` integrados como `adb31bc5`, `67d022e4`; origem reporta 99 testes adapters/handler e SQL PGlite aprovados. Migration `20261001214638` ainda não aplicada em produção. T1 4–5 e T2 4/16 reais seguem pendentes.
 - Prova SQL local alternativa usa PGlite temporário fora do produto, pois Docker Desktop não disponibilizou daemon. Cobre 9/10/11 leads, atomicidade do aborto, RLS/grants/constraints e append-only; não equivale a Auth/PostgREST/Vault real.
 - D despachado como `/root/mercado` no worktree `hubmkt-dot-mercado` após A concluir. Escopo T3 1–7 e roteiro T1 6–8. A linha anterior que o colocava na fila é histórica.
+
+### Integração C e revisão independente — rodada 1
+
+- C integrado: `1003a14a` → `b711fd20`; `3e7d919c` → `4d4b3d57`. Integração preserva autorização do dot nas operações Google existentes; somente `google/connect` fica exclusivo de admin. Chamadas Google aguardam leitura Vault; reconexão invalida cache `conexoes`.
+- Checklist de provas: `.checks/hub-marketing-continuacao.md`. Verificador fresco `/root/verificador_codigo` assumiu T1/T2 após integração de todos os respectivos lotes. T3 terá rodada própria depois de D.
+- Coordenador repetiu ambos scripts SQL PGlite: passaram. Reproduziu duas falhas de datas no commit pré-correção `6aded586`; as mesmas provas passam na implementação integrada.
+- Verificador executou 184/184 Vitest e os dois scripts SQL, mas encontrou bugs não cobertos: formato de permissões Meta no frontend, propagação de estados de métricas e HTTP 500 para data impossível na API. Não liberar produção enquanto esses bugs não forem corrigidos e revisitados.
+- API de datas corrigida em `ff7894e3` com quatro casos HTTP 422. Frontend reativado para correções no checkout de integração, com propriedade exclusiva de seus arquivos. Nenhuma ação de produção nesta retomada até aqui.
