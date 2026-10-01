@@ -51,7 +51,7 @@ o formato do Decided, com mocks, até B entregar.
 
 "pode ir criando PR e merge + deploy conforme voce revisa o trabalho deles."
 
-- **Coberto (sem perguntar de novo), desde que o coordenador tenha revisado e reprovado as provas:**
+- **Coberto (sem perguntar de novo), desde que o coordenador tenha revisado o trabalho e rodado as provas de novo:**
   - push da branch, PR para a `main` e merge;
   - deploy da `marketing-hub` pelo MCP;
   - migrations destas tarefas por `apply_migration`, medindo antes e depois `leads`, `lead_sessoes` e `lead_eventos` e rodando os advisors.
