@@ -350,33 +350,29 @@ describe('Facebook orgânico com permissão parcial (T1-4/5)', () => {
   }
   const postsChamadas = (chamadas: Chamada[]) => chamadas.filter((c) => c.url.includes('/222/posts')).map((c) => new URL(c.url).searchParams.get('fields'))
 
-  it('variante sem_comentarios: comments recusado com #10, curtidas ficam, comentários viram null com sem_permissao', async () => {
-    const chamadas = mockPagina((campos) => (campos.includes('comments') ? { status: 400, body: RECUSA_10 } : null))
+  it('não consulta comments nem reactions recusados em produção; preserva posts e métricas de conta', async () => {
+    const chamadas = mockPagina((campos) => (campos.includes('comments') || campos.includes('reactions') ? { status: 400, body: RECUSA_10 } : null))
     const reg = new Registro()
     const r = await facebookOrganico(ctxMeta, parsePeriodo('30d', AGORA)!, reg)
-    expect(postsChamadas(chamadas)).toEqual([
-      'id,message,created_time,permalink_url,shares,reactions.summary(true).limit(0),comments.summary(true).limit(0)',
-      'id,message,created_time,permalink_url,shares,reactions.summary(true).limit(0)',
-    ])
-    expect(r.posts[0]).toMatchObject({ curtidas: 5, comentarios: null, interacoes: null, compartilhamentos: 2 })
-    expect(r).toMatchObject({ seguidores: 40, visualizacoes: 10, interacoes: 4 })
-    // A variante recusada fica registrada pelo nome (vai ao log), sem mudar número.
-    expect(reg.falhas[0]).toMatchObject({ chaves: [], estado: 'sem_permissao', variante: 'completa' })
-    expect(reg.falhas[0].mensagem).toContain('pages_read_user_content')
-    const estados = calcularEstados({ periodo: { visualizacoes: r.visualizacoes, interacoes: r.interacoes }, atrasado: false }, reg)
-    expect(estados).toEqual({ 'posts.comentarios': 'sem_permissao', 'posts.interacoes': 'sem_permissao', bloco: 'parcial' })
-  })
-
-  it('variante sem_engajamento: reactions e comments recusados, curtidas e comentários null com sem_permissao', async () => {
-    const chamadas = mockPagina((campos) => (campos.includes('comments') || campos.includes('reactions') ? { status: 400, body: { error: { message: 'Permissions error', code: 200 } } } : null))
-    const reg = new Registro()
-    const r = await facebookOrganico(ctxMeta, parsePeriodo('30d', AGORA)!, reg)
-    expect(postsChamadas(chamadas)).toHaveLength(4)
+    expect(postsChamadas(chamadas)).toEqual(['id,message,created_time,permalink_url,shares'])
     expect(r.posts[0]).toMatchObject({ curtidas: null, comentarios: null, interacoes: null, compartilhamentos: 2 })
-    expect(reg.falhas.filter((f) => f.chaves.length === 0).map((f) => f.variante)).toEqual(['completa', 'sem_comentarios', 'sem_reacoes'])
+    expect(r).toMatchObject({ seguidores: 40, visualizacoes: 10, interacoes: 4 })
+    expect(reg.falhas).toHaveLength(1)
+    expect(reg.falhas[0]).toMatchObject({ estado: 'sem_permissao', variante: 'sem_engajamento' })
+    expect(JSON.stringify(reg.falhas)).not.toContain('pages_read_user_content')
     expect(calcularEstados({ atrasado: false }, reg)).toEqual({
       'posts.curtidas': 'sem_permissao', 'posts.comentarios': 'sem_permissao', 'posts.interacoes': 'sem_permissao', bloco: 'parcial',
     })
+  })
+
+  it('recusa real da consulta básica fica registrada, sem ocultar erro de permissão', async () => {
+    const chamadas = mockPagina(() => ({ status: 400, body: RECUSA_10 }))
+    const reg = new Registro()
+    const r = await facebookOrganico(ctxMeta, parsePeriodo('30d', AGORA)!, reg)
+    expect(postsChamadas(chamadas)).toHaveLength(1)
+    expect(r.posts).toEqual([])
+    expect(reg.falhas[0].mensagem).toContain('pages_read_user_content')
+    expect(calcularEstados({ atrasado: false }, reg)).toEqual({ posts: 'sem_permissao', bloco: 'parcial' })
   })
 
   it('posts do Facebook com erro comum: não sonda variantes e não derruba o bloco', async () => {
@@ -389,13 +385,13 @@ describe('Facebook orgânico com permissão parcial (T1-4/5)', () => {
     expect(calcularEstados({ atrasado: false }, reg)).toEqual({ posts: 'erro', bloco: 'parcial' })
   })
 
-  it('com permissão completa, uma chamada só e nenhum estado', async () => {
+  it('consulta aprovada mantém a restrição explícita de engajamento, sem assumir novas permissões', async () => {
     const chamadas = mockPagina(() => null)
     const reg = new Registro()
     const r = await facebookOrganico(ctxMeta, parsePeriodo('30d', AGORA)!, reg)
     expect(postsChamadas(chamadas)).toHaveLength(1)
-    expect(r.posts[0]).toMatchObject({ curtidas: 5, comentarios: 3, interacoes: 10 })
-    expect(reg.falhas).toEqual([])
+    expect(r.posts[0]).toMatchObject({ curtidas: null, comentarios: null, interacoes: null })
+    expect(reg.falhas[0]).toMatchObject({ estado: 'sem_permissao', variante: 'sem_engajamento' })
   })
 })
 

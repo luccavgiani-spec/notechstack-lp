@@ -451,21 +451,22 @@ function plataformas(trocar: Plataforma = () => undefined) {
 }
 
 describe('marketing-hub — Facebook de 30 dias com recusa de permissão (T1-4/5)', () => {
-  it('Facebook 30d com #10: bloco ok, comentários sem_permissao, variante no log sem token, outros blocos inteiros', async () => {
+  it('Facebook 30d: omite campos recusados, bloco ok, permissão explícita e logs sem novas recusas', async () => {
     plataformas((u) => (u.pathname.endsWith('/222/posts') && (u.searchParams.get('fields') ?? '').includes('comments') ? { status: 400, body: RECUSA_10 } : undefined))
     const { chamar, logs } = montar({ metaToken: TOKENS.meta })
     const r = await chamar('GET', '/overview?periodo=30d&fresco=1', 'admin-aal2')
     expect(r.status).toBe(200)
     const { facebook, meta_ads, instagram, leads } = r.body.blocos
     expect(facebook).toMatchObject({ ok: true, dados: { seguidores: 40, visualizacoes: 10 } })
-    expect(facebook.dados.posts[0]).toMatchObject({ curtidas: 5, comentarios: null })
+    expect(facebook.dados.posts[0]).toMatchObject({ curtidas: null, comentarios: null })
     expect(facebook.estados).toMatchObject({ 'posts.comentarios': 'sem_permissao', bloco: 'parcial' })
     expect(meta_ads).toMatchObject({ ok: true, dados: { total: { gasto_centavos: 17264 } } })
     expect(instagram).toMatchObject({ ok: true, dados: { seguidores: 300 } })
     expect(leads).toMatchObject({ ok: true, dados: { total: 1 } })
     const recusas = logs.filter((l) => l.evento === 'marketing_subconsulta_falhou' && l.dados?.chave === 'facebook')
-    expect(recusas.map((l) => l.dados?.variante)).toEqual(['completa', 'sem_comentarios'])
-    expect(String(recusas[0].dados?.mensagem)).toContain('pages_read_user_content')
+    expect(recusas.map((l) => l.dados?.variante)).toEqual(['sem_engajamento'])
+    expect(JSON.stringify(logs)).not.toContain('pages_read_user_content')
+    expect(String(recusas[0].dados?.mensagem)).toContain('omitidos após recusa de permissão')
     expect(semPrefixo(JSON.stringify(logs))).toBe(true)
   })
 

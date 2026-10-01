@@ -3,7 +3,7 @@
 // porque repetir um POST de criação duplica o objeto na conta.
 
 import { GRAPH_BASE, MetaApiError, extractMetaError, metaFetch } from "../meta.ts";
-import { Registro, mensagemMeta, semPermissao, tentar } from "./estados.ts";
+import { Registro, mensagemMeta, tentar } from "./estados.ts";
 import {
   type MetaInsightRow,
   type MetricasPagas,
@@ -368,47 +368,23 @@ type PostFacebookApi = {
 };
 
 const FB_CAMPOS_POST = "id,message,created_time,permalink_url,shares";
-const FB_REACOES = "reactions.summary(true).limit(0)";
-const FB_COMENTARIOS = "comments.summary(true).limit(0)";
-
-// Em 01/10/2026 o `/posts` de 30 dias voltou "(#10) This endpoint requires the
-// 'pages_read_user_content' permission". A doc da Graph exige essa permissão no
-// feed da Página sem dizer qual campo a dispara; `comments` herda a permissão do
-// objeto e `reactions` pede `pages_read_engagement`. Por isso a consulta sonda
-// variantes, da mais completa à mais enxuta, só em erro de permissão, e cada
-// variante recusada vai ao log com o nome: o log de produção prova o campo.
-// Decisão padrão (T1-Unresolved 4): não pedir permissão nova.
-export const FB_VARIANTES_POSTS = [
-  { nome: "completa", campos: [FB_CAMPOS_POST, FB_REACOES, FB_COMENTARIOS], sem: [] },
-  { nome: "sem_comentarios", campos: [FB_CAMPOS_POST, FB_REACOES], sem: ["comentarios"] },
-  { nome: "sem_reacoes", campos: [FB_CAMPOS_POST, FB_COMENTARIOS], sem: ["curtidas"] },
-  { nome: "sem_engajamento", campos: [FB_CAMPOS_POST], sem: ["curtidas", "comentarios"] },
-] as const;
-
+// Evidência real 01/10/2026 22:19 UTC: completa, sem_comentarios e
+// sem_reacoes recusadas; somente sem_engajamento retorna os posts.
+// Decisão T1-Unresolved 4: remover ambos os campos, sem pedir permissão nova.
+// Rever esta restrição apenas após autorização e prova de acesso da Página.
 async function postsDaPagina(pagina: string, tokenPagina: string, p: Periodo, reg: Registro) {
-  let recusa: unknown = null;
-  for (const v of FB_VARIANTES_POSTS) {
-    try {
-      const brutos = await paginar<PostFacebookApi>(`/${pagina}/posts`, {
-        access_token: tokenPagina, fields: v.campos.join(","),
-        since: unix(p.de), until: unix(p.ate, true), limit: "50",
-      }, 2);
-      if (recusa && v.sem.length) {
-        reg.falhou([...v.sem.map((c) => `posts.${c}`), "posts.interacoes"], recusa, v.nome);
-      }
-      return { brutos, sem: new Set<string>(v.sem) };
-    } catch (e) {
-      if (!semPermissao(e)) {
-        reg.falhou(["posts"], e, v.nome);
-        return null;
-      }
-      // Tentativa recusada por permissão: vai ao log, mas ainda não muda número.
-      reg.falhou([], e, v.nome);
-      recusa = e;
-    }
-  }
-  reg.falhou(["posts"], recusa, "sem_engajamento");
-  return null;
+  const brutos = await tentar(reg, ["posts"], () => paginar<PostFacebookApi>(`/${pagina}/posts`, {
+    access_token: tokenPagina, fields: FB_CAMPOS_POST,
+    since: unix(p.de), until: unix(p.ate, true), limit: "50",
+  }, 2), "sem_engajamento");
+  if (!brutos) return null;
+  reg.falhas.push({
+    chaves: ["posts.curtidas", "posts.comentarios", "posts.interacoes"],
+    estado: "sem_permissao",
+    mensagem: "Campos reactions e comments omitidos após recusa de permissão verificada na Página em 01/10/2026.",
+    variante: "sem_engajamento",
+  });
+  return { brutos, sem: new Set<string>(["curtidas", "comentarios"]) };
 }
 
 export async function facebookOrganico(ctx: MetaCtx, p: Periodo, reg = new Registro()) {
