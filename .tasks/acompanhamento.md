@@ -122,3 +122,10 @@ o formato do Decided, com mocks, até B entregar.
 - Skill localizada: `C:/Users/lucca/.claude/skills/tlc-implement/SKILL.md`; perfil light. Verificador independente será despachado pelo coordenador depois da última integração. Um lote por agente nos limites de contexto, C estima ~20k tokens de leitura.
 - Baseline de produção só leitura nesta retomada: leads 27; lead_sessoes 947; lead_eventos 898; backfill 10; marketing_actions 0; dots 0. Funções protegidas meta-capi/track-evento/painel-dados ACTIVE v17; marketing-hub ACTIVE v1; quatro legadas ACTIVE v18.
 - Advisors anteriores à mudança: INFO RLS sem policy 12; WARN extensão pg_net pública 1, security definer anon 2, authenticated 32, proteção de senha vazada desativada 1. Revalidar imediatamente antes e depois de qualquer aplicação.
+
+### Entregas A/B integradas nesta retomada
+
+- A: commits de origem `6aded586`, `be301402`, `eb58aa32` integrados como `d1f9a05b`, `261a738a`, `bba9a9e0`; origem reporta 66 testes de UI/app, TypeScript e lint aprovados. Provas ainda serão repetidas no conjunto integrado. Limites: UI com mocks, sem OAuth ou Ads Manager real; estados/dicionário têm cobertura amostral.
+- B: commits de origem `eb43ae71`, `226cc4a7` integrados como `adb31bc5`, `67d022e4`; origem reporta 99 testes adapters/handler e SQL PGlite aprovados. Migration `20261001214638` ainda não aplicada em produção. T1 4–5 e T2 4/16 reais seguem pendentes.
+- Prova SQL local alternativa usa PGlite temporário fora do produto, pois Docker Desktop não disponibilizou daemon. Cobre 9/10/11 leads, atomicidade do aborto, RLS/grants/constraints e append-only; não equivale a Auth/PostgREST/Vault real.
+- D despachado como `/root/mercado` no worktree `hubmkt-dot-mercado` após A concluir. Escopo T3 1–7 e roteiro T1 6–8. A linha anterior que o colocava na fila é histórica.
