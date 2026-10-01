@@ -9,7 +9,11 @@ export function comPeriodo(caminho: string, periodo: string | null): string {
 const DATA_ISO = /^\d{4}-\d{2}-\d{2}$/
 const MAX_DIAS = 366
 
-const dataValida = (d: string) => DATA_ISO.test(d) && new Date(`${d}T12:00:00Z`).toISOString().slice(0, 10) === d
+const dataValida = (d: string) => {
+  if (!DATA_ISO.test(d)) return false
+  const data = new Date(`${d}T12:00:00Z`)
+  return !Number.isNaN(data.getTime()) && data.toISOString().slice(0, 10) === d
+}
 const diasEntre = (de: string, ate: string) => Math.round((Date.parse(`${ate}T12:00:00Z`) - Date.parse(`${de}T12:00:00Z`)) / 86_400_000) + 1
 
 // Mesmas regras de parsePeriodo na marketing-hub, ditas antes de qualquer requisição.

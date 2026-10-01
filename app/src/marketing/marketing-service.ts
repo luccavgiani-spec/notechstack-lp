@@ -3,6 +3,11 @@ import { supabase } from '../lib/supabase'
 // Contrato com a Edge Function marketing-hub. O planner nunca fala com as
 // plataformas nem com as tabelas: tudo passa pela função, que checa o papel.
 
+// T2 Decided 2: por que um número está ou não está na tela. Rótulo estável para o dot (R7).
+export type EstadoMetrica = 'disponivel' | 'zero' | 'indisponivel' | 'sem_permissao' | 'parcial' | 'atrasado' | 'erro'
+
+// Campos acrescentados pela T2 (Decided 1) são opcionais aqui: uma resposta
+// guardada no cache da função antes do deploy (15 a 60 min) ainda não os traz.
 export type Metricas = {
   gasto_centavos: number
   impressoes: number
@@ -10,11 +15,18 @@ export type Metricas = {
   cliques: number
   cliques_link: number | null
   conversoes: number
+  // Visualizações da página de destino: actions[action_type=landing_page_view] (só Meta).
+  lpv?: number | null
 }
 
 export type Bloco<T> =
-  | { ok: true; dados: T; cache: boolean }
-  | { ok: false; motivo: 'nao_configurado' | 'falha'; mensagem: string }
+  | { ok: true; dados: T; cache: boolean; estados?: Record<string, EstadoMetrica> }
+  | { ok: false; motivo: 'nao_configurado' | 'falha' | 'sem_permissao'; mensagem: string }
+
+export type ContaMeta = { id: string; moeda: string | null; fuso: string | null; versao_api: string | null }
+
+export type CanalLead = 'meta' | 'google' | 'organico' | 'direto' | 'outros'
+export type ClasseLead = 'real' | 'teste' | 'invalido' | 'duplicado' | 'a_classificar'
 
 export type Periodo = { id: string; de: string; ate: string; dias: number; rotulo: string }
 
@@ -41,7 +53,7 @@ export type VisaoGeral = {
   periodo: Periodo
   gerado_em: string
   blocos: {
-    meta_ads: Bloco<{ total: Metricas; por_dia: SerieDiaria[] }>
+    meta_ads: Bloco<{ total: Metricas; por_dia: SerieDiaria[]; conta?: ContaMeta }>
     google_ads: Bloco<{ total: Metricas; por_dia: SerieDiaria[] }>
     ga4: Bloco<{
       sessoes: number
@@ -80,9 +92,14 @@ export type VisaoGeral = {
       posts: PostOrganico[]
     }>
     leads: Bloco<{
+      // Todo registro do funil, testes inclusive. O CPL não usa este número.
       total: number
-      por_canal: Record<'meta' | 'google' | 'organico' | 'direto' | 'outros', number>
+      por_canal: Record<CanalLead, number>
       por_dia: { dia: string; total: number }[]
+      // Leads cuja classificação mais recente é `real`.
+      validos?: number
+      por_classe?: Record<ClasseLead, number>
+      por_canal_validos?: Record<CanalLead, number>
     }>
   }
 }
@@ -175,6 +192,27 @@ export type Configuracao = {
   google: { credenciais: boolean; ads: boolean; ga4: boolean; search_console: string | null; criacao_liberada: boolean }
 }
 
+// T2 Decided 3: GET /marketing-hub/connections, uma linha por capacidade.
+export type EstadoCapacidade = 'ok' | 'sem_permissao' | 'nao_configurado' | 'erro' | 'nao_verificado'
+
+export type Capacidade = {
+  id: string
+  plataforma: 'meta' | 'google'
+  rotulo: string
+  estado: EstadoCapacidade
+  detalhe: string | null
+  correcao: string | null
+}
+
+export type Conexoes = {
+  capacidades: Capacidade[]
+  // null: a plataforma não informou (tokeninfo / me/permissions sem resposta).
+  google_escopos: string[] | null
+  meta_permissoes: string[] | null
+}
+
+export type Lead = { id: string; criado_em: string; canal: string; nome: string | null; email: string | null; classe: Exclude<ClasseLead, 'a_classificar'> | null }
+
 export type Agente = { id: string; email: string | null; banido: boolean; criado_em: string | null; ultimo_login: string | null }
 
 export class ErroHub extends Error {
@@ -226,7 +264,11 @@ const q = (params: Record<string, string | undefined>) => {
 export const novoRequestId = () => crypto.randomUUID()
 
 export const marketing = {
+  conectarGoogle: () => chamar<{ url: string }>('POST', '/google/connect'),
+  leads: (periodo: string) => chamar<{ leads: Lead[] }>('GET', `/leads${q({ periodo })}`),
+  classificarLead: (id: string, corpo: { request_id: string; classe: Exclude<ClasseLead, 'a_classificar'>; motivo?: string }) => chamar<ResultadoAcao>('POST', `/leads/${encodeURIComponent(id)}/classificacao`, corpo),
   configuracao: () => chamar<Configuracao>('GET', '/config'),
+  conexoes: (fresco = false) => chamar<Conexoes>('GET', `/connections${q({ fresco: fresco ? '1' : undefined })}`),
   visaoGeral: (periodo: string, fresco = false) => chamar<VisaoGeral>('GET', `/overview${q({ periodo, fresco: fresco ? '1' : undefined })}`),
   campanhas: (periodo: string) => chamar<ListaCampanhas>('GET', `/campaigns${q({ periodo })}`),
   campanhaMeta: (id: string, periodo: string) => chamar<DetalheMeta>('GET', `/campaigns/${encodeURIComponent(id)}${q({ plataforma: 'meta', periodo })}`),

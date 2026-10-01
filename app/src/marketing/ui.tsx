@@ -62,7 +62,9 @@ export function BlocoIndisponivel({ bloco, nome }: { bloco: Bloco<unknown>; nome
     <p role="note" className="rounded-xl border border-dashed border-borda bg-osso px-4 py-3 text-sm text-cinza">
       <strong className="font-semibold text-tinta">{nome} indisponível</strong>
       {' — '}
-      {bloco.motivo === 'nao_configurado' ? 'integração ainda não configurada.' : bloco.mensagem}
+      {bloco.motivo === 'nao_configurado' ? 'integração ainda não configurada.' : null}
+      {bloco.motivo === 'sem_permissao' ? `sem permissão: ${bloco.mensagem}` : null}
+      {bloco.motivo === 'falha' ? bloco.mensagem : null}
     </p>
   )
 }

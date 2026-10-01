@@ -1,23 +1,31 @@
 import { useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { METRICAS_CAMPANHAS } from './definicoes'
+import { Dicionario } from './Dicionario'
 import { SeletorPeriodo } from './MarketingLayout'
-import { custoPor, inteiro, numeroDecimal, reais, rotuloStatus, tomDoStatus } from './format'
+import { inteiro, numeroDecimal, reais, rotuloStatus, tomDoStatus } from './format'
 import { type Bloco, type CampanhaResumo, marketing } from './marketing-service'
 import { BlocoIndisponivel, Carregando, Erro, Secao, Selo, Vazio, botaoPrimario, tabela, td, tdNum, th } from './ui'
 import { useDados } from './useDados'
+import { ValorMetrica, ValorRazao } from './ValorMetrica'
 
-function TabelaCampanhas({ bloco, nome, periodo }: { bloco: Bloco<CampanhaResumo[]> | null; nome: string; periodo: string }) {
+const reaisDeRazao = (n: number) => reais(Math.round(n))
+
+// LPV só existe na Meta (T2 critérios 4 e 6): a tabela Google não ganha as colunas.
+function TabelaCampanhas({ bloco, nome, periodo, lpv = false }: { bloco: Bloco<CampanhaResumo[]> | null; nome: string; periodo: string; lpv?: boolean }) {
   if (!bloco) return null
   if (!bloco.ok) return <BlocoIndisponivel bloco={bloco} nome={nome} />
   if (!bloco.dados.length) return <Vazio texto={`Nenhuma campanha ${nome} ainda.`} />
   return (
     <div className="overflow-x-auto">
-      <table className={`${tabela} min-w-[760px]`}>
+      <table className={`${tabela} ${lpv ? 'min-w-[1040px]' : 'min-w-[760px]'}`}>
         <caption className="sr-only">Campanhas {nome} no período</caption>
         <thead><tr>
           <th className={th}>Campanha</th><th className={th}>Status</th><th className={th}>Tipo</th>
           <th className={`${th} text-right`}>Orçamento</th><th className={`${th} text-right`}>Gasto</th>
-          <th className={`${th} text-right`}>Cliques</th><th className={`${th} text-right`}>Leads / conv.</th><th className={`${th} text-right`}>Custo por lead</th>
+          <th className={`${th} text-right`}>Cliques</th>
+          {lpv ? <><th className={`${th} text-right`}>Visualizações da página de destino</th><th className={`${th} text-right`}>Custo por LPV</th></> : null}
+          <th className={`${th} text-right`}>Leads / conv.</th><th className={`${th} text-right`}>Custo por lead</th>
         </tr></thead>
         <tbody>
           {bloco.dados.map((c) => (
@@ -33,8 +41,14 @@ function TabelaCampanhas({ bloco, nome, periodo }: { bloco: Bloco<CampanhaResumo
               </td>
               <td className={tdNum}>{reais(c.metricas.gasto_centavos)}</td>
               <td className={tdNum}>{inteiro(c.metricas.cliques)}</td>
+              {lpv ? (
+                <>
+                  <td className={tdNum}><ValorMetrica valor={c.metricas.lpv} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorRazao numerador={c.metricas.gasto_centavos} denominador={c.metricas.lpv} formatar={reaisDeRazao} /></td>
+                </>
+              ) : null}
               <td className={tdNum}>{numeroDecimal(c.metricas.conversoes)}</td>
-              <td className={tdNum}>{custoPor(c.metricas.gasto_centavos, c.metricas.conversoes)}</td>
+              <td className={tdNum}><ValorRazao numerador={c.metricas.gasto_centavos} denominador={c.metricas.conversoes} formatar={reaisDeRazao} /></td>
             </tr>
           ))}
         </tbody>
@@ -65,11 +79,12 @@ export function CampaignsPage() {
       {dados ? (
         <div className={`space-y-6 ${carregando ? 'opacity-60' : ''}`} aria-busy={carregando}>
           <Secao titulo="Meta Ads" rotulo={dados.periodo.rotulo} acento="bg-azul">
-            <TabelaCampanhas bloco={dados.blocos.meta} nome="Meta" periodo={periodo} />
+            <TabelaCampanhas bloco={dados.blocos.meta} nome="Meta" periodo={periodo} lpv />
           </Secao>
           <Secao titulo="Google Ads" rotulo={dados.periodo.rotulo} acento="bg-verde">
             <TabelaCampanhas bloco={dados.blocos.google} nome="Google" periodo={periodo} />
           </Secao>
+          <Dicionario metricas={METRICAS_CAMPANHAS} />
         </div>
       ) : null}
     </div>

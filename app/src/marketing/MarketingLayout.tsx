@@ -42,6 +42,8 @@ export function MarketingLayout() {
           <NavLink to={comPeriodo('/no/marketing/campanhas', periodo)} className={itemMenu}>Campanhas</NavLink>
           <NavLink to={comPeriodo('/no/marketing/calendario', periodo)} className={itemMenu}>Calendário</NavLink>
           <NavLink to={comPeriodo('/no/marketing/registro', periodo)} className={itemMenu}>Registro</NavLink>
+          <NavLink to={comPeriodo('/no/marketing/conexoes', periodo)} className={itemMenu}>Conexões</NavLink>
+          {admin ? <NavLink to={comPeriodo('/no/marketing/leads', periodo)} className={itemMenu}>Leads</NavLink> : null}
           {admin ? <NavLink to={comPeriodo('/no/marketing/dot', periodo)} className={itemMenu}>Dot</NavLink> : null}
           {admin ? <Link to="/no/projetos" className="whitespace-nowrap px-3 py-2 text-sm text-cinza underline">Voltar para projetos</Link> : null}
         </nav>

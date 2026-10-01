@@ -14,6 +14,10 @@ const mocks = vi.hoisted(() => ({
   invoke: vi.fn(),
   marketing: {
     configuracao: vi.fn(),
+    conexoes: vi.fn(),
+    conectarGoogle: vi.fn(),
+    leads: vi.fn(),
+    classificarLead: vi.fn(),
     visaoGeral: vi.fn(),
     campanhas: vi.fn(),
     campanhaMeta: vi.fn(),
@@ -92,7 +96,7 @@ function visao(): VisaoGeral {
       search_console: naoConfigurado,
       instagram: naoConfigurado,
       facebook: naoConfigurado,
-      leads: { ok: true, cache: true, dados: { total: 7, por_canal: { meta: 4, google: 0, organico: 2, direto: 1, outros: 0 }, por_dia: [{ dia: '2026-09-23', total: 7 }] } },
+      leads: { ok: true, cache: true, dados: { total: 7, validos: 7, por_classe: { real: 7, teste: 0, invalido: 0, duplicado: 0, a_classificar: 0 }, por_canal_validos: { meta: 4, google: 0, organico: 2, direto: 1, outros: 0 }, por_canal: { meta: 4, google: 0, organico: 2, direto: 1, outros: 0 }, por_dia: [{ dia: '2026-09-23', total: 7 }] } },
     },
   }
 }
@@ -105,6 +109,8 @@ beforeEach(() => {
   mocks.marketing.posts.mockResolvedValue({ de: '2026-09-23', ate: '2026-11-04', posts: [] })
   mocks.marketing.acoes.mockResolvedValue({ acoes: [] })
   mocks.marketing.agentes.mockResolvedValue({ agentes: [] })
+  mocks.marketing.conexoes.mockResolvedValue({ capacidades: [], google_escopos: null, meta_permissoes: null })
+  mocks.marketing.leads.mockResolvedValue({ leads: [] })
 })
 
 describe('papéis no planner (R9, AC7, AC11)', () => {
@@ -498,4 +504,90 @@ describe('calendário, registro e dot', () => {
     await u.click(within(screen.getByRole('region', { name: 'Criar a conta do dot' })).getByRole('button', { name: 'Confirmar e executar' }))
     expect(await screen.findByLabelText('Link de convite (abrir no navegador do dot)')).toHaveValue('https://auth/convite')
   })
+})
+
+describe('primeira entrega: contratos visíveis T2', () => {
+  it('1, 7, 14, 15: zero reais, CPL não calculável, testes excluídos e conta da resposta', async () => {
+    const v = visao()
+    if (v.blocos.leads.ok) Object.assign(v.blocos.leads.dados, { validos: 0, por_classe: { real: 0, teste: 10, invalido: 0, duplicado: 0, a_classificar: 0 } })
+    if (v.blocos.meta_ads.ok) v.blocos.meta_ads.dados.conta = { id: 'act_1415926037237997', moeda: 'BRL', fuso: 'America/Sao_Paulo', versao_api: 'v25.0' }
+    mocks.marketing.visaoGeral.mockResolvedValue(v)
+    abrir('/no/marketing/visao-geral?periodo=2026-08-31..2026-09-29', sessao('MARKETING_AGENT'))
+    expect(await screen.findByRole('group', { name: 'Leads válidos' })).toHaveTextContent('0')
+    expect(screen.getByRole('group', { name: 'Custo por lead' })).toHaveTextContent('não calculável')
+    expect(screen.getByRole('row', { name: /Testes excluídos/ })).toHaveTextContent('10')
+    expect(screen.getByRole('group', { name: 'Gasto em anúncios' })).toHaveTextContent('só Meta — Google Ads indisponível')
+    for (const valor of ['act_1415926037237997', 'BRL', 'America/Sao_Paulo', 'v25.0']) expect(screen.getByRole('table', { name: /Conta Meta Ads/ })).toHaveTextContent(valor)
+    expect(screen.getAllByText(/inline_link_clicks/).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/todos os cliques/).length).toBeGreaterThan(0)
+  })
+  it('6, 9: LPV ausente é indisponível, não zero', async () => {
+    abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+    const pago = await screen.findByRole('region', { name: 'Tráfego pago' })
+    expect(within(pago).getByRole('row', { name: /Visualizações da página de destino/ })).toHaveTextContent('— indisponível')
+    expect(within(pago).getByRole('row', { name: /Custo por LPV/ })).toHaveTextContent('— indisponível')
+  })
+  it('23: admin classifica sem recarregar e repetição após erro usa mesmo request_id', async () => {
+    mocks.marketing.leads.mockResolvedValue({ leads: [{ id: 'l1', criado_em: '2026-09-25T12:00:00Z', canal: 'meta', nome: 'Exemplo', email: 'exemplo@example.test', classe: null }] })
+    mocks.marketing.classificarLead.mockRejectedValueOnce(new Error('rede')).mockResolvedValueOnce({ status: 'ok', acao_id: 'a1' })
+    abrir('/no/marketing/leads?periodo=30d', sessao('NO_ADMIN', 'aal2'))
+    const row = await screen.findByRole('row', { name: /Exemplo/ })
+    const u = userEvent.setup()
+    expect(row).toHaveTextContent('a classificar')
+    await u.click(within(row).getByRole('button', { name: 'Real' }))
+    await within(row).findByRole('alert')
+    await u.click(within(row).getByRole('button', { name: 'Real' }))
+    await waitFor(() => expect(within(row).getByRole('status')).toHaveTextContent('Real'))
+    expect(mocks.marketing.classificarLead.mock.calls[0]).toEqual(mocks.marketing.classificarLead.mock.calls[1])
+    expect(mocks.marketing.leads).toHaveBeenCalledWith('30d')
+  })
+  it('23: lista vazia e 24: menu de leads exclusivo do admin', async () => {
+    abrir('/no/marketing/leads', sessao('NO_ADMIN', 'aal2'))
+    expect(await screen.findByText('Nenhum lead no período.')).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Leads' })).toBeVisible()
+  })
+  it('24: dot não acessa leads nem dispara leitura pessoal', async () => {
+    abrir('/no/marketing/leads', sessao('MARKETING_AGENT'))
+    await waitFor(() => expect(window.location.pathname).toBe('/nao-autorizado'))
+    expect(mocks.marketing.leads).not.toHaveBeenCalled()
+  })
+  it('10–12 e T1 20: dot lê diagnóstico sem botão OAuth ou menu leads', async () => {
+    mocks.marketing.conexoes.mockResolvedValue({ capacidades: [{ id: 'meta.publicar', plataforma: 'meta', rotulo: 'Publicação IG', estado: 'nao_verificado', detalhe: null, correcao: 'Provar publicação' }], google_escopos: null, meta_permissoes: null })
+    abrir('/no/marketing/conexoes', sessao('MARKETING_AGENT'))
+    expect(await screen.findByRole('row', { name: /Publicação IG/ })).toHaveTextContent('não verificado')
+    expect(screen.getByText('leitura funcionar não prova publicação')).toBeVisible()
+    expect(screen.getAllByText('não informado pela plataforma')).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: 'Conectar Google' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Leads' })).toBeNull()
+  })
+  it.each(['state_invalido', 'access_denied', 'troca_falhou'])('T1 18–19: callback %s mostra erro e reconexão para admin', async motivo => {
+    abrir(`/no/marketing/conexoes?google=erro&motivo=${motivo}`, sessao('NO_ADMIN', 'aal2'))
+    expect(await screen.findByRole('button', { name: 'Conectar Google' })).toBeVisible()
+    expect(screen.getByRole('alert')).toBeVisible()
+  })
+  it('T1 17: retorno bem-sucedido e contrato POST /google/connect', async () => {
+    abrir('/no/marketing/conexoes?google=ok', sessao('NO_ADMIN', 'aal2'))
+    expect(await screen.findByText('Google conectado. Consulte o diagnóstico abaixo.')).toBeVisible()
+    const real = await vi.importActual<typeof import('./marketing/marketing-service')>('./marketing/marketing-service')
+    mocks.invoke.mockResolvedValue({ data: { url: 'https://accounts.google.com/o/oauth2/v2/auth' }, error: null })
+    await real.marketing.conectarGoogle()
+    expect(mocks.invoke).toHaveBeenCalledWith('marketing-hub/google/connect', { method: 'POST' })
+  })
+})
+
+it('19: datas impossíveis na URL produzem erro em vez de RangeError', async () => {
+  const { erroDoPeriodo } = await import('./marketing/periodo')
+  for (const de of ['2026-99-01', '2026-02-30', '2026-00-01']) expect(erroDoPeriodo(de, '2026-09-23', '2026-10-01')).toMatch(/datas completas/)
+})
+
+it('4–5: campanha expõe LPV, custo e objetivo com otimização na mesma linha', async () => {
+  mocks.marketing.campanhaMeta.mockResolvedValue({ plataforma: 'meta', periodo, campanha: { id: '555', nome: 'TRAF - 20d - Agencias', status: 'PAUSED', objetivo: 'OUTCOME_TRAFFIC' }, metricas: { ...vazio, gasto_centavos: 10000, lpv: 50, cliques_link: 100 }, conjuntos: [{ id: 'a', nome: 'Conjunto', status: 'PAUSED', orcamento_diario_centavos: 1000, orcamento_total_centavos: null, otimizacao: 'LANDING_PAGE_VIEWS' }], anuncios: [] })
+  abrir('/no/marketing/campanhas/meta/555', sessao('MARKETING_AGENT'))
+  const t = await screen.findByRole('table', { name: 'Objetivo, otimização e resultado' })
+  const row = within(t).getByRole('row', { name: /OUTCOME_TRAFFIC/ })
+  expect(row).toHaveTextContent('LANDING_PAGE_VIEWS')
+  expect(row).toHaveTextContent('Visualizações da página de destino')
+  expect(row).toHaveTextContent('50')
+  expect(row).toHaveTextContent('R$ 2,00')
+  expect(screen.getByRole('row', { name: /LPV por clique no link/ })).toHaveTextContent('diagnóstico, não funil individual')
 })
