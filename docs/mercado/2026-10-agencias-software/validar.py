@@ -54,3 +54,20 @@ print("Preço numérico R$:", sum("R$" in row["preco_publico"] for row in rows))
 print("LinkedIn público:", sum(row["linkedin_empresa"] != "nao_informado" for row in rows))
 print("Temas observados:", sum(row["temas_de_conteudo"] != "nao_informado" for row in rows))
 print("Fontes e nomes pessoais: verificação factual/manual independente ainda necessária.")
+
+with (ROOT / "auditoria-por-marca.csv").open(encoding="utf-8", newline="") as stream:
+    audit = list(csv.DictReader(stream))
+assert len(audit) == len(rows) == 50
+assert [r["nome"] for r in audit] == [r["nome"] for r in rows]
+for r in audit:
+    assert r["pais"] in {"Brasil", "Uruguai", "Estados Unidos", "nao_informado"}
+    assert r["promessa_roadmap_prototipo_3dias"] in {"identificada", "nao_observado", "nao_verificado"}
+    assert all(r.values())
+    for key in ["fonte_geografia", "fonte_promessa"]:
+        assert urlsplit(r[key]).scheme == "https" and urlsplit(r[key]).hostname
+countries = Counter(r["pais"] for r in audit)
+upper = sum(r["pais"] != "Brasil" for r in audit)
+assert upper <= 10, "Teto conservador de internacionais excedido"
+print("País:", dict(countries), "Teto conservador internacional:", upper)
+print("Promessa conjunta:", dict(Counter(r["promessa_roadmap_prototipo_3dias"] for r in audit)))
+print("PASS: apêndice 50 marcas, fontes, estados e teto numérico; recorte qualitativo de países desconhecidos segue pendente")

@@ -1,3 +1,37 @@
+# Hub marketing — verificação independente, rodada 3 final de código
+
+**Verdict local: PASS. Integral T1/T2: needs_verification, com provas reais sob registro do coordenador.**
+**Profile:** light. **Round:** 3 — scoped. **HEAD:** fcd6c6bd3e7debfdf8757e6044f3f2119ad68432. **Diff de código revisto:** b11e2587..fcd6c6bd. **Verifier:** independente, não autor.
+
+A alteração local está aprovada tecnicamente para publicar a marketing-hub v3, dentro da autorização de produção existente e após checks operacionais do coordenador. Não encontrei bug acionável no diff. Os demais veredictos locais dos 49 critérios são **carried from b23932e0**, salvo T1-4/5 e T2-8/9, reafirmados abaixo. Provas de produção informadas nesta rodada não foram executadas por este verificador e devem constar em execution.md; não são convertidas em certificação independente aqui. T3 não está no escopo.
+
+## Testes e regressão (verified at fcd6c6bd)
+
+Reexecutei uma invocação Vitest dos cinco arquivos (marketingPlanner, App, marketingAdapters, marketingHub, marketingGoogleOAuth), reporter verbose e config temporária `envDir:false`: **194/194 PASS, 5 arquivos, exit 0, 33,53s**. Todos os testes adaptados aparecem individualmente aprovados. A configuração temporária foi removida. SQL e migrations não mudaram: resultados PGlite são **carried from b23932e0**, sem reexecução conforme escopo desta rodada. Nenhum código ou teste foi alterado pelo verificador; sem fault injection no perfil light.
+
+## Adaptação dos testes Facebook
+
+A mudança não enfraquece o critério: substitui descoberta por tentativa por uma consulta que segue a decisão T1 de remover os campos recusados. Evidência de produção recebida do coordenador: em 01/10 às 22:19:41Z, completa, sem_comentarios e sem_reacoes recusaram #10; sem_engajamento retornou posts. O diff remove permanentemente comments e reactions, preserva demais leituras e marca ausência como sem_permissao, sem inventar zero.
+
+| Prova | Asserção localizada atual | Resultado |
+|---|---|---|
+| Consulta não contém campos proibidos | marketingAdapters.test.ts:357 `expect(postsChamadas(chamadas)).toEqual(['id,message,created_time,permalink_url,shares'])` | PASS; trava ambos campos e número de chamadas |
+| Posts e métricas da conta preservados | marketingAdapters.test.ts:358–359 exige curtidas/comentarios/interacoes null, compartilhamentos2 e seguidores40/visualizacoes10/interacoes4 | PASS |
+| Ausência explicitamente rotulada | marketingAdapters.test.ts:363–365 `calcularEstados` igual a posts.curtidas/posts.comentarios/posts.interacoes sem_permissao e bloco parcial | PASS |
+| Recusa real básica não escondida | marketingAdapters.test.ts:372–375 exige uma chamada, posts vazio, mensagem contendo pages_read_user_content e `{posts:'sem_permissao',bloco:'parcial'}` | PASS |
+| Falha comum preservada | marketingAdapters.test.ts:382–385 exige uma chamada, posts vazio, visualizacoes10 e `{posts:'erro',bloco:'parcial'}` | PASS |
+| Não pressupõe novas permissões | marketingAdapters.test.ts:392–394 exige uma chamada e métricas de engajamento null mesmo com resposta básica aprovada | PASS |
+| Contrato HTTP e isolamento | marketingHub.test.ts:459–470 exige bloco Facebook ok, comentários sem_permissao, Meta/IG/leads intactos, variante sem_engajamento e mensagem `omitidos após recusa de permissão` | PASS |
+
+A mensagem em meta.ts:384 identifica uma limitação histórica verificada na Página em 01/10, não uma nova falha remota. `tentar()` continua registrando o erro remoto original quando a consulta básica falha; o teste separado demonstra isso. Registrar a limitação no evento já existente de subconsulta não mascara a mensagem real nem satisfaz artificialmente o critério de logs limpos: a consulta proibida de fato deixou de ocorrer. Voltar a ler reações/comentários exige nova autorização/prova de permissões, como indica o comentário de implementação.
+
+## Gates reais
+
+T1-4/5 estão **PASS local**, mas a versão v3 ainda precisa de leitura fresca e logs pós-deploy para encerrar a prova real pertinente. A comparação de variantes feita na v2 pertence ao registro de produção do coordenador. OAuth/contas/escritas/reconciliação/legado e demais gates humanos seguem seus próprios estados; esta aprovação local não os encerra. Os registros históricos abaixo preservam os 49 critérios e as limitações anteriores, com esta rodada prevalecendo sobre as afirmações de T1-4/5 relativas ao algoritmo antigo de fallback.
+
+---
+
+## Histórico da rodada 2
 # Hub marketing — verificação independente T1/T2, rodada 2
 
 **Verdict local: PASS. Verdict integral T1/T2: needs_verification.**
@@ -147,4 +181,5 @@ Relidos: `_shared/marketing/validacao.ts` é exercitado pela suite adapters (cam
 Fontes integralmente abertas: checklist .checks, tarefas T1/T2 e SKILL.md/verify.md. Perfil light não faz comparação de design binding nem fault injection. Documentos upstream herdados não foram novamente auditados; tarefas dizem ser o registro de decisão. Não houve publicação, push, PR, acesso OAuth, leitura de .env ou alteração de implementação pelo verificador.
 
 Nenhum PASS local acima fecha gates de produção. A rodada seguinte deve rodar o lote inteiro no novo HEAD e rever achados + todos resultados não PASS; carregar explicitamente as demais evidências deste SHA.
+
 

@@ -83,19 +83,19 @@ o formato do Decided, com mocks, até B entregar.
 |---|---|---|---|---|
 | T1 | 1–3 Google | Codex / Lucca | OAuth implementado e função v2; reconexão depende de G2b e consentimento | revisão local 194/194; diagnóstico invalid_grant |
 | T1 | 17–22 conectar Google | Codex | PASS local; migration aplicada; prova OAuth real pendente | .checks/hub-marketing-continuacao.verified.md |
-| T1 | 4–5 Facebook | Codex | fallback implementado; conferir leitura real após publicação | função v2 |
+| T1 | 4–5 Facebook | Codex | PASS produção: consulta 30d fresca e zero recusas nos logs v3 | função v3 |
 | T1 | 6–8 dot | Lucca | roteiro pronto; bloqueado G3 | roteiro-dot.md |
 | T1 | 9–12 escritas | Codex / Lucca | bloqueado G4/G5 | nenhuma escrita de teste executada |
 | T1 | 13 AC1 | Codex | depende de reconexão Google | — |
 | T1 | 14 legado | Lucca | bloqueado G7 | 4 funções ACTIVE v18 |
 | T1 | 15–16 registro e rotação | Codex / Lucca | documentação atualizada; rotação G8 pendente | execution.md e rotacao-segredos.md |
-| T2 | 1–3, 22–27 leads | Codex | PASS local; backfill 10 aplicado; UI aguardando publicação | 27 leads preservados, RLS e grants conferidos |
+| T2 | 1–3, 22–27 leads | Codex | PASS local; backfill 10 aplicado; UI publicada e conferida (0 válidos, CPL não calculável) | 27 leads preservados, RLS e grants conferidos |
 | T2 | 4–6 LPV | Codex | PASS local; comparação Ads Manager pendente | revisão rodada 2 |
-| T2 | 7–9 estados | Codex | PASS local; publicação em curso | revisão rodada 2 |
-| T2 | 10–13 conexões | Codex | PASS local; publicação em curso | revisão rodada 2 |
+| T2 | 7–9 estados | Codex | PASS local; publicado no PR #50 | revisão rodada 2 |
+| T2 | 10–13 conexões | Codex | PASS local; publicado no PR #50 | revisão rodada 2 |
 | T2 | 14–16 definições | Codex | dicionário PASS local; comparação real pendente | 30 definições testadas |
-| T2 | 17–21 datas | Codex | PASS local; publicação em curso | regressão vermelha na base, verde atual |
-| T3 | 1–7 mercado | Codex / agente | 50 marcas integradas; 5/7 PASS, 3/6 em complemento factual | .checks/mercado-agencias-software.verified.md |
+| T2 | 17–21 datas | Codex | PASS local; publicado no PR #50 | regressão vermelha na base, verde atual |
+| T3 | 1–7 mercado | Codex / agente | 50 marcas e apêndice auditável; 5/7 PASS, T3:3/6 parciais | .checks/mercado-agencias-software.verified.md |
 
 ## Diário
 
@@ -146,3 +146,14 @@ o formato do Decided, com mocks, até B entregar.
 - Função marketing-hub ACTIVE v2. Probes sem credenciais: GET overview 401, POST publish-due 401, OPTIONS 204. Funções protegidas e legadas não alteradas.
 - T3 integrado de `41b9c444` como `d96894e3`. Revisor aprovou cinco critérios; pediu rastreabilidade geográfica e registro individual da promessa conjunta de três dias. Agente frontend, já livre, assumiu esse complemento documental.
 - Próximo: PR/merge e verificar planner real; registrar os gates remanescentes sem declarar T1/T2 integrais concluídos.
+
+### Publicado e verificação final
+
+- PR #50 MERGED, main b11e2587; deployment app dpl_Hz4Jc69Sxbnj5Qw7biJybHYpXSDt READY com alias de produção. Lint/tsc/build do coordenador verdes. Planner confirma zero válidos, dez testes, CPL não calculável e LPV 1060 para 31/08..29/09.
+- Facebook: logs v2 de 22:19 UTC provaram que comments e reactions, mesmo isolados, recusam #10; consulta sem ambos retorna posts. Correção 86bd2c2a remove ambos conforme decisão T1, sem pedir permissão. Revisão independente rodada 3 em fcd6c6bd aprovada; 194/194 novamente. Função v3 ACTIVE.
+- Período custom 22/09..23/09 aplicado no navegador e gasto R$49,98 confirmado; links mantêm período entre Visão geral, Campanhas e Conexões.
+- Pesquisa: 40 BR, 2 internacionais, 8 desconhecidas (teto conservador 10); 49 promessas não observadas, 1 não verificada. Cinco marcas ainda precisam provar Brasil ou white-label: AutoAgencia, Nexio System, Aurabit, Galáxia Digital, GVD Soluções. Relatório independente mantém 5/7 PASS, sem transformar ausência de evidência em dado.
+- Vault atualizado via sync-vault: projeto NoTechStack LP, conectores Supabase/Google Ads; método de publicação com árvore de arquivos preservada. Memória operacional consolidada no caminho indicado no HANDOFF.
+
+- Prova final v3 (22:26–22:29 UTC): Facebook 30d fresco com posts, 13 seguidores, 1.251 visualizações, 71 interações; zero linhas pages_read_user_content em 22 logs da função v3. T1:4/5 verificados; limitação comments/reactions explícita e sem nova permissão. PR complementar #51 registra correção e apêndice.
+- Próximo gerente deve começar por este painel e pelos relatórios `.checks/`. T1/T2 integrais continuam needs_verification: Google G2b/consentimento, dot G3, escritas G4/G5, legado G7, rotação G8 e comparação Ads Manager. Não reexecutar backfill nem pedir nova autorização de PR/merge/deploy já concedida; não confundir essa autorização com os gates de conta/escrita real.

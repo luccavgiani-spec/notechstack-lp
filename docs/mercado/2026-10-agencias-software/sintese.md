@@ -4,6 +4,8 @@ Coleta: 2026-10-01. Base: [50 marcas](marcas.csv), 50 domínios únicos. Amostra
 ## Método e limites
 Selecionamos oferta de software sob medida para PMEs ou soluções para agências. O tipo representa a oferta da página coletada; fábrica white-label significa serviço técnico sob marca do parceiro, enquanto SaaS representa licença de plataforma. Marca de relatório isolada não basta para classificar a plataforma como white-label. Não presumimos sede brasileira pela língua: referências internacionais explicitamente white-label, como Bioma, entram como comparação; cidade desconhecida permanece nao_informado.
 
+O [apêndice geográfico e de promessa](apendice-auditoria.md) registra 40 brasileiras, 2 internacionais e 8 países desconhecidos: teto conservador de 10 internacionais. A condição adicional white-label está comprovada para as 2 internacionais conhecidas; permanece pendente para desconhecidas sem declaração white-label.
+
 Cada linha traz a página oficial efetivamente aberta e a data. As 2/50 páginas empresariais LinkedIn foram lidas publicamente, sem login. Nenhum formulário foi submetido. Etapas são as declaradas, não conversões experimentadas. Ausência de evidência permanece lacuna, não “não oferece”. Links e preços podem mudar depois da coleta. A seleção favorece páginas indexáveis e empresas que explicam sua oferta.
 
 Candidatos sem leitura suficiente foram descartados: Aquos, E-SaaS, Hyper Sistemas, RostDesk, Organify, GestZa, Talan, Facilware, Ollie O e SocialPlus. Monde e Focus Turismo atendem agências de viagens; não entraram. Não há dados de contatos ou pessoas no CSV.
@@ -54,7 +56,7 @@ Candidatos sem leitura suficiente foram descartados: Aquos, E-SaaS, Hyper Sistem
 Referência interna do plano: execução white-label para agências e roadmap + protótipo em 3 dias. A referência não representa comprovação de SLA em produção.
 
 **Observações**
-- White-label está declarado em 24/50. A promessa conjunta “roadmap + protótipo em 3 dias” foi identificada em 0/50 páginas inspecionadas. Isso é ausência de identificação nesta coleta, não prova de exclusividade de mercado.
+- White-label está declarado em 24/50. A promessa conjunta “roadmap + protótipo em 3 dias” teve 0 identificações positivas na base de 50: 49 páginas com `nao_observado` no texto recuperado e 1 `nao_verificado` (Cappei), conforme [auditoria individual](auditoria-por-marca.csv). Isso é ausência de identificação nesta coleta, não prova de exclusividade de mercado.
 - Até cinco comparáveis, cada um 1/50: [Abstract Devs](https://abstractdevs.com.br/br/servicos/white-label) combina engenharia para agências, NDA e protótipos; [Sistelia](https://sistelia.com.br/parcerias) combina marca invisível e alinhamento de investimento; [Otto.dev](https://letsotto.dev/parceria-agencias) associa software/IA a parceria e propriedade; [Frelo](https://frelo.co/pt) combina parceria para agências e escopo/prazo fixos; [Cappei](https://cappei.com/) conecta diagnóstico e protótipo para PME, embora não declare white-label.
 - Nenhuma dessas 5/50 referências foi contada como oferta conjunta de roadmap e protótipo em 3 dias. Teste grátis de 3 dias (Nexio, 1/50), orçamento em 24 horas (Codech, 1/50) e landing page em 3–5 dias (CCypher, 1/50) não equivalem à promessa.
 
