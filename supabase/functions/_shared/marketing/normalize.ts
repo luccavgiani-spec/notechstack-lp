@@ -27,7 +27,8 @@ export function addDias(data: string, dias: number): string {
 
 function dataValida(data: string): boolean {
   if (!DATA_ISO.test(data)) return false;
-  return new Date(`${data}T12:00:00Z`).toISOString().slice(0, 10) === data;
+  const parsed = new Date(`${data}T12:00:00Z`);
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === data;
 }
 
 function diasEntre(de: string, ate: string): number {

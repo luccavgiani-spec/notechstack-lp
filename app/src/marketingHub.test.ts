@@ -210,6 +210,12 @@ describe('marketing-hub — autorização por papel (R9, AC7, AC11)', () => {
     const { chamar } = montar()
     expect((await chamar('GET', '/overview?periodo=2026-09-10..2026-09-01', 'dot')).status).toBe(422)
   })
+  it.each(['2026-99-01..2026-09-23', '2026-09-22..2026-13-01', '2026-02-30..2026-03-01', '2026-09-00..2026-09-23'])('T2-19: data impossível %s responde 422 em vez de 500', async periodo => {
+    const { chamar } = montar()
+    const response = await chamar('GET', `/overview?periodo=${periodo}`, 'dot')
+    expect(response.status).toBe(422)
+    expect(await response.json()).toMatchObject({ error_code: 'PERIODO_INVALIDO' })
+  })
 })
 
 const postIg = (extra: Record<string, unknown> = {}) => ({
