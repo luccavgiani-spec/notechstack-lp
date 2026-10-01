@@ -81,21 +81,21 @@ o formato do Decided, com mocks, até B entregar.
 
 | Tarefa | Critérios | Dono | Estado | Evidência |
 |---|---|---|---|---|
-| T1 | 1–3 Google | C → Lucca | depende de 17–22 + G2b + G6 | — |
-| T1 | 17–22 conectar Google | C (back) + A (botão) | diagnóstico em curso | — |
-| T1 | 4–5 Facebook | B | a fazer | — |
-| T1 | 6–8 dot | D → Lucca | bloqueado (G3) | — |
-| T1 | 9–12 escritas | coordenador | bloqueado (G4, G5) | — |
-| T1 | 13 AC1 | coordenador | depende de 1 | — |
-| T1 | 14 legado | coordenador | bloqueado (G7) | — |
-| T1 | 15–16 registro e rotação | coordenador / C | a fazer | — |
-| T2 | 1–3, 22–27 leads | B + A | a fazer | — |
-| T2 | 4–6 LPV | B + A | a fazer | — |
-| T2 | 7–9 estados | B + A | a fazer | — |
-| T2 | 10–13 conexões | B + A | a fazer | — |
-| T2 | 14–16 definições | B + A | a fazer | — |
-| T2 | 17–21 datas | A | a fazer | — |
-| T3 | 1–7 mercado | D | a fazer | — |
+| T1 | 1–3 Google | Codex / Lucca | OAuth implementado e função v2; reconexão depende de G2b e consentimento | revisão local 194/194; diagnóstico invalid_grant |
+| T1 | 17–22 conectar Google | Codex | PASS local; migration aplicada; prova OAuth real pendente | .checks/hub-marketing-continuacao.verified.md |
+| T1 | 4–5 Facebook | Codex | fallback implementado; conferir leitura real após publicação | função v2 |
+| T1 | 6–8 dot | Lucca | roteiro pronto; bloqueado G3 | roteiro-dot.md |
+| T1 | 9–12 escritas | Codex / Lucca | bloqueado G4/G5 | nenhuma escrita de teste executada |
+| T1 | 13 AC1 | Codex | depende de reconexão Google | — |
+| T1 | 14 legado | Lucca | bloqueado G7 | 4 funções ACTIVE v18 |
+| T1 | 15–16 registro e rotação | Codex / Lucca | documentação atualizada; rotação G8 pendente | execution.md e rotacao-segredos.md |
+| T2 | 1–3, 22–27 leads | Codex | PASS local; backfill 10 aplicado; UI aguardando publicação | 27 leads preservados, RLS e grants conferidos |
+| T2 | 4–6 LPV | Codex | PASS local; comparação Ads Manager pendente | revisão rodada 2 |
+| T2 | 7–9 estados | Codex | PASS local; publicação em curso | revisão rodada 2 |
+| T2 | 10–13 conexões | Codex | PASS local; publicação em curso | revisão rodada 2 |
+| T2 | 14–16 definições | Codex | dicionário PASS local; comparação real pendente | 30 definições testadas |
+| T2 | 17–21 datas | Codex | PASS local; publicação em curso | regressão vermelha na base, verde atual |
+| T3 | 1–7 mercado | Codex / agente | 50 marcas integradas; 5/7 PASS, 3/6 em complemento factual | .checks/mercado-agencias-software.verified.md |
 
 ## Diário
 
@@ -137,3 +137,12 @@ o formato do Decided, com mocks, até B entregar.
 - Coordenador repetiu ambos scripts SQL PGlite: passaram. Reproduziu duas falhas de datas no commit pré-correção `6aded586`; as mesmas provas passam na implementação integrada.
 - Verificador executou 184/184 Vitest e os dois scripts SQL, mas encontrou bugs não cobertos: formato de permissões Meta no frontend, propagação de estados de métricas e HTTP 500 para data impossível na API. Não liberar produção enquanto esses bugs não forem corrigidos e revisitados.
 - API de datas corrigida em `ff7894e3` com quatro casos HTTP 422. Frontend reativado para correções no checkout de integração, com propriedade exclusiva de seus arquivos. Nenhuma ação de produção nesta retomada até aqui.
+
+### Revisão 2 e publicação — 01/10/2026, 22:16 UTC
+
+- HEAD de código revisado `b23932e0`: 194/194 Vitest e ambos scripts SQL PGlite aprovados por verificador independente; coordenador confirmou lint, TypeScript e build (envDir:false). Warning de bundle principal >500 kB, sem falha.
+- Migrations `marketing_lead_classificacao` e `marketing_google_oauth` aplicadas na ordem autorizada. Antes/depois: leads 27/27, sessões 956/956, eventos 898/898. Backfill 10/10 testes, nenhuma alteração em leads.
+- Produção: tabela nova com RLS, zero policies e zero grants por tabela/coluna a anon/authenticated; RPCs Google executáveis só por service_role entre esses papéis. Advisors WARN sem mudança; INFO RLS sem policy 12→13 pela tabela service-only, intencional.
+- Função marketing-hub ACTIVE v2. Probes sem credenciais: GET overview 401, POST publish-due 401, OPTIONS 204. Funções protegidas e legadas não alteradas.
+- T3 integrado de `41b9c444` como `d96894e3`. Revisor aprovou cinco critérios; pediu rastreabilidade geográfica e registro individual da promessa conjunta de três dias. Agente frontend, já livre, assumiu esse complemento documental.
+- Próximo: PR/merge e verificar planner real; registrar os gates remanescentes sem declarar T1/T2 integrais concluídos.

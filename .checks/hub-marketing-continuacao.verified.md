@@ -1,3 +1,60 @@
+# Hub marketing — verificação independente T1/T2, rodada 2
+
+**Verdict local: PASS. Verdict integral T1/T2: needs_verification.**
+**Profile:** light. **Round:** 2 — scoped. **Diff integral:** e87ada92..b23932e07c78e661c0aa0c1832f31cbfb459c1b2. **Diff revisto:** c5458484..b23932e0. **Verifier:** subagente independente, não autor.
+
+Código local aprovado nesta revisão para a sequência **migration → marketing-hub → app**, quando autorizada pelo Lucca e completados os checks de lint/tipagem/build executados pelo coordenador. Isto é aprovação técnica do código local, não autorização de produção nem certificação dos gates humanos. T3 continua fora desta revisão.
+
+## Provas reexecutadas no HEAD b23932e0
+
+- Vitest em lote, mesmos cinco arquivos da rodada 1, reporter verbose, configuração temporária `envDir:false`: **194/194 passaram**, 5 arquivos, exit 0, 36,92 s. Novos testes de datas HTTP, retorno do período, permissões Meta, estados de posts/campanhas/detalhe e dicionário apareceram e passaram.
+- Ambos scripts PGlite: **PASS**, exit 0; 9/10/11 leads, restrições, RLS/grants, consumo state, Vault stub/auditoria/rollback. Mesmo caminho PGlite e comandos documentados na rodada 1.
+- Reexecutei pessoalmente no scratch `%TEMP%/codex-hub-datas-regressao/app` os dois testes `reproduz a falha de 30/09`: **2 falhas esperadas**, exit 1, ausência de alert e perda do query periodo. A causa consta em execution.md:255–259. Scratch preparado com arquivos de 6aded586 pelo coordenador; não reconstruído por este verificador. A mesma dupla passou no HEAD atual.
+- Config temporária do checkout removida ao final. Sem alteração de implementação/testes por este verificador. Sem produção, OAuth ou leitura de conteúdo .env. Sem faults injetados (perfil light).
+
+## Achados encerrados / provas novas (verified at b23932e0)
+
+| Item | Evidência atual | Resultado |
+|---|---|---|
+| T2-10/12, permissões Meta | marketing-service.ts:213 tipa objetos; ConnectionsPage.tsx:121 mapeia permissao/status para texto; marketingPlanner.test.tsx:599–600 exige `ads_read: granted` e `pages_read_user_content: declined` visíveis | PASS local |
+| T2-19, datas impossíveis | normalize.ts:30–31 testa getTime antes de toISOString; marketingHub.test.ts:221–222 exige status422 e `{error_code:'PERIODO_INVALIDO'}` nos quatro inputs inválidos; parser e testes de formulário reexecutados | PASS local |
+| T2-9, estados das células | marketingPlanner.test.tsx:608 exige dois elementos sem_permissao; :609 exige zero; :615 atraso em campanhas, :616 null indisponivel; :622–624 atraso e LPV ausente no detalhe sem inventar permissão. OverviewPage agora passa estado específico dos posts; arrays GA4/GSC/por_dia e gráficos propagam estado agregado | PASS local |
+| T1-17, conjunto de escopos | marketingGoogleOAuth.test.ts:58–62 compara array literal adwords, analytics.readonly e webmasters.readonly; offline/consent/state/TTL e callback rerodados | PASS local; OAuth real pendente |
+| T2-15, definições | marketingPlanner.test.tsx:629 enumera literalmente 30 artigos; :633 exige seis rótulos visíveis e :634 exige conteúdo não vazio em cada um. definicoes.ts adiciona alcance/interações/comentários de post e variação GSC; Dicionario compartilha seis campos nas três telas | PASS local no perfil light |
+| T2-17, resposta HTTP | marketingHub.test.ts:215 status200 e :216 `.toMatchObject({periodo:{de:'2026-09-22',ate:'2026-09-23',dias:2}})`; provas UI URL/pedido/título reexecutadas | PASS local |
+| T2-20, antes/depois | Dupla de regressões vermelha no scratch anterior e verde no HEAD, execution.md:255–259 documenta causas | PASS local |
+
+## Estado dos 49 critérios
+
+As evidências localizadas da tabela histórica abaixo são **carried from c5458484**, com provas integralmente reexecutadas em b23932e0; as sete linhas acima substituem explicitamente os antigos FAIL/gaps. Asserções nos arquivos tocados preservam o conteúdo, salvo novos casos descritos acima. Para localizar linhas no HEAD: marketingHub após o antigo :211 desloca +12; marketingGoogleOAuth após antigo :58 desloca +4; marketingPlanner linhas anteriores a :594 permanecem estáveis. Sem inferência de aprovação de produção.
+
+| Critérios | Veredicto atual | Limite |
+|---|---|---|
+| T1-1,2 | needs_verification | Google/OAuth real e logs frescos |
+| T1-3 | needs_verification | Sanitização local passa; scan/logs integrais não certificado por este verificador. Prefixos literais dos requisitos não são valores de segredo |
+| T1-4,5 | needs_verification | Graph real com/sem campo e logs pós-deploy |
+| T1-6,7,8 | needs_verification | Conta própria dot, RPC/login e desligar/religar reais |
+| T1-9,10,11,12 | needs_verification | Escritas/publicações reais, autorização e remoção dos objetos |
+| T1-13,14 | needs_verification | Reconciliação painéis e remoção autorizada do legado/versões |
+| T1-15 | needs_verification | Fechamento/vault/memória do coordenador; status continua pendente |
+| T1-16 | PASS documental | Leitura carregada da rodada 1 |
+| T1-17 | PASS local / needs_verification integral | Prova OAuth real ainda ausente |
+| T1-18,19,20 | PASS local | Sem certificação de runtime real |
+| T1-21,22 | PASS local / needs_verification integral | Vault real ainda não exercitado |
+| T2-1,2,3 | PASS local | Dados/backfill e PostgREST reais pendentes |
+| T2-4 | PASS local / needs_verification integral | LPV/Ads Manager real ainda pendente |
+| T2-5,6,7,8,9,10,11,12,13,14,15 | PASS local | Plataformas simuladas; perfil light não prova cada estado em cada célula |
+| T2-16 | needs_verification | Reconciliação real R$172,64 |
+| T2-17,18,19,20,21 | PASS local | Provas novas e regressões reexecutadas |
+| T2-22 | PASS SQL isolado / needs_verification integral | Pré-condição de dez leads será verificada pela migration real |
+| T2-23,24,25,26 | PASS local | Store mock + SQL isolado |
+| T2-27 | PASS SQL isolado / needs_verification integral | Grants/RLS reais após migration |
+
+Nenhum bug local acionável permanece dos achados da rodada 1. Swept existing permanece carregado de c5458484, com a exceção PERIODO_INVALIDO agora corrigida e reprovada positivamente. As limitações de amostragem do perfil light, stub Vault e runtime externo permanecem explícitas; não tornam os gates reais concluídos.
+
+---
+
+## Histórico da rodada 1 — substituído pelo veredicto acima
 # Hub marketing — verificação independente T1/T2
 
 **Verdict: FAIL local / needs_verification integral.**
@@ -90,3 +147,4 @@ Relidos: `_shared/marketing/validacao.ts` é exercitado pela suite adapters (cam
 Fontes integralmente abertas: checklist .checks, tarefas T1/T2 e SKILL.md/verify.md. Perfil light não faz comparação de design binding nem fault injection. Documentos upstream herdados não foram novamente auditados; tarefas dizem ser o registro de decisão. Não houve publicação, push, PR, acesso OAuth, leitura de .env ou alteração de implementação pelo verificador.
 
 Nenhum PASS local acima fecha gates de produção. A rodada seguinte deve rodar o lote inteiro no novo HEAD e rever achados + todos resultados não PASS; carregar explicitamente as demais evidências deste SHA.
+
