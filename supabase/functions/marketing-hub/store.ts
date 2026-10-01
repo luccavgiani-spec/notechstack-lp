@@ -77,6 +77,25 @@ export function criarStore(admin: SupabaseClient): MarketingStore {
   }
 
   return {
+    async googleStateConsumir(state) {
+      const { data, error } = await admin.rpc("marketing_google_state_consume", { p_state: state });
+      if (error) throw new Error("Google OAuth state indisponível.");
+      return typeof data === "string" ? { user_id: data } : null;
+    },
+
+    async googleRefreshLer() {
+      const { data, error } = await admin.rpc("marketing_google_refresh_read");
+      if (error) throw new Error("Google OAuth Vault indisponível.");
+      return typeof data === "string" && data ? data : null;
+    },
+
+    async googleConexaoSalvar(userId, refreshToken, requestId) {
+      const { error } = await admin.rpc("marketing_google_connection_save", {
+        p_user_id: userId, p_refresh_token: refreshToken, p_request_id: requestId,
+      });
+      if (error) throw new Error("Google OAuth não foi salvo.");
+    },
+
     async cacheLer(chave) {
       const { data, error } = await admin.from("marketing_cache").select("payload, expires_at").eq("key", chave).maybeSingle();
       if (error || !data) return null;

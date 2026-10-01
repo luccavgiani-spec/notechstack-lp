@@ -9,6 +9,7 @@ import { MetaApiError } from "../_shared/meta.ts";
 import { adsAlterarStatus, adsAtualizarOrcamento, adsCampanhaDetalhe, adsCampanhas, adsCriarCampanhaPesquisa, adsResumo, adsSugerirLocais, type AdsCtx } from "../_shared/marketing/google-ads.ts";
 import { type EscritaOk, diagnosticarConexoes } from "../_shared/marketing/conexoes.ts";
 import { type EstadoMetrica, Registro, type Valores, calcularEstados, semPermissao, semSegredo } from "../_shared/marketing/estados.ts";
+import { googleConsentimento, googleState, googleTrocarCodigo } from "../_shared/marketing/google-oauth.ts";
 import { GoogleApiError, googleAccessToken, limparCacheGoogle } from "../_shared/marketing/google-auth.ts";
 import { ga4Resumo } from "../_shared/marketing/ga4.ts";
 import { gscResumo } from "../_shared/marketing/gsc.ts";
@@ -95,6 +96,9 @@ export type AgenteRow = { id: string; email: string | null; banido: boolean; cri
 export class ConflitoError extends Error {}
 
 export interface MarketingStore {
+  googleStateConsumir?(state: string): Promise<{ user_id: string } | null>;
+  googleRefreshLer?(): Promise<string | null>;
+  googleConexaoSalvar?(userId: string, refreshToken: string, requestId: string): Promise<void>;
   cacheLer(chave: string): Promise<unknown | null>;
   cacheGravar(chave: string, valor: unknown, ttlSegundos: number): Promise<void>;
   cacheLimpar(prefixo: string): Promise<void>;
@@ -252,15 +256,16 @@ export function criarHandler(deps: Deps) {
     };
   }
 
-  function googleCred() {
+  async function googleCred() {
     const g = config.google;
-    return g.clientId && g.clientSecret && g.refreshToken
-      ? { clientId: g.clientId, clientSecret: g.clientSecret, refreshToken: g.refreshToken }
+    const refreshToken = (await store.googleRefreshLer?.()) || g.refreshToken;
+    return g.clientId && g.clientSecret && refreshToken
+      ? { clientId: g.clientId, clientSecret: g.clientSecret, refreshToken }
       : null;
   }
 
   async function adsCtx(): Promise<AdsCtx | null> {
-    const cred = googleCred();
+    const cred = await googleCred();
     const g = config.google;
     if (!cred || !g.developerToken || !g.customerId) return null;
     return {
@@ -328,7 +333,7 @@ export function criarHandler(deps: Deps) {
       ga4: () => bloco(k("ga4"), ttl, fresco, {
         atrasado,
         ler: async () => {
-          const cred = googleCred();
+          const cred = await googleCred();
           if (!cred || !config.google.ga4PropertyId) return null;
           return await ga4Resumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.ga4PropertyId, p);
         },
@@ -337,7 +342,7 @@ export function criarHandler(deps: Deps) {
       search_console: () => bloco(k("gsc"), ttl, fresco, {
         atrasado: atrasadoGsc,
         ler: async () => {
-          const cred = googleCred();
+          const cred = await googleCred();
           if (!cred || !config.google.gscSiteUrl) return null;
           return await gscResumo(await googleAccessToken(cred, deps.agora().getTime()), config.google.gscSiteUrl, p);
         },
@@ -395,7 +400,7 @@ export function criarHandler(deps: Deps) {
     const diagnostico = await diagnosticarConexoes({
       meta,
       google: {
-        cred: googleCred(), developerToken: g.developerToken, customerId: g.customerId, loginCustomerId: g.loginCustomerId,
+        cred: await googleCred(), developerToken: g.developerToken, customerId: g.customerId, loginCustomerId: g.loginCustomerId,
         ga4PropertyId: g.ga4PropertyId, gscSiteUrl: g.gscSiteUrl, criacaoLiberada: config.googleCriacaoLiberada,
       },
       escritas,
@@ -528,9 +533,37 @@ export function criarHandler(deps: Deps) {
       return json(req, 200, await publicarVencidos());
     }
 
+    if (m === "GET" && r0 === "google" && r1 === "callback" && partes.length === 2) {
+      const voltar = (motivo?: string) => {
+        const destino = new URL("/no/marketing/conexoes", config.appUrl);
+        destino.searchParams.set("google", motivo ? "erro" : "ok");
+        if (motivo) destino.searchParams.set("motivo", motivo);
+        return new Response(null, { status: 303, headers: { Location: destino.toString(),
+          "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" } });
+      };
+      const state = url.searchParams.get("state") ?? "";
+      if (!/^[a-f0-9]{64}$/.test(state)) return voltar("state_invalido");
+      let dono: { user_id: string } | null;
+      try { dono = await store.googleStateConsumir?.(state) ?? null; }
+      catch { return voltar("state_invalido"); }
+      if (!dono) return voltar("state_invalido");
+      if (url.searchParams.get("error") === "access_denied") return voltar("access_denied");
+      const code = url.searchParams.get("code");
+      if (url.searchParams.has("error") || !code || !config.google.clientId || !config.google.clientSecret || !store.googleConexaoSalvar) return voltar("troca_falhou");
+      try {
+        const refreshToken = await googleTrocarCodigo(config.google.clientId, config.google.clientSecret, code);
+        await store.googleConexaoSalvar(dono.user_id, refreshToken, deps.uuid());
+        limparCacheGoogle();
+        for (const prefix of ["ga4:", "gsc:", "google_ads:", "campanhas_google:", CHAVE_CONEXOES]) {
+          await store.cacheLimpar(prefix).catch(() => undefined);
+        }
+        return voltar();
+      } catch { return voltar("troca_falhou"); }
+    }
+
     const token = bearer(req);
     const ch = token ? await deps.autenticar(token) : null;
-    const soAdmin = r0 === "agent" || r0 === "leads";
+    const soAdmin = r0 === "agent" || r0 === "leads" || (r0 === "google" && r1 === "connect");
     autorizar(ch, soAdmin);
     const chamador = ch as Chamador;
     const fresco = url.searchParams.get("fresco") === "1";
@@ -557,6 +590,17 @@ export function criarHandler(deps: Deps) {
       });
     }
 
+    if (m === "POST" && r0 === "google" && r1 === "connect" && partes.length === 2) {
+      if (!config.google.clientId || !config.google.clientSecret || !store.googleStateConsumir || !store.googleConexaoSalvar) {
+        return erro(req, 503, "NAO_CONFIGURADO", "Conexão Google ainda não configurada.");
+      }
+      const state = googleState();
+      await store.cacheGravar(`google_oauth_state:${state}`, { user_id: chamador.userId }, 600);
+      const resposta = json(req, 200, { url: googleConsentimento(config.google.clientId, state) });
+      resposta.headers.set("Cache-Control", "no-store");
+      return resposta;
+    }
+
     // ----------------------------------------------------------------- Leitura
     if (m === "GET") {
       if (r0 === "config" && partes.length === 1) {
@@ -566,7 +610,7 @@ export function criarHandler(deps: Deps) {
           papel: chamador.role,
           meta: { token: Boolean(config.metaToken), conta_anuncios: a.metaAds?.externalId ?? null, pagina: a.metaPage?.externalId ?? null, instagram: a.metaInstagram?.externalId ?? null },
           google: {
-            credenciais: Boolean(googleCred()), ads: Boolean(g.developerToken && g.customerId), ga4: Boolean(g.ga4PropertyId),
+            credenciais: Boolean(await googleCred()), ads: Boolean(g.developerToken && g.customerId), ga4: Boolean(g.ga4PropertyId),
             search_console: g.gscSiteUrl, criacao_liberada: config.googleCriacaoLiberada,
           },
         });
@@ -816,3 +860,4 @@ export function criarHandler(deps: Deps) {
     }
   };
 }
+

@@ -108,7 +108,7 @@ que ter mais de uma chave aumenta o risco. O secret do Supabase foi gravado em 3
 ### 4. Refresh token do Google
 
 Hoje o refresh token está no secret `GOOGLE_OAUTH_REFRESH_TOKEN`, e é ele que falha com
-`unauthorized_client`: foi emitido para outro client OAuth, não para o `no-hub`. Com os
+`unauthorized_client`: é compatível com a hipótese de emissão para outro client OAuth; a origem exata não foi provada nesta retomada. Com os
 critérios 17–22 da T1, ele passa a nascer pelo botão "Conectar Google" e a morar no Vault
 como `marketing_google_refresh_token`. A função lê o Vault primeiro e só cai no secret se o
 Vault estiver vazio.
@@ -160,3 +160,37 @@ Então: **não rotacionar**. O nível de acesso que importa está em
   status e horários, nunca valores).
 - Se algum bloco não voltar `ok: true`, não repita a troca às cegas: leia o evento
   `marketing_bloco_falhou` nos logs da `marketing-hub`, que traz o motivo sem o token.
+
+
+## Diagnóstico de retomada — 01/10/2026, somente leitura
+
+No Chrome autenticado, o projeto selecionado era `no-hub`:
+
+- [Público-alvo](https://console.cloud.google.com/auth/audience?project=no-hub): app externo,
+  status **Testando**, botão **Publicar app** desabilitado. A própria tela pede concluir
+  a configuração na página de branding. A tabela de usuários de teste está vazia (0).
+- [Branding](https://console.cloud.google.com/auth/branding?project=no-hub): nome
+  `No Tech Stack Marketing`, homepage e domínio autorizado preenchidos; campos de
+  Política de Privacidade e Termos de Serviço vazios. Contato e suporte identificam Lucca.
+  Esses campos vazios são evidência de configuração incompleta; a tela não individualiza
+  qual deles bloqueia a publicação. Não foi feita tentativa de salvar/publicar.
+- O proprietário IAM não foi confirmado: a tentativa de abrir IAM expirou. O contato de
+  suporte não é prova do papel de proprietário. Nenhuma configuração foi alterada.
+- Gate G2b: o Lucca precisa cadastrar o callback listado acima no
+  [cliente Web 1](https://console.cloud.google.com/auth/clients/514667239502-huuig85caf5g46mql6og7gh0fejctel0.apps.googleusercontent.com?project=no-hub).
+  Esta retomada não abriu a área de chaves do cliente nem confirmou o URI cadastrado.
+- Para testes antes de publicar, falta adicionar a conta que autorizará aos usuários de
+  teste. Autorização OAuth, edição de conta e publicação continuam ações do Lucca.
+
+Backend preparado localmente: state aleatório de 32 bytes, TTL de 600 segundos e consumo
+atômico; leitura Vault antes do secret legado; salvamento do token e uma linha de auditoria
+na mesma transação. As RPCs só são executáveis por service role. Erros de callback nunca
+incluem respostas remotas nem erros de banco. O callback é fixo, conforme T1, e não usa o Host
+da requisição. Conexão concluída invalida caches Google e diagnóstico.
+
+Provas locais: `marketingGoogleOAuth.test.ts` (19 testes), regressão dos adapters e handler
+(62 testes); `marketing_google_oauth_migration.mjs` valida SQL, grants, consumo único,
+expiração, rollback e auditoria num Postgres WASM isolado. O Vault desse teste é um stub
+explícito: criptografia/extensão real e isolamento entre conexões Postgres reais ainda
+precisam de prova no ambiente integrado. Critérios T1 1–2 e consentimento real de 17
+permanecem sem verificação, dependentes de G2b, usuários de teste e publicação da função.
