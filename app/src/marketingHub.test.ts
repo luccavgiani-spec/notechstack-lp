@@ -31,6 +31,7 @@ function storeEmMemoria() {
   const cache = new Map<string, unknown>()
   const banidos = new Set<string>()
   const papeis: Record<string, string> = { [DOT]: 'MARKETING_AGENT', [ADMIN]: 'NO_ADMIN' }
+  const classificacoes: { lead_id: string; classe: 'real' | 'teste' | 'invalido' | 'duplicado'; motivo: string | null; classificado_por: string; papel: string }[] = []
   let n = 0
   const store: MarketingStore = {
     async cacheLer(k) { return cache.has(k) ? cache.get(k) : null },
@@ -70,8 +71,11 @@ function storeEmMemoria() {
       return vencidos.map((p) => ({ ...p }))
     },
     async leadsOrigem() {
-      return [{ created_at: '2026-09-25T15:00:00Z', utm_source: 'instagram', utm_medium: 'paid', gclid: null, fbclid: null }]
+      return [{ classe: classificacoes.at(-1)?.classe ?? null, created_at: '2026-09-25T15:00:00Z', utm_source: 'instagram', utm_medium: 'paid', gclid: null, fbclid: null }]
     },
+    async leadsListar() { return [{ id: CLIENTE, criado_em: '2026-09-25T15:00:00Z', canal: 'meta', nome: 'Fixture', email: 'fixture@example.test', classe: classificacoes.at(-1)?.classe ?? null }] },
+    async leadExiste(id) { return id === CLIENTE },
+    async leadClassificar(linha) { classificacoes.push(linha) },
     async cronSecretOk(s) { return s === 'segredo-do-cron' },
     async urlUpload(c) { return { signedUrl: `https://storage/upload/${c}`, token: 'tk', path: c } },
     async urlLeitura(c) { return `https://storage/sign/${c}?token=1` },
@@ -84,7 +88,7 @@ function storeEmMemoria() {
     },
     async agenteBanir(id, banir) { if (banir) banidos.add(id); else banidos.delete(id) },
   }
-  return { store, acoes, posts, cache, banidos }
+  return { store, acoes, posts, cache, banidos, classificacoes }
 }
 
 const CONFIG_VAZIA: HubConfig = {
@@ -671,4 +675,68 @@ describe('marketing-hub — GET /connections (T2-10 a 13)', () => {
     // fresco=1 renova o access token de verdade (não reaproveita o do worker).
     expect(chamadas.filter((c) => c.url === 'https://oauth2.googleapis.com/token')).toHaveLength(2)
   })
+})
+
+
+describe('T2 classificação de leads', () => {
+  it('T2-24: dot e admin aal1 não leem nem classificam leads', async () => {
+    const { chamar, acoes, classificacoes } = montar()
+    for (const sessao of ['dot', 'admin-aal1']) {
+      expect((await chamar('GET', '/leads?periodo=30d', sessao)).status).toBe(403)
+      expect((await chamar('POST', `/leads/${CLIENTE}/classificacao`, sessao, { classe: 'real', request_id: crypto.randomUUID() })).status).toBe(403)
+    }
+    expect(acoes).toHaveLength(0)
+    expect(classificacoes).toHaveLength(0)
+  })
+  it('T2-1–3,23,25: reclassificação é aditiva, idempotente, auditada e só real conta como válido', async () => {
+    const { chamar, acoes, classificacoes } = montar()
+    const inicial = await chamar('GET', '/leads?periodo=30d', 'admin-aal2')
+    expect(inicial.body.leads[0].classe).toBeNull()
+    for (const classe of ['teste', 'invalido', 'duplicado', 'real']) {
+      const corpo = { classe, motivo: 'fixture', request_id: crypto.randomUUID() }
+      expect((await chamar('POST', `/leads/${CLIENTE}/classificacao`, 'admin-aal2', corpo)).status).toBe(200)
+      expect((await chamar('POST', `/leads/${CLIENTE}/classificacao`, 'admin-aal2', corpo)).body.idempotente).toBe(true)
+      const resumo = (await chamar('GET', '/overview?periodo=30d&fresco=1', 'dot')).body.blocos.leads.dados
+      expect(resumo.validos).toBe(classe === 'real' ? 1 : 0)
+      expect(resumo.por_canal_validos.meta).toBe(classe === 'real' ? 1 : 0)
+      expect(resumo.por_classe[classe]).toBe(1)
+      expect(resumo.total).toBe(1)
+      expect(JSON.stringify(resumo)).not.toContain('fixture@example.test')
+    }
+    expect(classificacoes).toHaveLength(4)
+    expect(classificacoes.every(c => c.classificado_por === ADMIN && c.papel === 'NO_ADMIN')).toBe(true)
+    expect(acoes).toHaveLength(4)
+    expect(acoes.every(a => a.kind === 'lead.classificar' && a.target === CLIENTE)).toBe(true)
+    expect(acoes[0].payload).toEqual({ lead_id: CLIENTE, classe: 'teste', motivo: 'fixture' })
+  })
+  it('T2-26: valores inválidos e lead inexistente não gravam classificação nem ação', async () => {
+    const { chamar, acoes, classificacoes } = montar()
+    for (const [id, patch, campo] of [
+      [CLIENTE, { classe: 'outro' }, 'classe'],
+      [CLIENTE, { classe: ['real'] }, 'classe'],
+      [CLIENTE, { classe: null }, 'classe'],
+      [CLIENTE, { motivo: 'x'.repeat(501) }, 'motivo'],
+      [CLIENTE, { motivo: 1 }, 'motivo'],
+      [ADMIN, {}, 'lead_id'],
+      ['invalido', {}, 'lead_id'],
+    ] as const) {
+      const r = await chamar('POST', `/leads/${id}/classificacao`, 'admin-aal2', { classe: 'real', request_id: crypto.randomUUID(), ...patch })
+      expect(r.status).toBe(422)
+      expect(r.body.error_code).toBe('INVALID_REQUEST')
+      expect(r.body.campos).toContain(campo)
+    }
+    expect(acoes).toHaveLength(0)
+    expect(classificacoes).toHaveLength(0)
+  })
+})
+
+
+it('T1-3: erro de escrita remove segredos da resposta, registro e logs', async () => {
+  const { chamar, store, acoes, logs } = montar()
+  store.leadClassificar = async () => { throw new Error(PREFIXOS_TOKEN.map(p => `${p}sintetico`).join(' ')) }
+  const r = await chamar('POST', `/leads/${CLIENTE}/classificacao`, 'admin-aal2', { classe: 'real', request_id: crypto.randomUUID() })
+  expect(r.status).toBe(502)
+  const canais = JSON.stringify({ resposta: r.body, acoes, logs })
+  for (const prefixo of PREFIXOS_TOKEN) expect(canais).not.toContain(prefixo)
+  expect(acoes[0].error).toContain('[removido]')
 })

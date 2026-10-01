@@ -12,7 +12,7 @@ import { type EstadoMetrica, Registro, type Valores, calcularEstados, semPermiss
 import { GoogleApiError, googleAccessToken, limparCacheGoogle } from "../_shared/marketing/google-auth.ts";
 import { ga4Resumo } from "../_shared/marketing/ga4.ts";
 import { gscResumo } from "../_shared/marketing/gsc.ts";
-import { COLUNAS_ORIGEM_LEAD, type LeadOrigem, leadsResumo } from "../_shared/marketing/leads.ts";
+import { COLUNAS_ORIGEM_LEAD, type LeadOrigem, type LeadAdmin, type ClasseLead, leadsResumo } from "../_shared/marketing/leads.ts";
 import {
   type MetaCtx,
   MetaEscritaError,
@@ -30,7 +30,7 @@ import {
   publicarFacebook,
   publicarInstagram,
 } from "../_shared/marketing/meta.ts";
-import { type MetricasPagas, type Periodo, addDias, hojeSaoPaulo, parsePeriodo, ttlSegundos } from "../_shared/marketing/normalize.ts";
+import { type MetricasPagas, type Periodo, addDias, hojeSaoPaulo, parsePeriodo, ttlSegundos, limitesUtc } from "../_shared/marketing/normalize.ts";
 import {
   caminhoMidia,
   requestId as validarRequestId,
@@ -112,6 +112,9 @@ export interface MarketingStore {
   postAtualizar(id: string, patch: Partial<PostRow>): Promise<void>;
   postsReservarVencidos(limite: number): Promise<PostRow[]>;
   leadsOrigem(inicioUtc: string, fimExclusivoUtc: string): Promise<LeadOrigem[]>;
+  leadsListar(inicioUtc: string, fimExclusivoUtc: string): Promise<LeadAdmin[]>;
+  leadExiste(id: string): Promise<boolean>;
+  leadClassificar(linha: { lead_id: string; classe: ClasseLead; motivo: string | null; classificado_por: string; papel: string }): Promise<void>;
   cronSecretOk(segredo: string): Promise<boolean>;
   urlUpload(caminho: string): Promise<{ signedUrl: string; token: string; path: string }>;
   urlLeitura(caminho: string, segundos: number): Promise<string>;
@@ -191,10 +194,11 @@ function base64(bytes: Uint8Array): string {
 }
 
 function mensagemDe(e: unknown): string {
-  if (e instanceof MetaEscritaError) return e.message;
-  if (e instanceof GoogleApiError) return `Google: ${e.message}`;
-  if (e instanceof MetaApiError) return mensagemMeta(e);
-  return e instanceof Error ? e.message : String(e);
+  const mensagem = e instanceof MetaEscritaError ? e.message
+    : e instanceof GoogleApiError ? `Google: ${e.message}`
+    : e instanceof MetaApiError ? mensagemMeta(e)
+    : e instanceof Error ? e.message : String(e);
+  return semSegredo(mensagem);
 }
 
 // `estados` (T2 Decided 1–2): só as métricas que não estão `disponivel`.
@@ -208,8 +212,8 @@ type Leitura<T> = {
   atrasado: boolean;
 };
 
-// v2 = { v, dados, estados }. Entrada mais antiga (só `dados`) conta como cache vazio.
-const VERSAO_CACHE = 2;
+// v3 acrescenta classificação dos leads; caches anteriores são refeitos.
+const VERSAO_CACHE = 3;
 const CHAVE_CONEXOES = "conexoes";
 const TTL_CONEXOES = 15 * 60;
 const JANELA_ESCRITA_MS = 30 * 86_400_000;
@@ -361,7 +365,7 @@ export function criarHandler(deps: Deps) {
       leads: () => bloco(k("leads"), Math.min(ttl, 15 * 60), fresco, {
         atrasado,
         ler: () => leadsResumo((i, f) => store.leadsOrigem(i, f), p),
-        metricas: (d) => ({ periodo: { total: d.total } }),
+        metricas: (d) => ({ periodo: { total: d.total, validos: d.validos } }),
       }),
     };
   }
@@ -526,11 +530,32 @@ export function criarHandler(deps: Deps) {
 
     const token = bearer(req);
     const ch = token ? await deps.autenticar(token) : null;
-    const soAdmin = r0 === "agent";
+    const soAdmin = r0 === "agent" || r0 === "leads";
     autorizar(ch, soAdmin);
     const chamador = ch as Chamador;
     const fresco = url.searchParams.get("fresco") === "1";
-    const corpo = m === "GET" ? {} : await req.json().catch(() => ({})) as Record<string, unknown>;
+    const recebido: unknown = m === "GET" ? {} : await req.json().catch(() => ({}));
+    const corpo = recebido && typeof recebido === "object" && !Array.isArray(recebido) ? recebido as Record<string, unknown> : {};
+
+    if (r0 === "leads" && m === "GET" && partes.length === 1) {
+      const { inicio, fimExclusivo } = limitesUtc(periodo(url));
+      return json(req, 200, { leads: await store.leadsListar(inicio, fimExclusivo) });
+    }
+    if (r0 === "leads" && m === "POST" && partes.length === 3 && partes[2] === "classificacao") {
+      const id = partes[1];
+      const campos: string[] = [];
+      if (!validarUuid(id)) campos.push("lead_id");
+      if (typeof corpo.classe !== "string" || !["real", "teste", "invalido", "duplicado"].includes(corpo.classe)) campos.push("classe");
+      if (corpo.motivo !== undefined && (typeof corpo.motivo !== "string" || [...corpo.motivo].length > 500)) campos.push("motivo");
+      if (!campos.includes("lead_id") && !(await store.leadExiste(id))) campos.push("lead_id");
+      if (campos.length) return erro(req, 422, "INVALID_REQUEST", "Classificação inválida.", { campos });
+      const payload = { lead_id: id, classe: corpo.classe as ClasseLead, motivo: (corpo.motivo as string | undefined) ?? null };
+      return acao(req, chamador, corpo, "lead.classificar", id, payload, async () => {
+        await store.leadClassificar({ ...payload, classificado_por: chamador.userId, papel: chamador.role! });
+        await store.cacheLimpar("leads:").catch(() => undefined);
+        return { result: { lead_id: id, classe: payload.classe } };
+      });
+    }
 
     // ----------------------------------------------------------------- Leitura
     if (m === "GET") {

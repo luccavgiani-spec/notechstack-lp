@@ -137,15 +137,15 @@ export async function googleEscopos(token: string): Promise<string[] | null> {
 
 function correcaoOauth(mensagem: string): string {
   if (mensagem.includes("unauthorized_client")) {
-    return "O refresh token foi emitido para outro client OAuth. Autorizar de novo com o client \"no-hub\" (o mesmo de GOOGLE_OAUTH_CLIENT_ID) e trocar GOOGLE_OAUTH_REFRESH_TOKEN.";
+    return "O refresh token foi emitido para outro client OAuth. Autorizar de novo com o client \"no-hub\" (o mesmo de GOOGLE_OAUTH_CLIENT_ID) pelo botão Conectar Google no planner; a nova conexão fica no Vault.";
   }
   if (mensagem.includes("invalid_grant")) {
-    return "O refresh token expirou ou foi revogado (com o app em \"Teste\", vence em 7 dias). Autorizar de novo e trocar GOOGLE_OAUTH_REFRESH_TOKEN.";
+    return "O refresh token expirou ou foi revogado (com o app em \"Teste\", vence em 7 dias). Autorizar de novo pelo botão Conectar Google no planner; a nova conexão fica no Vault.";
   }
   if (mensagem.includes("invalid_client")) {
     return "O client OAuth não confere: revisar GOOGLE_OAUTH_CLIENT_ID e GOOGLE_OAUTH_CLIENT_SECRET do projeto \"no-hub\".";
   }
-  return "Revisar os secrets GOOGLE_OAUTH_* da marketing-hub e refazer a leitura com \"fresco\".";
+  return "Usar Conectar Google no planner e refazer a leitura com \"fresco\".";
 }
 
 async function diagnosticoMeta(entrada: EntradaConexoes, ontem: string, hoje: string) {
