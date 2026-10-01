@@ -3,7 +3,7 @@ movement_id: hub-marketing-agentes
 plan: ./plan.md
 status: needs_verification
 started: 2026-09-30T21:45:00-03:00
-updated: 2026-10-01T17:45:00-03:00
+updated: 2026-10-01T19:25:00-03:00
 executor: Codex (coordenador atual, worktree suspicious-hypatia-6f295c)
 branch: claude/windsor-ai-nó-integration-y64r9w (squash na main em 5f0d1aee, PR #49); continuação em claude/hub-marketing-continuacao
 handoff: ./HANDOFF.md
@@ -20,6 +20,22 @@ A/B/C retomados nos próprios worktrees, preservando commits e alterações herd
 Baseline de produção consultado somente em leitura: 27 leads, 947 sessões, 898 eventos; exatamente 10 leads no intervalo do backfill, zero ações e zero contas dot. Função marketing-hub v1; funções protegidas meta-capi, track-evento e painel-dados v17; quatro funções legadas v18, todas ACTIVE.
 
 Diagnóstico C, navegador somente leitura: projeto Google no-hub em Testando, zero usuários de teste; Publicar app bloqueado por branding incompleto. Campos Política de Privacidade e Termos vazios. Nenhuma conta/configuração foi alterada.
+
+## Publicação da continuação — Codex, 01/10/2026 22:16–22:25 UTC
+
+- PR [#50](https://github.com/luccavgiani-spec/notechstack-lp/pull/50) mesclado; main `b11e2587111ec86661a04f22e539380cb179423d`. App Vercel `dpl_Hz4Jc69Sxbnj5Qw7biJybHYpXSDt` READY com alias app.notechstack.com.br.
+- Ambas migrations aplicadas antes da função marketing-hub v2 e do merge, conforme autorização permanente. Contagens antes/depois idênticas: leads 27, sessões 956, eventos 898. Classificações: 10 testes. RLS ligada, sem policies, zero grants de tabela/coluna para anon/authenticated; RPCs Google recusam execução por esses papéis.
+- Advisors: nenhum WARN novo (pg_net público 1, security definer anon 2/authenticated 32, proteção de senha 1). INFO RLS sem policy 12→13 esperado na tabela de acesso exclusivo da service role ([referência](https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy)).
+- Provas locais: 194 Vitest, dois SQL PGlite, lint, tsc e build PASS; relatório independente em `.checks/hub-marketing-continuacao.verified.md`.
+- Planner real 31/08..29/09: gasto R$172,64 identificado como só Meta; 0 leads válidos, 10 testes excluídos e CPL não calculável. Meta: 20.084 impressões, 16.601 alcance, 1.499 cliques, 1.500 cliques no link, 1.060 LPV, custo/LPV R$0,16; moeda BRL, fuso America/Sao_Paulo, API v25.0. Comparação independente no Ads Manager segue pendente.
+- Conexões real: 11 capacidades, Meta anúncios/IG insights/FB insights OK; escrita/publicação NÃO VERIFICADO; Google invalid_grant e criação bloqueada. Lista não vazia de permissões Meta renderiza sem erro. Botão Conectar Google disponível ao admin; não foi acionado, pois G2b e consentimento são do Lucca.
+- Facebook voltou a mostrar posts. Métricas da Página: 13 seguidores, 1.246 visualizações, 65 interações; comentários/interações por post ficam sem permissão.
+
+### Evidência Graph T1:5 e correção final
+
+Logs da v2 às 22:19:41.577Z, gerados pela leitura real do período acima, registraram recusa Graph #10 nas variantes `completa`, `sem_comentarios` e `sem_reacoes`; a variante `sem_engajamento` retornou posts. Campos comuns: `id,message,created_time,permalink_url,shares`. Somente `reactions.summary(true).limit(0)` e somente `comments.summary(true).limit(0)` também provocaram a recusa, portanto não era apenas comments.
+
+A evidência foi obtida por consulta read-only de logs, com remoção de padrões de segredo na própria seleção. Não houve exibição de tokens. Decisão já prevista em T1-Unresolved4: remover ambos os campos da consulta, sem pedir nova permissão. Commit `86bd2c2a` faz essa remoção e mantém a limitação histórica explícita (`sem_permissao`) no contrato; não esconde falha nova da consulta básica. Prova local de regressão exige exatamente a lista comum, e testa separadamente erro de permissão real da consulta básica. Revisão independente final antes da v3.
 
 ## Estado em 01/10/2026, 20:30 UTC (fim da sessão do primeiro Executor)
 

@@ -1,3 +1,47 @@
+# Rodada 2 — verificação documental complementar
+
+**Verdict: needs_verification.** 5/7 PASS; T3:3 e T3:6 seguem parciais. A pesquisa pode ser entregue como base exploratória com limites auditáveis; esta conclusão não é bloqueio do código nem autorização de produção.
+**Profile:** light. **Round:** 2 — scoped. **HEAD:** fcd6c6bd3e7debfdf8757e6044f3f2119ad68432. **Diff revisto:** b23932e0..fcd6c6bd, docs/mercado. **Data:** 2026-10-01.
+
+## Provas e herança
+
+Validador completo reexecutado no novo HEAD, exit 0. Assertions antigas e contagens permanecem verdes. `validar.py:60–61` comprova as mesmas 50 marcas e ordem; :63–67 verifica estados/campos/fontes; :70 `assert upper <= 10` confere teto 10. Saída: Brasil 40, Uruguai 1, Estados Unidos 1, desconhecido 8; promessa 49 nao_observado e 1 nao_verificado.
+
+T3:1, T3:2 e T3:4: **PASS**, análise carregada de b23932e0; proofs reexecutados em fcd6c6bd. A base principal não mudou. O novo CSV foi lido integralmente, sem contatos ou nomes de pessoas. T3:5 e T3:7: **PASS**, revisão do diff e da síntese em fcd6c6bd, com cinco seções/pares de listas e oito hipóteses preservados; contagens do apêndice coerentes. A amostra de ofertas/preços da rodada 1 permanece carregada de b23932e0.
+
+## T3:3 — needs_verification
+
+A lacuna de ausência de registro geográfico foi resolvida: `auditoria-por-marca.csv:2–51` informa evidência, URL e modo de recuperação individual. `apendice-auditoria.md:7–13` limita corretamente a inferência: evidência de empresa brasileira, não operação exclusivamente brasileira; desconhecido não equivale a estrangeiro. O teto **2 + 8 = 10** é aritmeticamente correto sobre os estados registrados, mas sua prova factual ainda é amostral nesta revisão independente.
+
+Amostra complementar aberta nesta rodada confirma:
+
+- [ReplyAgent Contato](https://www.replyagent.com/pt-br/contact-us/): sede nos Estados Unidos; condição white-label para agências já corroborada na rodada 1.
+- [DreamDesk Termos](https://dreamdesk.app/use-terms): empresa operadora com sede em Franca/SP.
+- [Virtus Privacidade](https://crmvirtus.com/privacidade): declaração da sede empresarial.
+- [WiseData Termos](https://www.wisedataagency.com/termos-de-uso): declaração da licenciante brasileira.
+- [CodeIA Sobre](https://codeia.com.br/sobre): declaração de empresa brasileira.
+
+Bioma/Abstract/Frelo/Otto/Cappei e respectivas provas geográficas da rodada 1 são carregadas de b23932e0. Sem contradições encontradas na amostra complementar. Não foi realizada auditoria independente das 40 declarações brasileiras.
+
+O join dos oito países desconhecidos com o CSV principal revela **cinco marcas sem white-label declarado**: AutoAgencia, Nexio System, Aurabit, Galáxia Digital e GVD Soluções. Para estas, confirmar Brasil ou white-label para agências continua necessário ao fechamento integral do recorte. Web4Business, Datalitics e Vision Developer já têm `sim` no CSV; isso reduz a pendência qualitativa a cinco, sem resolver a revisão factual integral.
+
+## T3:6 — needs_verification, com lacuna de rastreabilidade resolvida
+
+`auditoria-por-marca.csv:2–51` agora registra a promessa individualmente; `sintese.md:59` distingue **49 nao_observado, 1 nao_verificado (Cappei), 0 identificações positivas**. O método em `apendice-auditoria.md:17–19` exclui trial/onboarding/orçamento e limita a busca ao texto recuperado. Essa formulação é metodologicamente honesta e a contagem é reproduzível; deixou de sugerir leitura conclusiva de 50 páginas completas.
+
+Mantém-se parcial porque Cappei não foi verificada integralmente e a evidência remota das 49 linhas não foi reaberta integralmente pelo verificador. Os cinco comparáveis e seus motivos continuam corroborados pela rodada 1. Não exigir prova de inexistência universal no site/mercado: ela não é reivindicada pela síntese. O dado entregue é ausência de identificação nesta coleta limitada.
+
+## Limites restantes e encerramento desta rodada
+
+- Fechamento formal de T3 depende da evidência factual integral e do recorte qualitativo das cinco marcas acima; a entrega exploratória não deve ser anunciada como 7/7 verificada.
+- As contagens exibidas são conferidas nesta revisão; o validador imprime as contagens e não faz assertion de equivalência com cada numeral na prosa, portanto revisão humana continua necessária após atualizações.
+- Meta/Google permanecem 50/50 nao_verificado, corretamente; sem inferências de anúncios.
+- Roteiro dot: análise carregada de b23932e0, PASS documental; T1:6–8 em produção permanecem não executados nesta revisão.
+- Sem fault injection no perfil light. Nenhum código, CSV ou documento de pesquisa alterado pelo verificador; apenas este relatório, sem commit.
+
+A seção abaixo preserva a rodada 1 como histórico; seus achados de falta de registro geográfico/registro individual da promessa foram substituídos pelas conclusões acima.
+
+---
 # Mercado de agências/software — verificação independente
 
 **Verdict: needs_verification** — 5/7 critérios PASS; T3:3 e T3:6 parcialmente comprovados, com lacuna factual explícita.
@@ -49,3 +93,4 @@ Nenhuma evidência contraditória foi encontrada nas ofertas/preços amostrados.
 `roteiro-dot.md:1–54` cobre convite/entrada, conciliação 7d e desligar/religar, com status NÃO EXECUTADO e evidências sanitizadas. PASS como roteiro; T1:6–8 de produção continuam **needs_verification**, sob coordenação do root e execução autorizada. Nenhuma conta, integração, banco, deploy, envio, sessão LinkedIn, arquivo .env ou segredo foi acessado nesta revisão.
 
 Perfil light: sem fault injection; Coverage/Test policy formais ausentes, portanto nenhum join ou veredicto de política adicional. Swept existente não reivindica mecanismos de código; revisado como escopo documental. Nenhuma pesquisa ou código alterado; só este relatório foi criado, sem commit.
+
