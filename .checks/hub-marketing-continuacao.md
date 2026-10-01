@@ -96,3 +96,7 @@ Provas Vitest abaixo são testes nomeados dentro de `marketingPlanner.test.tsx` 
 ## Swept
 
 Validação T2-19/26; falhas T1-19 e T2-8/9; idempotência T1-18/T2-25; autorização T1-8/20 e T2-13/24/27; concorrência T1-18/22 e trilha T2-3; ciclo dos dados T1-9/10/14 e backfill T2-22; dependências externas T1-1/4; transições T1-9/11; observabilidade T1-3/12/22 e T2-10/25. As linhas `existing` das tarefas exigem releitura pelo verificador; nenhuma é automaticamente aprovada.
+
+## Evidência de produção complementar (coordenador)
+
+PR #50 publicado, função v3 e provas em execution.md. T1:4/5: variantes Graph com cada campo isolado recusadas na v2; removidos comments/reactions; leitura 30d fresca na v3 com posts e métricas da Página, zero recusas pages_read_user_content em 22 logs (22:26–22:29 UTC). T2:1/7/22/27: dez testes classificados, zero válidos/CPL não calculável; contagens 27/956/898 preservadas, RLS e grants verificados. Datas custom 22–23/09 resultam R$49,98 e URL/título correspondentes. Conexões apresenta 11 capacidades e permissões não vazias. Google real e demais gates permanecem pendentes; estas provas não encerram as tarefas integrais.

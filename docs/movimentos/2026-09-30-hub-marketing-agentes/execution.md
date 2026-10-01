@@ -37,6 +37,14 @@ Logs da v2 às 22:19:41.577Z, gerados pela leitura real do período acima, regis
 
 A evidência foi obtida por consulta read-only de logs, com remoção de padrões de segredo na própria seleção. Não houve exibição de tokens. Decisão já prevista em T1-Unresolved4: remover ambos os campos da consulta, sem pedir nova permissão. Commit `86bd2c2a` faz essa remoção e mantém a limitação histórica explícita (`sem_permissao`) no contrato; não esconde falha nova da consulta básica. Prova local de regressão exige exatamente a lista comum, e testa separadamente erro de permissão real da consulta básica. Revisão independente final antes da v3.
 
+### Prova final v3 — 01/10/2026, 22:26–22:29 UTC
+
+Função marketing-hub v3 ACTIVE. Leitura pelo botão sem cache com período 30d (01/09..30/09) retornou Facebook com posts, 13 seguidores, 1.251 visualizações e 71 interações; métricas omitidas dos posts seguem sem permissão. Query de logs exclusiva da função/v3 nessa janela: 22 linhas, zero ocorrências de pages_read_user_content, três registros explícitos da limitação histórica. Assim, T1:4/5 têm evidência real de consulta corrigida, sem conceder novas permissões. Google continua invalid_grant, portanto T1:1/2/13 não se encerram.
+
+Período personalizado 22/09..23/09 confirmado pelo título/URL e gasto R$49,98; navegação preservou período entre Visão geral, Campanhas e Conexões. Nenhum lead foi reclassificado manualmente e nenhuma escrita de campanha/post foi executada. Probes sem autenticação continuam registrados acima.
+
+PR complementar [#51](https://github.com/luccavgiani-spec/notechstack-lp/pull/51) contém a correção Facebook e evidências finais. Checklist e relatórios independentes preservam os gates; status do movimento continua needs_verification. Pesquisa: cinco critérios PASS, dois parcialmente verificados; pendência factual identificada em cinco marcas no apêndice. Próxima ação humana: G2b + consentimento Google, depois G3, G4/G5, G7 e G8, na ordem do plano.
+
 ## Estado em 01/10/2026, 20:30 UTC (fim da sessão do primeiro Executor)
 
 Status `needs_verification`: tudo está em produção, mas faltam provas obrigatórias

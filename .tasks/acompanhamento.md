@@ -83,7 +83,7 @@ o formato do Decided, com mocks, até B entregar.
 |---|---|---|---|---|
 | T1 | 1–3 Google | Codex / Lucca | OAuth implementado e função v2; reconexão depende de G2b e consentimento | revisão local 194/194; diagnóstico invalid_grant |
 | T1 | 17–22 conectar Google | Codex | PASS local; migration aplicada; prova OAuth real pendente | .checks/hub-marketing-continuacao.verified.md |
-| T1 | 4–5 Facebook | Codex | campos comments/reactions removidos após prova real; v3 em verificação fresca | função v3 |
+| T1 | 4–5 Facebook | Codex | PASS produção: consulta 30d fresca e zero recusas nos logs v3 | função v3 |
 | T1 | 6–8 dot | Lucca | roteiro pronto; bloqueado G3 | roteiro-dot.md |
 | T1 | 9–12 escritas | Codex / Lucca | bloqueado G4/G5 | nenhuma escrita de teste executada |
 | T1 | 13 AC1 | Codex | depende de reconexão Google | — |
@@ -153,4 +153,7 @@ o formato do Decided, com mocks, até B entregar.
 - Facebook: logs v2 de 22:19 UTC provaram que comments e reactions, mesmo isolados, recusam #10; consulta sem ambos retorna posts. Correção 86bd2c2a remove ambos conforme decisão T1, sem pedir permissão. Revisão independente rodada 3 em fcd6c6bd aprovada; 194/194 novamente. Função v3 ACTIVE.
 - Período custom 22/09..23/09 aplicado no navegador e gasto R$49,98 confirmado; links mantêm período entre Visão geral, Campanhas e Conexões.
 - Pesquisa: 40 BR, 2 internacionais, 8 desconhecidas (teto conservador 10); 49 promessas não observadas, 1 não verificada. Cinco marcas ainda precisam provar Brasil ou white-label: AutoAgencia, Nexio System, Aurabit, Galáxia Digital, GVD Soluções. Relatório independente mantém 5/7 PASS, sem transformar ausência de evidência em dado.
-- Vault atualizado via sync-vault: projeto NoTechStack LP, conectores Supabase/Google Ads; método de publicação com árvore de arquivos preservada. Memória operacional será consolidada após prova final.
+- Vault atualizado via sync-vault: projeto NoTechStack LP, conectores Supabase/Google Ads; método de publicação com árvore de arquivos preservada. Memória operacional consolidada no caminho indicado no HANDOFF.
+
+- Prova final v3 (22:26–22:29 UTC): Facebook 30d fresco com posts, 13 seguidores, 1.251 visualizações, 71 interações; zero linhas pages_read_user_content em 22 logs da função v3. T1:4/5 verificados; limitação comments/reactions explícita e sem nova permissão. PR complementar #51 registra correção e apêndice.
+- Próximo gerente deve começar por este painel e pelos relatórios `.checks/`. T1/T2 integrais continuam needs_verification: Google G2b/consentimento, dot G3, escritas G4/G5, legado G7, rotação G8 e comparação Ads Manager. Não reexecutar backfill nem pedir nova autorização de PR/merge/deploy já concedida; não confundir essa autorização com os gates de conta/escrita real.
