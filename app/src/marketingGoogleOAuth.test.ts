@@ -77,7 +77,7 @@ describe('Google OAuth T1', () => {
     expect(m.store.googleConexaoSalvar).not.toHaveBeenCalled()
   })
   it('17/18/21/22 callback concorrente troca uma vez, salva uma conexão e retorna sem segredos', async () => {
-    const m = montar(), remote = vi.fn(async (..._args: Parameters<typeof fetch>) => Response.json({ refresh_token: 'vault-fixture', scope: GOOGLE_ESCOPOS.join(' ') }))
+    const m = montar(), remote = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ refresh_token: 'vault-fixture', scope: GOOGLE_ESCOPOS.join(' ') }))
     vi.stubGlobal('fetch', remote)
     const { url } = await m.connect(), state = url.searchParams.get('state')
     const responses = await Promise.all([m.call(`google/callback?state=${state}&code=code-fixture`), m.call(`google/callback?state=${state}&code=code-fixture`)])
@@ -132,7 +132,7 @@ describe('Google OAuth T1', () => {
   it.each([true, false])('21 leitura usa Vault antes do fallback (Vault preenchido: %s)', async filled => {
     const m = montar()
     if (filled) await m.store.googleConexaoSalvar(admin.userId, 'vault-fixture', 'previous-id')
-    const remote = vi.fn(async (..._args: Parameters<typeof fetch>) => Response.json({ access_token: 'access-fixture', expires_in: 3600 }))
+    const remote = vi.fn<typeof fetch>().mockResolvedValue(Response.json({ access_token: 'access-fixture', expires_in: 3600 }))
     vi.stubGlobal('fetch', remote)
     // GET autenticado para atravessar o handler completo.
     const response = await criarLeitura(m)
