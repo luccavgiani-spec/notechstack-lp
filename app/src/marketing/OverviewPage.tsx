@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ColunasDiarias } from './ColunasDiarias'
 import { METRICAS_VISAO_GERAL } from './definicoes'
 import { Dicionario } from './Dicionario'
-import { SEM_VALOR, estadoDe, estadoDoBloco } from './estados'
+import { SEM_VALOR, estadoDaMetrica, estadoDe, estadoDoBloco } from './estados'
 import { dataCompleta, dataHora, inteiro, numeroDecimal, pct, reais, reaisEixo, tituloPeriodo } from './format'
 import { SeletorPeriodo } from './MarketingLayout'
 import { type Bloco, type CanalLead, type ClasseLead, type EstadoMetrica, type Metricas, type SerieDiaria, type VisaoGeral, marketing } from './marketing-service'
@@ -116,8 +116,7 @@ function TrafegoPago({ v }: { v: VisaoGeral }) {
   const porDia = new Map<string, { metaGasto?: number; metaLeads?: number; metaLpv?: number | null; googleGasto?: number; googleConv?: number }>()
   if (meta_ads.ok) for (const d of meta_ads.dados.por_dia) porDia.set(d.dia, { ...porDia.get(d.dia), metaGasto: d.gasto_centavos, metaLeads: d.conversoes, metaLpv: d.lpv ?? null })
   if (google_ads.ok) for (const d of google_ads.dados.por_dia) porDia.set(d.dia, { ...porDia.get(d.dia), googleGasto: d.gasto_centavos, googleConv: d.conversoes })
-  const estadoMeta = estadoDoBloco(meta_ads)
-  const estadoGoogle = estadoDoBloco(google_ads)
+
 
   return (
     <Secao titulo="Tráfego pago" rotulo="Meta Ads e Google Ads" acento="bg-azul">
@@ -145,13 +144,13 @@ function TrafegoPago({ v }: { v: VisaoGeral }) {
       </div>
       {ga4.ok ? (
         <p className="mt-2 text-xs text-cinza">
-          Conferência pelo GA4 (Google Ads vinculado): gasto {reais(ga4.dados.google_ads_segundo_ga4.gasto_centavos)},
-          {' '}{inteiro(ga4.dados.google_ads_segundo_ga4.cliques)} cliques, {inteiro(ga4.dados.google_ads_segundo_ga4.impressoes)} impressões.
+          Conferência pelo GA4 (Google Ads vinculado): gasto <ValorMetrica valor={ga4.dados.google_ads_segundo_ga4.gasto_centavos} estado={estadoDaMetrica(ga4.estados, "google_ads_segundo_ga4.gasto_centavos", ga4.dados.google_ads_segundo_ga4.gasto_centavos)} formatar={reais} />,
+          {' '}<ValorMetrica valor={ga4.dados.google_ads_segundo_ga4.cliques} estado={estadoDaMetrica(ga4.estados, "google_ads_segundo_ga4.cliques", ga4.dados.google_ads_segundo_ga4.cliques)} formatar={inteiro} /> cliques, <ValorMetrica valor={ga4.dados.google_ads_segundo_ga4.impressoes} estado={estadoDaMetrica(ga4.estados, "google_ads_segundo_ga4.impressoes", ga4.dados.google_ads_segundo_ga4.impressoes)} formatar={inteiro} /> impressões.
         </p>
       ) : null}
       <div className="mt-5 grid gap-6 lg:grid-cols-2">
-        {meta_ads.ok ? <ColunasDiarias titulo="Gasto por dia — Meta Ads" serie={meta_ads.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.gasto_centavos }))} formatar={reais} formatarEixo={reaisEixo} /> : null}
-        {google_ads.ok ? <ColunasDiarias titulo="Gasto por dia — Google Ads" serie={google_ads.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.gasto_centavos }))} formatar={reais} formatarEixo={reaisEixo} /> : null}
+        {meta_ads.ok ? <ColunasDiarias titulo="Gasto por dia — Meta Ads" estado={meta_ads.estados?.bloco} serie={meta_ads.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.gasto_centavos }))} formatar={reais} formatarEixo={reaisEixo} /> : null}
+        {google_ads.ok ? <ColunasDiarias titulo="Gasto por dia — Google Ads" estado={google_ads.estados?.bloco} serie={google_ads.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.gasto_centavos }))} formatar={reais} formatarEixo={reaisEixo} /> : null}
       </div>
       {porDia.size ? (
         <div className="mt-4 max-h-72 overflow-auto">
@@ -165,11 +164,11 @@ function TrafegoPago({ v }: { v: VisaoGeral }) {
               {[...porDia.entries()].sort().map(([dia, l]) => (
                 <tr key={dia}>
                   <th scope="row" className={`${td} font-normal`}>{dataCompleta(dia)}</th>
-                  <td className={tdNum}><ValorMetrica valor={l.metaGasto} estado={estadoMeta} formatar={reais} /></td>
-                  <td className={tdNum}><ValorMetrica valor={l.metaLpv} estado={estadoMeta} formatar={inteiro} /></td>
-                  <td className={tdNum}><ValorMetrica valor={l.metaLeads} estado={estadoMeta} formatar={inteiro} /></td>
-                  <td className={tdNum}><ValorMetrica valor={l.googleGasto} estado={estadoGoogle} formatar={reais} /></td>
-                  <td className={tdNum}><ValorMetrica valor={l.googleConv} estado={estadoGoogle} formatar={numeroDecimal} /></td>
+                  <td className={tdNum}><ValorMetrica valor={l.metaGasto} estado={meta_ads.ok ? estadoDaMetrica(meta_ads.estados, "por_dia.gasto_centavos", l.metaGasto) : estadoDoBloco(meta_ads)} formatar={reais} /></td>
+                  <td className={tdNum}><ValorMetrica valor={l.metaLpv} estado={meta_ads.ok ? estadoDaMetrica(meta_ads.estados, "por_dia.lpv", l.metaLpv) : estadoDoBloco(meta_ads)} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorMetrica valor={l.metaLeads} estado={meta_ads.ok ? estadoDaMetrica(meta_ads.estados, "por_dia.conversoes", l.metaLeads) : estadoDoBloco(meta_ads)} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorMetrica valor={l.googleGasto} estado={google_ads.ok ? estadoDaMetrica(google_ads.estados, "por_dia.gasto_centavos", l.googleGasto) : estadoDoBloco(google_ads)} formatar={reais} /></td>
+                  <td className={tdNum}><ValorMetrica valor={l.googleConv} estado={google_ads.ok ? estadoDaMetrica(google_ads.estados, "por_dia.conversoes", l.googleConv) : estadoDoBloco(google_ads)} formatar={numeroDecimal} /></td>
                 </tr>
               ))}
             </tbody>
@@ -248,7 +247,7 @@ function Conversao({ v, gasto }: { v: VisaoGeral; gasto: GastoPago }) {
                 <thead><tr><th className={th}>Canal</th><th className={`${th} text-right`}>Sessões</th><th className={`${th} text-right`}>Usuários</th><th className={`${th} text-right`}>Eventos-chave</th></tr></thead>
                 <tbody>
                   {ga4.dados.por_canal.map((c) => (
-                    <tr key={c.canal}><th scope="row" className={`${td} font-normal`}>{c.canal}</th><td className={tdNum}>{inteiro(c.sessoes)}</td><td className={tdNum}>{inteiro(c.usuarios)}</td><td className={tdNum}>{inteiro(c.eventos_chave)}</td></tr>
+                    <tr key={c.canal}><th scope="row" className={`${td} font-normal`}>{c.canal}</th><td className={tdNum}><ValorMetrica valor={c.sessoes} estado={estadoDaMetrica(ga4.estados, "por_canal.sessoes", c.sessoes)} formatar={inteiro} /></td><td className={tdNum}><ValorMetrica valor={c.usuarios} estado={estadoDaMetrica(ga4.estados, "por_canal.usuarios", c.usuarios)} formatar={inteiro} /></td><td className={tdNum}><ValorMetrica valor={c.eventos_chave} estado={estadoDaMetrica(ga4.estados, "por_canal.eventos_chave", c.eventos_chave)} formatar={inteiro} /></td></tr>
                   ))}
                   <tr>
                     <th scope="row" className={`${td} font-semibold`}>Total</th>
@@ -264,11 +263,11 @@ function Conversao({ v, gasto }: { v: VisaoGeral; gasto: GastoPago }) {
                 <table className={tabela}>
                   <caption className="mb-2 text-left text-sm font-semibold">Eventos-chave (GA4)</caption>
                   <thead><tr><th className={th}>Evento</th><th className={`${th} text-right`}>Total</th></tr></thead>
-                  <tbody>{ga4.dados.eventos.map((e) => <tr key={e.evento}><th scope="row" className={`${td} font-mono text-xs font-normal`}>{e.evento}</th><td className={tdNum}>{inteiro(e.total)}</td></tr>)}</tbody>
+                  <tbody>{ga4.dados.eventos.map((e) => <tr key={e.evento}><th scope="row" className={`${td} font-mono text-xs font-normal`}>{e.evento}</th><td className={tdNum}><ValorMetrica valor={e.total} estado={estadoDaMetrica(ga4.estados, "eventos.total", e.total)} formatar={inteiro} /></td></tr>)}</tbody>
                 </table>
               </div>
             ) : null}
-            <div className="mt-4"><ColunasDiarias titulo="Sessões por dia (GA4)" serie={ga4.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.sessoes }))} formatar={inteiro} /></div>
+            <div className="mt-4"><ColunasDiarias titulo="Sessões por dia (GA4)" estado={ga4.estados?.bloco} serie={ga4.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.sessoes }))} formatar={inteiro} /></div>
           </div>
         ) : null}
       </div>
@@ -321,9 +320,9 @@ function Social({ v }: { v: VisaoGeral }) {
                   <td className={`${td} whitespace-nowrap`}>{dataHora(p.data)}</td>
                   <td className={td}>{p.rede === 'instagram' ? `Instagram · ${p.tipo}` : 'Facebook'}</td>
                   <td className={`${td} max-w-xs truncate`} title={p.texto}>{p.texto || '(sem texto)'}</td>
-                  <td className={tdNum}><ValorMetrica valor={p.alcance} formatar={inteiro} /></td>
-                  <td className={tdNum}><ValorMetrica valor={p.interacoes} formatar={inteiro} /></td>
-                  <td className={tdNum}><ValorMetrica valor={p.comentarios} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorMetrica valor={p.alcance} estado={estadoDe(p.rede === "instagram" ? instagram : facebook, "posts.alcance")} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorMetrica valor={p.interacoes} estado={estadoDe(p.rede === "instagram" ? instagram : facebook, "posts.interacoes")} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorMetrica valor={p.comentarios} estado={estadoDe(p.rede === "instagram" ? instagram : facebook, "posts.comentarios")} formatar={inteiro} /></td>
                   <td className={td}>{p.link ? <a className="text-azul underline" href={p.link} target="_blank" rel="noreferrer">abrir</a> : '—'}</td>
                 </tr>
               ))}
@@ -335,11 +334,12 @@ function Social({ v }: { v: VisaoGeral }) {
   )
 }
 
-function TabelaGsc({ titulo, chave, colunaExtra, linhas }: {
+function TabelaGsc({ titulo, chave, colunaExtra, linhas, estados }: {
+  estados?: Record<string, EstadoMetrica>
   titulo: string
   chave: string
   colunaExtra: string
-  linhas: { chave: string; cliques: number; extra: string }[]
+  linhas: { chave: string; cliques: number; extra: number }[]
 }) {
   return (
     <div className="overflow-x-auto">
@@ -350,8 +350,8 @@ function TabelaGsc({ titulo, chave, colunaExtra, linhas }: {
           {linhas.length ? linhas.map((l) => (
             <tr key={l.chave}>
               <th scope="row" className={`${td} max-w-[16rem] break-all font-normal`}>{l.chave.replace(/^https?:\/\/(www\.)?/, '')}</th>
-              <td className={tdNum}>{inteiro(l.cliques)}</td>
-              <td className={tdNum}>{l.extra}</td>
+              <td className={tdNum}><ValorMetrica valor={l.cliques} estado={estadoDaMetrica(estados, "cliques", l.cliques)} formatar={inteiro} /></td>
+              <td className={tdNum}><ValorMetrica valor={l.extra} estado={estadoDaMetrica(estados, "extra", l.extra)} formatar={inteiro} /></td>
             </tr>
           )) : <tr><td className={td} colSpan={3}>Nada no período.</td></tr>}
         </tbody>
@@ -369,19 +369,19 @@ function Busca({ v }: { v: VisaoGeral }) {
         <>
           <p className="text-sm">
             <ValorMetrica valor={gsc.dados.cliques} estado={gsc.estados?.cliques} formatar={inteiro} /> cliques ·{' '}
-            <ValorMetrica valor={gsc.dados.impressoes} estado={gsc.estados?.impressoes} formatar={inteiro} /> impressões · CTR {pct(gsc.dados.ctr)}
+            <ValorMetrica valor={gsc.dados.impressoes} estado={gsc.estados?.impressoes} formatar={inteiro} /> impressões · CTR <ValorMetrica valor={gsc.dados.ctr} estado={estadoDaMetrica(gsc.estados, "ctr", gsc.dados.ctr)} formatar={pct} />
             <span className="text-cinza"> — datas do Search Console no fuso do Pacífico; os últimos 2–3 dias ainda consolidam.</span>
           </p>
-          <div className="mt-4"><ColunasDiarias titulo="Cliques orgânicos por dia" serie={gsc.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.cliques }))} formatar={inteiro} /></div>
+          <div className="mt-4"><ColunasDiarias titulo="Cliques orgânicos por dia" estado={gsc.estados?.bloco} serie={gsc.dados.por_dia.map((d) => ({ dia: d.dia, valor: d.cliques }))} formatar={inteiro} /></div>
           <div className="mt-4 grid gap-6 xl:grid-cols-3">
-            <TabelaGsc
+            <TabelaGsc estados={gsc.estados}
               titulo={`Páginas que mais cresceram (vs ${dataCompleta(gsc.dados.comparado_com.de)} a ${dataCompleta(gsc.dados.comparado_com.ate)})`}
               chave="Página"
-              linhas={gsc.dados.paginas_que_cresceram.map((l) => ({ chave: l.chave, cliques: l.cliques, extra: `+${inteiro(l.variacao)}` }))}
+              linhas={gsc.dados.paginas_que_cresceram.map((l) => ({ chave: l.chave, cliques: l.cliques, extra: l.variacao }))}
               colunaExtra="Variação"
             />
-            <TabelaGsc titulo="Consultas com mais cliques" chave="Consulta" linhas={gsc.dados.consultas.map((l) => ({ chave: l.chave, cliques: l.cliques, extra: inteiro(l.impressoes) }))} colunaExtra="Impressões" />
-            <TabelaGsc titulo="Páginas com mais cliques" chave="Página" linhas={gsc.dados.paginas.map((l) => ({ chave: l.chave, cliques: l.cliques, extra: inteiro(l.impressoes) }))} colunaExtra="Impressões" />
+            <TabelaGsc estados={gsc.estados} titulo="Consultas com mais cliques" chave="Consulta" linhas={gsc.dados.consultas.map((l) => ({ chave: l.chave, cliques: l.cliques, extra: l.impressoes }))} colunaExtra="Impressões" />
+            <TabelaGsc estados={gsc.estados} titulo="Páginas com mais cliques" chave="Página" linhas={gsc.dados.paginas.map((l) => ({ chave: l.chave, cliques: l.cliques, extra: l.impressoes }))} colunaExtra="Impressões" />
           </div>
         </>
       ) : null}

@@ -1,3 +1,4 @@
+import { estadoDaMetrica } from './estados'
 import { useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { METRICAS_CAMPANHAS } from './definicoes'
@@ -39,16 +40,16 @@ function TabelaCampanhas({ bloco, nome, periodo, lpv = false }: { bloco: Bloco<C
               <td className={tdNum}>
                 {c.orcamento_diario_centavos !== null ? `${reais(c.orcamento_diario_centavos)}/dia` : c.orcamento_total_centavos !== null ? `${reais(c.orcamento_total_centavos)} total` : 'no conjunto'}
               </td>
-              <td className={tdNum}>{reais(c.metricas.gasto_centavos)}</td>
-              <td className={tdNum}>{inteiro(c.metricas.cliques)}</td>
+              <td className={tdNum}><ValorMetrica valor={c.metricas.gasto_centavos} estado={estadoDaMetrica(bloco.estados, "gasto_centavos", c.metricas.gasto_centavos)} formatar={reais} /></td>
+              <td className={tdNum}><ValorMetrica valor={c.metricas.cliques} estado={estadoDaMetrica(bloco.estados, "cliques", c.metricas.cliques)} formatar={inteiro} /></td>
               {lpv ? (
                 <>
-                  <td className={tdNum}><ValorMetrica valor={c.metricas.lpv} formatar={inteiro} /></td>
-                  <td className={tdNum}><ValorRazao numerador={c.metricas.gasto_centavos} denominador={c.metricas.lpv} formatar={reaisDeRazao} /></td>
+                  <td className={tdNum}><ValorMetrica valor={c.metricas.lpv} estado={estadoDaMetrica(bloco.estados, "lpv", c.metricas.lpv)} formatar={inteiro} /></td>
+                  <td className={tdNum}><ValorRazao numerador={c.metricas.gasto_centavos} denominador={c.metricas.lpv} estadoNumerador={estadoDaMetrica(bloco.estados, "gasto_centavos", c.metricas.gasto_centavos)} estadoDenominador={estadoDaMetrica(bloco.estados, "lpv", c.metricas.lpv)} formatar={reaisDeRazao} /></td>
                 </>
               ) : null}
-              <td className={tdNum}>{numeroDecimal(c.metricas.conversoes)}</td>
-              <td className={tdNum}><ValorRazao numerador={c.metricas.gasto_centavos} denominador={c.metricas.conversoes} formatar={reaisDeRazao} /></td>
+              <td className={tdNum}><ValorMetrica valor={c.metricas.conversoes} estado={estadoDaMetrica(bloco.estados, "conversoes", c.metricas.conversoes)} formatar={numeroDecimal} /></td>
+              <td className={tdNum}><ValorRazao numerador={c.metricas.gasto_centavos} denominador={c.metricas.conversoes} estadoNumerador={estadoDaMetrica(bloco.estados, "gasto_centavos", c.metricas.gasto_centavos)} estadoDenominador={estadoDaMetrica(bloco.estados, "conversoes", c.metricas.conversoes)} formatar={reaisDeRazao} /></td>
             </tr>
           ))}
         </tbody>

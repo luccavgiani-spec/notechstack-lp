@@ -1,4 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { ROTULO_ESTADO, SEM_VALOR } from './estados'
+import type { EstadoMetrica } from './marketing-service'
 import { dataCompleta, dataCurta } from './format'
 
 // Série única por gráfico (o título diz o que é; sem legenda). Colunas ≤ 24px,
@@ -38,7 +40,8 @@ function colunaArredondada(x: number, y: number, w: number, h: number): string {
   return `M${x},${y + h} L${x},${y + r} Q${x},${y} ${x + r},${y} L${x + w - r},${y} Q${x + w},${y} ${x + w},${y + r} L${x + w},${y + h} Z`
 }
 
-export function ColunasDiarias({ titulo, serie, formatar, formatarEixo = formatar }: {
+export function ColunasDiarias({ titulo, serie, formatar, formatarEixo = formatar, estado }: {
+  estado?: EstadoMetrica
   titulo: string
   serie: Ponto[]
   formatar: (valor: number) => string
@@ -48,6 +51,7 @@ export function ColunasDiarias({ titulo, serie, formatar, formatarEixo = formata
   const idTitulo = useId()
   const [ref, W] = useLargura()
   if (!serie.length) return null
+  if (estado && SEM_VALOR.includes(estado)) return <p>{titulo}: — {ROTULO_ESTADO[estado]}</p>
 
   const teto = tetoRedondo(Math.max(...serie.map((p) => p.valor)))
   const larguraUtil = W - M.esq - M.dir
@@ -61,7 +65,7 @@ export function ColunasDiarias({ titulo, serie, formatar, formatarEixo = formata
 
   return (
     <figure ref={ref} className="relative" aria-labelledby={idTitulo}>
-      <figcaption id={idTitulo} className="mb-2 text-sm font-semibold">{titulo}</figcaption>
+      <figcaption id={idTitulo} className="mb-2 text-sm font-semibold">{titulo}{estado && estado !== "disponivel" ? ` · ${ROTULO_ESTADO[estado]}` : ""}</figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="block max-w-full" role="img" aria-label={`${titulo}: gráfico de colunas por dia; valores na tabela`}>
         {[0, 1, 2, 3].map((k) => {
           const v = (teto / 3) * k

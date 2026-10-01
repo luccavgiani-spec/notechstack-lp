@@ -36,3 +36,11 @@ export function estadoDoBloco(bloco: Bloco<unknown>): EstadoMetrica | undefined 
 export function estadoDe(bloco: Bloco<unknown>, campo: string): EstadoMetrica | undefined {
   return bloco.ok ? bloco.estados?.[campo] : estadoDoBloco(bloco)
 }
+
+// Estado específico vence o agregado; ausência continua ausente mesmo em período aberto.
+export function estadoDaMetrica(estados: Record<string, EstadoMetrica> | undefined, campo: string, valor: number | null | undefined, agregado?: EstadoMetrica): EstadoMetrica | undefined {
+  const especifico = estados?.[campo]
+  if (especifico) return especifico
+  if (valor === null || valor === undefined) return 'indisponivel'
+  return agregado ?? estados?.bloco
+}

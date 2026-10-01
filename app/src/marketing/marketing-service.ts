@@ -123,6 +123,7 @@ export type ListaCampanhas = {
 
 export type DetalheMeta = {
   plataforma: 'meta'
+  estados?: Record<string, EstadoMetrica>
   periodo: Periodo
   campanha: { id: string; nome: string; status: string; status_efetivo: string | null; objetivo: string | null; inicio: string | null; fim: string | null }
   metricas: Metricas
@@ -136,6 +137,7 @@ export type DetalheMeta = {
 
 export type DetalheGoogle = {
   plataforma: 'google'
+  estados?: Record<string, EstadoMetrica>
   periodo: Periodo
   campanha: { id: string; nome: string; status: string; tipo: string | null; lances: string | null; orcamento_diario_centavos: number | null }
   metricas: Metricas
@@ -208,7 +210,7 @@ export type Conexoes = {
   capacidades: Capacidade[]
   // null: a plataforma não informou (tokeninfo / me/permissions sem resposta).
   google_escopos: string[] | null
-  meta_permissoes: string[] | null
+  meta_permissoes: { permissao: string; status: string }[] | null
 }
 
 export type Lead = { id: string; criado_em: string; canal: string; nome: string | null; email: string | null; classe: Exclude<ClasseLead, 'a_classificar'> | null }

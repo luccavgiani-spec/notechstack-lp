@@ -591,3 +591,47 @@ it('4–5: campanha expõe LPV, custo e objetivo com otimização na mesma linha
   expect(row).toHaveTextContent('R$ 2,00')
   expect(screen.getByRole('row', { name: /LPV por clique no link/ })).toHaveTextContent('diagnóstico, não funil individual')
 })
+
+it('T2 12: permissões Meta não vazias preservam nome e status', async () => {
+  mocks.marketing.conexoes.mockResolvedValue({ capacidades: [], google_escopos: ['analytics.readonly'], meta_permissoes: [{ permissao: 'ads_read', status: 'granted' }, { permissao: 'pages_read_user_content', status: 'declined' }] })
+  abrir('/no/marketing/conexoes', sessao('MARKETING_AGENT'))
+  const permissoes = await screen.findByRole('list', { name: 'Permissões Meta do token' })
+  expect(permissoes).toHaveTextContent('ads_read: granted')
+  expect(permissoes).toHaveTextContent('pages_read_user_content: declined')
+})
+it('T2 9: posts preservam sem permissão específico e zero da resposta', async () => {
+  const v = visao()
+  v.blocos.facebook = { ok: true, cache: false, estados: { bloco: 'parcial', 'posts.interacoes': 'sem_permissao', 'posts.comentarios': 'sem_permissao' }, dados: { pagina: 'Página', seguidores: 0, visualizacoes: 0, interacoes: null, posts: [{ id: 'p', rede: 'facebook', data: '2026-09-28T12:00:00Z', texto: 'Post de prova', tipo: 'post', link: null, alcance: 0, visualizacoes: null, interacoes: null, curtidas: null, comentarios: null, compartilhamentos: 0 }] } }
+  mocks.marketing.visaoGeral.mockResolvedValue(v)
+  abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+  const row = await screen.findByRole('row', { name: /Post de prova/ })
+  expect(row.querySelectorAll('[data-estado="sem_permissao"]')).toHaveLength(2)
+  expect(row.querySelector('[data-estado="zero"]')).toHaveTextContent('0')
+})
+it('T2 9: campanha herda atraso e mantém LPV ausente indisponível', async () => {
+  mocks.marketing.campanhas.mockResolvedValue({ periodo, blocos: { meta: { ok: true, cache: false, estados: { bloco: 'atrasado' }, dados: [{ plataforma: 'meta', id: '555', nome: 'Campanha recente', status: 'PAUSED', objetivo: 'OUTCOME_TRAFFIC', orcamento_diario_centavos: null, orcamento_total_centavos: null, metricas: { ...vazio, lpv: null } }] }, google: null } })
+  abrir('/no/marketing/campanhas', sessao('MARKETING_AGENT'))
+  const row = await screen.findByRole('row', { name: /Campanha recente/ })
+  expect(row.querySelectorAll('[data-estado="atrasado"]').length).toBeGreaterThanOrEqual(3)
+  expect(row.querySelectorAll('[data-estado="indisponivel"]')).toHaveLength(2)
+})
+it('T2 9: detalhe deriva atraso de periodo sem inventar permissão', async () => {
+  mocks.marketing.campanhaMeta.mockResolvedValue({ plataforma: 'meta', periodo: { ...periodo, ate: hojeSaoPaulo() }, campanha: { id: '555', nome: 'Campanha hoje', status: 'PAUSED', objetivo: 'OUTCOME_TRAFFIC' }, metricas: { ...vazio, lpv: null }, conjuntos: [], anuncios: [] })
+  abrir('/no/marketing/campanhas/meta/555', sessao('MARKETING_AGENT'))
+  const t = await screen.findByRole('table', { name: 'Métricas da campanha no período' })
+  expect(within(t).getByRole('row', { name: /^Gasto/ })).toHaveTextContent('atrasado')
+  expect(within(t).getByRole('row', { name: /^Visualizações da página/ })).toHaveTextContent('indisponível')
+  expect(t.querySelector('[data-estado="sem_permissao"]')).toBeNull()
+})
+it('T2 15: dicionário completo expõe seis campos de cada definição sem hover', async () => {
+  abrir('/no/marketing/visao-geral', sessao('MARKETING_AGENT'))
+  const d = await screen.findByRole('region', { name: 'Dicionário de métricas' })
+  for (const nome of ['Gasto em anúncios (total pago)', 'Gasto', 'Impressões', 'Alcance', 'Cliques', 'Cliques no link', 'Visualizações da página de destino', 'Custo por LPV', 'Leads / conversões (plataforma)', 'Custo por lead / conversão (plataforma)', 'Leads válidos', 'Testes, inválidos, duplicados e a classificar', 'Custo por lead (válido)', 'Canal do lead', 'Sessões (GA4)', 'Usuários (GA4)', 'Eventos-chave (GA4)', 'Conferência pelo GA4', 'Seguidores', 'Alcance (Instagram)', 'Visualizações', 'Interações', 'Contas engajadas (Instagram)', 'Cliques orgânicos (Search Console)', 'Impressões orgânicas (Search Console)', 'CTR orgânico', 'Interações do post', 'Comentários do post', 'Alcance do post', 'Variação de cliques por página']) expect(within(d).getByRole('article', { name: nome })).toBeVisible()
+  for (const a of within(d).getAllByRole('article').filter(a => a.getAttribute('aria-label') !== 'Estados de uma métrica')) {
+    for (const campo of ['Campo de origem', 'Unidade', 'Escopo', 'Fórmula', 'Janela', 'Limitações']) {
+      const rotulo = within(a).getByText(campo, { exact: true })
+      expect(rotulo).toBeVisible()
+      expect(rotulo.nextElementSibling?.textContent?.trim().length).toBeGreaterThan(0)
+    }
+  }
+})

@@ -1,10 +1,11 @@
+import { estadoDaMetrica } from './estados'
 import { type FormEvent, type ReactNode, useCallback, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { METRICAS_DETALHE } from './definicoes'
 import { Dicionario } from './Dicionario'
 import { SeletorPeriodo } from './MarketingLayout'
-import { centavosDeReais, dataHora, inteiro, isoParaLocal, localParaIso, numeroDecimal, pct, reais, rotuloStatus, tomDoStatus } from './format'
-import { type DetalheGoogle, type DetalheMeta, type Metricas, marketing } from './marketing-service'
+import { centavosDeReais, dataHora, hojeSaoPaulo, inteiro, isoParaLocal, localParaIso, numeroDecimal, pct, reais, rotuloStatus, tomDoStatus } from './format'
+import { type DetalheGoogle, type DetalheMeta, type Metricas, type EstadoMetrica, marketing } from './marketing-service'
 import { Carregando, Erro, PainelRevisao, Secao, Selo, botaoSecundario, campo, tabela, td, tdNum, th } from './ui'
 import { useDados } from './useDados'
 import { type FluxoRevisao, useRevisao } from './useRevisao'
@@ -15,20 +16,23 @@ const AVISO_ATIVAR = 'Ativar libera veiculação e gasto real. O dot só confirm
 const reaisDeRazao = (n: number) => reais(Math.round(n))
 
 // Uma métrica por linha: cabe em 375px e cada número tem o rótulo ao lado.
-function TabelaMetricas({ m, meta }: { m: Metricas; meta: boolean }) {
+function estadosDetalhe(d: DetalheMeta | DetalheGoogle) {
+  return { ...(d.periodo.ate >= hojeSaoPaulo() ? { bloco: 'atrasado' as const } : {}), ...d.estados }
+}
+function TabelaMetricas({ m, meta, estados }: { m: Metricas; meta: boolean; estados: Record<string, EstadoMetrica> }) {
   const linhas: [string, ReactNode][] = [
-    ['Gasto', <ValorMetrica valor={m.gasto_centavos} formatar={reais} />],
-    ['Impressões', <ValorMetrica valor={m.impressoes} formatar={inteiro} />],
-    ['Alcance', <ValorMetrica valor={m.alcance} formatar={inteiro} />],
-    ['Cliques', <ValorMetrica valor={m.cliques} formatar={inteiro} />],
+    ['Gasto', <ValorMetrica valor={m.gasto_centavos} estado={estadoDaMetrica(estados, "gasto_centavos", m.gasto_centavos)} formatar={reais} />],
+    ['Impressões', <ValorMetrica valor={m.impressoes} estado={estadoDaMetrica(estados, "impressoes", m.impressoes)} formatar={inteiro} />],
+    ['Alcance', <ValorMetrica valor={m.alcance} estado={estadoDaMetrica(estados, "alcance", m.alcance)} formatar={inteiro} />],
+    ['Cliques', <ValorMetrica valor={m.cliques} estado={estadoDaMetrica(estados, "cliques", m.cliques)} formatar={inteiro} />],
     ...(meta ? [
-      ['Cliques no link', <ValorMetrica valor={m.cliques_link} formatar={inteiro} />],
-      ['Visualizações da página de destino', <ValorMetrica valor={m.lpv} formatar={inteiro} />],
-      ['Custo por LPV', <ValorRazao numerador={m.gasto_centavos} denominador={m.lpv} formatar={reaisDeRazao} />],
-      ['LPV por clique no link (diagnóstico, não funil individual)', <ValorRazao numerador={m.lpv} denominador={m.cliques_link} formatar={pct} />],
+      ['Cliques no link', <ValorMetrica valor={m.cliques_link} estado={estadoDaMetrica(estados, "cliques_link", m.cliques_link)} formatar={inteiro} />],
+      ['Visualizações da página de destino', <ValorMetrica valor={m.lpv} estado={estadoDaMetrica(estados, "lpv", m.lpv)} formatar={inteiro} />],
+      ['Custo por LPV', <ValorRazao numerador={m.gasto_centavos} denominador={m.lpv} estadoNumerador={estadoDaMetrica(estados, "gasto_centavos", m.gasto_centavos)} estadoDenominador={estadoDaMetrica(estados, "lpv", m.lpv)} formatar={reaisDeRazao} />],
+      ['LPV por clique no link (diagnóstico, não funil individual)', <ValorRazao numerador={m.lpv} denominador={m.cliques_link} estadoNumerador={estadoDaMetrica(estados, "lpv", m.lpv)} estadoDenominador={estadoDaMetrica(estados, "cliques_link", m.cliques_link)} formatar={pct} />],
     ] as [string, ReactNode][] : []),
-    ['Leads / conv.', <ValorMetrica valor={m.conversoes} formatar={numeroDecimal} />],
-    ['Custo por lead', <ValorRazao numerador={m.gasto_centavos} denominador={m.conversoes} formatar={reaisDeRazao} />],
+    ['Leads / conv.', <ValorMetrica valor={m.conversoes} estado={estadoDaMetrica(estados, "conversoes", m.conversoes)} formatar={numeroDecimal} />],
+    ['Custo por lead', <ValorRazao numerador={m.gasto_centavos} denominador={m.conversoes} estadoNumerador={estadoDaMetrica(estados, "gasto_centavos", m.gasto_centavos)} estadoDenominador={estadoDaMetrica(estados, "conversoes", m.conversoes)} formatar={reaisDeRazao} />],
   ]
   return (
     <div className="overflow-x-auto">
@@ -74,8 +78,8 @@ function ObjetivoResultado({ d }: { d: DetalheMeta }) {
                 <td className={`${td} font-mono text-xs`}>{d.campanha.objetivo ?? '—'}</td>
                 <td className={`${td} font-mono text-xs`}>{otimizacao ?? 'sem conjunto'}</td>
                 <td className={td}>{resultado ? resultado.rotulo : 'resultado não mapeado no painel'}</td>
-                <td className={tdNum}><ValorMetrica valor={quantidade} formatar={resultado?.campo === 'conversoes' ? numeroDecimal : inteiro} /></td>
-                <td className={tdNum}><ValorRazao numerador={d.metricas.gasto_centavos} denominador={quantidade} formatar={reaisDeRazao} /></td>
+                <td className={tdNum}><ValorMetrica valor={quantidade} estado={estadoDaMetrica(estadosDetalhe(d), resultado?.campo ?? "resultado", quantidade)} formatar={resultado?.campo === 'conversoes' ? numeroDecimal : inteiro} /></td>
+                <td className={tdNum}><ValorRazao numerador={d.metricas.gasto_centavos} denominador={quantidade} estadoNumerador={estadoDaMetrica(estadosDetalhe(d), "gasto_centavos", d.metricas.gasto_centavos)} estadoDenominador={estadoDaMetrica(estadosDetalhe(d), resultado?.campo ?? "resultado", quantidade)} formatar={reaisDeRazao} /></td>
               </tr>
             )
           })}
@@ -168,7 +172,7 @@ function MetaDetalhe({ d, fluxo, recarregar }: { d: DetalheMeta; fluxo: FluxoRev
           <span className="text-cinza">Objetivo {c.objetivo ?? '—'} · início {dataHora(c.inicio)} · término {dataHora(c.fim)}</span>
         </p>
         <ObjetivoResultado d={d} />
-        <TabelaMetricas m={d.metricas} meta />
+        <TabelaMetricas m={d.metricas} estados={estadosDetalhe(d)} meta />
       </Secao>
       <Secao titulo="Conjuntos de anúncios" acento="bg-azul">
         <div className="overflow-x-auto">
@@ -261,7 +265,7 @@ function GoogleDetalhe({ d, fluxo, recarregar }: { d: DetalheGoogle; fluxo: Flux
           Status: <Selo texto={rotuloStatus(c.status)} tom={tomDoStatus(c.status)} />
           <span className="text-cinza">{c.tipo} · lances {c.lances ?? '—'} · locais {d.locais.join(', ') || '—'} · idiomas {d.idiomas.join(', ') || '—'}</span>
         </p>
-        <TabelaMetricas m={d.metricas} meta={false} />
+        <TabelaMetricas m={d.metricas} estados={estadosDetalhe(d)} meta={false} />
         <form onSubmit={orcamento} className="mt-4 flex flex-wrap items-end gap-2">
           <label className="text-xs"><span className="mb-1 block font-semibold">Orçamento diário (R$)</span>
             <input className={campo} inputMode="decimal" value={valor} onChange={(e) => setValor(e.target.value)} />

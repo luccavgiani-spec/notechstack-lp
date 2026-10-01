@@ -260,6 +260,18 @@ export const DEFINICOES = {
     janela: 'dias do período',
     limitacoes: 'Não existe no Facebook nesta consulta.',
   },
+  posts_alcance: {
+    nome: 'Alcance do post', origem: 'Instagram media insights: reach. Facebook: não consultado.', unidade: 'contas (estimativa)', escopo: 'cada post publicado no período', formula: 'reach informado pela plataforma', janela: 'acumulado do post até a leitura; período seleciona a publicação', limitacoes: 'Não somar como pessoas únicas. Sem resposta mostra o estado da leitura.',
+  },
+  posts_interacoes: {
+    nome: 'Interações do post', origem: 'Instagram media insights: total_interactions. Facebook: reactions.summary.total_count, comments.summary.total_count e shares.count.', unidade: 'interações', escopo: 'cada post publicado no período', formula: 'Instagram: total_interactions. Facebook: reações + comentários + compartilhamentos, somente se reações e comentários disponíveis.', janela: 'acumulado do post até a leitura', limitacoes: 'Permissão negada para um componente impede tratar o total como zero; definição varia por rede.',
+  },
+  posts_comentarios: {
+    nome: 'Comentários do post', origem: 'Instagram: comments_count. Facebook: comments.summary.total_count.', unidade: 'comentários', escopo: 'cada post publicado no período', formula: 'contagem devolvida pela plataforma', janela: 'acumulado do post até a leitura', limitacoes: 'No Facebook pode exigir permissão adicional; sem permissão é ausência, não zero.',
+  },
+  gsc_crescimento: {
+    nome: 'Variação de cliques por página', origem: 'Search Analytics: clicks por page nos dois períodos.', unidade: 'cliques', escopo: 'cada página apresentada em Páginas que mais cresceram', formula: 'cliques atuais menos cliques anteriores', janela: 'período selecionado versus intervalo anterior exibido no título', limitacoes: 'Os últimos 3 dias consolidam. Variação absoluta, não percentual; consulta e limites de linhas da API podem omitir páginas.',
+  },
 } satisfies Record<string, Definicao>
 
 export type IdMetrica = keyof typeof DEFINICOES
@@ -269,7 +281,7 @@ export const METRICAS_VISAO_GERAL: IdMetrica[] = [
   'leads_validos', 'classes_lead', 'cpl', 'canal_lead',
   'sessoes', 'usuarios', 'eventos_chave', 'ga4_google_ads',
   'seguidores', 'alcance_ig', 'visualizacoes', 'interacoes', 'contas_engajadas',
-  'gsc_cliques', 'gsc_impressoes', 'gsc_ctr',
+  'gsc_cliques', 'gsc_impressoes', 'gsc_ctr', 'gsc_crescimento', 'posts_alcance', 'posts_interacoes', 'posts_comentarios',
 ]
 
 export const METRICAS_CAMPANHAS: IdMetrica[] = ['gasto', 'cliques', 'lpv', 'custo_lpv', 'conversoes', 'custo_conversao']
