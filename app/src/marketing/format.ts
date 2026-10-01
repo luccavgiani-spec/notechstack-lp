@@ -27,6 +27,12 @@ export function dataCompleta(iso: string): string {
   return `${d}/${m}/${a}`
 }
 
+// Título do período: o intervalo personalizado já é o próprio rótulo.
+export function tituloPeriodo(p: { rotulo: string; de: string; ate: string }): string {
+  const faixa = `${dataCompleta(p.de)} a ${dataCompleta(p.ate)}`
+  return p.rotulo === faixa ? faixa : `${p.rotulo}: ${faixa}`
+}
+
 export function dataHora(iso: string | null): string {
   if (!iso) return '—'
   return new Date(iso).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'short' })

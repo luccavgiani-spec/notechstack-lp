@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { ColunasDiarias } from './ColunasDiarias'
 import { SeletorPeriodo } from './MarketingLayout'
-import { custoPor, dataCompleta, dataHora, inteiro, numeroDecimal, pct, reais, reaisEixo } from './format'
+import { custoPor, dataCompleta, dataHora, inteiro, numeroDecimal, pct, reais, reaisEixo, tituloPeriodo } from './format'
 import { type Metricas, type VisaoGeral, marketing } from './marketing-service'
 import { BlocoIndisponivel, Carregando, Erro, Secao, Vazio, botaoSecundario, tabela, td, tdNum, th } from './ui'
 import { useDados } from './useDados'
@@ -277,10 +277,10 @@ export function OverviewPage() {
       {dados ? (
         <div className={`space-y-6 transition-opacity ${carregando ? 'opacity-60' : ''}`} aria-busy={carregando}>
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-            <p>
-              <strong>{dados.periodo.rotulo}</strong>: {dataCompleta(dados.periodo.de)} a {dataCompleta(dados.periodo.ate)}
-              <span className="text-cinza"> · gerado em {dataHora(dados.gerado_em)}</span>
-            </p>
+            <div>
+              <h2 className="text-lg font-semibold tracking-[-0.01em]">{tituloPeriodo(dados.periodo)}</h2>
+              <p className="text-xs text-cinza">gerado em {dataHora(dados.gerado_em)}</p>
+            </div>
             <button type="button" className={botaoSecundario} onClick={() => setForcar((n) => n + 1)} disabled={carregando}>
               Buscar números frescos (sem cache)
             </button>
