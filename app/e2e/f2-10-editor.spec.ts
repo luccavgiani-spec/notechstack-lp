@@ -88,11 +88,11 @@ test.describe('F2-10 · cenário B', () => {
     const downloads: string[] = []
     clientPage.on('download', d => downloads.push(d.suggestedFilename()))
     await clientPage.getByRole('button', { name: 'Enviar para análise' }).click()
-    await expect(clientPage.getByText('Pacote privado enviado para análise.', { exact: false })).toBeVisible()
-    await expect.poll(() => downloads.length).toBe(4)
-    expect(downloads.sort()).toEqual(['editor.cfg','editor.css','editor.md','manifest.json'])
+    await expect(clientPage.getByText('Ajustes enviados para a Nó.', { exact: false })).toBeVisible()
     await clientPage.getByRole('button', { name: 'Enviar para análise' }).click()
-    await expect(clientPage.getByText('Este mesmo pacote já estava recebido;', { exact: false })).toBeVisible()
+    await expect(clientPage.getByText('Esses mesmos ajustes já tinham sido enviados;', { exact: false })).toBeVisible()
+    // The package goes straight to the Nó dashboard; the client never handles files.
+    expect(downloads).toEqual([])
     const { data: exports, error: exportError } = await f.admin.from('editor_exports').select('id,content_sha256,files_ready_at').eq('project_id', f.projectId)
     if (exportError) throw exportError
     expect(exports).toHaveLength(1)

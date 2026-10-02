@@ -67,6 +67,7 @@ export type ProjectVersion = {
 export type EditorChecklistGroup = {
   screen: string
   component: string
+  label?: string | null
   changes: Array<{ before: Record<string, JsonValue>; after: Record<string, JsonValue> }>
 }
 

@@ -494,7 +494,7 @@ function VersionsModule({ versions }: { versions: ProjectVersion[] }) {
                       key={`${group.screen}:${group.component}`}
                     >
                       <span className="font-semibold">
-                        {group.screen} / {group.component}
+                        {group.screen} / {group.label ?? group.component}
                       </span>
                       <span className="text-cinza">
                         {' '}

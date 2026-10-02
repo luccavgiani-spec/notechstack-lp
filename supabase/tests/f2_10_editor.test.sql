@@ -116,6 +116,75 @@ select throws_ok($$select public.list_admin_editor_exports('f2300000-0000-4000-8
   '42501','NO_ADMIN_REQUIRED','security: client cannot use administrative exports RPC');
 reset role;
 
+-- Submissions reach the Nó activity feed, attributed to the client.
+select is((select count(*)::integer from public.activity_events
+  where type='editor.export_submitted' and project_id='f2300000-0000-4000-8000-000000000001'
+    and actor_id='f2100000-0000-4000-8000-000000000001'),2,'feed: each new export emits editor.export_submitted once');
+
+-- Automatic components ("*") and layout fields.
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"f2100000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"CLIENT"}}',true);
+select throws_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"screen":"Honorários","component":"auto:#valores/p.1","after":{"text":"x"}}]','{}','auto-without-wildcard')$$,
+  '22023','EDITOR_COMPONENT_NOT_ALLOWED','auto: automatic ids need "*" in the allowlist');
+select lives_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"screen":"home","component":"cta","before":{"x":"0"},"after":{"x":"24","y":"-8","width":""}}]','{}','layout-mapped')$$,
+  'layout: move and resize are accepted for mapped components');
+select throws_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"component":"cta","after":{"x":"99999"}}]','{}','layout-out-of-range')$$,
+  '22023','EDITOR_VALUES_INVALID','layout: out-of-range position is rejected');
+select throws_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"component":"cta","after":{"width":"abc"}}]','{}','layout-not-numeric')$$,
+  '22023','EDITOR_VALUES_INVALID','layout: non-numeric size is rejected without a cast error');
+reset role;
+
+update public.editor_version_configs
+set allowed_components = allowed_components || '[{"id":"*","controls":["text","color"]}]'
+where version_id='f2400000-0000-4000-8000-000000000001';
+
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"f2100000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"CLIENT"}}',true);
+select lives_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"screen":"Honorários","component":"auto:#valores/div.1/p.2","label":"Texto “Sessões de 50 minutos”","before":{"text":"Sessões de 50 minutos"},"after":{"text":"Sessões de 60 minutos","color":"#123456"}}]',
+  '{}','auto-export')$$,'auto: wildcard accepts automatic ids with label and before');
+select throws_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"component":"auto:#valores/p.1","after":{"size":"20"}}]','{}','auto-disallowed-control')$$,
+  '22023','EDITOR_VALUES_INVALID','auto: wildcard controls still apply');
+select throws_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"component":"auto:<script>","after":{"text":"x"}}]','{}','auto-bad-id')$$,
+  '22023','EDITOR_COMPONENT_NOT_ALLOWED','auto: malformed automatic ids are rejected');
+select throws_ok($$select public.submit_client_editor_export(
+  'f2300000-0000-4000-8000-000000000001','f2400000-0000-4000-8000-000000000001',
+  '[{"component":"*","after":{"text":"x"}}]','{}','auto-star')$$,
+  '22023','EDITOR_COMPONENT_NOT_ALLOWED','auto: the wildcard itself is not a component');
+reset role;
+
+select is((select items->0->>'label' from public.editor_export_checklists checklist
+  join public.editor_exports export on export.id = checklist.export_id where export.request_id='auto-export'),
+  'Texto “Sessões de 50 minutos”','auto: checklist keeps the readable label');
+select is((select items->0->'changes'->0->'before'->>'text' from public.editor_export_checklists checklist
+  join public.editor_exports export on export.id = checklist.export_id where export.request_id='auto-export'),
+  'Sessões de 50 minutos','auto: checklist keeps the original value');
+
+update public.editor_exports set files_ready_at = now() where request_id='auto-export';
+select set_config('test.auto_export', (select id::text from public.editor_exports where request_id='auto-export'), true);
+update public.projects set project_status='EM_REVISAO_CLIENTE' where id='f2300000-0000-4000-8000-000000000001';
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"f2100000-0000-4000-8000-000000000002","role":"authenticated","app_metadata":{"role":"NO_ADMIN"}}',true);
+select lives_ok($$select public.ingest_editor_export(current_setting('test.auto_export')::uuid,'auto-ingest')$$,
+  'auto: admin ingests the automatic export');
+reset role;
+select is((select count(*)::integer from public.kanban_items
+  where project_id='f2300000-0000-4000-8000-000000000001' and title='Editor — Honorários / Texto “Sessões de 50 minutos”'),1,
+  'auto: Kanban card is named by the label, not the DOM path');
+
 select is((select public from storage.buckets where id='editor-exports'),false,'security: export bucket stays private');
 select is((select count(*)::integer from pg_policies where schemaname='storage' and tablename='objects' and policyname='editor_exports_client_upload'),1,'security: authenticated upload policy exists');
 select * from finish();

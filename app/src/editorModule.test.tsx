@@ -32,6 +32,7 @@ const config = {
 async function selectInPreview(
   user: ReturnType<typeof userEvent.setup>,
   componentId: string,
+  extra: Record<string, unknown> = {},
 ) {
   const modeButton = await screen.findByRole('button', { name: /Modo editor/ })
   if (modeButton.getAttribute('aria-pressed') !== 'true') await user.click(modeButton)
@@ -49,6 +50,7 @@ async function selectInPreview(
         projectId: 'project-1',
         baseVersionId: 'version-1',
         componentId,
+        ...extra,
       },
     }),
   )
@@ -105,8 +107,10 @@ describe('F2-10 Editor', () => {
     await user.click(screen.getByRole('button', { name: 'Enviar para análise' }))
     await waitFor(() => expect(mocks.submitEditorExport).toHaveBeenCalledWith('project-1', 'version-1', [expect.objectContaining({ screen: 'home', component: 'hero' })], expect.objectContaining({ files: ['editor.md', 'editor.cfg', 'editor.css', 'manifest.json'] })))
     expect(mocks.uploadEditorExportFiles).toHaveBeenCalledWith('project-1', 'sha-content', expect.objectContaining({ 'editor.md': expect.any(String), 'editor.cfg': expect.any(String), 'editor.css': expect.any(String), 'manifest.json': expect.any(String) }))
-    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalledTimes(4)
     expect(mocks.finalizeEditorExport).toHaveBeenCalledWith('export-1')
+    expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
+    expect(URL.createObjectURL).not.toHaveBeenCalled()
+    expect(await screen.findByRole('status')).toHaveTextContent('Ajustes enviados para a Nó')
   })
 
   it('preserva o rascunho quando o envio falha', async () => {
@@ -178,4 +182,54 @@ describe('F2-10 Editor', () => {
     expect(screen.queryByRole('button', { name: 'Honorários' })).not.toBeInTheDocument()
   })
 
+  it('modo automático aceita qualquer elemento do preview e envia rótulo, antes e depois', async () => {
+    mocks.loadEditorConfig.mockResolvedValue({
+      ...config,
+      allowedComponents: [...config.allowedComponents, { id: '*', controls: ['text', 'size', 'color', 'logo'] }],
+    })
+    const user = userEvent.setup()
+    render(<EditorModule projectId="project-1" />)
+    const autoId = 'auto:#valores/div.1/p.2'
+    await selectInPreview(user, autoId, {
+      meta: { label: 'Texto “Sessões de 50 minutos”', screen: 'Honorários', controls: ['text', 'color'] },
+      original: { text: 'Sessões de 50 minutos', color: '#333333', size: '16' },
+    })
+    expect(await screen.findByText('Texto “Sessões de 50 minutos”', { selector: 'strong' })).toBeVisible()
+    expect(screen.queryByLabelText(`Tamanho ${autoId}`)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(`Logo ${autoId}`)).not.toBeInTheDocument()
+    await user.type(screen.getByLabelText(`Texto ${autoId}`), 'Sessões de 60 minutos')
+    await user.click(screen.getByRole('button', { name: 'Enviar para análise' }))
+
+    await waitFor(() => expect(mocks.submitEditorExport).toHaveBeenCalled())
+    expect(mocks.submitEditorExport.mock.calls[0][2]).toEqual([{
+      screen: 'Honorários',
+      component: autoId,
+      label: 'Texto “Sessões de 50 minutos”',
+      before: { text: 'Sessões de 50 minutos' },
+      after: { text: 'Sessões de 60 minutos' },
+    }])
+    const files = mocks.uploadEditorExportFiles.mock.calls[0][2] as Record<string, string>
+    expect(files['editor.md']).toContain('"Sessões de 50 minutos" → "Sessões de 60 minutos"')
+    expect(files['editor.md']).toContain('#valores > div:nth-of-type(1) > p:nth-of-type(2)')
+  })
+
+  it('sem "*" na allowlist, elementos automáticos são ignorados', async () => {
+    const user = userEvent.setup()
+    render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'auto:#valores/h2.1', { meta: { label: 'Título' } })
+    expect(await screen.findByText(/Selecione um texto/)).toBeVisible()
+    expect(screen.queryByLabelText('Texto auto:#valores/h2.1')).not.toBeInTheDocument()
+  })
+
+  it('arrastar e redimensionar também vão para a Nó', async () => {
+    const user = userEvent.setup()
+    render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'cta', { original: { text: 'Agendar', x: '0', y: '0' } })
+    await selectInPreview(user, 'cta', { type: 'NO_EDITOR_CHANGE', changes: { x: '24', y: '-8' } })
+    await user.click(screen.getByRole('button', { name: 'Enviar para análise' }))
+    await waitFor(() => expect(mocks.submitEditorExport).toHaveBeenCalled())
+    expect(mocks.submitEditorExport.mock.calls[0][2]).toEqual([
+      expect.objectContaining({ component: 'cta', before: { x: '0', y: '0' }, after: { x: '24', y: '-8' } }),
+    ])
+  })
 })
