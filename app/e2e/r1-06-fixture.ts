@@ -2,10 +2,12 @@ import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { cadastrarTotp } from './mfa'
 
 export type R106Fixture = {
   admin: SupabaseClient
   adminEmail: string
+  adminTotp: string
   clientEmail: string
   password: string
   adminId: string
@@ -72,7 +74,9 @@ export async function createR106Fixture(): Promise<R106Fixture> {
   if (kanbanError) throw kanbanError
   await admin.from('activity_events').delete().eq('project_id', projectId)
 
-  return { admin, adminEmail, clientEmail, password, adminId, clientId, tenantId, projectId }
+  // NO_ADMIN precisa de TOTP desde o hub de marketing (C2).
+  const adminTotp = await cadastrarTotp(adminEmail, password)
+  return { admin, adminEmail, adminTotp, clientEmail, password, adminId, clientId, tenantId, projectId }
 }
 
 export async function cleanupR106Fixture(fixture: R106Fixture | undefined) {

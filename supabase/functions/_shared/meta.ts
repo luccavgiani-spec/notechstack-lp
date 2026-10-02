@@ -1,9 +1,11 @@
-// Cliente mínimo pro Graph API v21.0 com retry exponencial em 429/5xx.
+// Cliente mínimo pro Graph API com retry exponencial em 429/5xx.
 // Meta limita ~200 calls/h por user token; qualquer 429 aqui dispara backoff.
 
 import { log } from "./logger.ts";
 
-export const GRAPH_API_VERSION = "v21.0";
+// v21.0 da Marketing API expirou em 09/09/2025 (changelog de versões da Meta).
+// meta-capi, pagarme-webhook-no e send-lead-email têm a versão própria e não usam esta.
+export const GRAPH_API_VERSION = "v25.0";
 export const GRAPH_BASE = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
 export const META_APP_ID = "1590026522084626";
 

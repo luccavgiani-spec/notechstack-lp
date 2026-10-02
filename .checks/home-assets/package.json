@@ -1,0 +1,6 @@
+{
+  "name": "no-home-assets",
+  "private": true,
+  "scripts": {"build": "node build.cjs"},
+  "devDependencies": {"clean-css": "5.3.3", "purgecss": "8.0.0"}
+}

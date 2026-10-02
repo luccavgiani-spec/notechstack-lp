@@ -2,10 +2,12 @@ import { execFileSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { cadastrarTotp } from './mfa'
 
 export type F311Fixture = {
   admin: SupabaseClient
   adminEmail: string
+  adminTotp: string
   clientEmail: string
   password: string
   adminId: string
@@ -86,7 +88,9 @@ export async function createF311Fixture(): Promise<F311Fixture> {
   ]).select('id')
   if (installmentsError || !installments) throw installmentsError ?? new Error('F3-11 installments were not created')
   await admin.from('activity_events').delete().eq('project_id', projectId)
-  return { admin, adminEmail, clientEmail, password, adminId, clientUserId, clientId, leadId, projectId, projectName, installmentIds: installments.map(({ id }) => id) }
+  // NO_ADMIN precisa de TOTP desde o hub de marketing (C2).
+  const adminTotp = await cadastrarTotp(adminEmail, password)
+  return { admin, adminEmail, adminTotp, clientEmail, password, adminId, clientUserId, clientId, leadId, projectId, projectName, installmentIds: installments.map(({ id }) => id) }
 }
 
 export async function cleanupF311Fixture(fixture: F311Fixture | undefined) {

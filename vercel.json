@@ -2,36 +2,236 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "trailingSlash": true,
   "rewrites": [
-    { "source": "/", "destination": "/lp-narrador/cenas-lp/lp-v8.html" }
+    {
+      "source": "/",
+      "destination": "/lp-narrador/cenas-lp/lp-v8.html"
+    }
   ],
   "headers": [
     {
       "source": "/lp-narrador/cenas-lp/(lp-v3|lp-v5|lp-v7|painel-leads|parede-editorial|RASTREIO-lp-v5|_mobile-harness)\\.html",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/(preview-mobile|roteador-jornada-v3)\\.html",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/roteador/(roteador-lp-v2\\.html|roteador-lp-teste-videos)(.*)",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/(.*)\\.md",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     },
     {
       "source": "/(assets|brand/og|brand/logo|brand/lockup|brand/favicon)/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
     },
     {
       "source": "/lp-narrador/cenas-lp/(historia/img|historia/logos-clientes|sheets|assets)/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=86400" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, stale-while-revalidate=86400"
+        }
+      ]
     },
     {
       "source": "/brand/fonts/(.*)\\.woff2",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/lp-narrador/cenas-lp/lp-v7.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/lp-narrador/cenas-lp/lp-v7.html/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/servicos/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/servicos/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/servicos/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/sistemas-sob-medida/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/sistemas-sob-medida/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/sistemas-sob-medida/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/desenvolvimento-de-aplicativos/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/desenvolvimento-de-aplicativos/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/desenvolvimento-de-aplicativos/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/paineis-empresariais/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/paineis-empresariais/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/paineis-empresariais/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/integracoes-e-automacoes/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/integracoes-e-automacoes/:path*",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/integracoes-e-automacoes/:path*/",
+      "destination": "/agencia/#solucoes",
+      "permanent": true
+    },
+    {
+      "source": "/cases/",
+      "destination": "/#clientes",
+      "permanent": true
+    },
+    {
+      "source": "/cases/:path*",
+      "destination": "/#clientes",
+      "permanent": true
+    },
+    {
+      "source": "/cases/:path*/",
+      "destination": "/#clientes",
+      "permanent": true
+    },
+    {
+      "source": "/conteudos/",
+      "destination": "/#como-funciona",
+      "permanent": true
+    },
+    {
+      "source": "/conteudos/:path*",
+      "destination": "/#como-funciona",
+      "permanent": true
+    },
+    {
+      "source": "/conteudos/:path*/",
+      "destination": "/#como-funciona",
+      "permanent": true
+    },
+    {
+      "source": "/roteador/",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/roteador/:path*",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/roteador/:path*/",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/Roteador/",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/Roteador/:path*",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/Roteador/:path*/",
+      "destination": "/health/",
+      "permanent": true
+    },
+    {
+      "source": "/diagnostico-de-sistema/",
+      "destination": "/contato/",
+      "permanent": true
+    },
+    {
+      "source": "/diagnostico-de-sistema/:path*",
+      "destination": "/contato/",
+      "permanent": true
+    },
+    {
+      "source": "/diagnostico-de-sistema/:path*/",
+      "destination": "/contato/",
+      "permanent": true
     }
   ]
 }

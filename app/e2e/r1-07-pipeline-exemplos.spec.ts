@@ -2,12 +2,14 @@ import { expect, test, type Page } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 import { cleanupR107Fixture, createR107Fixture, setHelloAccessOffset, type R107Fixture } from './r1-07-fixture'
+import { concluirMfa } from './mfa'
 
-async function login(page: Page, email: string, password: string) {
+async function login(page: Page, email: string, password: string, totpSecret?: string) {
   await page.goto('/login')
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill(password)
   await page.getByRole('button', { name: 'Entrar' }).click()
+  if (totpSecret) await concluirMfa(page, totpSecret)
   await expect(page).not.toHaveURL(/\/login$/)
 }
 
@@ -58,7 +60,7 @@ test.describe('R1-07 · pipeline e exemplos', () => {
     await page.screenshot({ path: path.join(evidenceDir, `c8-${testInfo.project.name}.png`), fullPage: true })
 
     await page.evaluate(() => localStorage.clear())
-    await login(page, fixture.adminEmail, fixture.password)
+    await login(page, fixture.adminEmail, fixture.password, fixture.adminTotp)
     await page.goto(`/no/projetos/${fixture.helloProjectId}`)
     await expect(page.getByRole('heading', { name: 'Hello Best — Projeto em produção' })).toBeVisible()
     await expect(page.getByText('https://hello-best.lovable.app', { exact: true })).toBeVisible()

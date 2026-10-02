@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="only light">
 <!-- Google Tag Manager: mesmo container da home e do Roteador. -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -38,7 +39,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="stylesheet" href="/shared/brand-derived.css">
 <!-- tokens da vertical DEPOIS da base (BRAND-HEALTH.md §Tokens) -->
 <link rel="stylesheet" href="/health/brand/tokens-health.css">
-<link rel="stylesheet" href="/shared/pillnav.css">
+
 <link rel="stylesheet" href="/shared/transitions.css"><style>
 /* ─── nó health · identidade v2 ───
    Base: brand/tokens/tokens.css · vertical: health/brand/tokens-health.css.
@@ -141,11 +142,6 @@ button{font-family:inherit}
 .hero-sub{font-family:var(--font);font-weight:300;font-size:clamp(18px,1.9vw,23px);line-height:1.5;color:var(--mid);max-width:60ch;margin-top:30px;opacity:0;transform:translateY(20px);transition:opacity .7s ease .65s,transform .7s ease .65s}
 .hero-sub .brand{color:var(--green);display:inline;line-height:inherit;position:relative;top:.04em;font-size:1.12em;margin:0 .02em}
 .hero-screen.in .hero-sub{opacity:1;transform:translateY(0)}
-
-/* ─── Custom cursor ─── */
-.cursor{width:10px;height:10px;background:var(--health-accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .12s ease,background .2s;mix-blend-mode:multiply;left:-50px;top:-50px}
-.cursor-ring{width:38px;height:38px;border:1.5px solid var(--health-accent);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .22s ease;opacity:.45;left:-50px;top:-50px}
-@media(hover:none),(max-width:768px){.cursor,.cursor-ring{display:none}}
 
 /* ─── Scroll progress bar (top) ─── */
 .scroll-progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--green);z-index:9999;transition:width .08s ease;will-change:width}
@@ -610,6 +606,10 @@ footer .ft-right a:hover{color:var(--health-link)}
 #cta-form .ctaf-submit:active{background:#2a8459}
 #cta-form .ctaf-submit:disabled{background:#8bcbac;cursor:not-allowed}
 </style>
+<link rel="stylesheet" href="/shared/card-nav.css">
+<link rel="stylesheet" href="/shared/site-layout.css">
+<script src="/shared/card-nav.js" defer></script>
+<link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
@@ -621,14 +621,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="brand-topbar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
 
 <!-- Cursor -->
-<div class="cursor" id="cur"></div>
-<div class="cursor-ring" id="curR"></div>
 
 <!-- Top scroll progress -->
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- PILL NAV (floating, primary navigation) -->
-<div id="pill-nav-root"></div>
+<!-- site-nav:start -->
+<nav class="no-card-nav" aria-label="Navegação principal"><div class="no-card-top"><button class="no-card-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="no-card-panel"><span></span><span></span></button><a class="no-card-brand" href="/" aria-label="Nó — página inicial"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="46" height="30"></a><div class="no-card-toplinks"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/contato/">Contato</a></div></div><div id="no-card-panel" class="no-card-panel" aria-hidden="true" inert><div class="no-card-panel-inner"><div class="no-card-grid"><div class="no-card"><b>Home</b><div><a href="/">Conheça a Nó</a><a href="/#como-funciona">Como funciona</a><a href="/#clientes">Nossos clientes</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/health/">nó.health</a></div></div><div class="no-card"><b>Agência</b><div><a href="/agencia/#solucoes">Soluções</a><a href="/agencia/#como-funciona">Como funciona</a><a href="/agencia/#organizacao">Organização</a><a href="/agencia/#acompanhamento">Acompanhamento</a><a href="/agencia/#empresas">Empresas</a></div></div><div class="no-card"><b>Contato</b><div><a href="/contato/">Conte sua ideia</a><a href="/agencia/#contato">Parceria com agências</a></div></div></div></div></div></nav>
+<!-- site-nav:end -->
 
 <!-- Hero side dots (desktop only, visible during hero) -->
 <nav class="hero-dots" id="heroDots" aria-label="Telas do hero">
@@ -821,7 +821,7 @@ compliance</div>
         <li>Compliance CFM e LGPD resolvidos por desenho</li>
         <li>Operação completa rodando no go-live</li>
       </ul>
-      <a href="/roteador/" class="opt-cta">Conhecer o Roteador →</a>
+      <a href="/contato/" class="opt-cta">Conversar sobre o Roteador →</a>
     </div>
 
     <!-- Card 3 — Integração com Plataforma Existente -->
@@ -934,43 +934,22 @@ compliance</div>
 </section>
 
 <!-- ═══════════════ Footer ═══════════════ -->
-<footer>
-  <div>
-    <div class="ft-logo">
-      <!-- rodapé usa o logo `nó.` com ponto verde, não o lockup nó.health
-           (BRAND-HEALTH.md §Lockup: lockup só em primeiro contato) -->
-      <img src="/brand/logo/svg/no-branca-ponto-verde.svg" alt="nó" width="61" height="36" style="height:36px;width:auto;object-fit:contain">
-    </div>
-    <div class="ft-tag">Telemedicina que <span class="hl-word">encaixa</span> na sua rotina.</div>
-    <!-- rodapé da marca-mãe: 4 pontos + nó · @notechstack (BRAND.md §7) -->
-    <div style="display:flex;align-items:center;gap:12px;margin-top:18px">
-      <span class="brand-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-      <span class="mono-label" style="color:rgba(255,255,255,.55)">nó · @notechstack</span>
-    </div>
+<!-- site-footer:start -->
+<footer class="no-site-footer">
+  <div class="ft-brand">
+    <a class="ft-logo" href="/" aria-label="Nó — página inicial"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="198" height="27"></a>
+    <div class="ft-txt">IA que arquiteta, integra e opera.</div>
+    <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
   </div>
-  <div class="ft-right">
-    <a href="/">Home</a>
-    <a href="#cta-form" data-scroll-form>Contato</a>
-    <a href="/#faq">FAQ geral</a>
-    <span>© 2026 <span class="brand">nó</span></span>
-  </div>
+  <nav class="ft-nav" aria-label="Mapa do site"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/health/">nó.health</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/sobre/">Sobre a Nó</a><a href="/contato/">Conte sua ideia</a></nav>
+  <div class="ft-legal ft-txt"><div class="ft-legal-links"><a href="/termos/" class="ft-link">Termos de uso</a><span aria-hidden="true"> · </span><a href="/privacidade/" class="ft-link">Privacidade e cookies</a></div><div>© 2026 nó. Todos os direitos reservados.</div></div>
 </footer>
+<!-- site-footer:end -->
 
 <!-- Mobile fixed CTA -->
 <a href="#cta-form" class="mobile-cta-fixed" data-scroll-form>Falar com a nó →</a>
 
-<script type="module">
-  import { initPillNav } from '/shared/pillnav.js';
-  import { pillNavConfig } from '/shared/pillnav-config.js';
 
-  initPillNav(document.getElementById('pill-nav-root'), {
-    ...pillNavConfig,
-    // nav da vertical usa o `nó.` de ponto VERDE, não o lockup nó.health
-    // (BRAND-HEALTH.md §Lockup) nem o mark âmbar da marca-mãe
-    logo: '/health/brand/favicon/favicon-dark.svg',
-    activeHref: '/health/'
-  });
-</script>
 <script src="/health/brand-icons.js" defer></script>
 <script src="/health/main.js" defer></script>
 <script type="module">
@@ -1053,6 +1032,7 @@ compliance</div>
     });
   }
 </script>
-<script src="/shared/glow-cursor.js?v=1" defer></script>
+
+<script src="/shared/smooth-cursor.js?v=1" defer></script>
 </body>
 </html>

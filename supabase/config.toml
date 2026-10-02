@@ -1,5 +1,8 @@
 project_id = "sdeowbqmwkwseyktyemn"
 
+[functions.save-lead-progress]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
@@ -42,6 +45,15 @@ additional_redirect_urls = ["https://*.notechstack.com.br", "http://localhost:*/
 jwt_expiry = 3600
 enable_signup = false
 
+# MFA TOTP obrigatório para NO_ADMIN (hub-marketing-agentes, C2): o app exige aal2
+# em /no/* e a marketing-hub recusa sessão aal1 do NO_ADMIN.
+[auth.mfa]
+max_enrolled_factors = 10
+
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
+
 [edge_runtime]
 enabled = true
 policy = "per_worker"
@@ -50,20 +62,7 @@ inspector_port = 8083
 [analytics]
 enabled = false
 
-# Per-function config. oauth-callback is called by Meta via browser redirect,
-# so JWT verification must be disabled.
-[functions.oauth-callback]
-verify_jwt = false
-
-[functions.sync-meta-ads]
-verify_jwt = true
-
-[functions.sync-meta-organic]
-verify_jwt = true
-
-[functions.refresh-tokens]
-verify_jwt = true
-
+# Per-function config.
 [functions.roadmap-checkout]
 verify_jwt = false
 
@@ -81,3 +80,8 @@ verify_jwt = true
 
 [functions.project-publish-version]
 verify_jwt = true
+
+# marketing-hub valida a sessão ela mesma (papel + aal2 via auth.getUser) e a rota
+# /internal/publish-due é chamada pelo pg_cron com x-cron-secret, sem JWT.
+[functions.marketing-hub]
+verify_jwt = false

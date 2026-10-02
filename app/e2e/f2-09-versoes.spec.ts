@@ -1,11 +1,13 @@
 import { expect, test, type Page } from '@playwright/test'
 import { cleanupF209Fixture, createF209Fixture, type F209Fixture } from './f2-09-fixture'
+import { concluirMfa } from './mfa'
 
-async function login(page: Page, email: string, password: string) {
+async function login(page: Page, email: string, password: string, totpSecret?: string) {
   await page.goto('/login')
   await page.getByLabel('E-mail').fill(email)
   await page.getByLabel('Senha').fill(password)
   await page.getByRole('button', { name: 'Entrar' }).click()
+  if (totpSecret) await concluirMfa(page, totpSecret)
   await expect(page).not.toHaveURL(/\/login$/)
 }
 
@@ -36,7 +38,7 @@ test.describe('F2-09 · ciclo de versões', () => {
     page.on('pageerror', (error) => failures.push(error.message))
     page.on('response', (response) => { if (response.status() >= 500) failures.push(`${response.status()} ${response.url()}`) })
 
-    await login(page, fixture.adminEmail, fixture.password)
+    await login(page, fixture.adminEmail, fixture.password, fixture.adminTotp)
     await expect(page).toHaveURL(/\/no\/projetos$/)
     await page.goto(`/no/projetos/${fixture.projectId}`)
     await expect(page.getByText('Estado atual: Agendado')).toBeVisible()

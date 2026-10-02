@@ -1,0 +1,32 @@
+/* Preserve the authored palette, including in browsers with automatic darkening. */
+:root{color-scheme:only light}
+/* Shared home footer. Scoped rules isolate it from each page's legacy styles. */
+footer.no-site-footer{box-sizing:border-box;background:#141414;color:#fff;padding:52px 60px;border-top:1px solid #ffffff12;display:flex;align-items:center;justify-content:space-between;gap:32px;font-family:Sora,sans-serif;font-weight:400;line-height:1.6;text-align:left;width:100%}
+.no-site-footer *{box-sizing:border-box}
+.no-site-footer .ft-brand{display:flex;flex-direction:column;align-items:flex-start;gap:9px;flex-shrink:0}
+.no-site-footer .ft-logo{display:block}
+.no-site-footer .ft-logo img{display:block;width:198px;height:27px;object-fit:contain}
+.no-site-footer .ft-txt{font-family:Sora,sans-serif;font-size:12px;color:#ffffff9e}
+.no-site-footer .ft-whatsapp{display:inline-flex;align-items:center;gap:12px;margin-top:9px;padding:10px 16px;border:1px solid #ffffff59;border-radius:999px;color:#fff;text-decoration:none;font-family:Sora,sans-serif;font-size:13px;font-weight:700}
+.no-site-footer .ft-whatsapp:hover{background:#1d9c5a;border-color:#1d9c5a}
+.no-site-footer .ft-nav{position:static;transform:none;background:none;border:0;box-shadow:none;padding:0;margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 18px;max-width:520px;width:auto;font-family:Sora,sans-serif;font-size:13px}
+.no-site-footer .ft-nav a{color:#ffffffc7;text-decoration:none;border-bottom:1px solid transparent}
+.no-site-footer .ft-nav a:hover{color:#fff;border-bottom-color:#eda33b}
+.no-site-footer .ft-legal{display:flex;flex-direction:column;align-items:flex-end;gap:7px;text-align:right}
+.no-site-footer .ft-legal-links{display:flex;align-items:center;gap:2px;flex-wrap:wrap;justify-content:flex-end}
+.no-site-footer .ft-link{color:#ffffff9e;text-decoration:none;border-bottom:1px solid #ffffff2e}
+.no-site-footer a:focus-visible{outline:2px solid #eda33b;outline-offset:4px}
+.no-card-nav{line-height:1.5;letter-spacing:normal;text-transform:none}
+.no-card-nav a{font-family:Sora,sans-serif;font-weight:400}
+.no-card-nav .no-card-toplinks a{font-weight:600}
+.no-card-nav~.lg-wrap{padding-top:110px}
+html.lg-embed .no-card-nav,html.lg-embed .no-site-footer{display:none}
+html.lg-embed .no-card-nav~.lg-wrap{padding-top:0}
+/* The digital collaborators runtime otherwise fixes its root to one viewport,
+   leaving the shared footer underneath overflowing page content. */
+body #dc-root,body #dc-root>.sc-host{height:auto}
+@media(max-width:900px){footer.no-site-footer{flex-direction:column;gap:22px;text-align:center;padding:36px 20px}.no-site-footer .ft-brand,.no-site-footer .ft-legal{align-items:center;text-align:center}.no-site-footer .ft-legal-links{justify-content:center}}
+
+.home-form .home-consent{display:flex;align-items:flex-start;gap:10px;margin:20px 0 0;font-size:12px;line-height:1.6;font-weight:400}
+.home-form .home-consent input[type="checkbox"]{appearance:auto;width:18px;height:18px;min-height:0;flex:0 0 18px;margin:3px 0 0;padding:0;accent-color:var(--no-verde,#30A46C)}
+.home-form .home-consent a{color:inherit;text-decoration:underline;text-underline-offset:3px}

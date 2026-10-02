@@ -13,6 +13,18 @@ const AdminProjectsPage = lazy(() => import('./admin-dashboard/AdminDashboardPag
 const SaldosPage = lazy(() => import('./pages/SaldosPage').then(m => ({ default: m.SaldosPage })))
 const ArchiveLibraryPage = lazy(() => import('./pages/ArchiveLibraryPage').then(m => ({ default: m.ArchiveLibraryPage })))
 const SchedulePage = lazy(() => import('./pages/SchedulePage').then(m => ({ default: m.SchedulePage })))
+const MarketingLayout = lazy(() => import('./marketing/MarketingLayout').then(m => ({ default: m.MarketingLayout })))
+const OverviewPage = lazy(() => import('./marketing/OverviewPage').then(m => ({ default: m.OverviewPage })))
+const CampaignsPage = lazy(() => import('./marketing/CampaignsPage').then(m => ({ default: m.CampaignsPage })))
+const CampaignDetailPage = lazy(() => import('./marketing/CampaignDetailPage').then(m => ({ default: m.CampaignDetailPage })))
+const NewMetaCampaignPage = lazy(() => import('./marketing/NewMetaCampaignPage').then(m => ({ default: m.NewMetaCampaignPage })))
+const NewGoogleCampaignPage = lazy(() => import('./marketing/NewGoogleCampaignPage').then(m => ({ default: m.NewGoogleCampaignPage })))
+const CalendarPage = lazy(() => import('./marketing/CalendarPage').then(m => ({ default: m.CalendarPage })))
+const LogPage = lazy(() => import('./marketing/LogPage').then(m => ({ default: m.LogPage })))
+const AgentPage = lazy(() => import('./marketing/AgentPage').then(m => ({ default: m.AgentPage })))
+const LeadsPage = lazy(() => import('./marketing/LeadsPage').then(m => ({ default: m.LeadsPage })))
+const ConnectionsPage = lazy(() => import('./marketing/ConnectionsPage').then(m => ({ default: m.ConnectionsPage })))
+const MarketingAccessPage = lazy(() => import('./marketing/MarketingAccessPage').then(m => ({ default: m.MarketingAccessPage })))
 
 const AgencyConsolePage = lazy(() => import('./agency/AgencyConsolePage').then(m => ({ default: m.AgencyConsolePage })))
 const AgencyManagementPage = lazy(() => import('./agency/AgencyManagementPage').then(m => ({ default: m.AgencyManagementPage })))
@@ -40,7 +52,27 @@ export function AppRoutes() {
         <Route path="/p/:projectId/editor" element={<ClientDashboardPage module="editor" />} />
         <Route path="/p/:projectId/versoes" element={<ClientDashboardPage module="versoes" />} />
         <Route path="/p/:projectId/marca" element={<Navigate to="../como-funciona" replace />} />
-        <Route path="/no/*" element={<RoleRoute role="NO_ADMIN" />}>
+        {/* Planner de marketing: Lucca (NO_ADMIN com aal2) e a conta do dot (MARKETING_AGENT). */}
+        <Route path="/no/marketing" element={<RoleRoute roles={['NO_ADMIN', 'MARKETING_AGENT']} requireAal2 />}>
+          <Route path="acesso" element={<MarketingAccessPage />} />
+          <Route element={<MarketingLayout />}>
+            <Route index element={<Navigate to="visao-geral" replace />} />
+            <Route path="visao-geral" element={<OverviewPage />} />
+            <Route path="campanhas" element={<CampaignsPage />} />
+            <Route path="campanhas/nova/meta" element={<NewMetaCampaignPage />} />
+            <Route path="campanhas/nova/google" element={<NewGoogleCampaignPage />} />
+            <Route path="campanhas/:plataforma/:campaignId" element={<CampaignDetailPage />} />
+            <Route path="calendario" element={<CalendarPage />} />
+            <Route path="registro" element={<LogPage />} />
+            <Route path="conexoes" element={<ConnectionsPage />} />
+            <Route element={<RoleRoute roles={['NO_ADMIN']} requireAal2 />}>
+              <Route path="dot" element={<AgentPage />} />
+              <Route path="leads" element={<LeadsPage />} />
+            </Route>
+            <Route path="*" element={<Navigate to="visao-geral" replace />} />
+          </Route>
+        </Route>
+        <Route path="/no/*" element={<RoleRoute roles={['NO_ADMIN']} requireAal2 />}>
           <Route path="projetos" element={<AdminProjectsPage />} />
           <Route path="agencias" element={<AgencyManagementPage />} />
           <Route path="projetos/:projectId" element={<AdminProjectDetailPage />} />

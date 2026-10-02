@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
+<meta name="color-scheme" content="only light">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Colaborador Digital | Nó Tech Stack</title>
 <meta name="description" content="Contrate, treine e promova um colaborador digital que aprende as tarefas da sua empresa e ganha autonomia sob sua supervisão.">
@@ -19,16 +20,18 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.notechstack.com.br/brand/og/og-colaboradores.png">
 <link rel="stylesheet" href="/brand/fonts/fonts.css">
-<link rel="stylesheet" href="/shared/products-nav.css">
+<link rel="stylesheet" href="/shared/card-nav.css">
+<link rel="stylesheet" href="/shared/site-layout.css">
+<script src="/shared/card-nav.js" defer></script>
 <script src="./support.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<link rel="stylesheet" href="/shared/smooth-cursor.css?v=1">
 </head>
 <body>
-<div id="products-nav-root"></div>
-<script type="module">
-import { initProductsNav } from "/shared/products-nav.js";
-initProductsNav(document.getElementById("products-nav-root"), {active:"/colaboradores-digitais/",contact:"https://wa.me/5511939289413"});
-</script>
+<!-- site-nav:start -->
+<nav class="no-card-nav" aria-label="Navegação principal"><div class="no-card-top"><button class="no-card-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="no-card-panel"><span></span><span></span></button><a class="no-card-brand" href="/" aria-label="Nó — página inicial"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="46" height="30"></a><div class="no-card-toplinks"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/contato/">Contato</a></div></div><div id="no-card-panel" class="no-card-panel" aria-hidden="true" inert><div class="no-card-panel-inner"><div class="no-card-grid"><div class="no-card"><b>Home</b><div><a href="/">Conheça a Nó</a><a href="/#como-funciona">Como funciona</a><a href="/#clientes">Nossos clientes</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/health/">nó.health</a></div></div><div class="no-card"><b>Agência</b><div><a href="/agencia/#solucoes">Soluções</a><a href="/agencia/#como-funciona">Como funciona</a><a href="/agencia/#organizacao">Organização</a><a href="/agencia/#acompanhamento">Acompanhamento</a><a href="/agencia/#empresas">Empresas</a></div></div><div class="no-card"><b>Contato</b><div><a href="/contato/">Conte sua ideia</a><a href="/agencia/#contato">Parceria com agências</a></div></div></div></div></div></nav>
+<!-- site-nav:end -->
+
 <x-dc>
 <helmet>
 <link rel="stylesheet" href="_ds/n-tech-stack-ec17ad1d-0f72-418f-a035-9131c5888184/styles.css">
@@ -500,16 +503,23 @@ a:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--no-ambar);outli
         </div>
       </div>
     </div>
-    <footer class="site-footer" style="border-top:1px solid var(--no-borda);margin-top:28px;padding:18px 0;display:flex;align-items:center;justify-content:space-between;max-width:1320px;width:100%;margin-left:auto;margin-right:auto">
-      <span style="display:flex;align-items:center;gap:14px"><span style="font-weight:800;font-size:20px;letter-spacing:-.05em">nó<span style="color:var(--no-verde)">.</span></span><span style="display:inline-flex;gap:4px"><i style="width:7px;height:7px;border-radius:50%;background:var(--no-azul)"></i><i style="width:7px;height:7px;border-radius:50%;background:var(--no-vermelho)"></i><i style="width:7px;height:7px;border-radius:50%;background:var(--no-ambar)"></i><i style="width:7px;height:7px;border-radius:50%;background:var(--no-verde)"></i></span></span>
-      <span style="font:400 11px/1 var(--font-mono,monospace);color:var(--no-cinza)">© 2026 nó tech stack · @notechstack</span>
-      <a href="{{waLink}}" target="_blank" rel="noopener" style="font-size:13px;font-weight:600;color:var(--no-tinta);text-decoration:none" style-hover="color:var(--no-verde)">WhatsApp ↗</a>
-    </footer>
+
   </section>
 
 </div>
 </div>
 </x-dc>
+<!-- site-footer:start -->
+<footer class="no-site-footer">
+  <div class="ft-brand">
+    <a class="ft-logo" href="/" aria-label="Nó — página inicial"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="198" height="27"></a>
+    <div class="ft-txt">IA que arquiteta, integra e opera.</div>
+    <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
+  </div>
+  <nav class="ft-nav" aria-label="Mapa do site"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/health/">nó.health</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/sobre/">Sobre a Nó</a><a href="/contato/">Conte sua ideia</a></nav>
+  <div class="ft-legal ft-txt"><div class="ft-legal-links"><a href="/termos/" class="ft-link">Termos de uso</a><span aria-hidden="true"> · </span><a href="/privacidade/" class="ft-link">Privacidade e cookies</a></div><div>© 2026 nó. Todos os direitos reservados.</div></div>
+</footer>
+<!-- site-footer:end -->
 <script type="text/x-dc" data-dc-script data-props="{&quot;whatsapp&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;5511939289413&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contato&quot;},&quot;girarCenas&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cenas 3D&quot;}}">
 class Component extends DCLogic {
   state = { menu: null };
@@ -790,174 +800,7 @@ class Component extends DCLogic {
   }, { once: true });
 })();
 </script>
-<script>
-(function () {
-  const initializedGrids = new WeakSet();
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const animationsDisabled = () => reducedMotion.matches || window.innerWidth <= 768;
 
-  const setupMagicBento = grid => {
-    if (initializedGrids.has(grid) || !window.gsap) return;
-    const cards = [...grid.querySelectorAll('[data-magic-bento-card]')];
-    if (cards.length !== 3) return;
-    initializedGrids.add(grid);
-    grid.dataset.magicBentoReady = '1';
-
-    const spotlight = document.createElement('div');
-    spotlight.className = 'pricing-spotlight';
-    document.body.appendChild(spotlight);
-
-    const clearParticles = card => {
-      card.querySelectorAll('.magic-particle').forEach(particle => {
-        window.gsap.killTweensOf(particle);
-        window.gsap.to(particle, { scale: 0, opacity: 0, duration: .24, ease: 'back.in(1.7)', onComplete: () => particle.remove() });
-      });
-    };
-
-    const createParticles = card => {
-      if (animationsDisabled() || card.querySelector('.magic-particle')) return;
-      const rect = card.getBoundingClientRect();
-      Array.from({ length: 12 }).forEach((_, index) => {
-        const particle = document.createElement('i');
-        particle.className = 'magic-particle';
-        particle.style.left = `${Math.random() * rect.width}px`;
-        particle.style.top = `${Math.random() * rect.height}px`;
-        card.appendChild(particle);
-        window.gsap.fromTo(particle,
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: .3, delay: index * .055, ease: 'back.out(1.7)' }
-        );
-        window.gsap.to(particle, {
-          x: (Math.random() - .5) * 90,
-          y: (Math.random() - .5) * 90,
-          rotation: Math.random() * 360,
-          opacity: .34,
-          duration: 2 + Math.random() * 1.8,
-          delay: index * .055,
-          ease: 'sine.inOut',
-          repeat: -1,
-          yoyo: true
-        });
-      });
-    };
-
-    const addRipple = (card, event) => {
-      if (animationsDisabled() || event.target.closest('a')) return;
-      const rect = card.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const radius = Math.max(
-        Math.hypot(x, y),
-        Math.hypot(x - rect.width, y),
-        Math.hypot(x, y - rect.height),
-        Math.hypot(x - rect.width, y - rect.height)
-      );
-      const ripple = document.createElement('i');
-      ripple.className = 'magic-ripple';
-      Object.assign(ripple.style, {
-        width: `${radius * 2}px`,
-        height: `${radius * 2}px`,
-        left: `${x - radius}px`,
-        top: `${y - radius}px`
-      });
-      card.appendChild(ripple);
-      window.gsap.fromTo(ripple, { scale: 0, opacity: 1 }, {
-        scale: 1,
-        opacity: 0,
-        duration: .8,
-        ease: 'power2.out',
-        onComplete: () => ripple.remove()
-      });
-    };
-
-    cards.forEach(card => {
-      const flipCard = card.hasAttribute('data-flip-card');
-      card.addEventListener('mouseenter', () => createParticles(card));
-      card.addEventListener('mousemove', event => {
-        if (animationsDisabled()) return;
-        const rect = card.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const dx = (x - rect.width / 2) / (rect.width / 2);
-        const dy = (y - rect.height / 2) / (rect.height / 2);
-        window.gsap.to(card, {
-          rotationX: dy * -5,
-          rotationY: dx * 5,
-          x: dx * 7,
-          y: dy * 7 - 4,
-          duration: .16,
-          ease: 'power2.out',
-          transformPerspective: 1000,
-          overwrite: 'auto'
-        });
-      });
-      card.addEventListener('mouseleave', () => {
-        clearParticles(card);
-        if (!animationsDisabled()) {
-          window.gsap.to(card, { rotationX: 0, rotationY: 0, x: 0, y: 0, duration: .32, ease: 'power2.out', overwrite: 'auto' });
-        }
-      });
-      card.addEventListener('click', event => {
-        if (flipCard && window.innerWidth <= 768 && !event.target.closest('a')) {
-          card.classList.toggle('is-flipped');
-          card.setAttribute('aria-label', card.classList.contains('is-flipped')
-            ? 'Oferta Jovem Aprendiz: zero reais por sete dias. Toque novamente para voltar ao plano Estagiário'
-            : 'Plano Estagiário. Toque para ver a oferta Jovem Aprendiz');
-        }
-        addRipple(card, event);
-      });
-      if (flipCard) {
-        card.addEventListener('keydown', event => {
-          if ((event.key === 'Enter' || event.key === ' ') && event.target === card) {
-            event.preventDefault();
-            card.classList.toggle('is-flipped');
-          }
-        });
-      }
-    });
-
-    grid.addEventListener('mousemove', event => {
-      if (animationsDisabled()) return;
-      let nearest = Infinity;
-      cards.forEach(card => {
-        const rect = card.getBoundingClientRect();
-        const relativeX = ((event.clientX - rect.left) / rect.width) * 100;
-        const relativeY = ((event.clientY - rect.top) / rect.height) * 100;
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const distance = Math.max(0, Math.hypot(event.clientX - centerX, event.clientY - centerY) - Math.max(rect.width, rect.height) / 2);
-        nearest = Math.min(nearest, distance);
-        const intensity = distance <= 150 ? 1 : distance <= 225 ? (225 - distance) / 75 : 0;
-        card.style.setProperty('--glow-x', `${relativeX}%`);
-        card.style.setProperty('--glow-y', `${relativeY}%`);
-        card.style.setProperty('--glow-intensity', intensity.toFixed(3));
-      });
-      window.gsap.to(spotlight, {
-        left: event.clientX,
-        top: event.clientY,
-        opacity: nearest <= 150 ? .72 : nearest <= 225 ? ((225 - nearest) / 75) * .72 : 0,
-        duration: .16,
-        ease: 'power2.out',
-        overwrite: 'auto'
-      });
-    });
-
-    grid.addEventListener('mouseleave', () => {
-      cards.forEach(card => card.style.setProperty('--glow-intensity', '0'));
-      window.gsap.to(spotlight, { opacity: 0, duration: .3, ease: 'power2.out', overwrite: 'auto' });
-    });
-  };
-
-  const hydrateMagicBento = () => document.querySelectorAll('.pricing-grid').forEach(setupMagicBento);
-  const observer = new MutationObserver(hydrateMagicBento);
-  observer.observe(document.documentElement, { childList: true, subtree: true });
-  if (document.readyState === 'complete') hydrateMagicBento();
-  window.addEventListener('load', () => {
-    hydrateMagicBento();
-    window.setTimeout(hydrateMagicBento, 500);
-    window.setTimeout(() => observer.disconnect(), 5000);
-  }, { once: true });
-})();
-</script>
+<script src="/shared/smooth-cursor.js?v=1" defer></script>
 </body>
 </html>

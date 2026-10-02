@@ -64,12 +64,12 @@ async function sha256(v: string): Promise<string> {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-/* Telefone precisa ir com código do país. O formulário coleta "(11) 99999-9999";
-   sem o 55 na frente o hash não casa com nada e o dado enviado é lixo. */
+/* Código do país tanto no CAPI quanto no link do e-mail. Números nacionais
+   têm 10/11 dígitos, inclusive os de DDD 55; com + o DDI já é explícito. */
 function normFone(v: string): string {
   const d = (v || '').replace(/\D/g, '')
   if (!d) return ''
-  if (d.startsWith('55')) return d
+  if ((v || '').trim().startsWith('+')) return d
   if (d.length >= 10 && d.length <= 11) return '55' + d
   return d
 }
@@ -128,8 +128,22 @@ async function mandarLeadCapi(o: {
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
+  if (req.method === 'GET' && new URL(req.url).searchParams.has('capabilities')) return json({attachments:true})
   try {
-    const b = await req.json()
+    const raw=await req.text()
+    if(raw.length>7200000)return json({success:false,error:'Arquivos excedem o limite.'},413)
+    const b = JSON.parse(raw)
+    const attachments: {filename:string,content:string}[]=[]
+    if(b.attachments!==undefined){
+      if(!Array.isArray(b.attachments)||b.attachments.length>5)return json({success:false,error:'Até 5 arquivos.'},400)
+      let total=0
+      for(const file of b.attachments){
+        if(typeof file?.filename!=='string'||typeof file?.content!=='string'||!/^.{1,180}\.(pdf|png|jpe?g|webp|txt|csv|docx|xlsx|pptx)$/i.test(file.filename)||/[\\/\r\n]/.test(file.filename)||!file.content.length||file.content.length%4!==0||!/^[A-Za-z0-9+/]+={0,2}$/.test(file.content))return json({success:false,error:'Arquivo inválido.'},400)
+        try{total+=atob(file.content).length}catch{return json({success:false,error:'Arquivo inválido.'},400)}
+        if(total>5*1024*1024)return json({success:false,error:'Limite de 5 MB.'},413)
+        attachments.push({filename:file.filename,content:file.content})
+      }
+    }
 
     /* os oito de sempre — as LPs antigas dependem destes nomes */
     const nome         = txt(b.nome)
@@ -256,6 +270,7 @@ Deno.serve(async (req) => {
     const linha = (rot: string, val: string | null) =>
       val ? `<tr><td style="padding:8px 0;font-weight:700;color:#5f6368;width:150px">${rot}</td><td style="padding:8px 0;color:#1a1a1a">${val}</td></tr>` : ''
 
+    const whatsappFone = normFone(whatsapp || '')
     const htmlBody = `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
   <div style="background:#4285F4;padding:24px;border-radius:12px 12px 0 0">
@@ -276,9 +291,9 @@ Deno.serve(async (req) => {
     </table>
     ${descricao ? `<div style="margin-top:20px;padding:16px;background:#fff;border-radius:8px;border-left:4px solid #EDA33B"><h3 style="margin-top:0;color:#B0731A">O que ele contou</h3><p style="color:#1a1a1a;white-space:pre-wrap;margin:0">${descricao}</p></div>` : ''}
     ${aiAnalysis ? `<div style="margin-top:16px;padding:16px;background:#e8f0fe;border-radius:8px;border-left:4px solid #4285F4"><h3 style="margin-top:0;color:#4285F4">✦ Leitura da nó</h3><p style="color:#1a1a1a;white-space:pre-wrap;margin:0">${aiAnalysis}</p></div>` : ''}
-    <div style="margin-top:24px;padding:12px;background:#fff;border-radius:8px;text-align:center">
-      <a href="https://wa.me/55${(whatsapp || '').replace(/\D/g, '')}" style="background:#25D366;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block">💬 Responder no WhatsApp</a>
-    </div>
+    ${whatsappFone ? `<div style="margin-top:24px;padding:12px;background:#fff;border-radius:8px;text-align:center">
+      <a href="https://wa.me/${whatsappFone}" style="background:#25D366;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;display:inline-block">💬 Responder no WhatsApp</a>
+    </div>` : ''}
     ${sid ? `<p style="color:#9aa0a6;font-size:11px;margin:16px 0 0;font-family:monospace">sid ${sid}</p>` : ''}
   </div>
 </div>`
@@ -303,6 +318,7 @@ Deno.serve(async (req) => {
             reply_to: email || undefined,
             subject: `🚀 Novo lead: ${nome ?? 'sem nome'} — ${contexto || 'sem contexto'}`,
             html: htmlBody,
+            attachments: attachments.length ? attachments : undefined,
           }),
         })
         const data = await res.json().catch(() => ({}))
@@ -320,7 +336,7 @@ Deno.serve(async (req) => {
 
     /* 200 mesmo com e-mail falho: o lead já está gravado e o visitante não tem
        o que fazer com esse erro. Quem precisa vê-lo é o log e o front. */
-    return json({ success: saved || emailSent, saved, saveError, leadId, emailSent, emailId, emailError, capiStatus })
+    return json({ success: saved || emailSent, saved, saveError, leadId, emailSent, emailId, emailError, capiStatus, attachmentsSent:emailSent ? attachments.length : 0 })
   } catch (err) {
     console.error(err)
     return json({ success: false, error: String(err) }, 500)

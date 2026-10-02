@@ -134,6 +134,7 @@ export type AdminProjectVersion = {
 export type EditorChecklistGroup = {
   screen: string
   component: string
+  label?: string | null
   changes: Array<{ before: Record<string, unknown>; after: Record<string, unknown> }>
 }
 
