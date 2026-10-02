@@ -172,6 +172,27 @@ export async function uploadEditorExportFiles(projectId: string, contentSha256: 
   }
 }
 
+// Photos the client picks from their computer. Public bucket, random name
+// inside the project folder; the URL goes into the draft as the new image.
+export const EDITOR_IMAGE_TYPES: Record<string, string> = {
+  'image/png': 'png',
+  'image/jpeg': 'jpg',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+}
+export const EDITOR_IMAGE_MAX_BYTES = 5 * 1024 * 1024
+
+export async function uploadEditorImage(projectId: string, file: File) {
+  const extension = EDITOR_IMAGE_TYPES[file.type]
+  if (!extension) throw new Error('EDITOR_IMAGE_TYPE')
+  if (file.size > EDITOR_IMAGE_MAX_BYTES) throw new Error('EDITOR_IMAGE_SIZE')
+  const path = `${projectId}/${crypto.randomUUID()}.${extension}`
+  const bucket = supabase.storage.from('editor-assets')
+  const { error } = await bucket.upload(path, file, { contentType: file.type, cacheControl: '31536000', upsert: false })
+  if (error) throw error
+  return bucket.getPublicUrl(path).data.publicUrl
+}
+
 export async function finalizeEditorExport(exportId: string) {
   const { error } = await supabase.rpc('finalize_client_editor_export', { p_export_id: exportId })
   if (error) throw error

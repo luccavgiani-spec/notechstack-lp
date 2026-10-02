@@ -14,7 +14,8 @@ function startBridge(components: Record<string, string[]>) {
   const listeners = new Map<string, (event: unknown) => void>()
   const fakeWindow = { parent, addEventListener: (type: string, listener: (event: unknown) => void) => listeners.set(type, listener) }
   const source = readFileSync('public/no-editor-preview.js', 'utf8')
-  new Function('window', 'requestAnimationFrame', source)(fakeWindow, () => 0)
+  const frames: FrameRequestCallback[] = []
+  new Function('window', 'requestAnimationFrame', source)(fakeWindow, (callback: FrameRequestCallback) => frames.push(callback))
   scriptSpy.mockRestore()
   const preview = (changes: Record<string, unknown>, editorMode = true) => listeners.get('message')!({
     source: parent, origin: location.origin,
@@ -22,7 +23,8 @@ function startBridge(components: Record<string, string[]>) {
   })
   const lastSelect = () => (parent.postMessage.mock.calls.map(([payload]) => payload as Posted).filter((payload) => payload.type === 'NO_EDITOR_SELECT').at(-1))
   const posted = (type: string) => parent.postMessage.mock.calls.map(([payload]) => payload as Posted).filter((payload) => payload.type === type)
-  return { preview, lastSelect, posted }
+  const flushFrames = () => { while (frames.length) frames.shift()!(0) }
+  return { preview, lastSelect, posted, flushFrames }
 }
 
 function click(element: Element) {
@@ -59,7 +61,7 @@ it('modo automático seleciona qualquer texto, botão ou imagem e aplica os ajus
   expect(lastSelect()?.meta?.controls).not.toContain('text')
 
   click(document.querySelector('img')!)
-  expect(lastSelect()).toMatchObject({ componentId: 'auto:#valores/img.1', meta: { label: 'Imagem “Thaís no consultório”', controls: ['logo'] } })
+  expect(lastSelect()).toMatchObject({ componentId: 'auto:src/example.test/thais.jpg', meta: { label: 'Imagem “Thaís no consultório” · thais.jpg', controls: ['logo'] } })
 
   expect(click(document.querySelector('a')!).defaultPrevented).toBe(true)
 
@@ -133,4 +135,53 @@ it('lê o texto como o visitante vê e devolve o original quando o ajuste sai do
 
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true }))
   expect(posted('NO_EDITOR_UNDO')).toHaveLength(1)
+})
+
+it('troca de imagem ignora srcset e <picture> e volta ao original no desfazer', () => {
+  document.body.innerHTML = `
+    <main>
+      <section id="quem">
+        <picture><source srcset="https://example.test/thais.webp"><img alt="Thaís" src="https://example.test/thais.jpg" srcset="https://example.test/thais@2x.jpg 2x"></picture>
+      </section>
+    </main>`
+  const { preview, lastSelect } = startBridge({ '*': ['text', 'size', 'color', 'logo'] })
+  preview({})
+  const image = document.querySelector('img')!
+  click(image)
+  const id = lastSelect()!.componentId
+  expect(lastSelect()?.meta?.controls).toEqual(['logo'])
+
+  preview({ [id]: { logo: 'https://storage.example.test/nova.png' } })
+  expect(image.getAttribute('src')).toBe('https://storage.example.test/nova.png')
+  expect(image.hasAttribute('srcset')).toBe(false)
+  expect(document.querySelector('source')!.hasAttribute('srcset')).toBe(false)
+
+  preview({})
+  expect(image.getAttribute('src')).toBe('https://example.test/thais.jpg')
+  expect(image.getAttribute('srcset')).toBe('https://example.test/thais@2x.jpg 2x')
+  expect(document.querySelector('source')!.getAttribute('srcset')).toBe('https://example.test/thais.webp')
+})
+
+it('carrossel que remonta a foto recebe a imagem nova de novo e só aquela foto muda', async () => {
+  document.body.innerHTML = `
+    <main><section id="quem"><div class="slide"><img alt="Thaís" src="/prototipos/espaco/quem/thais-3.jpg"></div></section></main>`
+  const { preview, lastSelect, flushFrames } = startBridge({ '*': ['text', 'size', 'color', 'logo'] })
+  preview({})
+  click(document.querySelector('img')!)
+  const id = lastSelect()!.componentId
+  expect(id).toBe('auto:src/prototipos/espaco/quem/thais-3.jpg')
+  preview({ [id]: { logo: 'https://storage.example.test/nova.png' } })
+  expect(document.querySelector('img')!.getAttribute('src')).toBe('https://storage.example.test/nova.png')
+
+  // The carousel moves on to another photo: that one stays untouched.
+  document.querySelector('.slide')!.innerHTML = '<img alt="Thaís" src="/prototipos/espaco/quem/thais-4.jpg">'
+  await Promise.resolve()
+  flushFrames()
+  expect(document.querySelector('img')!.getAttribute('src')).toBe('/prototipos/espaco/quem/thais-4.jpg')
+
+  // And comes back to photo 3, freshly mounted with the original file.
+  document.querySelector('.slide')!.innerHTML = '<img alt="Thaís" src="/prototipos/espaco/quem/thais-3.jpg">'
+  await Promise.resolve()
+  flushFrames()
+  expect(document.querySelector('img')!.getAttribute('src')).toBe('https://storage.example.test/nova.png')
 })

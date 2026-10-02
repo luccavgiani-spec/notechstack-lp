@@ -185,6 +185,20 @@ select is((select count(*)::integer from public.kanban_items
   where project_id='f2300000-0000-4000-8000-000000000001' and title='Editor — Honorários / Texto “Sessões de 50 minutos”'),1,
   'auto: Kanban card is named by the label, not the DOM path');
 
+-- Images the client uploads to replace photos.
+select is((select public from storage.buckets where id='editor-assets'),true,'assets: image bucket is public for the preview');
+select is((select allowed_mime_types from storage.buckets where id='editor-assets'),array['image/png','image/jpeg','image/webp','image/gif'],'assets: only raster images, no SVG');
+select is((select file_size_limit from storage.buckets where id='editor-assets'),5242880::bigint,'assets: 5 MB limit');
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"f2100000-0000-4000-8000-000000000001","role":"authenticated","app_metadata":{"role":"CLIENT"}}',true);
+select is(public.can_write_editor_asset('f2300000-0000-4000-8000-000000000001/0b9f3c2e-6a1d-4c8e-9f00-123456789abc.png'),true,'assets: client writes in their own project folder');
+select is(public.can_write_editor_asset('f2300000-0000-4000-8000-000000000002/0b9f3c2e-6a1d-4c8e-9f00-123456789abc.png'),false,'assets: another project folder is denied');
+select is(public.can_write_editor_asset('f2300000-0000-4000-8000-000000000001/foto.png'),false,'assets: file name must be a random uuid');
+select is(public.can_write_editor_asset('f2300000-0000-4000-8000-000000000001/0b9f3c2e-6a1d-4c8e-9f00-123456789abc.svg'),false,'assets: svg extension is denied');
+select is(public.can_write_editor_asset('nao-e-uuid/0b9f3c2e-6a1d-4c8e-9f00-123456789abc.png'),false,'assets: malformed folder is denied without a cast error');
+reset role;
+select is((select count(*)::integer from pg_policies where schemaname='storage' and tablename='objects' and policyname in ('editor_assets_client_upload','editor_assets_client_read')),2,'assets: upload and read-back policies exist');
+
 select is((select public from storage.buckets where id='editor-exports'),false,'security: export bucket stays private');
 select is((select count(*)::integer from pg_policies where schemaname='storage' and tablename='objects' and policyname='editor_exports_client_upload'),1,'security: authenticated upload policy exists');
 select * from finish();

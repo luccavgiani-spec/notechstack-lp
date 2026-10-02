@@ -44,6 +44,12 @@
   let hovered
   let hoverTarget
   let overlayFrame = 0
+  let imageFrame = 0
+  let lastChanges = {}
+  // Images are addressed by their original file, not by position: carousels
+  // unmount and remount <img> elements, so a position points at whichever
+  // photo happens to be showing.
+  const SRC_PREFIX = 'auto:src/'
 
   function scheduleOverlay() {
     if (!editorMode || overlayFrame) return
@@ -172,7 +178,27 @@
     })
   }
 
+  function originalSrc(image) {
+    return image.getAttribute('data-no-editor-src') ?? image.getAttribute('src') ?? ''
+  }
+
+  function srcIdFor(image) {
+    let path
+    try {
+      const url = new URL(originalSrc(image), location.href)
+      path = url.origin === location.origin ? url.pathname : `${url.host}${url.pathname}`
+    } catch {
+      return ''
+    }
+    const id = `${SRC_PREFIX}${path.replace(/^\/+/, '').replace(/[^A-Za-z0-9/._-]/g, '_')}`
+    return id.length > SRC_PREFIX.length && AUTO_ID.test(id) ? id : ''
+  }
+
   function autoIdFor(element) {
+    if (element.tagName === 'IMG') {
+      const id = srcIdFor(element)
+      if (id) return id
+    }
     const parts = []
     for (let node = element; node && node !== document.body && node !== document.documentElement; node = node.parentElement) {
       if (node.id && ANCHOR_ID.test(node.id) && document.getElementById(node.id) === node) {
@@ -214,6 +240,7 @@
   function elementsFor(id) {
     if (!id) return []
     if (isAutoId(id) && !Object.hasOwn(allowed, id)) {
+      if (id.startsWith(SRC_PREFIX)) return [...document.querySelectorAll('img')].filter((image) => srcIdFor(image) === id)
       const element = resolveAuto(id)
       return element ? [element] : []
     }
@@ -364,7 +391,24 @@
     if (originals.has(id)) return
     originals.set(id, currentValues(element))
     const { position, left, top, width, height, fontSize, color } = element.style
-    pristineStyle.set(id, { position, left, top, width, height, fontSize, color, src: element.getAttribute('src') })
+    pristineStyle.set(id, {
+      position, left, top, width, height, fontSize, color,
+      src: element.getAttribute('src'),
+      srcset: element.getAttribute('srcset'),
+      sizes: element.getAttribute('sizes'),
+      sources: pictureSources(element).map((source) => [source, source.getAttribute('srcset')]),
+    })
+  }
+
+  function pictureSources(element) {
+    return element.parentElement?.tagName === 'PICTURE'
+      ? [...element.parentElement.querySelectorAll('source')]
+      : []
+  }
+
+  function setAttribute(element, name, value) {
+    if (value === null) element.removeAttribute(name)
+    else element.setAttribute(name, value)
   }
 
   function restore(id, element, field) {
@@ -378,7 +422,13 @@
       pristineContent.delete(id)
     } else if (field === 'size') element.style.fontSize = style.fontSize
     else if (field === 'color') element.style.color = style.color
-    else if (field === 'logo' && style.src !== null) element.setAttribute('src', style.src)
+    else if (field === 'logo') {
+      element.removeAttribute('data-no-editor-src')
+      setAttribute(element, 'src', style.src)
+      setAttribute(element, 'srcset', style.srcset)
+      setAttribute(element, 'sizes', style.sizes)
+      for (const [source, srcset] of style.sources) setAttribute(source, 'srcset', srcset)
+    }
     else if (field === 'x') element.style.left = style.left
     else if (field === 'y') element.style.top = style.top
     else if (field === 'width') element.style.width = style.width
@@ -402,7 +452,10 @@
             ? 'Link'
             : KIND[tag] || 'Texto'
     const sample = shorten(tag === 'IMG' ? element.getAttribute('alt') || '' : originals.get(id)?.text ?? readText(element), 48)
-    return sample ? `${kind} “${sample}”` : kind
+    const label = sample ? `${kind} “${sample}”` : kind
+    // Photos often share one alt text; the file name tells them apart.
+    const file = tag === 'IMG' ? originalSrc(element).split(/[?#]/)[0].split('/').pop() : ''
+    return file ? `${label} · ${file}` : label
   }
 
   function screenFor(element) {
@@ -449,9 +502,9 @@
     else if (height !== null && height >= 20 && height <= 4000) element.style.height = `${height}px`
   }
 
-  function applyChanges(changes) {
+  function applyChanges(changes, restoreMissing = true) {
     // Fields that left the draft (undo, discard) go back to the original look.
-    for (const [id, fields] of appliedFields) {
+    for (const [id, fields] of restoreMissing ? appliedFields : []) {
       const change = changes[id] && typeof changes[id] === 'object' ? changes[id] : {}
       const elements = elementsFor(id)
       let moved = false
@@ -481,7 +534,14 @@
         if (controls.includes('logo') && typeof change.logo === 'string' && element.tagName === 'IMG') {
           try {
             const url = new URL(change.logo)
-            if (url.protocol === 'https:') element.src = url.href
+            if (url.protocol === 'https:' && element.getAttribute('src') !== url.href) {
+              if (!element.hasAttribute('data-no-editor-src')) element.setAttribute('data-no-editor-src', element.getAttribute('src') ?? '')
+              // srcset and <picture> sources win over src; drop them so the new image shows.
+              element.removeAttribute('srcset')
+              element.removeAttribute('sizes')
+              for (const source of pictureSources(element)) source.removeAttribute('srcset')
+              element.src = url.href
+            }
           } catch {
             // Reject malformed and non-HTTPS logo URLs.
           }
@@ -655,10 +715,22 @@
   window.addEventListener('scroll', scheduleOverlay, true)
   window.addEventListener('resize', scheduleOverlay)
 
+  // A carousel that remounts a replaced photo gets the client's image again.
+  function scheduleImages() {
+    if (imageFrame || !Object.keys(lastChanges).some((id) => id.startsWith(SRC_PREFIX))) return
+    imageFrame = requestAnimationFrame(() => {
+      imageFrame = 0
+      applyChanges(Object.fromEntries(Object.entries(lastChanges).filter(([id]) => id.startsWith(SRC_PREFIX))), false)
+    })
+  }
+
   new MutationObserver((records) => {
     // The selection label is UI owned by this bridge, not a preview mutation.
     // Observing our own textContent writes caused an endless animation-frame loop.
-    if (records.some((record) => !overlay?.contains(record.target))) scheduleOverlay()
+    if (records.some((record) => !overlay?.contains(record.target))) {
+      scheduleOverlay()
+      scheduleImages()
+    }
   }).observe(document.documentElement, {
     childList: true,
     subtree: true,
@@ -679,6 +751,7 @@
       hoverTarget = null
       setHovered(null)
     }
+    lastChanges = message.changes
     applyChanges(message.changes)
     updateOverlay()
   })

@@ -7,6 +7,7 @@ const mocks = vi.hoisted(() => ({
   submitEditorExport: vi.fn(),
   uploadEditorExportFiles: vi.fn(),
   finalizeEditorExport: vi.fn(),
+  uploadEditorImage: vi.fn(),
 }))
 
 vi.mock('./client-dashboard/client-dashboard-service', () => ({
@@ -14,6 +15,9 @@ vi.mock('./client-dashboard/client-dashboard-service', () => ({
   submitEditorExport: mocks.submitEditorExport,
   uploadEditorExportFiles: mocks.uploadEditorExportFiles,
   finalizeEditorExport: mocks.finalizeEditorExport,
+  uploadEditorImage: mocks.uploadEditorImage,
+  EDITOR_IMAGE_TYPES: { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' },
+  EDITOR_IMAGE_MAX_BYTES: 5 * 1024 * 1024,
 }))
 
 import { EditorModule } from './client-dashboard/EditorModule'
@@ -63,6 +67,7 @@ beforeEach(() => {
   mocks.submitEditorExport.mockResolvedValue({ exportId: 'export-1', replayed: false, contentReplay: false, conflict: false, contentSha256: 'sha-content' })
   mocks.uploadEditorExportFiles.mockResolvedValue(undefined)
   mocks.finalizeEditorExport.mockResolvedValue(undefined)
+  mocks.uploadEditorImage.mockResolvedValue('https://storage.example.test/editor-assets/project-1/foto.png')
   vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined)
   if (!URL.createObjectURL) Object.defineProperty(URL, 'createObjectURL', { value: vi.fn(() => 'blob:test'), configurable: true })
   else vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test')
@@ -78,7 +83,9 @@ describe('F2-10 Editor', () => {
     await user.type(await screen.findByLabelText('Texto hero'), 'Título novo')
     fireEvent.change(screen.getByLabelText('Tamanho hero'), { target: { value: '32' } })
     fireEvent.change(screen.getByLabelText('Cor hero'), { target: { value: '#123456' } })
-    await user.type(screen.getByLabelText('Logo hero'), 'https://assets.example.test/logo.svg')
+    await user.upload(screen.getByLabelText('Imagem hero'), new File(['png'], 'foto.png', { type: 'image/png' }))
+    await waitFor(() => expect(screen.getByAltText('Imagem atual do elemento')).toHaveAttribute('src', 'https://storage.example.test/editor-assets/project-1/foto.png'))
+    expect(mocks.uploadEditorImage).toHaveBeenCalledWith('project-1', expect.any(File))
     expect(screen.queryByLabelText('Cor cta')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Salvar ajustes' }))
     view.unmount()
@@ -88,7 +95,7 @@ describe('F2-10 Editor', () => {
     expect(await screen.findByLabelText('Texto hero')).toHaveValue('Título novo')
     expect(screen.getByLabelText('Tamanho hero')).toHaveValue('32')
     expect(screen.getByLabelText('Cor hero')).toHaveValue('#123456')
-    expect(screen.getByLabelText('Logo hero')).toHaveValue('https://assets.example.test/logo.svg')
+    expect(screen.getByAltText('Imagem atual do elemento')).toHaveAttribute('src', 'https://storage.example.test/editor-assets/project-1/foto.png')
   })
 
   it('C3/C4 usa preview controlado e envia exatamente quatro arquivos', async () => {
@@ -111,6 +118,14 @@ describe('F2-10 Editor', () => {
     expect(HTMLAnchorElement.prototype.click).not.toHaveBeenCalled()
     expect(URL.createObjectURL).not.toHaveBeenCalled()
     expect(await screen.findByRole('status')).toHaveTextContent('Ajustes enviados para a Nó')
+    const stamp = screen.getByTitle('Fechar aviso')
+    expect(stamp).toHaveTextContent('vira a versão 2')
+    expect(screen.getByRole('button', { name: '✓ Enviado' })).toBeDisabled()
+
+    // A new adjustment after sending brings the button back and lifts the stamp.
+    await user.type(screen.getByLabelText('Texto hero'), ' novo')
+    expect(screen.queryByText('vira a versão 2')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Enviar para análise' })).toBeEnabled()
   })
 
   it('preserva o rascunho quando o envio falha', async () => {
@@ -281,5 +296,22 @@ describe('F2-10 Editor', () => {
     fireEvent.change(screen.getByLabelText('Tamanho hero'), { target: { value: '50' } })
     await selectInPreview(user, '', { type: 'NO_EDITOR_UNDO' })
     expect(screen.getByLabelText('Tamanho hero')).toHaveValue('16')
+  })
+
+  it('imagem só aceita PNG, JPG, WebP ou GIF de até 5 MB', async () => {
+    const user = userEvent.setup({ applyAccept: false })
+    render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
+    await user.upload(screen.getByLabelText('Imagem hero'), new File(['<svg/>'], 'logo.svg', { type: 'image/svg+xml' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Use uma imagem PNG, JPG, WebP ou GIF.')
+    const big = new File(['x'], 'grande.jpg', { type: 'image/jpeg' })
+    Object.defineProperty(big, 'size', { value: 6 * 1024 * 1024 })
+    await user.upload(screen.getByLabelText('Imagem hero'), big)
+    expect(await screen.findByRole('alert')).toHaveTextContent('A imagem passa de 5 MB.')
+    expect(mocks.uploadEditorImage).not.toHaveBeenCalled()
+
+    mocks.uploadEditorImage.mockRejectedValueOnce(new Error('offline'))
+    await user.upload(screen.getByLabelText('Imagem hero'), new File(['png'], 'foto.png', { type: 'image/png' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível enviar a imagem.')
   })
 })

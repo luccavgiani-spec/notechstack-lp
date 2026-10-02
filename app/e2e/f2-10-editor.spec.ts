@@ -30,6 +30,8 @@ test.describe('F2-10 · cenário B', () => {
   test.afterAll(async () => {
     if (fixture) {
       const { data: exports } = await fixture.admin.from('editor_exports').select('id,content_sha256').eq('project_id', fixture.projectId)
+      const { data: assets } = await fixture.admin.storage.from('editor-assets').list(fixture.projectId)
+      if (assets?.length) await fixture.admin.storage.from('editor-assets').remove(assets.map(asset => `${fixture!.projectId}/${asset.name}`))
       for (const item of exports ?? []) {
         await fixture.admin.storage.from('editor-exports').remove(['editor.md','editor.cfg','editor.css','manifest.json'].map(name => `${fixture!.projectId}/${item.content_sha256}/${name}`))
         await fixture.admin.from('editor_export_checklists').delete().eq('export_id', item.id)
@@ -75,7 +77,8 @@ test.describe('F2-10 · cenário B', () => {
     await clientPage.getByLabel('Tamanho hero').press('Home')
     for (let index = 0; index < 24; index++) await clientPage.getByLabel('Tamanho hero').press('ArrowRight')
     await clientPage.getByLabel('Cor hero').fill('#123456')
-    await clientPage.getByLabel('Logo hero').fill('https://assets.example.test/logo.svg')
+    await clientPage.getByLabel('Imagem hero').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64') })
+    await expect(clientPage.getByAltText('Imagem atual do elemento')).toHaveAttribute('src', /editor-assets/)
     await expect(clientPage.getByLabel('Cor cta')).toHaveCount(0)
     await clientPage.getByRole('button', { name: 'Salvar ajustes' }).click()
     await clientPage.reload()
@@ -89,6 +92,9 @@ test.describe('F2-10 · cenário B', () => {
     clientPage.on('download', d => downloads.push(d.suggestedFilename()))
     await clientPage.getByRole('button', { name: 'Enviar para análise' }).click()
     await expect(clientPage.getByText('Ajustes enviados para a Nó.', { exact: false })).toBeVisible()
+    await expect(clientPage.getByRole('button', { name: '✓ Enviado' })).toBeDisabled()
+    await expect(clientPage.getByText('vira a versão 2')).toBeVisible()
+    await clientPage.reload()
     await clientPage.getByRole('button', { name: 'Enviar para análise' }).click()
     await expect(clientPage.getByText('Esses mesmos ajustes já tinham sido enviados;', { exact: false })).toBeVisible()
     // The package goes straight to the Nó dashboard; the client never handles files.

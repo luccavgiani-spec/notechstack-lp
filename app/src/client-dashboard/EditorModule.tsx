@@ -4,6 +4,9 @@ import {
   loadEditorConfig,
   submitEditorExport,
   uploadEditorExportFiles,
+  uploadEditorImage,
+  EDITOR_IMAGE_MAX_BYTES,
+  EDITOR_IMAGE_TYPES,
   type EditorConfig,
 } from './client-dashboard-service'
 
@@ -72,6 +75,12 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
     lastKey: key,
     lastAt: action.at,
   }
+}
+
+// "V1" → "vira a versão 2": the promise shown on the sent stamp.
+function nextVersionText(label: string) {
+  const match = /(\d+)/.exec(label)
+  return match ? `vira a versão ${Number(match[1]) + 1}` : 'entra na próxima versão'
 }
 
 function editableTarget(target: EventTarget | null) {
@@ -157,6 +166,8 @@ function readMeta(projectId: string, config: EditorConfig): Meta {
 // `auto:#valores/div.1/h2.1` → `#valores > div:nth-of-type(1) > h2:nth-of-type(1)`
 function cssSelectorFor(id: string) {
   if (!AUTO_ID.test(id)) return `[data-editor="${id}"]`
+  // Photos are addressed by their original file: `auto:src/quem/thais-3.jpg`.
+  if (id.startsWith('auto:src/')) return `img[src$="${id.split('/').pop()}"]`
   const parts = id.slice('auto:'.length).split('/')
   const root = parts[0]?.startsWith('#') ? (parts.shift() ?? 'body') : 'body'
   return [
@@ -262,6 +273,11 @@ export function EditorModule({ projectId }: { projectId: string }) {
   const [loading, setLoading] = useState(true)
   const [loadFailed, setLoadFailed] = useState(false)
   const [sending, setSending] = useState(false)
+  // The draft exactly as it was sent; any later change brings the button back.
+  const [sentDraft, setSentDraft] = useState<string | null>(null)
+  const [stampDismissed, setStampDismissed] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [imageError, setImageError] = useState<{ id: string; text: string } | null>(null)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [message, setMessage] = useState('')
   const frameRef = useRef<HTMLIFrameElement>(null)
@@ -579,6 +595,8 @@ export function EditorModule({ projectId }: { projectId: string }) {
       const files = { ...coreFiles, 'manifest.json': manifest }
       await uploadEditorExportFiles(projectId, result.contentSha256, files)
       await finalizeEditorExport(result.exportId)
+      setSentDraft(JSON.stringify(draft))
+      setStampDismissed(false)
       setMessage(
         result.conflict
           ? 'Ajustes enviados para a Nó, com alerta de versão-base desatualizada; a Nó fará a conciliação.'
@@ -595,6 +613,27 @@ export function EditorModule({ projectId }: { projectId: string }) {
     }
   }
 
+  const replaceImage = async (id: string, file: File) => {
+    setImageError(null)
+    if (!EDITOR_IMAGE_TYPES[file.type]) {
+      setImageError({ id, text: 'Use uma imagem PNG, JPG, WebP ou GIF.' })
+      return
+    }
+    if (file.size > EDITOR_IMAGE_MAX_BYTES) {
+      setImageError({ id, text: 'A imagem passa de 5 MB. Escolha um arquivo menor.' })
+      return
+    }
+    setUploading(true)
+    try {
+      change(id, 'logo', await uploadEditorImage(projectId, file))
+    } catch {
+      setImageError({ id, text: 'Não foi possível enviar a imagem. Tente de novo.' })
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const sent = sentDraft !== null && sentDraft === JSON.stringify(draft)
   const screen = 'Página única'
   const component = selectedComponent
     ? componentFor(config, meta, selectedComponent)
@@ -693,10 +732,21 @@ export function EditorModule({ projectId }: { projectId: string }) {
                 <p>Nenhum componente liberado.</p>
               )}
               {value.logo ? (
-                <p className="preview-disclaimer">Logo: {value.logo}</p>
+                <p className="preview-disclaimer">Imagem: {value.logo}</p>
               ) : null}
             </div>
           )}
+          {sent && !stampDismissed ? (
+            <button
+              type="button"
+              className="editor-sent-stamp"
+              onClick={() => setStampDismissed(true)}
+              title="Fechar aviso"
+            >
+              <b>Enviado</b>
+              <span>{nextVersionText(config.label)}</span>
+            </button>
+          ) : null}
         </div>
       </div>
       <aside className="editor-inspector">
@@ -774,17 +824,30 @@ export function EditorModule({ projectId }: { projectId: string }) {
               </label>
             ) : null}
             {controls.includes('logo') ? (
-              <label>
-                Logo
-                <input
-                  aria-label={`Logo ${component.id}`}
-                  value={value.logo}
-                  onChange={(event) =>
-                    change(component.id, 'logo', event.target.value)
-                  }
-                  placeholder="URL do logo"
-                />
-              </label>
+              <div className="image-control">
+                <span>Imagem</span>
+                {value.logo ? (
+                  <img src={value.logo} alt="Imagem atual do elemento" />
+                ) : null}
+                <label className="image-upload-button">
+                  {uploading ? 'Enviando imagem…' : 'Escolher imagem do computador'}
+                  <input
+                    type="file"
+                    accept={Object.keys(EDITOR_IMAGE_TYPES).join(',')}
+                    aria-label={`Imagem ${component.id}`}
+                    disabled={uploading}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      event.target.value = ''
+                      if (file) void replaceImage(component.id, file)
+                    }}
+                  />
+                </label>
+                <small>PNG, JPG, WebP ou GIF, até 5 MB.</small>
+                {imageError?.id === component.id ? (
+                  <p role="alert">{imageError.text}</p>
+                ) : null}
+              </div>
             ) : null}
             <div className="layout-readout">
               <span>Posição</span>
@@ -822,11 +885,11 @@ export function EditorModule({ projectId }: { projectId: string }) {
             Salvar ajustes
           </button>
           <button
-            disabled={sending}
+            disabled={sending || sent || uploading}
             className="button-green"
             onClick={() => void send()}
           >
-            {sending ? 'Enviando…' : 'Enviar para análise'}
+            {sending ? 'Enviando…' : sent ? '✓ Enviado' : 'Enviar para análise'}
           </button>
           {!confirmDiscard ? (
             <button
