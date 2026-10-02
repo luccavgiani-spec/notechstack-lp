@@ -21,6 +21,7 @@
 
   const acceptedParentOrigin = localPreview ? location.origin : configuredParentOrigin
   const layoutFields = ['x', 'y', 'width', 'height']
+  const contentFields = ['text', 'size', 'color', 'logo']
   // "*" in the allowlist turns on automatic mode: any visible text, button or
   // image becomes editable, addressed by its DOM path instead of a data-editor mark.
   const autoControls = Array.isArray(allowed['*']) ? allowed['*'] : null
@@ -30,6 +31,9 @@
   const INLINE_TAGS = new Set(['BR', 'STRONG', 'EM', 'B', 'I', 'U', 'SPAN', 'SMALL', 'MARK', 'SUP', 'SUB', 'ABBR', 'CODE', 'S', 'CITE', 'Q', 'TIME'])
   const KIND = { H1: 'Título', H2: 'Título', H3: 'Subtítulo', H4: 'Subtítulo', H5: 'Subtítulo', H6: 'Subtítulo', P: 'Texto', LI: 'Item de lista', LABEL: 'Rótulo', BLOCKQUOTE: 'Citação', FIGCAPTION: 'Legenda', TD: 'Célula', TH: 'Célula', SUMMARY: 'Pergunta' }
   const originals = new Map()
+  const pristineStyle = new Map()
+  const pristineContent = new Map()
+  const appliedFields = new Map()
   const labels = new Map()
   let editorMode = false
   let selectedId = ''
@@ -96,9 +100,64 @@
     return nodes.length === 1 ? nodes[0] : null
   }
 
+  function inline(element) {
+    return getComputedStyle(element).display === 'inline'
+  }
+
+  // Text as the visitor reads it. Animated headings often split words into
+  // inline-block spans spaced by margin, so neither textContent nor innerText
+  // carries the spaces; <br> becomes a line break.
+  function smartText(node) {
+    let text = ''
+    let previous = null
+    for (const child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        text += child.nodeValue
+        previous = null
+        continue
+      }
+      if (child.nodeType !== Node.ELEMENT_NODE) continue
+      if (child.tagName === 'BR') {
+        text += '\n'
+        previous = null
+        continue
+      }
+      const piece = smartText(child)
+      const gap = !inline(child) || Number.parseFloat(getComputedStyle(child).marginLeft) > 0
+        || (previous && (!inline(previous) || Number.parseFloat(getComputedStyle(previous).marginRight) > 0))
+      if (piece && gap && text && !/\s$/.test(text) && !/^\s/.test(piece)) text += ' '
+      text += piece
+      previous = child
+    }
+    return text
+  }
+
   function readText(element) {
     const target = textTarget(element)
-    return target ? target.textContent || '' : element.textContent || ''
+    return target?.nodeType === Node.TEXT_NODE ? target.nodeValue : smartText(element)
+  }
+
+  // Keep the untouched markup (word spans, <em>, icons) so undo restores it exactly.
+  function snapshotContent(id, element) {
+    if (pristineContent.has(id)) return
+    const target = textTarget(element) || element
+    pristineContent.set(id, target.nodeType === Node.TEXT_NODE
+      ? { node: target, value: target.nodeValue }
+      : { element: target, nodes: [...target.childNodes].map((node) => node.cloneNode(true)) })
+  }
+
+  function writeText(id, element, value) {
+    // Writing the same text again would reset the caret while the client types.
+    if (readText(element) === value) return
+    snapshotContent(id, element)
+    const target = textTarget(element) || element
+    if (target.nodeType === Node.TEXT_NODE) {
+      target.nodeValue = value
+      return
+    }
+    target.replaceChildren(...value.split('\n').flatMap((line, index) => (
+      index ? [document.createElement('br'), document.createTextNode(line)] : [document.createTextNode(line)]
+    )))
   }
 
   // Automatic elements only expose the controls that make sense for them.
@@ -299,9 +358,31 @@
     return values
   }
 
-  // Snapshot the untouched element once, so the export can show "before → after".
+  // Snapshot the untouched element once, so the export can show "before → after"
+  // and undo can put back the inline styles the prototype itself set.
   function remember(id, element) {
-    if (!originals.has(id)) originals.set(id, currentValues(element))
+    if (originals.has(id)) return
+    originals.set(id, currentValues(element))
+    const { position, left, top, width, height, fontSize, color } = element.style
+    pristineStyle.set(id, { position, left, top, width, height, fontSize, color, src: element.getAttribute('src') })
+  }
+
+  function restore(id, element, field) {
+    const style = pristineStyle.get(id)
+    if (!style) return
+    if (field === 'text') {
+      const content = pristineContent.get(id)
+      if (!content) return
+      if (content.node) content.node.nodeValue = content.value
+      else content.element.replaceChildren(...content.nodes.map((node) => node.cloneNode(true)))
+      pristineContent.delete(id)
+    } else if (field === 'size') element.style.fontSize = style.fontSize
+    else if (field === 'color') element.style.color = style.color
+    else if (field === 'logo' && style.src !== null) element.setAttribute('src', style.src)
+    else if (field === 'x') element.style.left = style.left
+    else if (field === 'y') element.style.top = style.top
+    else if (field === 'width') element.style.width = style.width
+    else if (field === 'height') element.style.height = style.height
   }
 
   function shorten(value, size) {
@@ -309,12 +390,7 @@
     return clean.length > size ? `${clean.slice(0, size - 1)}…` : clean
   }
 
-  // innerText keeps the spaces that <br> and blocks imply; jsdom lacks it.
-  function visibleText(element) {
-    return typeof element.innerText === 'string' ? element.innerText : element.textContent || ''
-  }
-
-  function labelFor(element) {
+  function labelFor(id, element) {
     const tag = element.tagName
     const kind = tag === 'IMG'
       ? 'Imagem'
@@ -325,7 +401,7 @@
           : element.closest('a')
             ? 'Link'
             : KIND[tag] || 'Texto'
-    const sample = shorten(tag === 'IMG' ? element.getAttribute('alt') || '' : visibleText(element), 48)
+    const sample = shorten(tag === 'IMG' ? element.getAttribute('alt') || '' : originals.get(id)?.text ?? readText(element), 48)
     return sample ? `${kind} “${sample}”` : kind
   }
 
@@ -337,7 +413,8 @@
     if (region.tagName === 'NAV') return 'Menu'
     if (region.tagName === 'DIALOG' || region.getAttribute('role') === 'dialog') return 'Janela'
     const heading = region.querySelector('h1, h2, h3')
-    const title = heading ? shorten(visibleText(heading), 40) : ''
+    // The original heading text, so a section keeps its name after the client edits it.
+    const title = heading ? shorten(originals.get(idFor(heading))?.text ?? smartText(heading), 40) : ''
     if (title) return title
     if (region.id) return region.id
     return `Seção ${[...document.querySelectorAll('section')].indexOf(region) + 1}`
@@ -349,7 +426,7 @@
     selectedId = id
     remember(id, element)
     const auto = isAutoId(id) && !Object.hasOwn(allowed, id)
-    if (auto && !labels.has(id)) labels.set(id, labelFor(element))
+    if (auto && !labels.has(id)) labels.set(id, labelFor(id, element))
     updateOverlay()
     post('NO_EDITOR_SELECT', id, null, currentValues(element), {
       original: originals.get(id),
@@ -373,17 +450,32 @@
   }
 
   function applyChanges(changes) {
+    // Fields that left the draft (undo, discard) go back to the original look.
+    for (const [id, fields] of appliedFields) {
+      const change = changes[id] && typeof changes[id] === 'object' ? changes[id] : {}
+      const elements = elementsFor(id)
+      let moved = false
+      for (const field of [...fields]) {
+        if (Object.hasOwn(change, field)) continue
+        for (const element of elements) restore(id, element, field)
+        fields.delete(field)
+        moved ||= field === 'x' || field === 'y'
+      }
+      if (moved && !fields.has('x') && !fields.has('y')) {
+        for (const element of elements) element.style.position = pristineStyle.get(id)?.position ?? ''
+      }
+      if (!fields.size) appliedFields.delete(id)
+    }
     for (const [id, change] of Object.entries(changes)) {
       if (!change || typeof change !== 'object' || Array.isArray(change)) continue
       for (const element of elementsFor(id)) {
         const controls = elementControls(id, element)
         if (!controls) continue
         remember(id, element)
-        // Writing the same text again would reset the caret while the client types.
-        const text = controls.includes('text') && typeof change.text === 'string' && element.tagName !== 'IMG'
-          ? textTarget(element) || element
-          : null
-        if (text && text.textContent !== change.text) text.textContent = change.text
+        const fields = appliedFields.get(id) ?? new Set()
+        appliedFields.set(id, fields)
+        for (const field of [...contentFields, ...layoutFields]) if (Object.hasOwn(change, field)) fields.add(field)
+        if (controls.includes('text') && typeof change.text === 'string' && element.tagName !== 'IMG') writeText(id, element, change.text)
         if (controls.includes('size') && /^\d+(\.\d+)?$/.test(change.size) && Number(change.size) >= 8 && Number(change.size) <= 160) element.style.fontSize = `${Number(change.size)}px`
         if (controls.includes('color') && /^#[0-9a-f]{6}$/i.test(change.color)) element.style.color = change.color
         if (controls.includes('logo') && typeof change.logo === 'string' && element.tagName === 'IMG') {
@@ -411,7 +503,7 @@
   }
 
   function publishText() {
-    if (editingId && editingElement) post('NO_EDITOR_CHANGE', editingId, { text: editingElement.textContent || '' })
+    if (editingId && editingElement) post('NO_EDITOR_CHANGE', editingId, { text: readText(editingElement) })
     updateOverlay()
   }
 
@@ -425,6 +517,7 @@
     event.stopPropagation()
     endTextEditing()
     select(element)
+    snapshotContent(id, element)
     editingElement = element
     editingId = id
     element.setAttribute('contenteditable', 'true')
@@ -550,6 +643,14 @@
     event.stopPropagation()
     const element = pickAt(event)
     if (element) select(element)
+  }, true)
+  // Ctrl/Cmd+Z inside the preview undoes in the dashboard; while typing in a
+  // text, the browser's own undo keeps working.
+  document.addEventListener('keydown', (event) => {
+    if (!editorMode || editingElement || event.shiftKey || event.altKey || !(event.ctrlKey || event.metaKey)
+      || event.key.toLowerCase() !== 'z') return
+    event.preventDefault()
+    post('NO_EDITOR_UNDO', '')
   }, true)
   window.addEventListener('scroll', scheduleOverlay, true)
   window.addEventListener('resize', scheduleOverlay)

@@ -197,7 +197,10 @@ describe('F2-10 Editor', () => {
     expect(await screen.findByText('Texto “Sessões de 50 minutos”', { selector: 'strong' })).toBeVisible()
     expect(screen.queryByLabelText(`Tamanho ${autoId}`)).not.toBeInTheDocument()
     expect(screen.queryByLabelText(`Logo ${autoId}`)).not.toBeInTheDocument()
-    await user.type(screen.getByLabelText(`Texto ${autoId}`), 'Sessões de 60 minutos')
+    const textField = screen.getByLabelText(`Texto ${autoId}`)
+    expect(textField).toHaveValue('Sessões de 50 minutos')
+    await user.clear(textField)
+    await user.type(textField, 'Sessões de 60 minutos')
     await user.click(screen.getByRole('button', { name: 'Enviar para análise' }))
 
     await waitFor(() => expect(mocks.submitEditorExport).toHaveBeenCalled())
@@ -231,5 +234,52 @@ describe('F2-10 Editor', () => {
     expect(mocks.submitEditorExport.mock.calls[0][2]).toEqual([
       expect.objectContaining({ component: 'cta', before: { x: '0', y: '0' }, after: { x: '24', y: '-8' } }),
     ])
+  })
+
+  it('Desfazer volta um passo por vez e agrupa a digitação contínua', async () => {
+    const user = userEvent.setup()
+    render(<EditorModule projectId="project-1" />)
+    const undoButton = await screen.findByRole('button', { name: /Desfazer/ })
+    expect(undoButton).toBeDisabled()
+    await selectInPreview(user, 'hero', { original: { text: 'Título original', size: '40' } })
+    const frame = screen.getByTitle<HTMLIFrameElement>('Preview controlado V1')
+    if (!frame.contentWindow) throw new Error('Preview window is unavailable')
+    const postMessage = vi.spyOn(frame.contentWindow, 'postMessage')
+
+    const text = screen.getByLabelText('Texto hero')
+    await user.clear(text)
+    await user.type(text, 'Novo')
+    fireEvent.change(screen.getByLabelText('Tamanho hero'), { target: { value: '32' } })
+    expect(undoButton).toBeEnabled()
+
+    await user.click(undoButton)
+    expect(screen.getByLabelText('Tamanho hero')).toHaveValue('40')
+    expect(screen.getByLabelText('Texto hero')).toHaveValue('Novo')
+    await waitFor(() =>
+      expect(postMessage).toHaveBeenLastCalledWith(
+        expect.objectContaining({ changes: { hero: { text: 'Novo' } } }),
+        'https://preview.example.test',
+      ),
+    )
+
+    await user.click(undoButton)
+    expect(screen.getByLabelText('Texto hero')).toHaveValue('Título original')
+    expect(undoButton).toBeDisabled()
+    expect(screen.getByRole('status')).toHaveTextContent('Última alteração desfeita.')
+  })
+
+  it('Ctrl+Z desfaz fora dos campos e também quando vem de dentro do preview', async () => {
+    const user = userEvent.setup()
+    render(<EditorModule projectId="project-1" />)
+    await selectInPreview(user, 'hero')
+    fireEvent.change(screen.getByLabelText('Tamanho hero'), { target: { value: '30' } })
+    fireEvent.keyDown(screen.getByLabelText('Texto hero'), { key: 'z', ctrlKey: true })
+    expect(screen.getByLabelText('Tamanho hero')).toHaveValue('30')
+    fireEvent.keyDown(document.body, { key: 'z', ctrlKey: true })
+    expect(screen.getByLabelText('Tamanho hero')).toHaveValue('16')
+
+    fireEvent.change(screen.getByLabelText('Tamanho hero'), { target: { value: '50' } })
+    await selectInPreview(user, '', { type: 'NO_EDITOR_UNDO' })
+    expect(screen.getByLabelText('Tamanho hero')).toHaveValue('16')
   })
 })

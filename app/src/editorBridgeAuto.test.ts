@@ -21,7 +21,8 @@ function startBridge(components: Record<string, string[]>) {
     data: { source: 'no-editor', type: 'NO_EDITOR_PREVIEW', version: 1, projectId: 'project', baseVersionId: 'version', changes, editorMode },
   })
   const lastSelect = () => (parent.postMessage.mock.calls.map(([payload]) => payload as Posted).filter((payload) => payload.type === 'NO_EDITOR_SELECT').at(-1))
-  return { preview, lastSelect }
+  const posted = (type: string) => parent.postMessage.mock.calls.map(([payload]) => payload as Posted).filter((payload) => payload.type === type)
+  return { preview, lastSelect, posted }
 }
 
 function click(element: Element) {
@@ -92,4 +93,44 @@ it('sem "*" na allowlist, só elementos mapeados respondem e a navegação fica 
   expect(lastSelect()?.componentId).toBe('hero')
   preview({ 'auto:main.1/p.1': { text: 'Não aplica' } })
   expect(document.querySelector('p')!.textContent).toBe('Livre')
+})
+
+it('lê o texto como o visitante vê e devolve o original quando o ajuste sai do rascunho', () => {
+  document.body.innerHTML = `
+    <main>
+      <section id="frase">
+        <p class="palavras"><span style="display:inline-block;margin-right:6px">Muitas</span><span style="display:inline-block;margin-right:6px">vezes</span><span style="display:inline-block;margin-right:6px">você</span><span style="display:inline-block">fala.</span></p>
+        <h2 style="color: rgb(1, 2, 3)">Algumas experiências<br>só ganham <em>contorno</em></h2>
+      </section>
+    </main>`
+  const { preview, lastSelect, posted } = startBridge({ '*': ['text', 'size', 'color', 'logo'] })
+  preview({})
+
+  const phrase = document.querySelector('p.palavras')!
+  click(phrase.querySelector('span')!)
+  expect(lastSelect()).toMatchObject({
+    componentId: 'auto:#frase/p.1',
+    values: { text: 'Muitas vezes você fala.' },
+    meta: { label: 'Texto “Muitas vezes você fala.”' },
+  })
+
+  const heading = document.querySelector('h2')!
+  click(heading)
+  expect(lastSelect()?.original?.text).toBe('Algumas experiências\nsó ganham contorno')
+
+  preview({ 'auto:#frase/h2.1': { text: 'Linha um\nLinha dois', color: '#ff0000', x: '12' } })
+  expect(heading.innerHTML).toBe('Linha um<br>Linha dois')
+  expect(heading.style.color).toBe('rgb(255, 0, 0)')
+  expect(heading.style.position).toBe('relative')
+
+  // Undo in the dashboard removes the fields from the draft.
+  preview({ 'auto:#frase/h2.1': { text: 'Linha um\nLinha dois' } })
+  expect(heading.style.color).toBe('rgb(1, 2, 3)')
+  expect(heading.style.position).toBe('')
+  expect(heading.style.left).toBe('')
+  preview({})
+  expect(heading.innerHTML).toBe('Algumas experiências<br>só ganham <em>contorno</em>')
+
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'z', ctrlKey: true, bubbles: true }))
+  expect(posted('NO_EDITOR_UNDO')).toHaveLength(1)
 })
