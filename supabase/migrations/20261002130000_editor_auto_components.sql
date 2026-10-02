@@ -223,6 +223,7 @@ end;
 $$;
 revoke all on function public.editor_export_record_activity() from public, anon, authenticated;
 
+drop trigger if exists editor_export_record_activity on public.editor_exports;
 create trigger editor_export_record_activity
 after insert on public.editor_exports
 for each row execute function public.editor_export_record_activity();
