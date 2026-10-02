@@ -21,11 +21,24 @@
 
   const acceptedParentOrigin = localPreview ? location.origin : configuredParentOrigin
   const layoutFields = ['x', 'y', 'width', 'height']
+  // "*" in the allowlist turns on automatic mode: any visible text, button or
+  // image becomes editable, addressed by its DOM path instead of a data-editor mark.
+  const autoControls = Array.isArray(allowed['*']) ? allowed['*'] : null
+  const AUTO_ID = /^auto:[A-Za-z0-9#/._-]{1,300}$/
+  const ANCHOR_ID = /^[A-Za-z][\w-]{0,60}$/
+  const TEXT_TAGS = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'A', 'BUTTON', 'LI', 'SPAN', 'LABEL', 'BLOCKQUOTE', 'FIGCAPTION', 'SMALL', 'STRONG', 'EM', 'B', 'I', 'TD', 'TH', 'DT', 'DD', 'CITE', 'Q', 'SUMMARY', 'LEGEND'])
+  const INLINE_TAGS = new Set(['BR', 'STRONG', 'EM', 'B', 'I', 'U', 'SPAN', 'SMALL', 'MARK', 'SUP', 'SUB', 'ABBR', 'CODE', 'S', 'CITE', 'Q', 'TIME'])
+  const KIND = { H1: 'Título', H2: 'Título', H3: 'Subtítulo', H4: 'Subtítulo', H5: 'Subtítulo', H6: 'Subtítulo', P: 'Texto', LI: 'Item de lista', LABEL: 'Rótulo', BLOCKQUOTE: 'Citação', FIGCAPTION: 'Legenda', TD: 'Célula', TH: 'Célula', SUMMARY: 'Pergunta' }
+  const originals = new Map()
+  const labels = new Map()
   let editorMode = false
   let selectedId = ''
   let overlay
   let editingElement
+  let editingId = ''
   let gesture
+  let hovered
+  let hoverTarget
   let overlayFrame = 0
 
   function scheduleOverlay() {
@@ -38,9 +51,9 @@
 
   const style = document.createElement('style')
   style.textContent = `
-    html.no-editor-mode [data-editor] { cursor: pointer !important; }
-    html.no-editor-mode [data-editor]:hover { outline: 2px dashed #eda33b !important; outline-offset: 4px !important; }
-    html.no-editor-mode [data-editor][contenteditable="true"] { cursor: text !important; outline: 2px solid #eda33b !important; }
+    html.no-editor-mode [data-editor], html.no-editor-mode [data-no-editor-hover] { cursor: pointer !important; }
+    html.no-editor-mode [data-no-editor-hover] { outline: 2px dashed #eda33b !important; outline-offset: 4px !important; }
+    html.no-editor-mode [contenteditable="true"] { cursor: text !important; outline: 2px solid #eda33b !important; }
     #no-editor-selection { position: fixed; z-index: 2147483646; pointer-events: none; border: 2px solid #eda33b; border-radius: 3px; box-shadow: 0 0 0 1px #fff9; }
     #no-editor-selection[hidden] { display: none !important; }
     #no-editor-selection .no-editor-label { position: absolute; left: -2px; bottom: calc(100% + 6px); max-width: 220px; padding: 4px 7px; border-radius: 5px; background: #141414; color: white; font: 600 10px/1.2 system-ui, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -56,11 +69,144 @@
   `
   document.head.appendChild(style)
 
+  function isAutoId(id) {
+    return Boolean(autoControls) && AUTO_ID.test(id)
+  }
+
+  function controlsFor(id) {
+    if (id !== '*' && Object.hasOwn(allowed, id) && Array.isArray(allowed[id])) return allowed[id]
+    return isAutoId(id) ? autoControls : null
+  }
+
+  function textEditable(element) {
+    return element.tagName !== 'IMG' && [...element.querySelectorAll('*')].every((child) => INLINE_TAGS.has(child.tagName))
+  }
+
+  function ownTextNodes(element) {
+    return [...element.childNodes].filter((node) => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim())
+  }
+
+  // Where a text change lands: the whole element when it only holds text, or
+  // its single text node when it also holds an icon ("Agendar →" with an <svg>),
+  // so the icon survives. Anything more structured has no editable text.
+  function textTarget(element) {
+    if (element.tagName === 'IMG') return null
+    if (textEditable(element)) return element
+    const nodes = ownTextNodes(element)
+    return nodes.length === 1 ? nodes[0] : null
+  }
+
+  function readText(element) {
+    const target = textTarget(element)
+    return target ? target.textContent || '' : element.textContent || ''
+  }
+
+  // Automatic elements only expose the controls that make sense for them.
+  function elementControls(id, element) {
+    const controls = controlsFor(id)
+    if (!controls || !isAutoId(id) || Object.hasOwn(allowed, id)) return controls
+    const image = element.tagName === 'IMG'
+    return controls.filter((control) => {
+      if (control === 'text') return textTarget(element) !== null
+      if (control === 'logo') return image
+      return !image
+    })
+  }
+
+  function autoIdFor(element) {
+    const parts = []
+    for (let node = element; node && node !== document.body && node !== document.documentElement; node = node.parentElement) {
+      if (node.id && ANCHOR_ID.test(node.id) && document.getElementById(node.id) === node) {
+        parts.push(`#${node.id}`)
+        const id = `auto:${parts.reverse().join('/')}`
+        return AUTO_ID.test(id) ? id : ''
+      }
+      let index = 1
+      for (let sibling = node.previousElementSibling; sibling; sibling = sibling.previousElementSibling) {
+        if (sibling.tagName === node.tagName) index++
+      }
+      parts.push(`${node.tagName.toLowerCase()}.${index}`)
+    }
+    const id = `auto:${parts.reverse().join('/')}`
+    return AUTO_ID.test(id) ? id : ''
+  }
+
+  function resolveAuto(id) {
+    const parts = id.slice('auto:'.length).split('/')
+    let node = document.body
+    if (parts[0]?.startsWith('#')) node = document.getElementById(parts.shift().slice(1))
+    for (const part of parts) {
+      const match = /^([a-z][a-z0-9-]*)\.(\d+)$/.exec(part)
+      if (!node || !match) return null
+      const tag = match[1].toUpperCase()
+      let remaining = Number(match[2])
+      let next = null
+      for (const child of node.children) {
+        if (child.tagName === tag && --remaining === 0) {
+          next = child
+          break
+        }
+      }
+      node = next
+    }
+    return node && node !== document.body ? node : null
+  }
+
+  function elementsFor(id) {
+    if (!id) return []
+    if (isAutoId(id) && !Object.hasOwn(allowed, id)) {
+      const element = resolveAuto(id)
+      return element ? [element] : []
+    }
+    return [...document.querySelectorAll('[data-editor]')].filter(
+      (element) => element.getAttribute('data-editor') === id,
+    )
+  }
+
+  function idFor(element) {
+    const mapped = element.getAttribute('data-editor')
+    if (mapped && controlsFor(mapped)) return mapped
+    return autoControls ? autoIdFor(element) : ''
+  }
+
+  function isAutoCandidate(element) {
+    if (element === document.body || element === document.documentElement || element.closest('#no-editor-selection, svg')) return false
+    if (element.tagName === 'IMG') return true
+    if (TEXT_TAGS.has(element.tagName)) return (element.textContent || '').trim() !== ''
+    return [...element.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.nodeValue.trim())
+  }
+
+  function editableFrom(target) {
+    const start = target instanceof Element ? target : target?.parentElement
+    if (!start || start.closest('#no-editor-selection')) return null
+    const mapped = start.closest('[data-editor]')
+    if (mapped && controlsFor(mapped.getAttribute('data-editor'))) return mapped
+    if (!autoControls) return null
+    for (let element = start; element && element !== document.body; element = element.parentElement) {
+      if (!isAutoCandidate(element)) continue
+      // A click on an <em> or <strong> means the whole heading or paragraph.
+      let candidate = element
+      while (INLINE_TAGS.has(candidate.tagName) && candidate.parentElement && candidate.parentElement !== document.body
+        && isAutoCandidate(candidate.parentElement) && textEditable(candidate.parentElement)) candidate = candidate.parentElement
+      return candidate
+    }
+    return null
+  }
+
+  // Decorative layers (gradients, video veils) often sit on top of the text;
+  // look through them before giving up on the click.
+  function pickAt(event) {
+    const direct = editableFrom(event.target)
+    if (direct || !autoControls || typeof document.elementsFromPoint !== 'function') return direct
+    for (const element of document.elementsFromPoint(event.clientX, event.clientY)) {
+      const candidate = editableFrom(element)
+      if (candidate) return candidate
+    }
+    return null
+  }
+
   function selectedElement() {
-    if (!selectedId) return null
-    return [...document.querySelectorAll('[data-editor]')].find(
-      (element) => element.getAttribute('data-editor') === selectedId,
-    ) || null
+    return elementsFor(selectedId)[0] || null
   }
 
   function ensureOverlay() {
@@ -97,10 +243,18 @@
     box.style.width = `${rect.width}px`
     box.style.height = `${rect.height}px`
     const label = box.querySelector('.no-editor-label')
-    if (label.textContent !== selectedId) label.textContent = selectedId
+    const text = labels.get(selectedId) || selectedId
+    if (label.textContent !== text) label.textContent = text
   }
 
-  function post(type, componentId, changes, values) {
+  function setHovered(element) {
+    if (hovered === element) return
+    hovered?.removeAttribute('data-no-editor-hover')
+    hovered = element
+    hovered?.setAttribute('data-no-editor-hover', '')
+  }
+
+  function post(type, componentId, changes, values, extra) {
     const payload = {
       source: 'no-editor-preview',
       type,
@@ -108,6 +262,7 @@
       projectId,
       baseVersionId: versionId,
       componentId,
+      ...extra,
     }
     if (changes) payload.changes = changes
     if (values) payload.values = values
@@ -120,30 +275,86 @@
     return `#${match.slice(1, 4).map((part) => Number(part).toString(16).padStart(2, '0')).join('')}`
   }
 
-  function select(element) {
-    const id = element?.getAttribute('data-editor') || ''
-    if (!id || !Object.hasOwn(allowed, id)) return
-    selectedId = id
-    updateOverlay()
+  function positionValues(element) {
+    return {
+      left: Number.parseFloat(element.style.left) || 0,
+      top: Number.parseFloat(element.style.top) || 0,
+    }
+  }
+
+  function currentValues(element) {
     const rect = element.getBoundingClientRect()
     const computed = getComputedStyle(element)
     const position = positionValues(element)
-    post('NO_EDITOR_SELECT', id, null, {
-      text: element.tagName === 'IMG' ? '' : element.textContent || '',
+    const values = {
+      text: element.tagName === 'IMG' ? '' : readText(element),
       size: String(Math.round(Number.parseFloat(computed.fontSize) || 16)),
       color: hexColor(computed.color),
       x: String(Math.round(position.left)),
       y: String(Math.round(position.top)),
       width: String(Math.round(rect.width)),
       height: String(Math.round(rect.height)),
-    })
+    }
+    if (element.tagName === 'IMG') values.logo = element.currentSrc || element.src || ''
+    return values
   }
 
-  function positionValues(element) {
-    return {
-      left: Number.parseFloat(element.style.left) || 0,
-      top: Number.parseFloat(element.style.top) || 0,
-    }
+  // Snapshot the untouched element once, so the export can show "before → after".
+  function remember(id, element) {
+    if (!originals.has(id)) originals.set(id, currentValues(element))
+  }
+
+  function shorten(value, size) {
+    const clean = value.replace(/\s+/g, ' ').trim()
+    return clean.length > size ? `${clean.slice(0, size - 1)}…` : clean
+  }
+
+  // innerText keeps the spaces that <br> and blocks imply; jsdom lacks it.
+  function visibleText(element) {
+    return typeof element.innerText === 'string' ? element.innerText : element.textContent || ''
+  }
+
+  function labelFor(element) {
+    const tag = element.tagName
+    const kind = tag === 'IMG'
+      ? 'Imagem'
+      : /^H[1-6]$/.test(tag)
+        ? KIND[tag]
+        : element.closest('button')
+          ? 'Botão'
+          : element.closest('a')
+            ? 'Link'
+            : KIND[tag] || 'Texto'
+    const sample = shorten(tag === 'IMG' ? element.getAttribute('alt') || '' : visibleText(element), 48)
+    return sample ? `${kind} “${sample}”` : kind
+  }
+
+  function screenFor(element) {
+    const region = element.closest('section, header, footer, nav, aside, dialog, [role="dialog"]')
+    if (!region) return 'Página'
+    if (region.tagName === 'HEADER') return 'Topo'
+    if (region.tagName === 'FOOTER') return 'Rodapé'
+    if (region.tagName === 'NAV') return 'Menu'
+    if (region.tagName === 'DIALOG' || region.getAttribute('role') === 'dialog') return 'Janela'
+    const heading = region.querySelector('h1, h2, h3')
+    const title = heading ? shorten(visibleText(heading), 40) : ''
+    if (title) return title
+    if (region.id) return region.id
+    return `Seção ${[...document.querySelectorAll('section')].indexOf(region) + 1}`
+  }
+
+  function select(element) {
+    const id = element ? idFor(element) : ''
+    if (!id || !controlsFor(id)) return
+    selectedId = id
+    remember(id, element)
+    const auto = isAutoId(id) && !Object.hasOwn(allowed, id)
+    if (auto && !labels.has(id)) labels.set(id, labelFor(element))
+    updateOverlay()
+    post('NO_EDITOR_SELECT', id, null, currentValues(element), {
+      original: originals.get(id),
+      ...(auto ? { meta: { label: labels.get(id), screen: screenFor(element), controls: elementControls(id, element) } } : {}),
+    })
   }
 
   function applyLayout(element, change) {
@@ -162,13 +373,17 @@
   }
 
   function applyChanges(changes) {
-    for (const [id, controls] of Object.entries(allowed)) {
-      if (!Array.isArray(controls) || !Object.hasOwn(changes, id)) continue
-      const change = changes[id]
+    for (const [id, change] of Object.entries(changes)) {
       if (!change || typeof change !== 'object' || Array.isArray(change)) continue
-      for (const element of document.querySelectorAll('[data-editor]')) {
-        if (element.getAttribute('data-editor') !== id) continue
-        if (controls.includes('text') && typeof change.text === 'string' && element.tagName !== 'IMG') element.textContent = change.text
+      for (const element of elementsFor(id)) {
+        const controls = elementControls(id, element)
+        if (!controls) continue
+        remember(id, element)
+        // Writing the same text again would reset the caret while the client types.
+        const text = controls.includes('text') && typeof change.text === 'string' && element.tagName !== 'IMG'
+          ? textTarget(element) || element
+          : null
+        if (text && text.textContent !== change.text) text.textContent = change.text
         if (controls.includes('size') && /^\d+(\.\d+)?$/.test(change.size) && Number(change.size) >= 8 && Number(change.size) <= 160) element.style.fontSize = `${Number(change.size)}px`
         if (controls.includes('color') && /^#[0-9a-f]{6}$/i.test(change.color)) element.style.color = change.color
         if (controls.includes('logo') && typeof change.logo === 'string' && element.tagName === 'IMG') {
@@ -189,28 +404,29 @@
     if (!editingElement) return
     const element = editingElement
     editingElement = null
+    editingId = ''
     element.removeAttribute('contenteditable')
     element.removeEventListener('input', publishText)
     element.removeEventListener('blur', endTextEditing)
   }
 
-  function publishText(event) {
-    const element = event.currentTarget
-    const id = element.getAttribute('data-editor')
-    if (id) post('NO_EDITOR_CHANGE', id, { text: element.textContent || '' })
+  function publishText() {
+    if (editingId && editingElement) post('NO_EDITOR_CHANGE', editingId, { text: editingElement.textContent || '' })
     updateOverlay()
   }
 
   function beginTextEditing(event) {
-    if (!editorMode) return
-    const element = event.target.closest?.('[data-editor]')
-    const id = element?.getAttribute('data-editor')
-    if (!id || !allowed[id]?.includes('text') || element.tagName === 'IMG') return
+    if (!editorMode || (editingElement && editingElement.contains(event.target))) return
+    const element = pickAt(event)
+    const id = element ? idFor(element) : ''
+    // Inline editing only where the element is pure text; icon buttons use the panel field.
+    if (!id || !elementControls(id, element)?.includes('text') || textTarget(element) !== element) return
     event.preventDefault()
     event.stopPropagation()
     endTextEditing()
     select(element)
     editingElement = element
+    editingId = id
     element.setAttribute('contenteditable', 'true')
     element.addEventListener('input', publishText)
     element.addEventListener('blur', endTextEditing)
@@ -224,13 +440,14 @@
 
   function beginMove(event) {
     if (!editorMode || event.button !== 0 || event.target.closest?.('#no-editor-selection')) return
-    const element = event.target.closest?.('[data-editor]')
+    if (editingElement && editingElement.contains(event.target)) return
+    const element = pickAt(event)
     if (!element) return
     select(element)
     const current = positionValues(element)
     gesture = {
       type: 'move',
-      id: element.getAttribute('data-editor'),
+      id: selectedId,
       element,
       startX: event.clientX,
       startY: event.clientY,
@@ -263,7 +480,13 @@
   }
 
   function updateGesture(event) {
-    if (!gesture) return
+    if (!gesture) {
+      if (editorMode && event.target !== hoverTarget) {
+        hoverTarget = event.target
+        setHovered(pickAt(event))
+      }
+      return
+    }
     const dx = event.clientX - gesture.startX
     const dy = event.clientY - gesture.startY
     if (gesture.type === 'move') {
@@ -318,13 +541,15 @@
   document.addEventListener('pointermove', updateGesture, true)
   document.addEventListener('pointerup', endGesture, true)
   document.addEventListener('dblclick', beginTextEditing, true)
+  // In editor mode a click selects; it never navigates, submits or opens the
+  // prototype's own menus. Turning the mode off restores normal navigation.
   document.addEventListener('click', (event) => {
-    if (!editorMode) return
-    const element = event.target.closest?.('[data-editor]')
-    if (!element) return
+    if (!editorMode || event.target.closest?.('#no-editor-selection')) return
+    if (editingElement && editingElement.contains(event.target)) return
     event.preventDefault()
     event.stopPropagation()
-    select(element)
+    const element = pickAt(event)
+    if (element) select(element)
   }, true)
   window.addEventListener('scroll', scheduleOverlay, true)
   window.addEventListener('resize', scheduleOverlay)
@@ -347,8 +572,12 @@
 
     editorMode = message.editorMode === true
     document.documentElement.classList.toggle('no-editor-mode', editorMode)
-    if (typeof message.selectedComponent === 'string' && Object.hasOwn(allowed, message.selectedComponent)) selectedId = message.selectedComponent
-    if (!editorMode) endTextEditing()
+    if (typeof message.selectedComponent === 'string' && controlsFor(message.selectedComponent)) selectedId = message.selectedComponent
+    if (!editorMode) {
+      endTextEditing()
+      hoverTarget = null
+      setHovered(null)
+    }
     applyChanges(message.changes)
     updateOverlay()
   })
