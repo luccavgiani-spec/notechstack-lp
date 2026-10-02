@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import {
   finalizeEditorExport,
   loadEditorConfig,
@@ -43,6 +43,41 @@ const emptyValue: DraftValue = {
   width: '',
   height: '',
 }
+// Undo history: one entry per deliberate change. A drag or a burst of typing
+// on the same element and control collapses into a single step.
+const HISTORY_LIMIT = 50
+const COALESCE_MS = 800
+type EditorState = { draft: Draft; history: Draft[]; lastKey: string; lastAt: number }
+type EditorAction =
+  | { type: 'change'; id: string; field: keyof DraftValue; value: string; at: number }
+  | { type: 'undo' }
+  | { type: 'reset'; draft: Draft }
+const initialEditorState: EditorState = { draft: {}, history: [], lastKey: '', lastAt: 0 }
+
+function editorReducer(state: EditorState, action: EditorAction): EditorState {
+  if (action.type === 'reset') return { ...initialEditorState, draft: action.draft }
+  if (action.type === 'undo') {
+    const previous = state.history.at(-1)
+    return previous
+      ? { draft: previous, history: state.history.slice(0, -1), lastKey: '', lastAt: 0 }
+      : state
+  }
+  if (state.draft[action.id]?.[action.field] === action.value) return state
+  const group = (layoutControls as readonly string[]).includes(action.field) ? 'layout' : action.field
+  const key = `${action.id}:${group}`
+  const coalesce = key === state.lastKey && action.at - state.lastAt < COALESCE_MS
+  return {
+    draft: { ...state.draft, [action.id]: { ...state.draft[action.id], [action.field]: action.value } },
+    history: coalesce ? state.history : [...state.history, state.draft].slice(-HISTORY_LIMIT),
+    lastKey: key,
+    lastAt: action.at,
+  }
+}
+
+function editableTarget(target: EventTarget | null) {
+  return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+}
+
 const keyFor = (projectId: string, versionId: string) =>
   `no_editor:${projectId}:${versionId}`
 const metaKeyFor = (projectId: string, versionId: string) =>
@@ -221,7 +256,7 @@ export function EditorModule({ projectId }: { projectId: string }) {
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop')
   const [editorMode, setEditorMode] = useState(false)
   const [config, setConfig] = useState<EditorConfig | null>(null)
-  const [draft, setDraft] = useState<Draft>({})
+  const [{ draft, history }, dispatch] = useReducer(editorReducer, initialEditorState)
   const [meta, setMeta] = useState<Meta>({})
   const [previewValues, setPreviewValues] = useState<Draft>({})
   const [loading, setLoading] = useState(true)
@@ -234,13 +269,15 @@ export function EditorModule({ projectId }: { projectId: string }) {
   const change = useCallback(
     (id: string, field: keyof DraftValue, value: string) => {
       setConfirmDiscard(false)
-      setDraft((old) => ({
-        ...old,
-        [id]: { ...old[id], [field]: value },
-      }))
+      dispatch({ type: 'change', id, field, value, at: Date.now() })
     },
     [],
   )
+  const undo = useCallback(() => {
+    setConfirmDiscard(false)
+    dispatch({ type: 'undo' })
+    setMessage('Última alteração desfeita.')
+  }, [])
 
   const load = useCallback(() => {
     setLoading(true)
@@ -250,7 +287,7 @@ export function EditorModule({ projectId }: { projectId: string }) {
         const nextMeta = next ? readMeta(projectId, next) : {}
         setConfig(next)
         setMeta(nextMeta)
-        setDraft(next ? readDraft(projectId, next, nextMeta) : {})
+        dispatch({ type: 'reset', draft: next ? readDraft(projectId, next, nextMeta) : {} })
       })
       .catch(() => setLoadFailed(true))
       .finally(() => setLoading(false))
@@ -263,7 +300,7 @@ export function EditorModule({ projectId }: { projectId: string }) {
         const nextMeta = next ? readMeta(projectId, next) : {}
         setConfig(next)
         setMeta(nextMeta)
-        setDraft(next ? readDraft(projectId, next, nextMeta) : {})
+        dispatch({ type: 'reset', draft: next ? readDraft(projectId, next, nextMeta) : {} })
       })
       .catch(() => {
         if (active) setLoadFailed(true)
@@ -275,6 +312,18 @@ export function EditorModule({ projectId }: { projectId: string }) {
       active = false
     }
   }, [projectId])
+
+  useEffect(() => {
+    // Fields keep the browser's own undo; elsewhere Ctrl/Cmd+Z undoes the editor.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.shiftKey || event.altKey || !(event.ctrlKey || event.metaKey)) return
+      if (event.key.toLowerCase() !== 'z' || editableTarget(event.target) || !history.length) return
+      event.preventDefault()
+      undo()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [history.length, undo])
 
   const sendPreview = useCallback(() => {
     const target = previewUrl(config)
@@ -314,18 +363,23 @@ export function EditorModule({ projectId }: { projectId: string }) {
         message.source !== 'no-editor-preview' ||
         message.version !== 1 ||
         message.projectId !== projectId ||
-        message.baseVersionId !== config.versionId ||
-        typeof message.componentId !== 'string'
+        message.baseVersionId !== config.versionId
       )
         return
+      if (message.type === 'NO_EDITOR_UNDO') {
+        if (history.length) undo()
+        return
+      }
+      if (typeof message.componentId !== 'string') return
       const componentId = message.componentId
       const reported = sanitizeMeta({
         ...(message.meta && typeof message.meta === 'object' ? message.meta : {}),
         before: message.original,
       })
-      // First report wins: later selections see the already-edited element.
+      // The bridge names elements from their untouched text, so its latest
+      // label is authoritative; the first "before" seen is kept.
       const known = meta[componentId]
-      const merged: ComponentMeta = { ...reported, ...known }
+      const merged: ComponentMeta = { ...known, ...reported }
       if (known?.before || reported?.before)
         merged.before = { ...reported?.before, ...known?.before }
       const component = componentFor(config, { ...meta, [componentId]: merged }, componentId)
@@ -374,7 +428,7 @@ export function EditorModule({ projectId }: { projectId: string }) {
     }
     window.addEventListener('message', receivePreview)
     return () => window.removeEventListener('message', receivePreview)
-  }, [change, config, editorMode, meta, projectId])
+  }, [change, config, editorMode, history.length, meta, projectId, undo])
 
   if (loading)
     return (
@@ -426,7 +480,7 @@ export function EditorModule({ projectId }: { projectId: string }) {
   const discard = () => {
     localStorage.removeItem(keyFor(projectId, config.versionId))
     localStorage.removeItem(metaKeyFor(projectId, config.versionId))
-    setDraft({})
+    dispatch({ type: 'reset', draft: {} })
     setMeta({})
     setPreviewRevision((revision) => revision + 1)
     setConfirmDiscard(false)
@@ -546,10 +600,16 @@ export function EditorModule({ projectId }: { projectId: string }) {
     ? componentFor(config, meta, selectedComponent)
     : null
   const controls = component ? controlsFor(component) : []
+  const original = component ? meta[component.id]?.before : undefined
   const value = component
     ? {
         ...emptyValue,
         ...previewValues[component.id],
+        ...Object.fromEntries(
+          contentControls.flatMap((field) =>
+            original?.[field] !== undefined ? [[field, original[field]]] : [],
+          ),
+        ),
         ...draft[component.id],
       }
     : emptyValue
@@ -591,6 +651,15 @@ export function EditorModule({ projectId }: { projectId: string }) {
               onClick={() => setEditorMode((active) => !active)}
             >
               {editorMode ? '✓ Modo editor' : '✦ Modo editor'}
+            </button>
+            <button
+              type="button"
+              className="editor-mode-toggle editor-undo"
+              onClick={undo}
+              disabled={!history.length || sending}
+              title="Desfazer a última alteração (Ctrl+Z)"
+            >
+              ↶ Desfazer
             </button>
           </div>
           <small>{target ? 'Preview controlado' : 'Ajustes locais'}</small>
@@ -634,8 +703,8 @@ export function EditorModule({ projectId }: { projectId: string }) {
         <p className="eyebrow">Elemento selecionado</p>
         {component ? (
           <div className="selected-component-card">
+            <small title={component.screen ?? 'geral'}>{component.screen ?? 'geral'}</small>
             <strong>{component.label ?? component.id}</strong>
-            <small>{component.screen ?? 'geral'}</small>
           </div>
         ) : (
           <div className="selection-empty">
@@ -649,13 +718,14 @@ export function EditorModule({ projectId }: { projectId: string }) {
         )}
         {component ? (
           <fieldset className="component-controls" disabled={sending}>
-            <legend>{component.label ?? component.id}</legend>
+            <legend>Ajustes</legend>
             {controls.includes('text') ? (
               <label>
                 Texto
-                <input
+                <textarea
                   aria-label={`Texto ${component.id}`}
                   value={value.text}
+                  rows={Math.min(8, Math.max(2, Math.ceil(value.text.length / 34) + (value.text.match(/\n/g)?.length ?? 0)))}
                   onChange={(event) =>
                     change(component.id, 'text', event.target.value)
                   }

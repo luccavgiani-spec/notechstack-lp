@@ -1030,6 +1030,12 @@
   color: #141414;
   box-shadow: 0 5px 16px #eda33b3d;
 }
+.editor-undo:disabled {
+  border-color: #dddcd6;
+  color: #5f5f5a;
+  opacity: 0.45;
+  cursor: default;
+}
 .editor-preview {
   min-height: calc(100vh - 157px);
   padding: 30px 20px;
@@ -1095,10 +1101,8 @@
   color: #888;
 }
 .selected-component-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: grid;
+  gap: 6px;
   margin: 14px 0 18px;
   padding: 13px 14px;
   border: 1px solid #eda33b55;
@@ -1106,12 +1110,20 @@
   background: #eda33b14;
 }
 .selected-component-card strong {
+  display: -webkit-box;
   min-width: 0;
+  overflow: hidden;
   font-size: 13px;
-  overflow-wrap: anywhere;
+  line-height: 1.45;
+  overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }
 .selected-component-card small {
-  flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: #b47924;
   font:
     8px 'JetBrains Mono',
@@ -1189,7 +1201,8 @@
     11px 'JetBrains Mono',
     monospace;
 }
-.component-controls input:not([type='range']):not([type='color']) {
+.component-controls input:not([type='range']):not([type='color']),
+.component-controls textarea {
   display: block;
   width: 100%;
   background: #222;
@@ -1199,6 +1212,12 @@
   color: #eee;
   margin-top: 8px;
   font-size: 12px;
+}
+.component-controls textarea {
+  min-height: 44px;
+  font-family: inherit;
+  line-height: 1.5;
+  resize: vertical;
 }
 .component-controls input[type='range'] {
   display: block;
@@ -1788,7 +1807,8 @@
 .client-dashboard[data-theme='light'] .version-card.current:before {
   background: #ffffff;
 }
-.client-dashboard[data-theme='light'] .component-controls input:not([type='range']):not([type='color']) {
+.client-dashboard[data-theme='light'] .component-controls input:not([type='range']):not([type='color']),
+.client-dashboard[data-theme='light'] .component-controls textarea {
   background: #ffffff;
   border-color: #1414142b;
   color: #141414;
