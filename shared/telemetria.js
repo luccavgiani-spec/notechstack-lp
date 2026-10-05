@@ -7,6 +7,8 @@
    e a ORIGEM (utm/gclid) só é gravada na primeira página da sessão — por
    isso ela roda em todas as páginas, não só nas que têm formulário. */
 (function(){
+  if (window.__noTelemetryLoaded) return;
+  window.__noTelemetryLoaded = true;
   var SS; try { SS=window.sessionStorage; } catch(e) { SS={getItem:function(){return null},setItem:function(){}}; } var sid='';
   try { sid = SS.getItem('no_sid') || ''; } catch(e){}
   if (!sid){

@@ -200,11 +200,12 @@
     setMode('project');
   }
 
-  document.querySelectorAll('[data-track]').forEach(function(node){node.addEventListener('click',function(){if(window.track)window.track('agencia_cta',{origem:node.getAttribute('data-track'),etapa:1});});});
+  document.querySelectorAll('[data-track]').forEach(function(node){node.addEventListener('click',function(){if(window.track)window.track('cta_click',{modo:'agencia',cta:node.getAttribute('data-track'),etapa:1});});});
   var phone=document.getElementById('ag-phone');
   if(phone)phone.addEventListener('input',function(){var v=phone.value.replace(/\D/g,'').slice(0,11);if(v.length>6)v='('+v.slice(0,2)+') '+v.slice(2,7)+'-'+v.slice(7);else if(v.length>2)v='('+v.slice(0,2)+') '+v.slice(2);else if(v.length)v='('+v;phone.value=v;});
 
   var form=document.getElementById('agencyLeadForm');
+  if(form)form.addEventListener('input',function(){if(window.track)window.track('form_etapa',{etapa:1,modo:'agencia'},'agencia_inicio');},{once:true});
   if(form)form.addEventListener('submit',async function(event){
     event.preventDefault();if(!form.checkValidity()){form.reportValidity();return;}
     var submit=document.getElementById('ag-submit');
@@ -214,7 +215,7 @@
       var response=await fetch('https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/send-lead-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sid:window.leadSid,origem:window.leadOrig,modo:"agencia",event_source_url:location.href,valor:0,nome:document.getElementById('ag-name').value.trim(),email:document.getElementById('ag-email').value.trim(),whatsapp:document.getElementById('ag-phone').value.trim(),contexto:'nó.agência — landing page | agência: '+document.getElementById('ag-company').value.trim()+' | cargo: '+document.getElementById('ag-role').value.trim()+' | instagram: '+document.getElementById('ag-instagram').value.trim(),objetivos:interests.join(', ')||'Parceria com agência',investimento:'',prazo:'',aiAnalysis:document.getElementById('ag-message').value.trim()})});
       var result=await response.json();
       if(!response.ok||!result.success||!(result.saved||result.emailSent))throw new Error('Falha ao enviar contato');
-      if(window.track)window.track('agencia_lead_enviado',{etapa:5,interesses:interests.join('|')},'agencia_form');
+      if(window.track)window.track('lead_submit',{etapa:5,modo:'agencia',valor:0},'agencia_form');
       form.hidden=true;document.getElementById('formSuccess').hidden=false;
     }catch(error){submit.disabled=false;submit.firstElementChild.textContent='Tentar enviar novamente';window.alert('Não conseguimos enviar agora. Tente novamente ou fale com a nó pelo WhatsApp no rodapé.');}
   });
