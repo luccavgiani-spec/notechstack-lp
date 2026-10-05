@@ -19,16 +19,4 @@
   let mascot=false;
   function loadMascot(){if(mascot)return;mascot=true;script('/lp-narrador/cenas-lp/historia/mascote-home.js?v=1').catch(()=>{mascot=false;});}
   ['scroll','pointerdown','keydown'].forEach(event=>addEventListener(event,loadMascot,{once:true,passive:true}));
-  let marketing=false;
-  function loadMarketing(){
-    if(marketing || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return;
-    marketing=true;
-    window.dataLayer=window.dataLayer||[];
-    window.dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});
-    script('https://www.googletagmanager.com/gtm.js?id=GTM-NK87FH8W').catch(()=>{});
-  }
-  ['pointerdown','keydown','scroll'].forEach(event=>addEventListener(event,loadMarketing,{once:true,passive:true}));
-  // Quem lê sem interagir também conta, depois de a primeira tela estar pronta.
-  function idle(){setTimeout(loadMarketing,5000);}
-  if(document.readyState==='complete') idle(); else addEventListener('load',idle,{once:true});
 })();
