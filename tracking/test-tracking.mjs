@@ -4,6 +4,7 @@ import vm from 'node:vm';
 const code=readFileSync('shared/marketing.js','utf8');
 let scripts=[], pushes=[];
 const context={location:{hostname:'www.notechstack.com.br'},Date,window:{dataLayer:{push:e=>pushes.push(e)}},document:{querySelector:()=>scripts[0],createElement:()=>({}),head:{appendChild:s=>scripts.push(s)}}};
+vm.runInNewContext(readFileSync('shared/marketing-host.js','utf8'),context);
 vm.runInNewContext(code,context);vm.runInNewContext(code,context);
 assert.equal(scripts.length,1);assert.equal(pushes.length,1);assert.equal(pushes[0].event,'gtm.js');
 for(const file of ['lp-narrador/cenas-lp/lp-v8.html','agencia/index.html','contato/index.html','colaboradores-digitais/index.html']){
