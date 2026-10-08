@@ -1,0 +1,342 @@
+/* ==========================================================================
+   GAZETA BRAGANTINA · tokens.css
+   --------------------------------------------------------------------------
+   Fonte unica de verdade do design system. Este arquivo e o que migra
+   inteiro para o tema do Next.js (§5 do documento de arquitetura).
+
+   Regra de ouro: nenhum valor literal de cor, tipo, espaco, raio ou duracao
+   deve existir fora daqui. Os outros CSS so consomem var().
+
+   Indice
+     1. Cor base
+     2. Cor por editoria (o fio de 3px — elemento de assinatura)
+     3. Contrato de tema  <-- o que os sub-portais trocam
+     4. Temas dos sub-portais
+     5. Tipografia
+     6. Espacamento (escala de 4px)
+     7. Grid e medida
+     8. Proporcoes de imagem
+     9. Alturas reservadas de anuncio (CLS zero)
+    10. Elevacao, raio, foco e movimento
+   ========================================================================== */
+
+:root {
+  /* --------------------------------------------------------------------
+     1. COR BASE
+     Fundo branco, tinta quase-preta. Sem fundo creme no portal principal
+     (a excecao e o Modelo B — coluna — ver --cor-fundo-opiniao).
+     Todos os valores de texto validados >= 4.5:1 sobre branco.
+     -------------------------------------------------------------------- */
+  --cor-fundo: #ffffff;
+  --cor-tinta: #16161a;            /* 18.04:1 — texto principal        */
+  --cor-tinta-2: #4a4a52;          /*  8.78:1 — linha fina, resumo     */
+  --cor-tinta-3: #6b6b74;          /*  5.28:1 — meta, legenda, credito */
+  --cor-fio: #e2e2e6;              /* fio de 1px entre itens           */
+  --cor-fio-forte: #c4c4cb;        /* fio de secao                     */
+  --cor-superficie: #f5f5f7;       /* bloco suave sobre branco         */
+  --cor-superficie-2: #fafafb;     /* bloco suavissimo                 */
+  --cor-inverso: #ffffff;          /* texto sobre fundo escuro         */
+  --cor-fundo-escuro: #16161a;     /* rodape                           */
+  --cor-fundo-opiniao: #faf8f4;    /* §3.4 — fundo da coluna           */
+  --cor-plantao: #b0111e;          /*  7.13:1 — PlantaoBar             */
+  --cor-acao: #134a9a;             /*  8.49:1 — link dentro do texto   */
+  --cor-sucesso: #14614a;
+  --cor-foco: #0b57d0;             /* anel de foco de teclado          */
+  --cor-sombra-imagem: rgba(22, 22, 26, 0.72);
+
+  /* --------------------------------------------------------------------
+     2. COR POR EDITORIA
+     "Nao e decoracao: e o sistema de orientacao do portal inteiro" (§3.0).
+     Cada valor foi verificado com ferramentas/gerar-placeholders.mjs.
+     -------------------------------------------------------------------- */
+  --ed-cidade: #1b3d77;      /* azul-tinta        10.60:1 */
+  --ed-regiao: #4c5b22;      /* verde-oliva        7.43:1 */
+  --ed-politica: #8e1f3d;    /* bordo              8.70:1 */
+  --ed-economia: #14614a;    /* verde-escuro       7.40:1 */
+  --ed-bragantino: #c8102e;  /* vermelho           5.88:1 */
+  --ed-esportes: #a8460a;    /* laranja-queimado   5.92:1 */
+  --ed-cultura: #6b2d8e;     /* roxo               8.78:1 */
+  --ed-policia: #454b54;     /* chumbo             8.80:1 */
+  --ed-colunas: #8a5a00;     /* ambar-escuro       5.93:1 */
+  --ed-opiniao: #0f5b6e;     /* azul-petroleo      7.66:1 */
+
+  /* Cor corrente da editoria. Herdada: quem nao declarar data-editoria
+     usa a cor primaria do tema — e por isso que um sub-portal muda de
+     identidade sem uma linha de CSS nova. */
+  --cor-editoria: var(--cor-primaria);
+
+  /* --------------------------------------------------------------------
+     3. CONTRATO DE TEMA
+     Isto e o `tokens` (jsonb) da tabela SubPortal (§4.5). Um sub-portal
+     e exatamente este conjunto de variaveis — nada mais.
+     -------------------------------------------------------------------- */
+  --cor-primaria: #16161a;
+  --cor-primaria-forte: #000000;
+  --cor-primaria-suave: #f0f0f2;
+  --cor-sobre-primaria: #ffffff;
+  --cor-masthead-fundo: #ffffff;
+  --cor-masthead-tinta: #16161a;
+  --cor-masthead-fio: #16161a;
+  --cor-nav-fundo: #ffffff;
+  --cor-nav-tinta: #16161a;
+  --cor-nav-ativo: var(--cor-editoria);
+  --fonte-titulo: var(--fonte-serifada);
+  --peso-titulo: 600;
+  --tracking-titulo: -0.015em;
+  --transform-masthead: none;
+  --raio: 2px;
+  --raio-grande: 3px;
+  --largura-fio-chapeu: 3px;
+
+  /* Tres acentos genericos que os blocos de secao consomem.
+     No portal principal apontam para editorias; num sub-portal, para a
+     paleta do parceiro. */
+  --tema-acento-1: var(--ed-cidade);
+  --tema-acento-2: var(--ed-cultura);
+  --tema-acento-3: var(--ed-economia);
+
+  /* --------------------------------------------------------------------
+     5. TIPOGRAFIA
+     Newsreader (titulos e corpo) + Archivo (chapeus, nav, dados).
+     Libre Franklin entra apenas como --fonte-titulo do Sindicato.
+     Fallbacks declarados: se o Google Fonts nao responder, o layout
+     continua legivel e as metricas nao explodem.
+     -------------------------------------------------------------------- */
+  --fonte-serifada: "Newsreader", Georgia, "Times New Roman", Times, serif;
+  --fonte-apoio: "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --fonte-institucional: "Libre Franklin", "Archivo", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+
+  /* escala */
+  --fs-100: 0.6875rem;  /* 11 — credito de foto       */
+  --fs-200: 0.75rem;    /* 12 — chapeu, meta, hora    */
+  --fs-300: 0.8125rem;  /* 13 — legenda, nav, tag     */
+  --fs-400: 0.875rem;   /* 14 — byline, card texto    */
+  --fs-500: 1rem;       /* 16 — card lista            */
+  --fs-600: 1.125rem;   /* 18 — card lista grande     */
+  --fs-700: 1.25rem;    /* 20 — card destaque pequeno */
+  --fs-800: 1.5rem;     /* 24 — titulo de bloco       */
+  --fs-900: 1.75rem;    /* 28 — card destaque         */
+  --fs-1000: 2rem;      /* 32 — citacao especial      */
+  --fs-1100: 2.5rem;    /* 40 — h1 de materia         */
+  --fs-1200: 3rem;      /* 48 — manchete desktop      */
+  --fs-1400: 4rem;      /* 64 — capa de especial      */
+
+  /* papeis tipograficos — escalam sozinhos entre mobile e desktop */
+  --fs-titulo-materia: clamp(1.75rem, 1.15rem + 2.6vw, 2.5rem);   /* 28 -> 40 */
+  --lh-titulo-materia: 1.2;
+  --fs-manchete: clamp(1.875rem, 1.05rem + 3.6vw, 3rem);          /* 30 -> 48 */
+  --lh-manchete: 1.08;
+  --fs-corpo: clamp(1.0625rem, 1.0rem + 0.28vw, 1.1875rem);       /* 17 -> 19 */
+  --lh-corpo: 1.7;
+  --fs-corpo-coluna: clamp(1.125rem, 1.03rem + 0.4vw, 1.25rem);   /* 18 -> 20 */
+  --lh-corpo-coluna: 1.75;
+  --fs-linha-fina: clamp(1.0625rem, 0.95rem + 0.5vw, 1.375rem);   /* 17 -> 22 */
+  --fs-capa-especial: clamp(2.25rem, 1.1rem + 5vw, 4rem);         /* 36 -> 64 */
+
+  --tracking-chapeu: 0.09em;
+  --tracking-nav: 0.02em;
+  --peso-corpo: 400;
+
+  /* --------------------------------------------------------------------
+     6. ESPACAMENTO — escala de 4px
+     -------------------------------------------------------------------- */
+  --e-1: 4px;
+  --e-2: 8px;
+  --e-3: 12px;
+  --e-4: 16px;
+  --e-5: 20px;
+  --e-6: 24px;
+  --e-7: 28px;
+  --e-8: 32px;
+  --e-10: 40px;
+  --e-12: 48px;
+  --e-14: 56px;
+  --e-16: 64px;
+  --e-20: 80px;
+  --e-24: 96px;
+  --e-32: 128px;
+
+  /* --------------------------------------------------------------------
+     7. GRID E MEDIDA
+     Container 1200 / 12 colunas / gutter 24. Breakpoints 480-768-1024-1280
+     (os breakpoints vivem nas media queries: CSS custom properties nao
+     funcionam dentro de @media — anotado em NOTAS.md).
+     -------------------------------------------------------------------- */
+  --container: 1200px;
+  --container-estreito: 860px;
+  --gutter: var(--e-6);
+  --colunas: 12;
+  --largura-sidebar: 300px;
+  --medida: 680px;          /* 66-72 caracteres — corpo da materia  */
+  --medida-larga: 720px;    /* foto-reportagem (§3.5)               */
+  --medida-coluna: 660px;   /* coluna de opiniao (§3.4)             */
+  --medida-especial: 700px; /* longform (§3.6)                      */
+  --altura-nav: 48px;       /* barra sticky de editorias            */
+  --altura-topbar-mobile: 56px;
+
+  /* --------------------------------------------------------------------
+     8. PROPORCOES DE IMAGEM — sempre por CSS, nunca por altura fixa
+     -------------------------------------------------------------------- */
+  --ar-16x9: 16 / 9;
+  --ar-4x3: 4 / 3;
+  --ar-3x2: 3 / 2;
+  --ar-1x1: 1 / 1;
+  --ar-21x9: 21 / 9;
+
+  /* --------------------------------------------------------------------
+     9. ANUNCIOS — altura reservada antes de qualquer requisicao (§2.4)
+     -------------------------------------------------------------------- */
+  --ad-billboard: 250px;         /* 970x250 */
+  --ad-billboard-mobile: 100px;  /* 320x100 */
+  --ad-leaderboard: 90px;        /* 728x90  */
+  --ad-retangulo: 250px;         /* 300x250 */
+  --ad-meia-pagina: 600px;       /* 300x600 */
+  --ad-rodape-mobile: 50px;      /* 320x50  */
+
+  /* --------------------------------------------------------------------
+    10. ELEVACAO, FOCO E MOVIMENTO
+     -------------------------------------------------------------------- */
+  --sombra-1: 0 1px 2px rgba(22, 22, 26, 0.06), 0 2px 8px rgba(22, 22, 26, 0.05);
+  --sombra-2: 0 4px 12px rgba(22, 22, 26, 0.1), 0 12px 32px rgba(22, 22, 26, 0.08);
+  --sombra-3: 0 12px 40px rgba(22, 22, 26, 0.22);
+  --largura-foco: 3px;
+  --deslocamento-foco: 2px;
+  --dur-rapida: 120ms;
+  --dur-media: 220ms;
+  --dur-lenta: 420ms;
+  --easing: cubic-bezier(0.2, 0, 0.15, 1);
+  --z-drawer: 90;
+  --z-nav: 60;
+  --z-progresso: 75;
+  --z-topo: 70;
+  --z-overlay: 100;
+  --z-lightbox: 120;
+  --z-toast: 140;
+}
+
+/* ==========================================================================
+   2b. Mapeamento editoria -> --cor-editoria
+   O unico lugar do sistema que conhece o nome das editorias. Um bloco, um
+   card, um chapeu ou uma pagina inteira herdam a cor so por declarar
+   data-editoria. Nada alem disso muda.
+   ========================================================================== */
+[data-editoria="cidade"]     { --cor-editoria: var(--ed-cidade); }
+[data-editoria="regiao"]     { --cor-editoria: var(--ed-regiao); }
+[data-editoria="politica"]   { --cor-editoria: var(--ed-politica); }
+[data-editoria="economia"]   { --cor-editoria: var(--ed-economia); }
+[data-editoria="bragantino"] { --cor-editoria: var(--ed-bragantino); }
+[data-editoria="esportes"]   { --cor-editoria: var(--ed-esportes); }
+[data-editoria="cultura"]    { --cor-editoria: var(--ed-cultura); }
+[data-editoria="policia"]    { --cor-editoria: var(--ed-policia); }
+[data-editoria="colunas"]    { --cor-editoria: var(--ed-colunas); }
+[data-editoria="opiniao"]    { --cor-editoria: var(--ed-opiniao); }
+
+/* Slots genericos de secao. No portal principal caem nas editorias acima;
+   num sub-portal, nos acentos do parceiro. O CSS e o mesmo. */
+[data-editoria="secao-1"] { --cor-editoria: var(--tema-acento-1); }
+[data-editoria="secao-2"] { --cor-editoria: var(--tema-acento-2); }
+[data-editoria="secao-3"] { --cor-editoria: var(--tema-acento-3); }
+
+/* ==========================================================================
+   4. TEMAS DOS SUB-PORTAIS
+   --------------------------------------------------------------------------
+   ESTE E O UNICO CSS QUE UM SUB-PORTAL TEM DIREITO DE TER.
+   Se em algum momento for preciso escrever uma regra `[data-tema="x"] .algo`
+   fora daqui, o sistema de tokens esta errado — refaca o componente para
+   ler o token, nao para conhecer o tema. (§3.7)
+   ========================================================================== */
+
+/* --- GB Norte: verde, sem serifa, cantos arredondados -------------------- */
+[data-tema="gbnorte"] {
+  --cor-primaria: #1d6b3f;         /* 6.51:1 sobre branco */
+  --cor-primaria-forte: #14532f;
+  --cor-primaria-suave: #e8f3ec;
+  --cor-sobre-primaria: #ffffff;
+  --cor-masthead-fundo: #0e3d24;   /* 12.27:1 com texto branco */
+  --cor-masthead-tinta: #ffffff;
+  --cor-masthead-fio: #7fd3a0;
+  --cor-nav-fundo: #ffffff;
+  --cor-nav-tinta: #14532f;
+  --cor-nav-ativo: var(--cor-editoria);
+  --cor-superficie: #f1f7f3;
+  --cor-superficie-2: #f8fbf9;
+  --cor-acao: #1d6b3f;
+  --fonte-titulo: var(--fonte-apoio);
+  --peso-titulo: 700;
+  --tracking-titulo: -0.022em;
+  --raio: 12px;
+  --raio-grande: 16px;
+  --largura-fio-chapeu: 4px;
+  --tema-acento-1: #1d6b3f;        /* Bairro       */
+  --tema-acento-2: #a8460a;        /* Eventos      */
+  --tema-acento-3: #14487f;        /* Comercio     */
+}
+
+/* --- Sindicato: azul institucional, grotesca larga, canto reto ----------- */
+[data-tema="sindicato"] {
+  --cor-primaria: #14487f;         /* 9.28:1 sobre branco */
+  --cor-primaria-forte: #0d3260;
+  --cor-primaria-suave: #e9f0f8;
+  --cor-sobre-primaria: #ffffff;
+  --cor-masthead-fundo: #0d3260;   /* 12.79:1 com texto branco */
+  --cor-masthead-tinta: #ffffff;
+  --cor-masthead-fio: #8fbff0;
+  --cor-nav-fundo: #14487f;
+  --cor-nav-tinta: #ffffff;
+  --cor-nav-ativo: #a9cdf5;
+  --cor-superficie: #eef3f9;
+  --cor-superficie-2: #f7fafd;
+  --cor-acao: #14487f;
+  --fonte-titulo: var(--fonte-institucional);
+  --peso-titulo: 600;
+  --tracking-titulo: -0.006em;
+  --transform-masthead: uppercase;
+  --raio: 0px;
+  --raio-grande: 0px;
+  --largura-fio-chapeu: 5px;
+  --tema-acento-1: #14487f;        /* Noticias    */
+  --tema-acento-2: #8e1f3d;        /* Direitos    */
+  --tema-acento-3: #0f5b6e;        /* Convencoes  */
+}
+
+/* --------------------------------------------------------------------------
+   4b. COR DO PARCEIRO NA CAPA DA GAZETA
+   O `BlocoSubPortal` (§2.3) e a barra de navegacao precisam mostrar a
+   vitrine "ja com a cor do parceiro" mesmo estando no portal principal.
+   Isso e um emprestimo de token, nao uma regra de componente: o elemento
+   marcado recebe uma fatia do tema do parceiro e todos os componentes
+   dentro dele continuam lendo as mesmas variaveis de sempre.
+   -------------------------------------------------------------------------- */
+[data-parceiro="gbnorte"] {
+  --cor-primaria: #1d6b3f;
+  --cor-primaria-forte: #14532f;
+  --cor-primaria-suave: #e8f3ec;
+  --cor-editoria: #1d6b3f;
+}
+
+[data-parceiro="sindicato"] {
+  --cor-primaria: #14487f;
+  --cor-primaria-forte: #0d3260;
+  --cor-primaria-suave: #e9f0f8;
+  --cor-editoria: #14487f;
+}
+
+/* ==========================================================================
+   Ajustes de token por viewport
+   Sao tokens mudando de valor — nao regras de layout. Layout fica em
+   layout.css.
+   ========================================================================== */
+@media (max-width: 767px) {
+  :root {
+    --gutter: var(--e-4);
+    --lh-titulo-materia: 1.2;
+    --lh-corpo: 1.65;
+    --altura-nav: 44px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --lh-titulo-materia: 1.15;
+  }
+}
