@@ -68,3 +68,21 @@ Verificação: transação com rollback antes da gravação e leitura posterior 
 RPC do console com papel authenticated/AGENCY_ADMIN e membership existente.
 Isso valida a projeção autorizada, sem representar novo teste de login real.
 Prévia local atualizada com os mesmos registros, exclusivamente em desenvolvimento.
+
+## Editor no Portal Final (07/10/2026)
+
+A pedido do Lucca, o Editor da Gazeta passou a abrir a home do Portal Final com a
+barra das dez identidades visuais, para reposicionar a marca na apresentação.
+Cópia estática em `public/prototipos/gazeta-bragantina/portal-final/`, gerada por
+`ferramentas/copiar-portal-final-editor.py` (repo gazeta_bragantina) a partir da
+apresentação local: sem o runtime do Next, links de página trocados por `#`, fotos
+das matérias servidas pelo R2 da Gazeta e troca de marca portada de `LogoOpcoes`.
+O script-ponte usa a versão V3.1 (`9a43cf34-2804-4b0e-bdfc-96bd4d2e1bb0`) e o modo
+automático (`*`). Com o modo de edição desligado, a barra troca a logo; ligado,
+o clique seleciona e o arraste move o elemento.
+
+No banco: V3.1 criada como versão atual com essa URL em `build_reference` (a V3
+continua com o marco histórico, protegido pelo trigger), `editor_version_configs`
+com `*` e `modules.editor = ativo`. A aba Protótipo segue no pacote de 15/09.
+O `editor_lock_reason` saiu de `next_steps.presentation`. Reexecutar
+`gazeta-production.sql` voltaria a bloquear o Editor e sobrescreveria `next_steps`.
