@@ -17,7 +17,8 @@ export type LeadOrigem = {
 
 export type CanalLead = "meta" | "google" | "organico" | "direto" | "outros";
 
-const FONTES_META = new Set(["facebook", "fb", "instagram", "ig", "meta"]);
+// "an" (Audience Network) e "msg" (Messenger) vêm do {{site_source_name}} do Meta.
+const FONTES_META = new Set(["facebook", "fb", "instagram", "ig", "meta", "an", "msg"]);
 const MEIOS_PAGOS = new Set(["cpc", "ppc", "paid", "paidsearch", "paid_search", "ads", "pago"]);
 const BUSCADORES = new Set(["google", "bing", "duckduckgo", "yahoo"]);
 

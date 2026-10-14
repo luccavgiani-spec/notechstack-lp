@@ -1,9 +1,9 @@
 /* Respostas privadas: nunca passam pelo dataLayer/GA4. */
 (function(){
   'use strict';
-  window.createLeadProgress = function(form, mode){
-    const endpoint = new URL('save-lead-progress', form.action).href;
-    const fields = ['nome','whatsapp','negocio','objetivo','descricao','links'];
+  window.createLeadProgress = function(form, mode, options){
+    const endpoint = options?.endpoint || new URL('save-lead-progress', form.action).href;
+    const fields = options?.fields || ['nome','whatsapp','negocio','objetivo','descricao','links'];
     let completed = 0, finalized = false, interacted = false, timer, retry, version = 0, acknowledged = '', pending = '', attempts = 0;
     function snapshot(){
       const respostas = {};
@@ -38,7 +38,7 @@
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') save(true); });
     return {
       advance(number){ interacted = true; completed = Math.max(completed, number); save(false); },
-      finish(){ finalized = true; save(false); }
+      finish(number){ interacted = true; finalized = true; if (number) completed = Math.max(completed, number); save(false); }
     };
   };
 })();

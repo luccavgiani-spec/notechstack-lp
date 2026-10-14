@@ -11,6 +11,7 @@ const db = new PGlite();
 await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
   create table public.leads (sid text, modo text); grant select on public.leads to service_role;`);
 await db.exec(fs.readFileSync('supabase/migrations/20260929173008_lead_rascunhos.sql','utf8'));
+await db.exec(fs.readFileSync('supabase/migrations/20261014160000_lead_rascunhos_agencia.sql','utf8'));
 let handler, unavailable = false;
 const backendCalls = [];
 vm.runInNewContext(stripTypeScriptTypes(fs.readFileSync('supabase/functions/save-lead-progress/index.ts','utf8')), {
@@ -115,9 +116,59 @@ for (const filename of ['lp-narrador/cenas-lp/lp-v8.html','contato/index.html'])
   const last=calls.filter(c=>c.data&&c.url.endsWith('save-lead-progress')).at(-1).data;
   assert.equal((await request(last)).status,200);
 }
+// /agencia: the real page script drafts privately, keeping utm_content/utm_term from the session origin.
+{
+  const html=fs.readFileSync('agencia/index.html','utf8');
+  assert.ok(html.indexOf('/shared/lead-progress.js') > -1 && html.indexOf('/shared/lead-progress.js') < html.indexOf('/agencia/agencia.js'));
+  const {document,Event}=parseHTML(html);
+  const form=document.getElementById('agencyLeadForm');
+  const inputs=[...form.querySelectorAll('input,textarea')];
+  form.elements={namedItem:name=>inputs.find(input=>input.name===name)};
+  form.checkValidity=()=>true;
+  const origem={utm_source:'an',utm_medium:'paid',utm_campaign:'agencia',utm_content:'reel-b2b',utm_term:'publico-agencias',fbclid:'fb-test'};
+  const timers=new Map(), listeners={}, calls=[], events=[]; let timerId=0;
+  const window={leadSid:'browser-test-session-agencia',leadOrig:origem,track:(event,params)=>events.push({event,...params}),matchMedia:()=>({matches:true,addEventListener(){}}),addEventListener(){},scrollY:0,innerHeight:800};
+  const context={window,document,URL,Blob,TextEncoder,Date,console,
+    setTimeout:(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId;}, clearTimeout:id=>timers.delete(id),
+    addEventListener:(name,fn)=>listeners[name]=fn,
+    navigator:{sendBeacon:(url,body)=>{calls.push({url,beacon:body});return true;}},
+    fetch:async(url,options)=>{calls.push({url,data:JSON.parse(options.body)});return new Response(JSON.stringify(url.endsWith('save-lead-progress')?{ok:true}:{success:true,saved:true}));},
+    location:{href:'https://www.notechstack.com.br/agencia/?utm_content=reel-b2b'},alert:()=>{},IntersectionObserver:class{observe(){}disconnect(){}},requestAnimationFrame:()=>0,performance};
+  context.window.createLeadProgress=undefined;
+  vm.createContext(context);
+  vm.runInContext(fs.readFileSync('shared/lead-progress.js','utf8'),context);
+  context.createLeadProgress=context.window.createLeadProgress;
+  vm.runInContext(fs.readFileSync('agencia/agencia.js','utf8'),context);
+  const settle=()=>new Promise(resolve=>setImmediate(resolve));
+  listeners.pagehide(); assert.equal(calls.length,0,'agency visit without interaction must not create a draft');
+  const set=(name,value)=>{form.elements.namedItem(name).value=value;form.elements.namedItem(name).dispatchEvent(new Event('input',{bubbles:true}));};
+  set('nome','Carla'); await settle();
+  const first=calls.find(c=>c.url.endsWith('save-lead-progress'));
+  assert.ok(first,'first agency input must save a draft');
+  assert.equal(first.url,'https://sdeowbqmwkwseyktyemn.supabase.co/functions/v1/save-lead-progress');
+  assert.equal(first.data.modo,'agencia'); assert.equal(first.data.respostas.nome,'Carla');
+  set('agencia','Agência Teste'); set('email','carla@agencia.test');
+  [...timers.values()].find(t=>t.ms===1000).fn(); await settle();
+  let snapshot=calls.filter(c=>c.data&&c.url.endsWith('save-lead-progress')).at(-1).data;
+  assert.equal((await request(snapshot)).status,200);
+  let agencyRow=(await db.query("select * from lead_rascunhos where modo='agencia'")).rows[0];
+  assert.equal(agencyRow.respostas.agencia,'Agência Teste'); assert.equal(agencyRow.respostas.email,'carla@agencia.test');
+  assert.equal(agencyRow.origem.utm_content,'reel-b2b'); assert.equal(agencyRow.origem.utm_term,'publico-agencias');
+  assert.equal(agencyRow.finalizado,false);
+  for(const [name,value] of [['cargo','Founder'],['whatsapp','(11) 98765-4321']]) set(name,value);
+  form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})); await settle(); await settle();
+  assert.ok(calls.some(c=>c.url.endsWith('send-lead-email')));
+  snapshot=calls.filter(c=>c.data&&c.url.endsWith('save-lead-progress')).at(-1).data;
+  assert.equal(snapshot.finalizado,true); assert.equal(snapshot.etapa,5);
+  assert.equal((await request(snapshot)).status,200);
+  agencyRow=(await db.query("select * from lead_rascunhos where modo='agencia'")).rows[0];
+  assert.equal(agencyRow.finalizado,true); assert.equal(agencyRow.respostas.whatsapp,'(11) 98765-4321');
+  assert.equal((await request({...base,modo:'agencia',respostas:{negocio:'campo de outro modo'}})).status,400);
+  assert.ok(!JSON.stringify(events).includes('Carla'),'agency answers must not reach analytics');
+}
 await db.close();
 const config=JSON.parse(fs.readFileSync('vercel.json','utf8'));
 for(const source of ['/lp-narrador/cenas-lp/lp-v7.html','/lp-narrador/cenas-lp/lp-v7.html/']) {
   assert.ok(config.redirects.some(rule=>rule.source===source&&rule.destination==='/'&&rule.permanent===true));
 }
-console.log('PASS: private partial saves, all 5 steps on Home/Contato, no answers in analytics, abandon beacon, completion, SQL ordering/idempotency, access denied for clients, invalid requests and backend failures. No production writes.');
+console.log('PASS: private partial saves, all 5 steps on Home/Contato, no answers in analytics, abandon beacon, completion, /agencia draft with utm_content/utm_term, SQL ordering/idempotency, access denied for clients, invalid requests and backend failures. No production writes.');
