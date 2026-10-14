@@ -74,11 +74,29 @@ function normFone(v: string): string {
   return d
 }
 
+/* Lista de teste: LEAD_TEST_EMAILS, e-mails separados por vírgula. Nenhum
+   e-mail fixo aqui. Comparação sem espaços e sem caixa. */
+function emailDeTeste(email: string | null): boolean {
+  const alvo = (email || '').trim().toLowerCase()
+  if (!alvo) return false
+  return (Deno.env.get('LEAD_TEST_EMAILS') || '')
+    .split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+    .includes(alvo)
+}
+
+/* Lead de teste só vai ao CAPI com test_event_code (META_TEST_EVENT_CODE):
+   aparece em "Eventos de teste" e não conta no pixel. Sem o código, nem
+   manda — `teste_sem_codigo`. Com o código, o status ganha prefixo
+   `teste_` (teste_ok_1, teste_erro_400…) para não se confundir com lead real. */
 async function mandarLeadCapi(o: {
   sid: string | null, email: string | null, fone: string | null,
   fbp: string | null, fbc: string | null, valor: number,
-  url: string | null, ip: string, ua: string,
+  url: string | null, ip: string, ua: string, teste: boolean,
 }): Promise<string> {
+  const CODIGO_TESTE = o.teste ? txt(Deno.env.get('META_TEST_EVENT_CODE')) : null
+  if (o.teste && !CODIGO_TESTE) return 'teste_sem_codigo'
+  const pre = o.teste ? 'teste_' : ''
+
   const TOKEN = Deno.env.get('META_ACCESS_TOKEN')
   if (!TOKEN) return 'sem_token'
 
@@ -109,17 +127,19 @@ async function mandarLeadCapi(o: {
              de política. Cortar de todos custa nada. */
           custom_data: { value: o.valor, currency: 'BRL' },
         }],
+        /* raiz do corpo, junto de `data` — é onde a Graph API lê */
+        test_event_code: CODIGO_TESTE || undefined,
       }),
     })
     const body = await res.json().catch(() => ({}))
     if (!res.ok) {
       console.error('Meta CAPI recusou o Lead:', res.status, JSON.stringify(body))
-      return `erro_${res.status}`
+      return `${pre}erro_${res.status}`
     }
-    return `ok_${body?.events_received ?? 0}`
+    return `${pre}ok_${body?.events_received ?? 0}`
   } catch (e) {
     console.error('Meta CAPI falhou na rede:', String(e))
-    return 'erro_rede'
+    return `${pre}erro_rede`
   }
 }
 
@@ -228,6 +248,32 @@ Deno.serve(async (req) => {
     }
     if (saveError) console.error('Falha ao gravar lead:', saveError)
 
+    /* ── 1b. Lead da lista de teste já entra classificado ──────────────── */
+    /* Mesmo mecanismo do hub: linha aditiva em `lead_classificacao`; a classe
+       vigente é a mais recente, então o hub ainda pode reclassificar. */
+    const teste = emailDeTeste(email)
+    if (teste && leadId && SUPABASE_KEY) {
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/lead_classificacao`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify({
+            lead_id: leadId, classe: 'teste',
+            motivo: 'e-mail na LEAD_TEST_EMAILS', papel: 'send-lead-email',
+          }),
+        })
+        if (!r.ok) console.error('Falha ao classificar lead de teste:', r.status, await r.text())
+      } catch (e) {
+        /* o lead já está gravado; a classe pode ser dada no hub depois */
+        console.error('Falha ao classificar lead de teste:', String(e))
+      }
+    }
+
     /* ── 2. Costurar com o percurso ────────────────────────────────────── */
     if (sid && SUPABASE_KEY) {
       try {
@@ -249,7 +295,7 @@ Deno.serve(async (req) => {
 
     /* ── 3. Meta CAPI ──────────────────────────────────────────────────── */
     const capiStatus = await mandarLeadCapi({
-      sid, email, fone: whatsapp, fbp, fbc, valor, url: pagina, ip, ua,
+      sid, email, fone: whatsapp, fbp, fbc, valor, url: pagina, ip, ua, teste,
     })
     if (leadId && SUPABASE_KEY && capiStatus !== 'sem_token') {
       try {

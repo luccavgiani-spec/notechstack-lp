@@ -3183,6 +3183,7 @@ requestAnimationFrame(frame);
 })();
 </script>
 <!-- GTM deferred loader -->
-<script>window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id=GTM-NK87FH8W&l=dataLayer';document.head.appendChild(s);},2000);});</script>
+<script src="/shared/marketing-host.js?v=1"></script>
+<script>window.addEventListener('load',function(){if(!(window.noMarketingHostAllowed&&window.noMarketingHostAllowed(location.hostname)))return;setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtm.js?id=GTM-NK87FH8W&l=dataLayer';document.head.appendChild(s);},2000);});</script>
 </body>
 </html>

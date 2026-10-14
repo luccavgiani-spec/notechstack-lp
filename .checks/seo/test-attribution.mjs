@@ -3,7 +3,7 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const store=new Map();
 function visit(path,referrer,search=''){
- const context={URL,URLSearchParams,crypto:globalThis.crypto,location:{pathname:path,hostname:'localhost',search},sessionStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},document:{referrer,cookie:'',visibilityState:'visible'},addEventListener(){},setTimeout(){},clearTimeout(){},navigator:{},console};context.window=context;
+ const context={URL,URLSearchParams,crypto:globalThis.crypto,location:{pathname:path,hostname:'localhost',search},sessionStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},document:{referrer,cookie:'',visibilityState:'visible',addEventListener(){}},addEventListener(){},setTimeout(){},clearTimeout(){},navigator:{},console};context.window=context;
  vm.runInNewContext(fs.readFileSync('shared/telemetria.js','utf8'),context);return context;
 }
 const landing=visit('/sistemas-sob-medida/','https://www.google.com/search?q=sistema');

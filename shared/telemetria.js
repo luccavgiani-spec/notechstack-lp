@@ -1,7 +1,7 @@
 /* Telemetria do site — um ponto de saída só (dataLayer + fila do painel de
-   percurso no Supabase). Mesma lógica do bloco inline no <head> da home
-   (lp-narrador/cenas-lp/lp-v8.html), que fica inline lá para não custar uma
-   ida à rede na página mais visitada. Mudou um, mude o outro.
+   percurso no Supabase). A home (lp-narrador/cenas-lp/lp-v8.html) também
+   carrega este arquivo; o bloco inline que existia lá saiu. As LPs antigas
+   (lp-v5, lp-v7, RASTREIO-lp-v5) ainda têm cópia inline própria.
 
    Carregar SÍNCRONO, antes do snippet do GTM: a primeira tag já quer o sid,
    e a ORIGEM (utm/gclid) só é gravada na primeira página da sessão — por
@@ -129,4 +129,35 @@
     if (document.visibilityState === 'hidden') descarrega(true);
   });
   track('site_visit',{pagina:location.pathname},'pagina');
+
+  /* ---------- clique no WhatsApp ----------
+     Delegado no document (capture): pega o rodapé (a.ft-whatsapp) e qualquer
+     link wa.me / api.whatsapp.com, inclusive os que o componente monta depois
+     do load. Sem `chave`: cada clique conta. Não chama preventDefault — a
+     navegação segue; medição não pode segurar o clique. */
+  var RE_WA = /^(?:https?:)?\/\/(?:www\.)?(?:wa\.me|api\.whatsapp\.com)(?:[\/?#]|$)/i;
+  function linkWhats(ev){
+    var nos = (ev.composedPath && ev.composedPath()) || [];
+    if (!nos.length){
+      for (var n = ev.target; n; n = n.parentNode) nos.push(n);
+    }
+    for (var i = 0; i < nos.length; i++){
+      var el = nos[i];
+      if (!el || !el.tagName || String(el.tagName).toUpperCase() !== 'A') continue;
+      var href = (el.getAttribute && el.getAttribute('href')) || el.href || '';
+      return RE_WA.test(href) ? el : null;   /* só o <a> mais próximo decide */
+    }
+    return null;
+  }
+  document.addEventListener('click', function(ev){
+    try {
+      var a = linkWhats(ev);
+      if (!a) return;
+      var rodape = (' ' + (a.getAttribute('class') || '') + ' ').indexOf(' ft-whatsapp ') > -1;
+      window.track('whatsapp_click', { pagina: location.pathname, link: rodape ? 'rodape' : 'conteudo' });
+      if (typeof window.fbq === 'function'){
+        window.fbq('track', 'Contact', { pagina: location.pathname });
+      }
+    } catch(e){}
+  }, true);
 })();
