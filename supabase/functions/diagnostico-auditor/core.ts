@@ -23,7 +23,6 @@ export type Deps = {
 };
 
 const RE_EVENT = /^diag_[0-9a-f-]{36}$/;
-const PEPPER_FIXO = 'notechstack-diag-v1-pepper-sem-salt';
 const ORIGENS = new Set(['https://www.notechstack.com.br', 'https://notechstack.com.br']);
 
 export function origemPermitida(o: string | null): string | null {
@@ -112,6 +111,13 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
   if (req.method !== 'POST') return json({ status: 'erro', erro: 'metodo' }, 405);
 
+  // Falha fechada: sem salt o hash de IPv4 seria reversivel. Nada e gravado nem contado.
+  const salt = deps.env('DIAG_IP_SALT');
+  if (!salt) {
+    log('diagnostico-auditor: DIAG_IP_SALT ausente, pedido recusado (config_ausente)');
+    return json({ status: 'erro', erro: 'config_ausente' }, 500);
+  }
+
   const raw = await req.text();
   if (raw.length > 16384) return json({ status: 'erro', erro: 'corpo_grande' }, 413);
   let p: any;
@@ -135,8 +141,6 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
   }
 
   const ipBruto = primeiroIp(req.headers.get('x-forwarded-for'));
-  let salt = deps.env('DIAG_IP_SALT');
-  if (!salt) { log('diagnostico-auditor: DIAG_IP_SALT ausente, usando pepper fixo'); salt = PEPPER_FIXO; }
   const ipHash = await sha256(salt + chaveIp(ipBruto));
   const urlHash = await sha256(url);
   const envDeps: EnviosDeps = { fetch: deps.fetch, env: deps.env };
