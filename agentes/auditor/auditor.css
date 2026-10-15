@@ -176,6 +176,8 @@
 @media(min-width:1080px){.au-cards{grid-template-columns:repeat(4,1fr)}.au-card{padding:22px 18px 20px}.au-card-status{font-size:10px}}
 .au-card-icone{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--ag-acento);color:var(--ag-botao-texto)}
 .au-card-icone svg{width:22px;height:22px;display:block}
+/* rodada 9: logos de marca (Meta, Google) são paths preenchidos, não traço; um pouco maiores para ter o mesmo peso visual dos ícones de linha */
+.au-card-icone--marca svg{width:24px;height:24px}
 .au-card h3{margin:0;font-size:18px;line-height:1.2;letter-spacing:-.01em}
 .au-card p{margin:0;font-size:15px;line-height:1.5;color:var(--ag-texto-painel)}
 .au-card-status{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 10.5px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;background:var(--ag-vidro-alt);color:var(--ag-texto-sec)}
