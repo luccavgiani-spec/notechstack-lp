@@ -7,8 +7,13 @@
   overflow: hidden;
 }
 
+.topography-container {
+  overflow: hidden;
+}
+
 .no-topo-bg > canvas,
-.no-topo-canvas {
+.no-topo-canvas,
+.topography-canvas {
   display: block;
   width: 100%;
   height: 100%;

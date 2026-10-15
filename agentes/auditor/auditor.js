@@ -16,8 +16,14 @@
   if (relevo && window.NoTopography) {
     var azul = getComputedStyle(document.documentElement).getPropertyValue('--no-azul').trim();
     var celular = window.matchMedia('(max-width: 699px)').matches;
-    /* celular: a hero de vidro cobre quase a tela toda, então o relevo só aparece nas margens; 0.28 deixa ele presente sem competir com o texto */
-    window.NoTopography.mount(relevo, { color: azul, lightMode: true, opacity: celular ? 0.28 : 0.3, lineCount: celular ? 18 : 22, lineWidth: 1.1, speed: 0.2, fog: 0.35 });
+    /* Topography completo do React Bits (porte em /shared/topography.js), em tinta sobre osso (lightMode) no azul nó.agentes.
+       Celular: menos linhas, dpr 1,5 e sem reação ao dedo (rolar não mexe no relevo; toque ainda solta o pulso). */
+    window.NoTopography.mount(relevo, {
+      color: azul, lightMode: true, opacity: celular ? 0.26 : 0.55,
+      lineCount: celular ? 16 : 22, lineWidth: 1.2, elevation: 1, foreground: 0.2, tilt: 32,
+      speed: 0.25, direction: 'forward', glow: celular ? 0.6 : 0.8, depthOfField: celular ? 0 : 0.15, fog: celular ? 0.35 : 0.2,
+      mouseInteraction: !celular, hoverEffect: 'lift', clickEffect: 'pulse', dpr: celular ? 1.5 : undefined
+    });
   }
 
   var form = document.getElementById('au-form');
