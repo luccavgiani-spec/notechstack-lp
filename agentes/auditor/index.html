@@ -32,7 +32,8 @@
 <link rel="stylesheet" href="/shared/site.css?v=1">
 <link rel="stylesheet" href="/shared/card-nav.css">
 <link rel="stylesheet" href="/shared/site-layout.css">
-<link rel="stylesheet" href="/agentes/auditor/auditor.css?v=1">
+<link rel="stylesheet" href="/shared/topography.css?v=1">
+<link rel="stylesheet" href="/agentes/auditor/auditor.css?v=2">
 <script src="/shared/card-nav.js" defer></script>
 <script src="/shared/telemetria.js?v=3"></script>
 <!-- Google Tag Manager (mesmo container da home) -->
@@ -43,17 +44,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
 <!-- End Google Tag Manager -->
-<script src="/agentes/auditor/auditor.js?v=1" defer></script>
+<script src="/shared/topography.js?v=1" defer></script>
+<script src="/agentes/auditor/auditor.js?v=2" defer></script>
 </head>
-<body class="ag-body">
+<body class="ag-body tema-agentes">
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK87FH8W" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<div class="no-topo-bg" id="au-relevo" aria-hidden="true"></div>
 <!-- site-nav:start -->
 <nav class="no-card-nav" aria-label="Navegação principal"><div class="no-card-top"><button class="no-card-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="no-card-panel"><span></span><span></span></button><a class="no-card-brand" href="/" aria-label="Nó — página inicial"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="46" height="30"></a><div class="no-card-toplinks"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/contato/">Contato</a></div></div><div id="no-card-panel" class="no-card-panel" aria-hidden="true" inert><div class="no-card-panel-inner"><div class="no-card-grid"><div class="no-card"><b>Home</b><div><a href="/">Conheça a Nó</a><a href="/#como-funciona">Como funciona</a><a href="/#clientes">Nossos clientes</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/agentes/">Nó Agentes</a><a href="/agentes/auditor/">Auditor de marketing</a><a href="/health/">nó.health</a></div></div><div class="no-card"><b>Agência</b><div><a href="/agencia/#solucoes">Soluções</a><a href="/agencia/#como-funciona">Como funciona</a><a href="/agencia/#organizacao">Organização</a><a href="/agencia/#acompanhamento">Acompanhamento</a><a href="/agencia/#empresas">Empresas</a></div></div><div class="no-card"><b>Contato</b><div><a href="/contato/">Conte sua ideia</a><a href="/agencia/#contato">Parceria com agências</a></div></div></div></div></div></nav>
 <!-- site-nav:end -->
 
 <main class="ag-main" id="conteudo">
   <section class="au-hero">
-    <span class="ag-kicker">Nó Agentes · Auditor de Integridade de Marketing</span>
+    <p class="ag-lockup"><span class="ag-lockup-no">nó</span><span class="ag-lockup-sub">.agentes</span></p>
+    <span class="ag-kicker">Auditor de Integridade de Marketing</span>
     <h1>Seu rastreamento pode estar contando errado.</h1>
     <p class="ag-lead">Cole a URL do seu site. Em segundos você vê se pixel, GA4, Google Ads e aviso de cookies estão instalados do jeito certo. Sem cadastro para o primeiro relatório.</p>
 
@@ -64,17 +68,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <button class="ag-btn ag-btn--primario au-submit" id="au-submit" type="submit">Diagnosticar grátis</button>
       </div>
       <p class="au-erro" id="au-erro" role="alert" hidden></p>
-
-      <fieldset class="au-consent" id="au-consent" aria-describedby="au-consent-desc">
-        <legend>Medição (LGPD)</legend>
-        <p id="au-consent-desc">Podemos registrar este diagnóstico nas nossas ferramentas de medição (Meta e Google)? Até você escolher, fica recusado. <a href="/privacidade/">Como tratamos dados</a>.</p>
-        <div class="au-consent-botoes">
-          <button type="button" class="au-chip" id="au-consent-grant" aria-pressed="false">Permitir medição</button>
-          <button type="button" class="au-chip" id="au-consent-deny" aria-pressed="false">Recusar</button>
-        </div>
-        <p class="au-consent-estado" id="au-consent-estado" aria-live="polite">Medição: recusada (padrão)</p>
-      </fieldset>
     </form>
+    <p class="au-prefs"><button type="button" class="au-prefs-btn" id="au-consent-prefs" aria-controls="au-cookies">Preferências de cookies</button></p>
   </section>
 
   <section class="au-estado" id="au-estado" aria-live="polite" aria-busy="false"></section>
@@ -90,6 +85,16 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <p class="au-passos"><span>1. URL</span><span>2. Diagnóstico inicial</span><span>3. Conectar Meta e Google</span><span>4. Cadastro</span></p>
   </section>
 </main>
+
+<!-- Pop-up de cookies: abre sozinho sem escolha salva em localStorage 'no_auditor_consent'; não bloqueia a página -->
+<div class="au-cookies" id="au-cookies" role="dialog" aria-modal="false" aria-labelledby="au-cookies-titulo" aria-describedby="au-cookies-desc" hidden>
+  <h2 class="au-cookies-titulo" id="au-cookies-titulo">Cookies e medição</h2>
+  <p class="au-cookies-desc" id="au-cookies-desc">Usamos cookies de medição (Meta e Google) só se você permitir. Até escolher, fica recusado. <a href="/privacidade/">Como tratamos dados</a>.</p>
+  <div class="au-cookies-botoes">
+    <button type="button" class="ag-btn ag-btn--primario" id="au-consent-grant">Permitir medição</button>
+    <button type="button" class="ag-btn ag-btn--secundario" id="au-consent-deny">Recusar</button>
+  </div>
+</div>
 
 <!-- site-footer:start -->
 <footer class="no-site-footer">

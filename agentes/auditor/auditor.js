@@ -11,6 +11,14 @@
     if (custom) ENDPOINT = custom;
   }
 
+  /* Fundo de relevo animado na página inteira (pedido do Lucca): azul da marca, opacidade baixa para não competir com o texto. */
+  var relevo = document.getElementById('au-relevo');
+  if (relevo && window.NoTopography) {
+    var azul = getComputedStyle(document.documentElement).getPropertyValue('--no-azul').trim();
+    var celular = window.matchMedia('(max-width: 699px)').matches;
+    window.NoTopography.mount(relevo, { color: azul, lightMode: true, opacity: celular ? 0.22 : 0.3, lineCount: celular ? 16 : 22, lineWidth: 1.1, speed: 0.2, fog: 0.35 });
+  }
+
   var form = document.getElementById('au-form');
   var input = document.getElementById('au-url');
   var submit = document.getElementById('au-submit');
@@ -18,7 +26,8 @@
   var estado = document.getElementById('au-estado');
   var btnGrant = document.getElementById('au-consent-grant');
   var btnDeny = document.getElementById('au-consent-deny');
-  var consentEstado = document.getElementById('au-consent-estado');
+  var cookies = document.getElementById('au-cookies');
+  var btnPrefs = document.getElementById('au-consent-prefs');
   if (!form || !input || !estado) return;
 
   /* ---------- utilidades ---------- */
@@ -66,14 +75,33 @@
     var mode = granted ? 'granted' : 'denied';
     window.gtag('consent', 'update', { ad_storage: mode, ad_user_data: mode, ad_personalization: mode, analytics_storage: mode });
     if (typeof window.fbq === 'function') window.fbq('consent', granted ? 'grant' : 'revoke');
-    if (btnGrant) btnGrant.setAttribute('aria-pressed', String(granted));
-    if (btnDeny) btnDeny.setAttribute('aria-pressed', String(!granted && persist));
-    if (consentEstado) consentEstado.textContent = 'Medição: ' + (granted ? 'permitida' : (persist ? 'recusada' : 'recusada (padrão)'));
+  }
+  /* pop-up de cookies (#au-cookies): aria-modal="false", não bloqueia a página.
+     Abre sozinho quando não há escolha salva; fecha com a escolha; Esc fecha sem salvar (continua recusado).
+     Foco: ao abrir sozinho no carregamento NÃO rouba o foco (é não modal); só quando a pessoa clica em
+     "Preferências de cookies" (devolverFoco=true) o foco vai para o pop-up e volta ao botão ao fechar. */
+  var focoAnterior = null;
+  function abrirCookies(devolverFoco) {
+    if (!cookies) return;
+    focoAnterior = devolverFoco ? document.activeElement : null;
+    cookies.hidden = false;
+    if (devolverFoco && btnGrant) btnGrant.focus({ preventScroll: true });
+  }
+  function fecharCookies() {
+    if (!cookies || cookies.hidden) return;
+    cookies.hidden = true;
+    if (focoAnterior && typeof focoAnterior.focus === 'function') focoAnterior.focus({ preventScroll: true });
+    focoAnterior = null;
   }
   var stored = null; try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
   applyConsent(stored === 'granted' ? 'granted' : 'denied', !!stored);
-  if (btnGrant) btnGrant.addEventListener('click', function () { applyConsent('granted', true); });
-  if (btnDeny) btnDeny.addEventListener('click', function () { applyConsent('denied', true); });
+  if (!stored) abrirCookies(false);
+  if (btnGrant) btnGrant.addEventListener('click', function () { applyConsent('granted', true); fecharCookies(); });
+  if (btnDeny) btnDeny.addEventListener('click', function () { applyConsent('denied', true); fecharCookies(); });
+  if (btnPrefs) btnPrefs.addEventListener('click', function () { abrirCookies(true); });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && cookies && !cookies.hidden) { ev.preventDefault(); fecharCookies(); }
+  });
 
   /* ---------- estados de tela ---------- */
   function render(html, busy) {
