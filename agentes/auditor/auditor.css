@@ -30,17 +30,24 @@
   --ag-vidro-forte:color-mix(in srgb, var(--no-osso) 94%, transparent);
 }
 .tema-agentes{
-  --ag-acento:var(--no-azul);
-  --ag-acento-escuro:var(--no-azul-escuro);
-  --ag-acento-foco:var(--no-azul);
-  --ag-acento-tint:var(--no-azul-tint);
-  --ag-link:var(--no-azul-escuro);
-  --ag-tag:var(--no-azul-escuro);
-  --ag-botao:var(--no-azul);
-  --ag-botao-hover:var(--no-azul-escuro);
+  --ag-acento:var(--no-agentes-azul);
+  --ag-acento-escuro:var(--no-agentes-azul-escuro);
+  --ag-acento-foco:var(--no-agentes-azul);
+  --ag-acento-tint:var(--no-agentes-azul-tint);
+  --ag-link:var(--no-agentes-azul-escuro);
+  --ag-tag:var(--no-agentes-azul-escuro);
+  --ag-botao:var(--no-agentes-azul);
+  --ag-botao-hover:var(--no-agentes-azul-escuro);
   --ag-botao-texto:var(--no-osso);
-  --ag-ok:var(--no-azul);
+  --ag-ok:var(--no-agentes-azul);
   --ag-atencao:var(--no-tinta);
+  /* nav azul com seletor branco e janela da hero em vidro azul-claro (pedido de Lucca, rodada 7) */
+  --ag-nav-fundo:var(--no-agentes-azul);
+  --ag-nav-texto:var(--no-osso);
+  --ag-nav-seletor:var(--no-osso);
+  --ag-nav-seletor-texto:var(--no-agentes-azul);
+  --ag-vidro-hero:color-mix(in srgb, var(--no-agentes-azul-tint) 70%, transparent);
+  --ag-vidro-hero-borda:color-mix(in srgb, var(--no-agentes-azul) 22%, transparent);
 }
 
 .ag-body{margin:0;min-width:0;overflow-x:clip;background:var(--ag-fundo);color:var(--ag-texto);font-family:var(--font-core,'Sora',sans-serif);-webkit-font-smoothing:antialiased}
@@ -74,8 +81,9 @@
 .ag-faixa{margin-top:48px;padding:20px 24px;border-radius:16px;background:var(--ag-fundo-alt);font-size:15px}
 .ag-faixa p{margin:0}.ag-faixa a{color:var(--ag-link);font-weight:600}
 
-/* Auditor: primeira dobra (painel de vidro: texto legível sobre o relevo) */
-.au-hero{position:relative;padding:18px 18px 22px;border-radius:22px;border:1px solid var(--ag-borda-suave);background:var(--ag-vidro);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+/* Auditor: primeira dobra. Janela em vidro azul bem claro e translúcido: o relevo animado aparece por trás,
+   o blur maior mantém o texto em destaque. Fora do .tema-agentes cai no vidro osso padrão. */
+.au-hero{position:relative;padding:18px 18px 22px;border-radius:22px;border:1px solid var(--ag-vidro-hero-borda,var(--ag-borda-suave));background:var(--ag-vidro-hero,var(--ag-vidro));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 @media(min-width:760px){.au-hero{padding:36px 40px 40px;border-radius:28px}}
 .au-form{margin-top:22px;display:flex;flex-direction:column;gap:12px;max-width:720px}
 .au-label{font:600 12px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.1em;text-transform:uppercase;color:var(--ag-texto-sec)}
@@ -87,11 +95,6 @@
 .au-submit{min-height:52px;padding-inline:26px}
 .au-submit[disabled]{opacity:.6;cursor:progress;transform:none}
 .au-erro{margin:0;color:var(--ag-erro-texto);font-size:14px}
-/* link-botão discreto que reabre o pop-up de cookies */
-.au-prefs{margin:12px 0 0}
-.au-prefs-btn{appearance:none;background:none;border:0;padding:0;color:var(--ag-texto-sec);font:500 12px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.06em;text-transform:uppercase;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.au-prefs-btn:hover{color:var(--ag-acento-escuro)}
-.au-prefs-btn:focus-visible{outline:3px solid var(--ag-acento-foco);outline-offset:3px;border-radius:4px}
 
 /* Pop-up de cookies: folha inferior compacta no mobile, card fixo no canto inferior direito no desktop.
    aria-modal="false": não bloqueia a página; z-index abaixo da nav (1100) e acima do conteúdo (1). */
@@ -146,21 +149,93 @@
 .au-fundo .ag-btn--primario:hover{background:var(--ag-botao-hover);border-color:var(--ag-botao-hover)}
 .au-fundo .ag-btn:focus-visible{outline-color:var(--no-osso)}
 
-/* Como funciona */
-.au-como{margin-top:56px;padding-top:32px;border-top:1px solid var(--ag-borda)}
-.au-como h2{margin:0 0 14px;font-size:clamp(20px,2.4vw,26px)}
-.au-lista-como{margin:0;padding:0;list-style:none;display:grid;gap:10px;grid-template-columns:1fr}
-@media(min-width:760px){.au-lista-como{grid-template-columns:1fr 1fr}}
-.au-lista-como li{padding:14px 16px;border-radius:12px;background:var(--ag-vidro-alt);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1.5;color:var(--ag-texto-sec)}
-.au-lista-como b{color:var(--ag-texto)}
-.au-passos{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
-.au-passos span{font:600 11px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--ag-borda);background:var(--ag-vidro);color:var(--ag-texto-sec)}
+/* ── Seções de apoio: mesma largura (960px), centradas, separadas por filete ── */
+.au-secao{margin:56px auto 0;max-width:960px;padding-top:32px;border-top:1px solid var(--ag-borda)}
+.au-secao>h2{margin:0 0 18px;font-size:clamp(22px,2.6vw,30px);line-height:1.15;letter-spacing:-.01em}
+.au-secao-lead{margin:-8px 0 20px;font-size:15px;line-height:1.5;color:var(--ag-texto-sec);max-width:60ch}
+
+/* O que o auditor confere: 4 cards em vidro, grid 2x2 (1 coluna no celular) */
+.au-cards{margin:0;padding:0;list-style:none;display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:700px){.au-cards{grid-template-columns:1fr 1fr}}
+.au-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:22px 22px 20px;border-radius:18px;border:1px solid var(--ag-borda-suave);background:var(--ag-vidro);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.au-card-icone{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--ag-acento-tint);color:var(--ag-acento)}
+.au-card-icone svg{width:22px;height:22px;display:block}
+.au-card h3{margin:0;font-size:18px;line-height:1.2;letter-spacing:-.01em}
+.au-card p{margin:0;font-size:15px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-card-status{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 10.5px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;background:var(--ag-vidro-alt);color:var(--ag-texto-sec)}
+.au-card-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ag-borda)}
+.au-card-status.is-ok{color:var(--ag-ok)}.au-card-status.is-ok::before{background:var(--ag-ok)}
+.au-card-status.is-atencao{color:var(--ag-atencao)}.au-card-status.is-atencao::before{background:var(--ag-atencao)}
+
+/* Como funciona: 4 passos em sequência. Número grande em Sora 800, ponto na linha, linha que se desenha
+   passo a passo (cada <li> desenha o trecho até o próximo). Vertical no celular, horizontal a partir de 700px. */
+.au-fluxo{position:relative;margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr;row-gap:26px}
+.au-passo{position:relative;display:grid;grid-template-columns:12px 1fr;column-gap:16px;align-items:start}
+.au-passo-marca{grid-column:1;grid-row:1;width:12px;height:12px;margin-top:14px;border-radius:50%;background:var(--ag-acento);box-shadow:0 0 0 4px var(--ag-acento-tint)}
+.au-passo-num{grid-column:2;grid-row:1;font:800 40px/1 var(--font-core,'Sora',sans-serif);letter-spacing:-.04em;color:var(--ag-acento)}
+.au-passo h3{grid-column:2;margin:8px 0 4px;font-size:17px;line-height:1.25;letter-spacing:-.01em}
+.au-passo p{grid-column:2;margin:0;font-size:14.5px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-passo-logos{grid-column:2;display:flex;align-items:center;gap:14px;margin-top:10px}
+.au-passo-logos svg{display:block;height:24px;width:auto}
+/* trecho vertical: do anel do ponto até o anel do ponto seguinte (row-gap 26 + 14 de margem - 4 de anel) */
+.au-passo:not(:last-child)::before{content:'';position:absolute;left:5px;top:30px;bottom:-36px;width:2px;border-radius:2px;background:var(--ag-acento);opacity:.4;transform-origin:top}
+/* animação só com script: sem JS (ou na prévia sem rolagem) os passos ficam visíveis. O auditor.js põe .is-espera
+   e troca para .is-animar quando a seção entra na tela. */
+.au-fluxo.is-espera .au-passo{opacity:0;transform:translateY(14px)}
+.au-fluxo.is-espera .au-passo:not(:last-child)::before{transform:scaleY(0)}
+.au-fluxo.is-animar .au-passo{animation:au-passo-in .6s cubic-bezier(.22,1,.36,1) forwards}
+.au-fluxo.is-animar .au-passo:not(:last-child)::before{animation:au-linha-v .5s ease-out forwards}
+.au-fluxo.is-animar .au-passo:nth-child(1){animation-delay:.15s}.au-fluxo.is-animar .au-passo:nth-child(1)::before{animation-delay:.4s}
+.au-fluxo.is-animar .au-passo:nth-child(2){animation-delay:.6s}.au-fluxo.is-animar .au-passo:nth-child(2)::before{animation-delay:.85s}
+.au-fluxo.is-animar .au-passo:nth-child(3){animation-delay:1.05s}.au-fluxo.is-animar .au-passo:nth-child(3)::before{animation-delay:1.3s}
+.au-fluxo.is-animar .au-passo:nth-child(4){animation-delay:1.5s}
+@media(min-width:700px){
+  .au-fluxo{grid-template-columns:repeat(4,1fr);row-gap:0}
+  .au-passo{display:flex;flex-direction:column;align-items:flex-start;padding-right:22px}
+  .au-passo-num{order:0;font-size:52px;height:52px;margin:0 0 14px}
+  .au-passo-marca{order:1;margin:0 0 16px}
+  .au-passo h3{order:2;margin:0 0 6px;font-size:18px}
+  .au-passo p{order:3}
+  .au-passo-logos{order:4;margin-top:12px}
+  /* trecho horizontal na altura do ponto: 52 (número) + 14 (margem) + 6 (meio do ponto) - 1 */
+  .au-passo:not(:last-child)::before{top:71px;left:22px;right:28px;bottom:auto;width:auto;height:2px;transform-origin:left}
+  .au-fluxo.is-espera .au-passo:not(:last-child)::before{transform:scaleX(0)}
+  .au-fluxo.is-animar .au-passo:not(:last-child)::before{animation-name:au-linha-h}
+}
+@keyframes au-passo-in{to{opacity:1;transform:none}}
+@keyframes au-linha-v{to{transform:scaleY(1)}}
+@keyframes au-linha-h{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){
+  .au-fluxo .au-passo{animation:none!important;opacity:1!important;transform:none!important}
+  .au-fluxo .au-passo::before{animation:none!important;transform:none!important}
+}
+
+/* FAQ: um <details> por pergunta, sumário com 48px de toque */
+.au-faq-lista{display:flex;flex-direction:column;gap:8px}
+.au-faq details{border:1px solid var(--ag-borda);border-radius:14px;padding:0 16px;background:var(--ag-vidro);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.au-faq details[open]{border-color:var(--ag-acento-foco)}
+.au-faq summary{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 0;cursor:pointer;font-weight:600;font-size:16px;line-height:1.3;list-style:none}
+.au-faq summary::-webkit-details-marker{display:none}
+.au-faq summary::after{content:'+';flex:none;margin-left:auto;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--ag-acento-tint);color:var(--ag-acento-escuro);font:600 16px/1 var(--font-mono,'JetBrains Mono',monospace)}
+.au-faq details[open] summary::after{content:'−'}
+.au-faq summary:focus-visible{outline:3px solid var(--ag-acento-foco);outline-offset:2px;border-radius:8px}
+.au-faq details p{margin:0;padding:0 0 16px;font-size:15px;line-height:1.6;color:var(--ag-texto-sec)}
+.au-faq-nota{margin:18px 0 0;font-size:14px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-faq-nota a{color:var(--ag-link);font-weight:600}
 
 /* o relatório rola para o topo; a margem deixa a marca de cache e o título fora da navbar flutuante */
 .au-estado{scroll-margin-top:112px}
 
-/* Nav compartilhada no tema nó.agentes: ponto azul na marca e CTA azul (o resto da nav segue o site). */
-.tema-agentes .no-card-brand img{content:url(/brand/agentes/no-tinta-ponto-azul-512w.png);object-fit:contain}
-.tema-agentes .no-card-toplinks a:last-child{background:var(--no-azul);color:var(--no-osso)}
-.tema-agentes .no-card-toplinks a:hover,.tema-agentes .no-card-toplinks a[aria-current=page]{background:var(--no-azul-tint)}
-.tema-agentes .no-card-toplinks a:last-child:hover{background:var(--no-azul);filter:brightness(.92)}
+/* ── Nav compartilhada no tema nó.agentes: barra azul, textos em osso, seletor (ativo/hover/CTA) em osso
+   com texto azul; logo branca toda (no-branca-mono.svg) para não sumir no azul. Painel do menu segue claro. ── */
+.tema-agentes .no-card-nav{background:var(--ag-nav-fundo);border-color:color-mix(in srgb, var(--ag-nav-texto) 22%, transparent);color:var(--ag-nav-texto);box-shadow:var(--no-shadow-lg)}
+.tema-agentes .no-card-toggle{color:var(--ag-nav-texto)}
+.tema-agentes .no-card-brand img{content:url(/brand/logo/svg/no-branca-mono.svg);object-fit:contain}
+.tema-agentes .no-card-toplinks a{color:var(--ag-nav-texto)}
+.tema-agentes .no-card-toplinks a:hover,.tema-agentes .no-card-toplinks a[aria-current=page],.tema-agentes .no-card-toplinks a:last-child{background:var(--ag-nav-seletor);color:var(--ag-nav-seletor-texto)}
+.tema-agentes .no-card-toplinks a:last-child:hover{background:var(--ag-nav-seletor);color:var(--ag-nav-seletor-texto);filter:brightness(.94)}
+.tema-agentes .no-card-nav :focus-visible{outline-color:var(--ag-nav-texto)}
+.tema-agentes .no-card{background:var(--ag-nav-seletor);color:var(--no-tinta)}
+.tema-agentes .no-card:nth-child(2){background:var(--no-agentes-azul-tint)}
+.tema-agentes .no-card:nth-child(3){background:var(--ag-nav-seletor)}
+.tema-agentes .no-card a,.tema-agentes .no-card b{color:var(--no-tinta)}

@@ -8,7 +8,7 @@
 <meta name="description" content="Diagnóstico gratuito do rastreamento do seu site: pixel da Meta, GA4, consentimento e eventos duplicados. Cole a URL e veja o relatório sem cadastro.">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://www.notechstack.com.br/agentes/auditor/">
-<meta name="theme-color" content="#141414">
+<meta name="theme-color" content="#2F56E5">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
 <meta property="og:site_name" content="Nó Tech Stack">
@@ -33,7 +33,7 @@
 <link rel="stylesheet" href="/shared/card-nav.css">
 <link rel="stylesheet" href="/shared/site-layout.css">
 <link rel="stylesheet" href="/shared/topography.css?v=2">
-<link rel="stylesheet" href="/agentes/auditor/auditor.css?v=2">
+<link rel="stylesheet" href="/agentes/auditor/auditor.css?v=5">
 <script src="/shared/card-nav.js" defer></script>
 <script src="/shared/telemetria.js?v=3"></script>
 <!-- Google Tag Manager (mesmo container da home) -->
@@ -45,7 +45,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
 <!-- End Google Tag Manager -->
 <script src="/shared/topography.js?v=2" defer></script>
-<script src="/agentes/auditor/auditor.js?v=3" defer></script>
+<script src="/agentes/auditor/auditor.js?v=6" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "O auditor invade ou mexe no meu site?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Ele abre a página que você informou do mesmo jeito que um navegador abre e lê o código público que qualquer visitante recebe. Não faz login, não preenche formulário, não envia nada para o seu site e não muda nenhuma configuração."}},
+    {"@type": "Question", "name": "Que dados ele usa?", "acceptedAnswer": {"@type": "Answer", "text": "Só o que é público na página: as tags e os scripts que o site entrega a qualquer visitante, como pixel da Meta, GA4, Google Ads, Google Tag Manager e o aviso de cookies. Nada de senha, painel ou área restrita."}},
+    {"@type": "Question", "name": "Vocês guardam meus dados?", "acceptedAnswer": {"@type": "Answer", "text": "Guardamos o endereço do site e o resultado do diagnóstico, para mostrar o mesmo relatório por até 24 horas sem ler o site de novo e para contar os 3 diagnósticos gratuitos. Seu IP não é gravado: fica só uma versão embaralhada dele, que serve para essa contagem. Esses dados servem só para o diagnóstico e não são vendidos."}},
+    {"@type": "Question", "name": "Algo vai para a Meta ou para o Google?", "acceptedAnswer": {"@type": "Answer", "text": "Só se você permitir a medição no aviso de cookies: aí avisamos Meta e Google que um diagnóstico foi entregue, para medir nossos anúncios. O endereço do site que você auditou não vai junto. Se recusar, nada sai do seu navegador e o diagnóstico funciona igual."}},
+    {"@type": "Question", "name": "Preciso criar conta?", "acceptedAnswer": {"@type": "Answer", "text": "Não. O primeiro relatório sai sem cadastro, e você tem 3 diagnósticos gratuitos. A conta só é pedida para ir mais fundo."}},
+    {"@type": "Question", "name": "E quando eu conectar Meta e Google?", "acceptedAnswer": {"@type": "Answer", "text": "A conexão só acontece se você criar a conta e autorizar pela tela oficial da Meta e do Google, que mostra o que está sendo liberado. Você pode desfazer a autorização quando quiser nas configurações da própria Meta e do Google."}}
+  ]
+}
+</script>
 </head>
 <body class="ag-body tema-agentes">
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK87FH8W" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -57,7 +71,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <main class="ag-main" id="conteudo">
   <section class="au-hero">
     <p class="ag-lockup"><span class="ag-lockup-no">nó</span><span class="ag-lockup-sub">.agentes</span></p>
-    <span class="ag-kicker">Auditor de Integridade de Marketing</span>
     <h1>Seu rastreamento pode estar contando errado.</h1>
     <p class="ag-lead">Cole a URL do seu site. Em segundos você vê se pixel, GA4, Google Ads e aviso de cookies estão instalados do jeito certo. Sem cadastro para o primeiro relatório.</p>
 
@@ -69,20 +82,103 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       </div>
       <p class="au-erro" id="au-erro" role="alert" hidden></p>
     </form>
-    <p class="au-prefs"><button type="button" class="au-prefs-btn" id="au-consent-prefs" aria-controls="au-cookies">Preferências de cookies</button></p>
   </section>
 
   <section class="au-estado" id="au-estado" aria-live="polite" aria-busy="false"></section>
 
-  <section class="au-como" aria-labelledby="au-como-titulo">
+  <section class="au-secao au-como" aria-labelledby="au-como-titulo">
     <h2 id="au-como-titulo">O que o auditor confere</h2>
-    <ul class="au-lista-como">
-      <li><b>Pixel da Meta</b> instalado, duplicado ou ausente.</li>
-      <li><b>GA4 e Google Ads</b> presentes na página, direto ou pelo GTM.</li>
-      <li><b>Aviso de cookies</b> para o visitante escolher antes da medição.</li>
-      <li><b>Tags repetidas</b> que podem contar a mesma visita duas vezes.</li>
+    <ul class="au-cards">
+      <li class="au-card">
+        <span class="au-card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span>
+        <h3>Pixel da Meta</h3>
+        <p>Instalado, duplicado ou ausente.</p>
+        <span class="au-card-status is-ok">ok · 1 pixel na página</span>
+      </li>
+      <li class="au-card">
+        <span class="au-card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16"/><rect x="5" y="11" width="3.5" height="6" rx="1"/><rect x="10.25" y="6" width="3.5" height="11" rx="1"/><rect x="15.5" y="9" width="3.5" height="8" rx="1"/></svg></span>
+        <h3>GA4 e Google Ads</h3>
+        <p>Presentes na página, direto ou pelo GTM.</p>
+        <span class="au-card-status is-ok">ok · via GTM</span>
+      </li>
+      <li class="au-card">
+        <span class="au-card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5C8 19.2 5 15.5 5 11V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <h3>Aviso de cookies</h3>
+        <p>Para o visitante escolher antes da medição.</p>
+        <span class="au-card-status is-atencao">atenção · sem aviso</span>
+      </li>
+      <li class="au-card">
+        <span class="au-card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V4h5l9 9-5 5z"/><path d="M11 4h2l8 8-2 2"/><circle cx="7" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <h3>Tags repetidas</h3>
+        <p>Podem contar a mesma visita duas vezes.</p>
+        <span class="au-card-status is-atencao">atenção · GA4 2×</span>
+      </li>
     </ul>
-    <p class="au-passos"><span>1. URL</span><span>2. Diagnóstico inicial</span><span>3. Conectar Meta e Google</span><span>4. Cadastro</span></p>
+  </section>
+
+  <section class="au-secao au-fluxo-sec" aria-labelledby="au-fluxo-titulo">
+    <h2 id="au-fluxo-titulo">Como funciona</h2>
+    <ol class="au-fluxo">
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">1</span>
+        <h3>URL</h3>
+        <p>Cole o endereço do site.</p>
+      </li>
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">2</span>
+        <h3>Diagnóstico inicial</h3>
+        <p>Relatório em segundos, sem cadastro.</p>
+      </li>
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">3</span>
+        <h3>Conectar Meta e Google</h3>
+        <p>Veja o que só aparece com as contas conectadas.</p>
+        <span class="au-passo-logos">
+          <svg viewBox="0 0 34 24" width="34" height="24" role="img" aria-label="Meta"><title>Meta</title><defs><linearGradient id="au-meta-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0064E0"/><stop offset="1" stop-color="#0081FB"/></linearGradient></defs><path d="M4 12c0-4.4 2.7-8 6-8 5 0 7 16 14 16 3.3 0 6-3.6 6-8s-2.7-8-6-8c-7 0-9 16-14 16-3.3 0-6-3.6-6-8z" fill="none" stroke="url(#au-meta-grad)" stroke-width="3.4" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Google Ads"><title>Google Ads</title><rect x="8" y="1" width="7" height="17" rx="3.5" transform="rotate(-30 11.5 9.5)" fill="#FABC04"/><rect x="11" y="4" width="7" height="17" rx="3.5" transform="rotate(30 14.5 12.5)" fill="#3C8BD9"/><circle cx="5" cy="19" r="3.5" fill="#34A853"/></svg>
+        </span>
+      </li>
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">4</span>
+        <h3>Cadastro</h3>
+        <p>Crie a conta e autorize pela tela oficial da Meta e do Google.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="au-secao au-faq" aria-labelledby="au-faq-titulo">
+    <h2 id="au-faq-titulo">Perguntas sobre segurança e dados</h2>
+    <div class="au-faq-lista">
+      <details open>
+        <summary>O auditor invade ou mexe no meu site?</summary>
+        <p>Não. Ele abre a página que você informou do mesmo jeito que um navegador abre e lê o código público que qualquer visitante recebe. Não faz login, não preenche formulário, não envia nada para o seu site e não muda nenhuma configuração.</p>
+      </details>
+      <details>
+        <summary>Que dados ele usa?</summary>
+        <p>Só o que é público na página: as tags e os scripts que o site entrega a qualquer visitante, como pixel da Meta, GA4, Google Ads, Google Tag Manager e o aviso de cookies. Nada de senha, painel ou área restrita.</p>
+      </details>
+      <details>
+        <summary>Vocês guardam meus dados?</summary>
+        <p>Guardamos o endereço do site e o resultado do diagnóstico, para mostrar o mesmo relatório por até 24 horas sem ler o site de novo e para contar os 3 diagnósticos gratuitos. Seu IP não é gravado: fica só uma versão embaralhada dele, que serve para essa contagem. Esses dados servem só para o diagnóstico e não são vendidos.</p>
+      </details>
+      <details>
+        <summary>Algo vai para a Meta ou para o Google?</summary>
+        <p>Só se você permitir a medição no aviso de cookies: aí avisamos Meta e Google que um diagnóstico foi entregue, para medir nossos anúncios. O endereço do site que você auditou não vai junto. Se recusar, nada sai do seu navegador e o diagnóstico funciona igual.</p>
+      </details>
+      <details>
+        <summary>Preciso criar conta?</summary>
+        <p>Não. O primeiro relatório sai sem cadastro, e você tem 3 diagnósticos gratuitos. A conta só é pedida para ir mais fundo.</p>
+      </details>
+      <details>
+        <summary>E quando eu conectar Meta e Google?</summary>
+        <p>A conexão só acontece se você criar a conta e autorizar pela tela oficial da Meta e do Google, que mostra o que está sendo liberado. Você pode desfazer a autorização quando quiser nas configurações da própria Meta e do Google.</p>
+      </details>
+    </div>
+    <p class="au-faq-nota">Detalhes na nossa <a href="/privacidade/">política de privacidade</a>.</p>
   </section>
 </main>
 

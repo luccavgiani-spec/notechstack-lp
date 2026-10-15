@@ -14,7 +14,7 @@
   /* Fundo de relevo animado na página inteira (pedido do Lucca): azul da marca, opacidade baixa para não competir com o texto. */
   var relevo = document.getElementById('au-relevo');
   if (relevo && window.NoTopography) {
-    var azul = getComputedStyle(document.documentElement).getPropertyValue('--no-azul').trim();
+    var azul = getComputedStyle(document.documentElement).getPropertyValue('--no-agentes-azul').trim() || '#2F56E5';
     var celular = window.matchMedia('(max-width: 699px)').matches;
     /* Topography completo do React Bits (porte em /shared/topography.js), em tinta sobre osso (lightMode) no azul nó.agentes.
        Celular: menos linhas, dpr 1,5 e sem reação ao dedo (rolar não mexe no relevo; toque ainda solta o pulso). */
@@ -24,6 +24,17 @@
       speed: 0.25, direction: 'forward', glow: celular ? 0.6 : 0.8, depthOfField: celular ? 0 : 0.15, fog: celular ? 0.35 : 0.2,
       mouseInteraction: !celular, hoverEffect: 'lift', clickEffect: 'pulse', dpr: celular ? 1.5 : undefined
     });
+  }
+
+  /* Passos do "Como funciona": entram em sequência quando a seção aparece. Sem observador ou com
+     movimento reduzido, ficam como estão (visíveis). */
+  var fluxo = document.querySelector('.au-fluxo');
+  if (fluxo && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    fluxo.classList.add('is-espera');
+    var obs = new IntersectionObserver(function (itens) {
+      itens.forEach(function (it) { if (it.isIntersecting) { fluxo.classList.add('is-animar'); obs.disconnect(); } });
+    }, { threshold: 0.25 });
+    obs.observe(fluxo);
   }
 
   var form = document.getElementById('au-form');

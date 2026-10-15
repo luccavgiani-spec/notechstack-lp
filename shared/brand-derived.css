@@ -12,6 +12,8 @@
   /* ── Estados por cor (ordem canônica: azul → vermelho → âmbar → verde) ── */
   --no-azul-escuro: #3452AF;      /* hover/pressed sobre claro */
   --no-azul-claro: #92A7E9;       /* texto/ícone sobre fundo tinta */
+  --no-agentes-azul-escuro: #2947B7; /* sub-marca nó.agentes: hover/pressed */
+  --no-agentes-azul-claro: #8AA0ED;  /* sub-marca nó.agentes: sobre fundo tinta */
 
   --no-vermelho-escuro: #B34633;
   --no-vermelho-claro: #EC9F92;
