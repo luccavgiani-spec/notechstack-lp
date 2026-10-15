@@ -85,6 +85,8 @@
 
   /* ---------- consentimento LGPD (padrão: recusado) ---------- */
   function consent() { return localStorage.getItem(CONSENT_KEY) === 'granted' ? 'granted' : 'denied'; }
+  /* O padrão (default) é definido no <head>, antes do GTM. Aqui só a escolha da pessoa vira update,
+     e o evento consentimento_atualizado deixa o GTM disparar o pixel para quem aceita depois de carregar. */
   function applyConsent(value, persist) {
     var granted = value === 'granted';
     if (persist) { try { localStorage.setItem(CONSENT_KEY, value); } catch (e) {} }
@@ -114,8 +116,9 @@
   var stored = null; try { stored = localStorage.getItem(CONSENT_KEY); } catch (e) {}
   applyConsent(stored === 'granted' ? 'granted' : 'denied', !!stored);
   if (!stored) abrirCookies(false);
-  if (btnGrant) btnGrant.addEventListener('click', function () { applyConsent('granted', true); fecharCookies(); });
-  if (btnDeny) btnDeny.addEventListener('click', function () { applyConsent('denied', true); fecharCookies(); });
+  function escolher(v) { applyConsent(v, true); dl({ event: 'consentimento_atualizado', consentimento_medicao: v }); fecharCookies(); }
+  if (btnGrant) btnGrant.addEventListener('click', function () { escolher('granted'); });
+  if (btnDeny) btnDeny.addEventListener('click', function () { escolher('denied'); });
   if (btnPrefs) btnPrefs.addEventListener('click', function () { abrirCookies(true); });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && cookies && !cookies.hidden) { ev.preventDefault(); fecharCookies(); }

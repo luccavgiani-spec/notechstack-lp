@@ -36,6 +36,10 @@
 <link rel="stylesheet" href="/agentes/auditor/auditor.css?v=6">
 <script src="/shared/card-nav.js" defer></script>
 <script src="/shared/telemetria.js?v=3"></script>
+<!-- Consentimento LGPD: padrão recusado ANTES do GTM; só a escolha "granted" salva libera a medição -->
+<script>window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};
+(function(){var c='denied';try{if(localStorage.getItem('no_auditor_consent')==='granted')c='granted';}catch(e){}
+window.gtag('consent','default',{ad_storage:c,ad_user_data:c,ad_personalization:c,analytics_storage:c,wait_for_update:500});})();</script>
 <!-- Google Tag Manager (mesmo container da home) -->
 <script src="/shared/marketing-host.js?v=1"></script>
 <script>if(window.noMarketingHostAllowed&&window.noMarketingHostAllowed(location.hostname))(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -45,7 +49,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
 <!-- End Google Tag Manager -->
 <script src="/shared/topography.js?v=2" defer></script>
-<script src="/agentes/auditor/auditor.js?v=7" defer></script>
+<script src="/agentes/auditor/auditor.js?v=8" defer></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
