@@ -6,6 +6,8 @@ const pages = {
   '/': 'lp-narrador/cenas-lp/lp-v8.html',
   '/agencia/': 'agencia/index.html',
   '/colaboradores-digitais/': 'colaboradores-digitais/index.html',
+  '/agentes/': 'agentes/index.html',
+  '/agentes/auditor/': 'agentes/auditor/index.html',
   '/health/': 'health/index.html',
   '/sobre/': 'sobre/index.html',
   '/contato/': 'contato/index.html',
@@ -13,7 +15,7 @@ const pages = {
   '/privacidade/': 'privacidade/index.html',
 };
 const groups = [
-  ['Home', [['Conheça a Nó', '/'], ['Como funciona', '/#como-funciona'], ['Nossos clientes', '/#clientes'], ['Colaboradores digitais', '/colaboradores-digitais/'], ['nó.health', '/health/']]],
+  ['Home', [['Conheça a Nó', '/'], ['Como funciona', '/#como-funciona'], ['Nossos clientes', '/#clientes'], ['Colaboradores digitais', '/colaboradores-digitais/'], ['Nó Agentes', '/agentes/'], ['Auditor de marketing', '/agentes/auditor/'], ['nó.health', '/health/']]],
   ['Agência', [['Soluções', '/agencia/#solucoes'], ['Como funciona', '/agencia/#como-funciona'], ['Organização', '/agencia/#organizacao'], ['Acompanhamento', '/agencia/#acompanhamento'], ['Empresas', '/agencia/#empresas']]],
   ['Contato', [['Conte sua ideia', '/contato/'], ['Parceria com agências', '/agencia/#contato']]],
 ];
@@ -24,7 +26,7 @@ const footer = `<footer class="no-site-footer">
     <div class="ft-txt">IA que arquiteta, integra e opera.</div>
     <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
   </div>
-  <nav class="ft-nav" aria-label="Mapa do site">${[['Home','/'],['Agência','/agencia/'],['nó.health','/health/'],['Colaboradores digitais','/colaboradores-digitais/'],['Sobre a Nó','/sobre/'],['Conte sua ideia','/contato/']].map(link).join('')}</nav>
+  <nav class="ft-nav" aria-label="Mapa do site">${[['Home','/'],['Agência','/agencia/'],['nó.health','/health/'],['Colaboradores digitais','/colaboradores-digitais/'],['Nó Agentes','/agentes/'],['Sobre a Nó','/sobre/'],['Conte sua ideia','/contato/']].map(link).join('')}</nav>
   <div class="ft-legal ft-txt"><div class="ft-legal-links"><a href="/termos/" class="ft-link">Termos de uso</a><span aria-hidden="true"> · </span><a href="/privacidade/" class="ft-link">Privacidade e cookies</a></div><div>© 2026 nó. Todos os direitos reservados.</div></div>
 </footer>`;
 let stale = false;

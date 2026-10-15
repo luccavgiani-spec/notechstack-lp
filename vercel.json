@@ -232,6 +232,16 @@
       "source": "/diagnostico-de-sistema/:path*/",
       "destination": "/contato/",
       "permanent": true
+    },
+    {
+      "source": "/auditor",
+      "destination": "/agentes/auditor/",
+      "permanent": true
+    },
+    {
+      "source": "/auditor/",
+      "destination": "/agentes/auditor/",
+      "permanent": true
     }
   ]
 }
