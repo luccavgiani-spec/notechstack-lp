@@ -86,3 +86,6 @@
 .au-lista-como b{color:var(--no-tinta)}
 .au-passos{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
 .au-passos span{font:600 11px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--no-cinza-claro);color:var(--no-tinta-alt)}
+
+/* o relatório rola para o topo; a margem deixa a marca de cache e o título fora da navbar flutuante */
+.au-estado{scroll-margin-top:112px}
