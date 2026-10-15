@@ -88,9 +88,19 @@
   var TETO_SESSAO = 200;   /* o mesmo teto que o banco aplica: não adianta gastar
                               rede com o que a RPC vai recusar do outro lado */
 
+  /* Página que exige consentimento (ex.: /agentes/auditor define window.noTelemetriaConsentKey):
+     sem a escolha "granted" salva, nada sai do navegador. A fila fica parada; se a pessoa permitir,
+     a página chama noTelemetriaLiberar() e o que estava na fila segue. Sem a chave, nada muda. */
+  function permitido(){
+    var k = window.noTelemetriaConsentKey;
+    if (!k) return true;
+    try { return localStorage.getItem(k) === 'granted'; } catch(e){ return false; }
+  }
+
   function descarrega(beacon){
     if (timer){ clearTimeout(timer); timer = null; }
     if (!fila.length) return;
+    if (!permitido()) return;
     var lote = fila.splice(0, 60);
     mandados += lote.length;
     var corpo = JSON.stringify({
@@ -122,6 +132,7 @@
     if (fila.length >= 20) return descarrega(false);
     if (!timer) timer = setTimeout(function(){ descarrega(false); }, 3000);
   };
+  window.noTelemetriaLiberar = function(){ descarrega(false); };
   /* pagehide e não beforeunload: o segundo não dispara no Safari do iPhone,
      que é justamente onde mais gente abandona no meio */
   addEventListener('pagehide', function(){ descarrega(true); });

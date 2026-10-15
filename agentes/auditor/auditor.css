@@ -101,6 +101,10 @@
 .au-submit{min-height:52px;padding-inline:26px}
 .au-submit[disabled]{opacity:.6;cursor:progress;transform:none}
 .au-erro{margin:0;color:var(--ag-erro-texto);font-size:14px}
+/* Linha permanente do consentimento: estado atual + botão que reabre o aviso para mudar ou revogar */
+.au-consent-linha{margin:0;font-size:13px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-link-btn{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;font-weight:600;color:var(--ag-link);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.au-link-btn:focus-visible{outline:2px solid var(--ag-link);outline-offset:2px;border-radius:2px}
 
 /* Pop-up de cookies: folha inferior compacta no mobile, card fixo no canto inferior direito no desktop.
    aria-modal="false": não bloqueia a página; z-index abaixo da nav (1100) e acima do conteúdo (1). */

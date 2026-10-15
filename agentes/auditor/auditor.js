@@ -45,7 +45,8 @@
   var btnGrant = document.getElementById('au-consent-grant');
   var btnDeny = document.getElementById('au-consent-deny');
   var cookies = document.getElementById('au-cookies');
-  var btnPrefs = document.getElementById('au-consent-prefs');
+  var btnsPrefs = document.querySelectorAll('[data-consent-prefs]');
+  var estadoConsent = document.getElementById('au-consent-estado');
   if (!form || !input || !estado) return;
 
   /* ---------- utilidades ---------- */
@@ -84,7 +85,7 @@
   }
 
   /* ---------- consentimento LGPD (padrão: recusado) ---------- */
-  function consent() { return localStorage.getItem(CONSENT_KEY) === 'granted' ? 'granted' : 'denied'; }
+  function consent() { try { return localStorage.getItem(CONSENT_KEY) === 'granted' ? 'granted' : 'denied'; } catch (e) { return 'denied'; } }
   /* O padrão (default) é definido no <head>, antes do GTM. Aqui só a escolha da pessoa vira update,
      e o evento consentimento_atualizado deixa o GTM disparar o pixel para quem aceita depois de carregar. */
   function applyConsent(value, persist) {
@@ -95,6 +96,21 @@
     var mode = granted ? 'granted' : 'denied';
     window.gtag('consent', 'update', { ad_storage: mode, ad_user_data: mode, ad_personalization: mode, analytics_storage: mode });
     if (typeof window.fbq === 'function') window.fbq('consent', granted ? 'grant' : 'revoke');
+    if (estadoConsent) estadoConsent.textContent = granted ? 'permitida' : 'recusada';
+    if (granted) { if (typeof window.noTelemetriaLiberar === 'function') window.noTelemetriaLiberar(); }
+    else if (persist) apagarCookiesMedicao();
+  }
+  /* Revogar apaga os cookies de medição já gravados (_fbp, _fbc, _ga, _ga_*, _gcl_*) no host e no domínio pai. */
+  function apagarCookiesMedicao() {
+    var host = location.hostname, partes = host.split('.'), dominios = ['', host];
+    for (var i = 1; i < partes.length - 1; i++) dominios.push('.' + partes.slice(i).join('.'));
+    document.cookie.split(';').forEach(function (par) {
+      var nome = par.split('=')[0].trim();
+      if (!/^(_fbp|_fbc|_ga|_ga_.+|_gcl_.+)$/.test(nome)) return;
+      dominios.forEach(function (d) {
+        document.cookie = nome + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/' + (d ? '; domain=' + d : '');
+      });
+    });
   }
   /* pop-up de cookies (#au-cookies): aria-modal="false", não bloqueia a página.
      Abre sozinho quando não há escolha salva; fecha com a escolha; Esc fecha sem salvar (continua recusado).
@@ -119,7 +135,8 @@
   function escolher(v) { applyConsent(v, true); dl({ event: 'consentimento_atualizado', consentimento_medicao: v }); fecharCookies(); }
   if (btnGrant) btnGrant.addEventListener('click', function () { escolher('granted'); });
   if (btnDeny) btnDeny.addEventListener('click', function () { escolher('denied'); });
-  if (btnPrefs) btnPrefs.addEventListener('click', function () { abrirCookies(true); });
+  /* Preferências de cookies: controle permanente (sob o formulário e no FAQ) para mudar ou revogar a escolha. */
+  Array.prototype.forEach.call(btnsPrefs, function (b) { b.addEventListener('click', function () { abrirCookies(true); }); });
   document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape' && cookies && !cookies.hidden) { ev.preventDefault(); fecharCookies(); }
   });
