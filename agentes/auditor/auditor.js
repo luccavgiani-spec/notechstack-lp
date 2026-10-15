@@ -16,7 +16,8 @@
   if (relevo && window.NoTopography) {
     var azul = getComputedStyle(document.documentElement).getPropertyValue('--no-azul').trim();
     var celular = window.matchMedia('(max-width: 699px)').matches;
-    window.NoTopography.mount(relevo, { color: azul, lightMode: true, opacity: celular ? 0.22 : 0.3, lineCount: celular ? 16 : 22, lineWidth: 1.1, speed: 0.2, fog: 0.35 });
+    /* celular: a hero de vidro cobre quase a tela toda, então o relevo só aparece nas margens; 0.28 deixa ele presente sem competir com o texto */
+    window.NoTopography.mount(relevo, { color: azul, lightMode: true, opacity: celular ? 0.28 : 0.3, lineCount: celular ? 18 : 22, lineWidth: 1.1, speed: 0.2, fog: 0.35 });
   }
 
   var form = document.getElementById('au-form');

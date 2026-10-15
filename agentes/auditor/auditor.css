@@ -6,7 +6,7 @@
    vermelho só para erro. */
 .ag-body{
   --ag-texto:var(--no-tinta);
-  --ag-texto-sec:var(--no-tinta-alt);
+  --ag-texto-sec:var(--no-cinza);           /* token de texto secundário (4,8:1 sobre osso) */
   --ag-fundo:var(--no-osso);
   --ag-fundo-alt:var(--no-osso-alt);
   --ag-borda:var(--no-cinza-claro);
