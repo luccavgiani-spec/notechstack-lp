@@ -28,6 +28,9 @@
   --ag-vidro:color-mix(in srgb, var(--no-osso) 86%, transparent);
   --ag-vidro-alt:color-mix(in srgb, var(--no-osso-alt) 86%, transparent);
   --ag-vidro-forte:color-mix(in srgb, var(--no-osso) 94%, transparent);
+  /* texto de apoio dentro dos painéis em vidro azul: o cinza secundário fica em 4,5:1 no limite (e abaixo
+     onde o relevo passa por trás), por isso mistura meio a meio com a tinta (~9:1 sobre o painel) */
+  --ag-texto-painel:color-mix(in srgb, var(--ag-texto) 50%, var(--ag-texto-sec));
 }
 .tema-agentes{
   --ag-acento:var(--no-agentes-azul);
@@ -81,12 +84,15 @@
 .ag-faixa{margin-top:48px;padding:20px 24px;border-radius:16px;background:var(--ag-fundo-alt);font-size:15px}
 .ag-faixa p{margin:0}.ag-faixa a{color:var(--ag-link);font-weight:600}
 
-/* Auditor: primeira dobra. Janela em vidro azul bem claro e translúcido: o relevo animado aparece por trás,
-   o blur maior mantém o texto em destaque. Fora do .tema-agentes cai no vidro osso padrão. */
-.au-hero{position:relative;padding:18px 18px 22px;border-radius:22px;border:1px solid var(--ag-vidro-hero-borda,var(--ag-borda-suave));background:var(--ag-vidro-hero,var(--ag-vidro));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
-@media(min-width:760px){.au-hero{padding:36px 40px 40px;border-radius:28px}}
+/* ── Painel em vidro azul (hero e as seções "O que o auditor confere" e "Como funciona"): janela azul bem
+   clara e translúcida, o relevo animado aparece por trás e o blur maior mantém o texto em destaque.
+   Uma regra só para os três; fora do .tema-agentes cai no vidro osso padrão. ── */
+.au-painel{position:relative;padding:18px 18px 22px;border-radius:22px;border:1px solid var(--ag-vidro-hero-borda,var(--ag-borda-suave));background:var(--ag-vidro-hero,var(--ag-vidro));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+@media(min-width:760px){.au-painel{padding:36px 40px 40px;border-radius:28px}}
 .au-form{margin-top:22px;display:flex;flex-direction:column;gap:12px;max-width:720px}
 .au-label{font:600 12px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.1em;text-transform:uppercase;color:var(--ag-texto-sec)}
+/* celular (campo e botão empilhados): rótulo centralizado (pedido de Lucca, rodada 8) */
+@media(max-width:639px){.au-label{text-align:center}}
 .au-row{display:flex;flex-direction:column;gap:10px}
 @media(min-width:640px){.au-row{flex-direction:row}}
 .au-input{flex:1;min-width:0;min-height:52px;padding:12px 16px;border-radius:14px;border:2px solid var(--ag-borda);background:var(--ag-vidro-forte);color:var(--ag-texto);font:400 16px/1.3 var(--font-mono,'JetBrains Mono',monospace)}
@@ -149,23 +155,45 @@
 .au-fundo .ag-btn--primario:hover{background:var(--ag-botao-hover);border-color:var(--ag-botao-hover)}
 .au-fundo .ag-btn:focus-visible{outline-color:var(--no-osso)}
 
-/* ── Seções de apoio: mesma largura (960px), centradas, separadas por filete ── */
-.au-secao{margin:56px auto 0;max-width:960px;padding-top:32px;border-top:1px solid var(--ag-borda)}
+/* ── Seções de apoio: centradas. As que são painel (.au-painel) seguem a largura da hero (a da .ag-main) e
+   encadeiam com ela sem filete; as demais (FAQ) ficam em 960px separadas por filete ── */
+.au-secao{margin:56px auto 0;max-width:960px}
+.au-secao:not(.au-painel){padding-top:32px;border-top:1px solid var(--ag-borda)}
+.au-secao.au-painel{max-width:none;margin-top:28px}
 .au-secao>h2{margin:0 0 18px;font-size:clamp(22px,2.6vw,30px);line-height:1.15;letter-spacing:-.01em}
 .au-secao-lead{margin:-8px 0 20px;font-size:15px;line-height:1.5;color:var(--ag-texto-sec);max-width:60ch}
 
-/* O que o auditor confere: 4 cards em vidro, grid 2x2 (1 coluna no celular) */
+/* O que o auditor confere: 4 cards em vidro claro sobre o painel azul, faixa de acento no topo, ícone em
+   quadrado azul sólido com traço em osso. 1 coluna no celular, 2 a partir de 700px, 4 a partir de 1080px
+   (abaixo disso o chip "ok · 1 pixel na página" não cabe em 4 colunas). */
 .au-cards{margin:0;padding:0;list-style:none;display:grid;gap:14px;grid-template-columns:1fr}
+.au-card{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:22px 22px 20px;border-radius:18px;border:1px solid color-mix(in srgb, var(--ag-acento) 18%, transparent);background:var(--ag-vidro-forte);box-shadow:var(--no-shadow-card);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.au-card::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--ag-acento),transparent);pointer-events:none}
+/* varredura de luz azul: passa uma vez pelo card quando ele entra ("o auditor conferindo"); parada, fica fora do card */
+.au-card::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,color-mix(in srgb, var(--ag-acento) 16%, transparent) 50%,transparent 65%);transform:translateX(-110%);pointer-events:none}
+.au-card:hover,.au-card:focus-within{transform:translateY(-4px);border-color:var(--ag-acento-foco);box-shadow:var(--no-shadow-lg)}
 @media(min-width:700px){.au-cards{grid-template-columns:1fr 1fr}}
-.au-card{position:relative;display:flex;flex-direction:column;gap:10px;padding:22px 22px 20px;border-radius:18px;border:1px solid var(--ag-borda-suave);background:var(--ag-vidro);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.au-card-icone{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--ag-acento-tint);color:var(--ag-acento)}
+@media(min-width:1080px){.au-cards{grid-template-columns:repeat(4,1fr)}.au-card{padding:22px 18px 20px}.au-card-status{font-size:10px}}
+.au-card-icone{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--ag-acento);color:var(--ag-botao-texto)}
 .au-card-icone svg{width:22px;height:22px;display:block}
 .au-card h3{margin:0;font-size:18px;line-height:1.2;letter-spacing:-.01em}
-.au-card p{margin:0;font-size:15px;line-height:1.5;color:var(--ag-texto-sec)}
-.au-card-status{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 10.5px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;background:var(--ag-vidro-alt);color:var(--ag-texto-sec)}
+.au-card p{margin:0;font-size:15px;line-height:1.5;color:var(--ag-texto-painel)}
+.au-card-status{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 10.5px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;background:var(--ag-vidro-alt);color:var(--ag-texto-sec)}
 .au-card-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ag-borda)}
 .au-card-status.is-ok{color:var(--ag-ok)}.au-card-status.is-ok::before{background:var(--ag-ok)}
-.au-card-status.is-atencao{color:var(--ag-atencao)}.au-card-status.is-atencao::before{background:var(--ag-atencao)}
+.au-card-status.is-atencao{color:var(--ag-atencao)}.au-card-status.is-atencao::before{background:var(--ag-atencao);animation:au-pulso 2.4s ease-in-out infinite}
+/* entrada escalonada (~120 ms entre cards): o auditor.js põe .is-espera na lista e acrescenta .is-animar quando ela
+   entra na tela. A entrada usa fill backwards, assim depois dela o hover (sobe 4px) volta a valer. Sem JS: tudo visível. */
+.au-cards.is-espera:not(.is-animar) .au-card{opacity:0;transform:translateY(18px)}
+.au-cards.is-animar .au-card{animation:au-card-in .55s cubic-bezier(.22,1,.36,1) backwards}
+.au-cards.is-animar .au-card::after{animation:au-varredura .9s ease-in-out forwards}
+.au-cards.is-animar .au-card:nth-child(1){animation-delay:.1s}.au-cards.is-animar .au-card:nth-child(1)::after{animation-delay:.5s}
+.au-cards.is-animar .au-card:nth-child(2){animation-delay:.22s}.au-cards.is-animar .au-card:nth-child(2)::after{animation-delay:.62s}
+.au-cards.is-animar .au-card:nth-child(3){animation-delay:.34s}.au-cards.is-animar .au-card:nth-child(3)::after{animation-delay:.74s}
+.au-cards.is-animar .au-card:nth-child(4){animation-delay:.46s}.au-cards.is-animar .au-card:nth-child(4)::after{animation-delay:.86s}
+@keyframes au-card-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes au-varredura{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
+@keyframes au-pulso{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--ag-atencao) 40%, transparent)}50%{box-shadow:0 0 0 5px transparent}}
 
 /* Como funciona: 4 passos em sequência. Número grande em Sora 800, ponto na linha, linha que se desenha
    passo a passo (cada <li> desenha o trecho até o próximo). Vertical no celular, horizontal a partir de 700px. */
@@ -174,7 +202,7 @@
 .au-passo-marca{grid-column:1;grid-row:1;width:12px;height:12px;margin-top:14px;border-radius:50%;background:var(--ag-acento);box-shadow:0 0 0 4px var(--ag-acento-tint)}
 .au-passo-num{grid-column:2;grid-row:1;font:800 40px/1 var(--font-core,'Sora',sans-serif);letter-spacing:-.04em;color:var(--ag-acento)}
 .au-passo h3{grid-column:2;margin:8px 0 4px;font-size:17px;line-height:1.25;letter-spacing:-.01em}
-.au-passo p{grid-column:2;margin:0;font-size:14.5px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-passo p{grid-column:2;margin:0;font-size:14.5px;line-height:1.5;color:var(--ag-texto-painel)}
 .au-passo-logos{grid-column:2;display:flex;align-items:center;gap:14px;margin-top:10px}
 .au-passo-logos svg{display:block;height:24px;width:auto}
 /* trecho vertical: do anel do ponto até o anel do ponto seguinte (row-gap 26 + 14 de margem - 4 de anel) */
@@ -208,6 +236,8 @@
 @media(prefers-reduced-motion:reduce){
   .au-fluxo .au-passo{animation:none!important;opacity:1!important;transform:none!important}
   .au-fluxo .au-passo::before{animation:none!important;transform:none!important}
+  .au-cards .au-card{animation:none!important;opacity:1!important;transform:none!important;transition:none}
+  .au-cards .au-card::after,.au-card-status::before{animation:none!important}
 }
 
 /* FAQ: um <details> por pergunta, sumário com 48px de toque */

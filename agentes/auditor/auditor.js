@@ -26,15 +26,15 @@
     });
   }
 
-  /* Passos do "Como funciona": entram em sequência quando a seção aparece. Sem observador ou com
-     movimento reduzido, ficam como estão (visíveis). */
-  var fluxo = document.querySelector('.au-fluxo');
-  if (fluxo && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    fluxo.classList.add('is-espera');
+  /* Cards do "O que o auditor confere" e passos do "Como funciona": entram em sequência quando a lista aparece
+     (.is-espera no carregamento, .is-animar na primeira vez que entra na tela, uma lista por vez). Sem observador
+     ou com movimento reduzido, ficam como estão (visíveis). */
+  var animados = document.querySelectorAll('.au-cards, .au-fluxo');
+  if (animados.length && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     var obs = new IntersectionObserver(function (itens) {
-      itens.forEach(function (it) { if (it.isIntersecting) { fluxo.classList.add('is-animar'); obs.disconnect(); } });
-    }, { threshold: 0.25 });
-    obs.observe(fluxo);
+      itens.forEach(function (it) { if (it.isIntersecting) { it.target.classList.add('is-animar'); obs.unobserve(it.target); } });
+    }, { threshold: 0.2 });
+    animados.forEach(function (el) { el.classList.add('is-espera'); obs.observe(el); });
   }
 
   var form = document.getElementById('au-form');
