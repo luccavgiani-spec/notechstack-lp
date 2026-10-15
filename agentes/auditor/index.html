@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="only light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Auditor de Integridade de Marketing: seu rastreamento pode estar contando errado | Nó Agentes</title>
+<meta name="description" content="Diagnóstico gratuito do rastreamento do seu site: pixel da Meta, GA4, consentimento e eventos duplicados. Cole a URL e veja o relatório sem cadastro.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://www.notechstack.com.br/agentes/auditor/">
+<meta name="theme-color" content="#2F56E5">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Nó Tech Stack">
+<meta property="og:url" content="https://www.notechstack.com.br/agentes/auditor/">
+<meta property="og:title" content="Seu rastreamento pode estar contando errado">
+<meta property="og:description" content="Diagnóstico gratuito do rastreamento do seu site. Cole a URL e veja o relatório sem cadastro.">
+<meta property="og:image" content="https://www.notechstack.com.br/brand/og/og-home-contato.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.notechstack.com.br/brand/og/og-home-contato.png">
+<link rel="icon" type="image/svg+xml" href="/brand/favicon/favicon.svg">
+<link rel="icon" href="/brand/favicon/favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="/brand/favicon/favicon-180.png">
+<link rel="preload" href="/brand/fonts/sora/sora-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/brand/fonts/sora/sora-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<link rel="stylesheet" href="/brand/fonts/fonts.css">
+<link rel="stylesheet" href="/brand/tokens/tokens.css">
+<link rel="stylesheet" href="/shared/brand-derived.css">
+<link rel="stylesheet" href="/shared/site.css?v=1">
+<link rel="stylesheet" href="/shared/card-nav.css">
+<link rel="stylesheet" href="/shared/site-layout.css">
+<link rel="stylesheet" href="/shared/topography.css?v=2">
+<link rel="stylesheet" href="/agentes/auditor/auditor.css?v=7">
+<script src="/shared/card-nav.js" defer></script>
+<!-- Nesta página a telemetria só sai do navegador com a medição permitida (mesma chave do aviso de cookies) -->
+<script>window.noTelemetriaConsentKey='no_auditor_consent';</script>
+<script src="/shared/telemetria.js?v=4"></script>
+<!-- Consentimento LGPD: padrão recusado ANTES do GTM; só a escolha "granted" salva libera a medição -->
+<script>window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};
+(function(){var c='denied';try{if(localStorage.getItem('no_auditor_consent')==='granted')c='granted';}catch(e){}
+window.gtag('consent','default',{ad_storage:c,ad_user_data:c,ad_personalization:c,analytics_storage:c,wait_for_update:500});})();</script>
+<!-- Google Tag Manager (mesmo container da home) -->
+<script src="/shared/marketing-host.js?v=1"></script>
+<script>if(window.noMarketingHostAllowed&&window.noMarketingHostAllowed(location.hostname))(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NK87FH8W');</script>
+<!-- End Google Tag Manager -->
+<script src="/shared/topography.js?v=2" defer></script>
+<script src="/agentes/auditor/auditor.js?v=9" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "O auditor invade ou mexe no meu site?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Ele abre a página que você informou do mesmo jeito que um navegador abre e lê o código público que qualquer visitante recebe. Não faz login, não preenche formulário, não envia nada para o seu site e não muda nenhuma configuração."}},
+    {"@type": "Question", "name": "Que dados ele usa?", "acceptedAnswer": {"@type": "Answer", "text": "Só o que é público na página: as tags e os scripts que o site entrega a qualquer visitante, como pixel da Meta, GA4, Google Ads, Google Tag Manager e o aviso de cookies. Nada de senha, painel ou área restrita."}},
+    {"@type": "Question", "name": "Vocês guardam meus dados?", "acceptedAnswer": {"@type": "Answer", "text": "Guardamos o endereço do site, o resultado do diagnóstico, a origem da visita (utm) e uma versão embaralhada do seu IP, nunca o IP em si. O resultado é reaproveitado por 24 horas: quem auditar o mesmo endereço nesse período vê o mesmo relatório, sem lermos o site de novo. A versão embaralhada do IP serve para contar os 3 diagnósticos gratuitos a cada 90 dias. Os registros são apagados em 90 dias, e o resultado reaproveitável, em 7. Usamos esses dados no diagnóstico e para saber de onde vêm as visitas, e não os vendemos."}},
+    {"@type": "Question", "name": "Algo vai para a Meta ou para o Google?", "acceptedAnswer": {"@type": "Answer", "text": "Só com a medição permitida no aviso de cookies: aí usamos os cookies da Meta e do Google e avisamos os dois quando um diagnóstico é entregue (a Meta recebe junto o IP e o navegador; o Google, o identificador do cookie dele). O endereço do site que você auditou não vai junto. Se recusar, o pixel da Meta não carrega, o diagnóstico não é enviado a eles e funciona igual; o Google pode receber só sinais de visita sem cookie. Dá para mudar a escolha quando quiser em Preferências de cookies."}},
+    {"@type": "Question", "name": "Preciso criar conta?", "acceptedAnswer": {"@type": "Answer", "text": "Não. O primeiro relatório sai sem cadastro, e você tem 3 diagnósticos gratuitos. A conta só é pedida para ir mais fundo."}},
+    {"@type": "Question", "name": "E quando eu conectar Meta e Google?", "acceptedAnswer": {"@type": "Answer", "text": "A conexão só acontece se você criar a conta e autorizar pela tela oficial da Meta e do Google, que mostra o que está sendo liberado. Você pode desfazer a autorização quando quiser nas configurações da própria Meta e do Google."}}
+  ]
+}
+</script>
+</head>
+<body class="ag-body tema-agentes">
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NK87FH8W" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<div class="no-topo-bg" id="au-relevo" aria-hidden="true"></div>
+<!-- site-nav:start -->
+<nav class="no-card-nav" aria-label="Navegação principal"><div class="no-card-top"><button class="no-card-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="no-card-panel"><span></span><span></span></button><a class="no-card-brand" href="/" aria-label="Nó — página inicial"><img src="/brand/logo/svg/no-tinta-ponto-ambar.svg" alt="nó." width="46" height="30"></a><div class="no-card-toplinks"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/contato/">Contato</a></div></div><div id="no-card-panel" class="no-card-panel" aria-hidden="true" inert><div class="no-card-panel-inner"><div class="no-card-grid"><div class="no-card"><b>Home</b><div><a href="/">Conheça a Nó</a><a href="/#como-funciona">Como funciona</a><a href="/#clientes">Nossos clientes</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/agentes/">Nó Agentes</a><a href="/agentes/auditor/">Auditor de marketing</a><a href="/health/">nó.health</a></div></div><div class="no-card"><b>Agência</b><div><a href="/agencia/#solucoes">Soluções</a><a href="/agencia/#como-funciona">Como funciona</a><a href="/agencia/#organizacao">Organização</a><a href="/agencia/#acompanhamento">Acompanhamento</a><a href="/agencia/#empresas">Empresas</a></div></div><div class="no-card"><b>Contato</b><div><a href="/contato/">Conte sua ideia</a><a href="/agencia/#contato">Parceria com agências</a></div></div></div></div></div></nav>
+<!-- site-nav:end -->
+
+<main class="ag-main" id="conteudo">
+  <section class="au-hero au-painel">
+    <p class="ag-lockup"><span class="ag-lockup-no">nó</span><span class="ag-lockup-sub">.agentes</span></p>
+    <h1>Teste a rastreabilidade das compras do seu site</h1>
+    <p class="ag-lead">Cole a URL do seu site. Em segundos você vê se pixel, GA4, Google Ads e aviso de cookies estão instalados do jeito certo. Sem cadastro, gratuitamente.</p>
+
+    <form class="au-form" id="au-form" novalidate>
+      <label class="au-label" for="au-url">URL do site</label>
+      <div class="au-row">
+        <input class="au-input" id="au-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://www.suaempresa.com.br" required>
+        <button class="ag-btn ag-btn--primario au-submit" id="au-submit" type="submit">Diagnosticar grátis</button>
+      </div>
+      <p class="au-erro" id="au-erro" role="alert" hidden></p>
+      <p class="au-consent-linha">Medição <span id="au-consent-estado" aria-live="polite">recusada</span> · <button type="button" class="au-link-btn" data-consent-prefs>Preferências de cookies</button></p>
+    </form>
+  </section>
+
+  <section class="au-estado" id="au-estado" aria-live="polite" aria-busy="false"></section>
+
+  <section class="au-secao au-painel au-como" aria-labelledby="au-como-titulo">
+    <h2 id="au-como-titulo">O que o auditor confere</h2>
+    <ul class="au-cards">
+      <li class="au-card">
+        <span class="au-card-icone au-card-icone--marca" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.915 4.03c-1.968 0-3.683 1.28-4.871 3.113C.704 9.208 0 11.883 0 14.449c0 .706.07 1.369.21 1.973a6.624 6.624 0 0 0 .265.86 5.297 5.297 0 0 0 .371.761c.696 1.159 1.818 1.927 3.593 1.927 1.497 0 2.633-.671 3.965-2.444.76-1.012 1.144-1.626 2.663-4.32l.756-1.339.186-.325c.061.1.121.196.183.3l2.152 3.595c.724 1.21 1.665 2.556 2.47 3.314 1.046.987 1.992 1.22 3.06 1.22 1.075 0 1.876-.355 2.455-.843a3.743 3.743 0 0 0 .81-.973c.542-.939.861-2.127.861-3.745 0-2.72-.681-5.357-2.084-7.45-1.282-1.912-2.957-2.93-4.716-2.93-1.047 0-2.088.467-3.053 1.308-.652.57-1.257 1.29-1.82 2.05-.69-.875-1.335-1.547-1.958-2.056-1.182-.966-2.315-1.303-3.454-1.303zm10.16 2.053c1.147 0 2.188.758 2.992 1.999 1.132 1.748 1.647 4.195 1.647 6.4 0 1.548-.368 2.9-1.839 2.9-.58 0-1.027-.23-1.664-1.004-.496-.601-1.343-1.878-2.832-4.358l-.617-1.028a44.908 44.908 0 0 0-1.255-1.98c.07-.109.141-.224.211-.327 1.12-1.667 2.118-2.602 3.358-2.602zm-10.201.553c1.265 0 2.058.791 2.675 1.446.307.327.737.871 1.234 1.579l-1.02 1.566c-.757 1.163-1.882 3.017-2.837 4.338-1.191 1.649-1.81 1.817-2.486 1.817-.524 0-1.038-.237-1.383-.794-.263-.426-.464-1.13-.464-2.046 0-2.221.63-4.535 1.66-6.088.454-.687.964-1.226 1.533-1.533a2.264 2.264 0 0 1 1.088-.285z"/></svg></span>
+        <h3>Pixel da Meta</h3>
+        <p>Instalado, duplicado ou ausente. Eventos configurados ou não.</p>
+        <span class="au-card-status is-ok">ok · 1 pixel na página</span>
+      </li>
+      <li class="au-card">
+        <span class="au-card-icone au-card-icone--marca" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg></span>
+        <h3>GA4 e Google Ads</h3>
+        <p>Presentes na página, direto ou pelo GTM. O Google sabe do seu site?</p>
+        <span class="au-card-status is-ok">ok · via GTM</span>
+      </li>
+      <li class="au-card">
+        <span class="au-card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5C8 19.2 5 15.5 5 11V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+        <h3>Aviso de cookies</h3>
+        <p>Para o visitante escolher antes da medição. Segurança e LGPD em primeiro lugar.</p>
+        <span class="au-card-status is-atencao">atenção · sem aviso</span>
+      </li>
+      <li class="au-card">
+        <span class="au-card-icone" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V4h5l9 9-5 5z"/><path d="M11 4h2l8 8-2 2"/><circle cx="7" cy="8" r="1" fill="currentColor" stroke="none"/></svg></span>
+        <h3>Tags repetidas</h3>
+        <p>Aparece mais cliques e compras que o normal? Os eventos podem estar duplicados.</p>
+        <span class="au-card-status is-atencao">atenção · GA4 2×</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="au-secao au-painel au-fluxo-sec" aria-labelledby="au-fluxo-titulo">
+    <h2 id="au-fluxo-titulo">Como funciona</h2>
+    <ol class="au-fluxo">
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">1</span>
+        <h3>URL</h3>
+        <p>Cole o endereço do site.</p>
+      </li>
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">2</span>
+        <h3>Diagnóstico inicial</h3>
+        <p>Relatório em segundos, sem cadastro.</p>
+      </li>
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">3</span>
+        <h3>Conectar Meta e Google</h3>
+        <p>Faça um diagnóstico real do tráfego do seu site.</p>
+        <span class="au-passo-logos">
+          <svg viewBox="0 0 34 24" width="34" height="24" role="img" aria-label="Meta"><title>Meta</title><defs><linearGradient id="au-meta-grad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0064E0"/><stop offset="1" stop-color="#0081FB"/></linearGradient></defs><path d="M4 12c0-4.4 2.7-8 6-8 5 0 7 16 14 16 3.3 0 6-3.6 6-8s-2.7-8-6-8c-7 0-9 16-14 16-3.3 0-6-3.6-6-8z" fill="none" stroke="url(#au-meta-grad)" stroke-width="3.4" stroke-linejoin="round"/></svg>
+          <svg viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Google Ads"><title>Google Ads</title><rect x="8" y="1" width="7" height="17" rx="3.5" transform="rotate(-30 11.5 9.5)" fill="#FABC04"/><rect x="11" y="4" width="7" height="17" rx="3.5" transform="rotate(30 14.5 12.5)" fill="#3C8BD9"/><circle cx="5" cy="19" r="3.5" fill="#34A853"/></svg>
+        </span>
+      </li>
+      <li class="au-passo">
+        <span class="au-passo-marca" aria-hidden="true"></span>
+        <span class="au-passo-num" aria-hidden="true">4</span>
+        <h3>Acesso e relatório</h3>
+        <p>Autorize uma vez o acesso pela tela oficial da Meta e do Google. Não guardamos seu login.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="au-secao au-faq" aria-labelledby="au-faq-titulo">
+    <h2 id="au-faq-titulo">Perguntas Frequentes</h2>
+    <div class="au-faq-lista">
+      <details open>
+        <summary>O sistema invade ou mexe no meu site?</summary>
+        <p>Definitivamente não. Ele abre a página que você informou do mesmo jeito que um navegador abre e lê o código público que qualquer visitante recebe. Não faz login, não preenche formulário, não envia nada para o seu site e não muda nenhuma configuração.</p>
+      </details>
+      <details>
+        <summary>Que dados ele usa?</summary>
+        <p>Só o que é público na página: as tags e os scripts que o site entrega a qualquer visitante, como pixel da Meta, GA4, Google Ads, Google Tag Manager e o aviso de cookies. Nada de senha, painel ou área restrita.</p>
+      </details>
+      <details>
+        <summary>Vocês guardam meus dados?</summary>
+        <p>Guardamos o endereço do site, o resultado do diagnóstico, a origem da visita (utm) e uma versão embaralhada do seu IP, nunca o IP em si. O resultado é reaproveitado por 24 horas: quem auditar o mesmo endereço nesse período vê o mesmo relatório. A versão embaralhada do IP serve para contar os 3 diagnósticos gratuitos a cada 90 dias. Os registros são apagados em 90 dias, e o resultado reaproveitável, em 7. Usamos esses dados no diagnóstico e para saber de onde vêm as visitas, e não os vendemos. Nosso objetivo é auxiliar a vistoria do seu sistema.</p>
+      </details>
+      <details>
+        <summary>Algo vai para a Meta ou para o Google?</summary>
+        <p>Ao aceitar os cookies, usamos os cookies da Meta e do Google e avisamos os dois quando um diagnóstico é entregue, para medir nossos anúncios: a Meta recebe junto o IP e o navegador; o Google, o identificador do cookie dele. O endereço do site que você auditou não vai junto. Se recusar, o pixel da Meta não carrega, o diagnóstico não é enviado a eles e funciona igual; o Google pode receber só sinais de visita sem cookie. Dá para mudar a escolha quando quiser em Preferências de cookies.</p>
+      </details>
+      <details>
+        <summary>Preciso criar conta?</summary>
+        <p>Não. O primeiro relatório sai sem cadastro, e você tem 3 diagnósticos gratuitos. A conta só é pedida para ir mais fundo, caso queira manter-se acompanhando o desempenho do seu site.</p>
+      </details>
+      <details>
+        <summary>E quando eu conectar Meta e Google?</summary>
+        <p>A conexão só acontece se você autorizar a conexão pela tela oficial da Meta e do Google, que mostra o que está sendo liberado. Você pode desfazer a autorização quando quiser nas configurações da própria Meta e do Google.</p>
+      </details>
+    </div>
+    <p class="au-faq-nota">Detalhes na nossa <a href="/privacidade/#auditor">política de privacidade</a> · <button type="button" class="au-link-btn" data-consent-prefs>Preferências de cookies</button></p>
+  </section>
+</main>
+
+<!-- Pop-up de cookies: abre sozinho sem escolha salva em localStorage 'no_auditor_consent'; não bloqueia a página -->
+<div class="au-cookies" id="au-cookies" role="dialog" aria-modal="false" aria-labelledby="au-cookies-titulo" aria-describedby="au-cookies-desc" hidden>
+  <h2 class="au-cookies-titulo" id="au-cookies-titulo">Cookies e medição</h2>
+  <p class="au-cookies-desc" id="au-cookies-desc">Se você permitir, usamos os cookies de medição da Meta (_fbp, _fbc) e do Google (_ga, _gcl) e avisamos os dois quando um diagnóstico é entregue; a Meta recebe junto o IP e o navegador. Até escolher, fica recusado. Dá para mudar depois em Preferências de cookies. <a href="/privacidade/#auditor">Como tratamos dados</a>.</p>
+  <div class="au-cookies-botoes">
+    <button type="button" class="ag-btn ag-btn--secundario" id="au-consent-grant">Permitir medição</button>
+    <button type="button" class="ag-btn ag-btn--secundario" id="au-consent-deny">Recusar</button>
+  </div>
+</div>
+
+<!-- site-footer:start -->
+<footer class="no-site-footer">
+  <div class="ft-brand">
+    <a class="ft-logo" href="/" aria-label="Nó — página inicial"><img src="/brand/lockup/svg/no-tech-stack-branca-ponto-ambar.svg" alt="nó tech stack" width="198" height="27"></a>
+    <div class="ft-txt">IA que arquiteta, integra e opera.</div>
+    <a class="ft-whatsapp" href="https://wa.me/5511939289413?text=Ol%C3%A1%2C%20vim%20pelo%20site%21" target="_blank" rel="noopener noreferrer" aria-label="Falar com a nó pelo WhatsApp no número +55 11 93928-9413">WhatsApp <span aria-hidden="true">↗</span></a>
+  </div>
+  <nav class="ft-nav" aria-label="Mapa do site"><a href="/">Home</a><a href="/agencia/">Agência</a><a href="/health/">nó.health</a><a href="/colaboradores-digitais/">Colaboradores digitais</a><a href="/agentes/">Nó Agentes</a><a href="/sobre/">Sobre a Nó</a><a href="/contato/">Conte sua ideia</a></nav>
+  <div class="ft-legal ft-txt"><div class="ft-legal-links"><a href="/termos/" class="ft-link">Termos de uso</a><span aria-hidden="true"> · </span><a href="/privacidade/" class="ft-link">Privacidade e cookies</a></div><div>© 2026 nó. Todos os direitos reservados.</div></div>
+</footer>
+<!-- site-footer:end -->
+</body>
+</html>

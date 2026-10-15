@@ -1,0 +1,277 @@
+/* Nó Agentes + Auditor: só tokens da marca (tokens.css / brand-derived.css). */
+
+/* ── Tema por tokens (decisão contrato-de-tema-por-tokens): os componentes leem --ag-*, nunca a cor direto.
+   .ag-body = padrão Nó (tinta / osso / âmbar), é o que /agentes/ usa.
+   .tema-agentes = sub-marca nó.agentes: "nó" tinta 800 + ".agentes" azul 400 sobre osso; acento azul em tudo,
+   vermelho só para erro. */
+.ag-body{
+  --ag-texto:var(--no-tinta);
+  --ag-texto-sec:var(--no-cinza);           /* token de texto secundário (4,8:1 sobre osso) */
+  --ag-fundo:var(--no-osso);
+  --ag-fundo-alt:var(--no-osso-alt);
+  --ag-borda:var(--no-cinza-claro);
+  --ag-borda-suave:var(--no-borda);
+  --ag-acento:var(--no-ambar-escuro);       /* kicker e lockup */
+  --ag-acento-escuro:var(--no-ambar-escuro);/* texto pequeno colorido sobre osso */
+  --ag-acento-foco:var(--no-ambar);         /* anel de foco, bordas de destaque */
+  --ag-acento-tint:var(--no-ambar-claro);   /* fundo suave do acento */
+  --ag-link:var(--no-azul-escuro);
+  --ag-tag:var(--no-verde-escuro);
+  --ag-botao:var(--no-tinta);               /* botão primário */
+  --ag-botao-hover:var(--no-tinta);
+  --ag-botao-texto:var(--no-osso);
+  --ag-ok:var(--no-verde-escuro);
+  --ag-atencao:var(--no-ambar-escuro);
+  --ag-erro:var(--no-vermelho);
+  --ag-erro-texto:var(--no-vermelho-escuro);
+  /* vidro: osso semitransparente + blur, para o texto seguir legível sobre o fundo animado que entra depois */
+  --ag-vidro:color-mix(in srgb, var(--no-osso) 86%, transparent);
+  --ag-vidro-alt:color-mix(in srgb, var(--no-osso-alt) 86%, transparent);
+  --ag-vidro-forte:color-mix(in srgb, var(--no-osso) 94%, transparent);
+  /* texto de apoio dentro dos painéis em vidro azul: o cinza secundário fica em 4,5:1 no limite (e abaixo
+     onde o relevo passa por trás), por isso mistura meio a meio com a tinta (~9:1 sobre o painel) */
+  --ag-texto-painel:color-mix(in srgb, var(--ag-texto) 50%, var(--ag-texto-sec));
+}
+.tema-agentes{
+  --ag-acento:var(--no-agentes-azul);
+  --ag-acento-escuro:var(--no-agentes-azul-escuro);
+  --ag-acento-foco:var(--no-agentes-azul);
+  --ag-acento-tint:var(--no-agentes-azul-tint);
+  --ag-link:var(--no-agentes-azul-escuro);
+  --ag-tag:var(--no-agentes-azul-escuro);
+  --ag-botao:var(--no-agentes-azul);
+  --ag-botao-hover:var(--no-agentes-azul-escuro);
+  --ag-botao-texto:var(--no-osso);
+  --ag-ok:var(--no-agentes-azul);
+  --ag-atencao:var(--no-tinta);
+  /* nav azul com seletor branco e janela da hero em vidro azul-claro (pedido de Lucca, rodada 7) */
+  --ag-nav-fundo:var(--no-agentes-azul);
+  --ag-nav-texto:var(--no-osso);
+  --ag-nav-seletor:var(--no-osso);
+  --ag-nav-seletor-texto:var(--no-agentes-azul);
+  --ag-vidro-hero:color-mix(in srgb, var(--no-agentes-azul-tint) 70%, transparent);
+  --ag-vidro-hero-borda:color-mix(in srgb, var(--no-agentes-azul) 22%, transparent);
+}
+
+.ag-body{margin:0;min-width:0;overflow-x:clip;background:var(--ag-fundo);color:var(--ag-texto);font-family:var(--font-core,'Sora',sans-serif);-webkit-font-smoothing:antialiased}
+.ag-main,.ag-main *{box-sizing:border-box}
+/* conteúdo acima do fundo de relevo (elemento position:fixed; z-index:0 que o Dwight encaixa depois).
+   A nav (.no-card-nav) já é position:fixed com z-index 1100 no card-nav.css, por isso não entra aqui. */
+.ag-main{position:relative;z-index:1;width:auto;max-width:1080px;min-width:0;margin:0 auto;padding:calc(104px + env(safe-area-inset-top)) 20px 72px}
+.ag-body .no-site-footer{position:relative;z-index:1}
+@media(min-width:900px){.ag-main{padding-top:132px}}
+
+/* lockup tipográfico nó.agentes + rótulo mono */
+.ag-lockup{display:flex;align-items:baseline;margin:0 0 8px;font:400 clamp(26px,3.4vw,36px)/1 var(--font-core,'Sora',sans-serif);letter-spacing:-.02em;color:var(--ag-texto)}
+.ag-lockup-no{font-weight:800}
+.ag-lockup-sub{font-weight:400;color:var(--ag-acento)}
+.ag-kicker{display:inline-block;font:600 11px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.14em;text-transform:uppercase;color:var(--ag-acento);margin-bottom:14px}
+.ag-hero h1,.au-hero h1{font-weight:800;font-size:clamp(30px,5vw,54px);line-height:1.08;letter-spacing:-.02em;margin:0 0 14px;max-width:16ch}
+.ag-lead{font-size:clamp(16px,1.6vw,19px);line-height:1.55;color:var(--ag-texto-sec);max-width:60ch;margin:0}
+.ag-grid{display:grid;gap:20px;grid-template-columns:1fr;margin-top:40px}
+@media(min-width:760px){.ag-grid{grid-template-columns:1.2fr 1fr}}
+.ag-card{background:var(--ag-vidro);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border:1px solid var(--ag-borda-suave);border-radius:20px;padding:28px;display:flex;flex-direction:column;gap:12px}
+.ag-card--destaque{border-color:var(--ag-acento-foco);box-shadow:var(--no-shadow-lg)}
+.ag-card h2{margin:0;font-size:clamp(22px,2.4vw,28px);line-height:1.15;letter-spacing:-.01em}
+.ag-card p{margin:0;line-height:1.55;color:var(--ag-texto-sec)}
+.ag-tag{font:600 10px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.12em;text-transform:uppercase;color:var(--ag-tag)}
+.ag-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:12px 22px;border-radius:999px;font:600 15px/1 var(--font-core,'Sora',sans-serif);text-decoration:none;cursor:pointer;border:2px solid transparent;transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease}
+.ag-btn:hover{transform:translateY(-2px)}
+.ag-btn:focus-visible{outline:3px solid var(--ag-acento-foco);outline-offset:3px}
+.ag-btn--primario{background:var(--ag-botao);color:var(--ag-botao-texto);border-color:var(--ag-botao)}
+.ag-btn--primario:hover{background:var(--ag-botao-hover);border-color:var(--ag-botao-hover)}
+.ag-btn--secundario{background:transparent;color:var(--ag-texto);border-color:var(--ag-texto)}
+.ag-faixa{margin-top:48px;padding:20px 24px;border-radius:16px;background:var(--ag-fundo-alt);font-size:15px}
+.ag-faixa p{margin:0}.ag-faixa a{color:var(--ag-link);font-weight:600}
+
+/* ── Painel em vidro azul (hero e as seções "O que o auditor confere" e "Como funciona"): janela azul bem
+   clara e translúcida, o relevo animado aparece por trás e o blur maior mantém o texto em destaque.
+   Uma regra só para os três; fora do .tema-agentes cai no vidro osso padrão. ── */
+.au-painel{position:relative;padding:18px 18px 22px;border-radius:22px;border:1px solid var(--ag-vidro-hero-borda,var(--ag-borda-suave));background:var(--ag-vidro-hero,var(--ag-vidro));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+@media(min-width:760px){.au-painel{padding:36px 40px 40px;border-radius:28px}}
+.au-form{margin-top:22px;display:flex;flex-direction:column;gap:12px;max-width:720px}
+.au-label{font:600 12px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.1em;text-transform:uppercase;color:var(--ag-texto-sec)}
+/* celular (campo e botão empilhados): rótulo centralizado (pedido de Lucca, rodada 8) */
+@media(max-width:639px){.au-label{text-align:center}}
+.au-row{display:flex;flex-direction:column;gap:10px}
+@media(min-width:640px){.au-row{flex-direction:row}}
+.au-input{flex:1;min-width:0;min-height:52px;padding:12px 16px;border-radius:14px;border:2px solid var(--ag-borda);background:var(--ag-vidro-forte);color:var(--ag-texto);font:400 16px/1.3 var(--font-mono,'JetBrains Mono',monospace)}
+.au-input:focus{outline:none;border-color:var(--ag-acento-foco);box-shadow:0 0 0 4px color-mix(in srgb, var(--ag-acento-foco) 22%, transparent)}
+.au-input[aria-invalid="true"]{border-color:var(--ag-erro);box-shadow:none}
+.au-submit{min-height:52px;padding-inline:26px}
+.au-submit[disabled]{opacity:.6;cursor:progress;transform:none}
+.au-erro{margin:0;color:var(--ag-erro-texto);font-size:14px}
+/* Linha permanente do consentimento: estado atual + botão que reabre o aviso para mudar ou revogar */
+.au-consent-linha{margin:0;font-size:13px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-link-btn{appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;font-weight:600;color:var(--ag-link);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.au-link-btn:focus-visible{outline:2px solid var(--ag-link);outline-offset:2px;border-radius:2px}
+
+/* Pop-up de cookies: folha inferior compacta no mobile, card fixo no canto inferior direito no desktop.
+   aria-modal="false": não bloqueia a página; z-index abaixo da nav (1100) e acima do conteúdo (1). */
+.au-cookies,.au-cookies *{box-sizing:border-box}
+.au-cookies{position:fixed;left:0;right:0;bottom:0;z-index:1050;max-width:100%;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));background:var(--ag-vidro-forte);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);border-top:1px solid var(--ag-borda-suave);box-shadow:var(--no-shadow-lg);font-family:var(--font-core,'Sora',sans-serif);color:var(--ag-texto)}
+.au-cookies[hidden]{display:none}
+.au-cookies-titulo{margin:0 0 4px;font-size:15px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+.au-cookies-desc{margin:0 0 10px;font-size:13px;line-height:1.45;color:var(--ag-texto-sec)}
+.au-cookies-desc a{color:var(--ag-link);font-weight:600}
+.au-cookies-botoes{display:flex;gap:8px;flex-wrap:wrap}
+.au-cookies-botoes .ag-btn{flex:1 1 auto;min-height:42px;padding:9px 16px;font-size:14px}
+@media(min-width:700px){
+  .au-cookies{left:auto;right:20px;bottom:20px;width:380px;padding:20px 22px calc(20px + env(safe-area-inset-bottom,0px));border:1px solid var(--ag-borda-suave);border-radius:20px}
+  .au-cookies-titulo{font-size:17px;margin-bottom:6px}
+  .au-cookies-desc{font-size:14px;margin-bottom:14px}
+  .au-cookies-botoes .ag-btn{flex:0 1 auto;min-height:44px}
+}
+
+/* Estados */
+.au-estado{margin-top:28px;max-width:860px}
+.au-estado:empty{display:none}
+.au-box{padding:24px;border-radius:20px;border:1px solid var(--ag-borda);background:var(--ag-vidro);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.au-box h2{margin:0 0 8px;font-size:clamp(20px,2.4vw,26px);line-height:1.2}
+.au-box p{margin:0 0 12px;line-height:1.55;color:var(--ag-texto-sec)}
+.au-box--carregando{border-style:dashed}
+.au-box--falha{border-color:var(--ag-erro)}
+.au-box--teto{border-color:var(--ag-acento-foco)}
+.au-box--limite{border-color:var(--ag-acento-foco)}
+.au-cache{display:inline-block;margin-bottom:10px;padding:4px 10px;border-radius:999px;background:var(--ag-acento-tint);color:var(--ag-acento-escuro);font:600 11px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase}
+.au-meta{font:400 12px/1.5 var(--font-mono,'JetBrains Mono',monospace);color:var(--ag-texto-sec);margin:0 0 14px;word-break:break-all}
+.au-resumo{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:0 0 18px;padding:0;list-style:none}
+@media(min-width:640px){.au-resumo{grid-template-columns:repeat(4,1fr)}}
+.au-resumo li{padding:12px 14px;border-radius:12px;background:var(--ag-vidro-alt);display:flex;flex-direction:column;gap:2px}
+.au-resumo b{font-size:24px;line-height:1;font-family:var(--font-mono,'JetBrains Mono',monospace)}
+.au-resumo span{font-size:12px;color:var(--ag-texto-sec)}
+.au-resumo .is-ok b{color:var(--ag-ok)}.au-resumo .is-atencao b{color:var(--ag-atencao)}.au-resumo .is-problema b{color:var(--ag-erro-texto)}.au-resumo .is-nao_verificavel b{color:var(--ag-borda)}
+.au-checagens{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.au-checagens details{border:1px solid var(--ag-borda);border-radius:12px;padding:0 14px;background:var(--ag-vidro)}
+.au-checagens summary{display:flex;align-items:center;gap:10px;min-height:48px;cursor:pointer;font-weight:600;font-size:15px;list-style:none}
+.au-checagens summary::-webkit-details-marker{display:none}
+.au-checagens summary::after{content:'+';margin-left:auto;font-family:var(--font-mono,'JetBrains Mono',monospace);color:var(--ag-texto-sec)}
+.au-checagens details[open] summary::after{content:'−'}
+.au-checagens .au-det{padding:0 0 14px;font-size:14px;line-height:1.55;color:var(--ag-texto-sec)}
+.au-checagens .au-det b{display:block;color:var(--ag-texto);margin-top:6px}
+.au-status{flex:none;width:10px;height:10px;border-radius:50%;background:var(--ag-borda)}
+.au-status.is-ok{background:var(--ag-ok)}.au-status.is-atencao{background:var(--ag-atencao)}.au-status.is-problema{background:var(--ag-erro)}
+.au-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.au-fundo{margin-top:18px;padding:22px;border-radius:16px;background:var(--no-tinta);color:var(--no-osso)}
+.au-fundo h3{margin:0 0 6px;font-size:20px;line-height:1.2}
+.au-fundo p{margin:0 0 14px;color:var(--no-osso-alt)}
+.au-fundo .ag-btn--primario{background:var(--ag-botao);border-color:var(--ag-botao);color:var(--ag-botao-texto)}
+.au-fundo .ag-btn--primario:hover{background:var(--ag-botao-hover);border-color:var(--ag-botao-hover)}
+.au-fundo .ag-btn:focus-visible{outline-color:var(--no-osso)}
+
+/* ── Seções de apoio: centradas. As que são painel (.au-painel) seguem a largura da hero (a da .ag-main) e
+   encadeiam com ela sem filete; as demais (FAQ) ficam em 960px separadas por filete ── */
+.au-secao{margin:56px auto 0;max-width:960px}
+.au-secao:not(.au-painel){padding-top:32px;border-top:1px solid var(--ag-borda)}
+.au-secao.au-painel{max-width:none;margin-top:28px}
+.au-secao>h2{margin:0 0 18px;font-size:clamp(22px,2.6vw,30px);line-height:1.15;letter-spacing:-.01em}
+.au-secao-lead{margin:-8px 0 20px;font-size:15px;line-height:1.5;color:var(--ag-texto-sec);max-width:60ch}
+
+/* O que o auditor confere: 4 cards em vidro claro sobre o painel azul, faixa de acento no topo, ícone em
+   quadrado azul sólido com traço em osso. 1 coluna no celular, 2 a partir de 700px, 4 a partir de 1080px
+   (abaixo disso o chip "ok · 1 pixel na página" não cabe em 4 colunas). */
+.au-cards{margin:0;padding:0;list-style:none;display:grid;gap:14px;grid-template-columns:1fr}
+.au-card{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px;padding:22px 22px 20px;border-radius:18px;border:1px solid color-mix(in srgb, var(--ag-acento) 18%, transparent);background:var(--ag-vidro-forte);box-shadow:var(--no-shadow-card);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.au-card::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,var(--ag-acento),transparent);pointer-events:none}
+/* varredura de luz azul: passa uma vez pelo card quando ele entra ("o auditor conferindo"); parada, fica fora do card */
+.au-card::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,color-mix(in srgb, var(--ag-acento) 16%, transparent) 50%,transparent 65%);transform:translateX(-110%);pointer-events:none}
+.au-card:hover,.au-card:focus-within{transform:translateY(-4px);border-color:var(--ag-acento-foco);box-shadow:var(--no-shadow-lg)}
+@media(min-width:700px){.au-cards{grid-template-columns:1fr 1fr}}
+@media(min-width:1080px){.au-cards{grid-template-columns:repeat(4,1fr)}.au-card{padding:22px 18px 20px}.au-card-status{font-size:10px}}
+.au-card-icone{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--ag-acento);color:var(--ag-botao-texto)}
+.au-card-icone svg{width:22px;height:22px;display:block}
+/* rodada 9: logos de marca (Meta, Google) são paths preenchidos, não traço; um pouco maiores para ter o mesmo peso visual dos ícones de linha */
+.au-card-icone--marca svg{width:24px;height:24px}
+.au-card h3{margin:0;font-size:18px;line-height:1.2;letter-spacing:-.01em}
+.au-card p{margin:0;font-size:15px;line-height:1.5;color:var(--ag-texto-painel)}
+.au-card-status{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font:600 10.5px/1.4 var(--font-mono,'JetBrains Mono',monospace);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;background:var(--ag-vidro-alt);color:var(--ag-texto-sec)}
+.au-card-status::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ag-borda)}
+.au-card-status.is-ok{color:var(--ag-ok)}.au-card-status.is-ok::before{background:var(--ag-ok)}
+.au-card-status.is-atencao{color:var(--ag-atencao)}.au-card-status.is-atencao::before{background:var(--ag-atencao);animation:au-pulso 2.4s ease-in-out infinite}
+/* entrada escalonada (~120 ms entre cards): o auditor.js põe .is-espera na lista e acrescenta .is-animar quando ela
+   entra na tela. A entrada usa fill backwards, assim depois dela o hover (sobe 4px) volta a valer. Sem JS: tudo visível. */
+.au-cards.is-espera:not(.is-animar) .au-card{opacity:0;transform:translateY(18px)}
+.au-cards.is-animar .au-card{animation:au-card-in .55s cubic-bezier(.22,1,.36,1) backwards}
+.au-cards.is-animar .au-card::after{animation:au-varredura .9s ease-in-out forwards}
+.au-cards.is-animar .au-card:nth-child(1){animation-delay:.1s}.au-cards.is-animar .au-card:nth-child(1)::after{animation-delay:.5s}
+.au-cards.is-animar .au-card:nth-child(2){animation-delay:.22s}.au-cards.is-animar .au-card:nth-child(2)::after{animation-delay:.62s}
+.au-cards.is-animar .au-card:nth-child(3){animation-delay:.34s}.au-cards.is-animar .au-card:nth-child(3)::after{animation-delay:.74s}
+.au-cards.is-animar .au-card:nth-child(4){animation-delay:.46s}.au-cards.is-animar .au-card:nth-child(4)::after{animation-delay:.86s}
+@keyframes au-card-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes au-varredura{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
+@keyframes au-pulso{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--ag-atencao) 40%, transparent)}50%{box-shadow:0 0 0 5px transparent}}
+
+/* Como funciona: 4 passos em sequência. Número grande em Sora 800, ponto na linha, linha que se desenha
+   passo a passo (cada <li> desenha o trecho até o próximo). Vertical no celular, horizontal a partir de 700px. */
+.au-fluxo{position:relative;margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr;row-gap:26px}
+.au-passo{position:relative;display:grid;grid-template-columns:12px 1fr;column-gap:16px;align-items:start}
+.au-passo-marca{grid-column:1;grid-row:1;width:12px;height:12px;margin-top:14px;border-radius:50%;background:var(--ag-acento);box-shadow:0 0 0 4px var(--ag-acento-tint)}
+.au-passo-num{grid-column:2;grid-row:1;font:800 40px/1 var(--font-core,'Sora',sans-serif);letter-spacing:-.04em;color:var(--ag-acento)}
+.au-passo h3{grid-column:2;margin:8px 0 4px;font-size:17px;line-height:1.25;letter-spacing:-.01em}
+.au-passo p{grid-column:2;margin:0;font-size:14.5px;line-height:1.5;color:var(--ag-texto-painel)}
+.au-passo-logos{grid-column:2;display:flex;align-items:center;gap:14px;margin-top:10px}
+.au-passo-logos svg{display:block;height:24px;width:auto}
+/* trecho vertical: do anel do ponto até o anel do ponto seguinte (row-gap 26 + 14 de margem - 4 de anel) */
+.au-passo:not(:last-child)::before{content:'';position:absolute;left:5px;top:30px;bottom:-36px;width:2px;border-radius:2px;background:var(--ag-acento);opacity:.4;transform-origin:top}
+/* animação só com script: sem JS (ou na prévia sem rolagem) os passos ficam visíveis. O auditor.js põe .is-espera
+   e troca para .is-animar quando a seção entra na tela. */
+.au-fluxo.is-espera .au-passo{opacity:0;transform:translateY(14px)}
+.au-fluxo.is-espera .au-passo:not(:last-child)::before{transform:scaleY(0)}
+.au-fluxo.is-animar .au-passo{animation:au-passo-in .6s cubic-bezier(.22,1,.36,1) forwards}
+.au-fluxo.is-animar .au-passo:not(:last-child)::before{animation:au-linha-v .5s ease-out forwards}
+.au-fluxo.is-animar .au-passo:nth-child(1){animation-delay:.15s}.au-fluxo.is-animar .au-passo:nth-child(1)::before{animation-delay:.4s}
+.au-fluxo.is-animar .au-passo:nth-child(2){animation-delay:.6s}.au-fluxo.is-animar .au-passo:nth-child(2)::before{animation-delay:.85s}
+.au-fluxo.is-animar .au-passo:nth-child(3){animation-delay:1.05s}.au-fluxo.is-animar .au-passo:nth-child(3)::before{animation-delay:1.3s}
+.au-fluxo.is-animar .au-passo:nth-child(4){animation-delay:1.5s}
+@media(min-width:700px){
+  .au-fluxo{grid-template-columns:repeat(4,1fr);row-gap:0}
+  .au-passo{display:flex;flex-direction:column;align-items:flex-start;padding-right:22px}
+  .au-passo-num{order:0;font-size:52px;height:52px;margin:0 0 14px}
+  .au-passo-marca{order:1;margin:0 0 16px}
+  .au-passo h3{order:2;margin:0 0 6px;font-size:18px}
+  .au-passo p{order:3}
+  .au-passo-logos{order:4;margin-top:12px}
+  /* trecho horizontal na altura do ponto: 52 (número) + 14 (margem) + 6 (meio do ponto) - 1 */
+  .au-passo:not(:last-child)::before{top:71px;left:22px;right:28px;bottom:auto;width:auto;height:2px;transform-origin:left}
+  .au-fluxo.is-espera .au-passo:not(:last-child)::before{transform:scaleX(0)}
+  .au-fluxo.is-animar .au-passo:not(:last-child)::before{animation-name:au-linha-h}
+}
+@keyframes au-passo-in{to{opacity:1;transform:none}}
+@keyframes au-linha-v{to{transform:scaleY(1)}}
+@keyframes au-linha-h{to{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){
+  .au-fluxo .au-passo{animation:none!important;opacity:1!important;transform:none!important}
+  .au-fluxo .au-passo::before{animation:none!important;transform:none!important}
+  .au-cards .au-card{animation:none!important;opacity:1!important;transform:none!important;transition:none}
+  .au-cards .au-card::after,.au-card-status::before{animation:none!important}
+}
+
+/* FAQ: um <details> por pergunta, sumário com 48px de toque */
+.au-faq-lista{display:flex;flex-direction:column;gap:8px}
+.au-faq details{border:1px solid var(--ag-borda);border-radius:14px;padding:0 16px;background:var(--ag-vidro);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.au-faq details[open]{border-color:var(--ag-acento-foco)}
+.au-faq summary{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 0;cursor:pointer;font-weight:600;font-size:16px;line-height:1.3;list-style:none}
+.au-faq summary::-webkit-details-marker{display:none}
+.au-faq summary::after{content:'+';flex:none;margin-left:auto;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--ag-acento-tint);color:var(--ag-acento-escuro);font:600 16px/1 var(--font-mono,'JetBrains Mono',monospace)}
+.au-faq details[open] summary::after{content:'−'}
+.au-faq summary:focus-visible{outline:3px solid var(--ag-acento-foco);outline-offset:2px;border-radius:8px}
+.au-faq details p{margin:0;padding:0 0 16px;font-size:15px;line-height:1.6;color:var(--ag-texto-sec)}
+.au-faq-nota{margin:18px 0 0;font-size:14px;line-height:1.5;color:var(--ag-texto-sec)}
+.au-faq-nota a{color:var(--ag-link);font-weight:600}
+
+/* o relatório rola para o topo; a margem deixa a marca de cache e o título fora da navbar flutuante */
+.au-estado{scroll-margin-top:112px}
+
+/* ── Nav compartilhada no tema nó.agentes: barra azul, textos em osso, seletor (ativo/hover/CTA) em osso
+   com texto azul; logo branca toda (no-branca-mono.svg) para não sumir no azul. Painel do menu segue claro. ── */
+.tema-agentes .no-card-nav{background:var(--ag-nav-fundo);border-color:color-mix(in srgb, var(--ag-nav-texto) 22%, transparent);color:var(--ag-nav-texto);box-shadow:var(--no-shadow-lg)}
+.tema-agentes .no-card-toggle{color:var(--ag-nav-texto)}
+.tema-agentes .no-card-brand img{content:url(/brand/logo/svg/no-branca-mono.svg);object-fit:contain}
+.tema-agentes .no-card-toplinks a{color:var(--ag-nav-texto)}
+.tema-agentes .no-card-toplinks a:hover,.tema-agentes .no-card-toplinks a[aria-current=page],.tema-agentes .no-card-toplinks a:last-child{background:var(--ag-nav-seletor);color:var(--ag-nav-seletor-texto)}
+.tema-agentes .no-card-toplinks a:last-child:hover{background:var(--ag-nav-seletor);color:var(--ag-nav-seletor-texto);filter:brightness(.94)}
+.tema-agentes .no-card-nav :focus-visible{outline-color:var(--ag-nav-texto)}
+.tema-agentes .no-card{background:var(--ag-nav-seletor);color:var(--no-tinta)}
+.tema-agentes .no-card:nth-child(2){background:var(--no-agentes-azul-tint)}
+.tema-agentes .no-card:nth-child(3){background:var(--ag-nav-seletor)}
+.tema-agentes .no-card a,.tema-agentes .no-card b{color:var(--no-tinta)}

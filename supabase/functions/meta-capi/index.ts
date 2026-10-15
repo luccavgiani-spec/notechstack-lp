@@ -25,6 +25,12 @@
 const PIXEL_ID = '1753619075655271';          // portfólio 990413650211777
 const GRAPH    = 'https://graph.facebook.com/v21.0';
 
+/* LISTA FECHADA: a função é pública (sem JWT), então só passam os eventos de
+   navegação que ela existe para cobrir. Lead e Purchase saem do servidor
+   (send-lead-email, pagarme-webhook-no) e DiagnosticoEntregue sai do
+   diagnostico-auditor; nenhum deles entra por aqui. */
+const EVENTOS_PERMITIDOS = new Set(['PageView', 'ViewContent']);
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -127,6 +133,12 @@ Deno.serve(async (req: Request) => {
      isso já passou do verify_jwt e já enxergou o token. */
   const event_name = String(body.event_name || '').trim();
   if (!event_name) return json({ error: 'event_name_required' }, 400);
+  /* fora da lista volta antes de qualquer chamada à Meta; o nome vai ao log
+     (sem dado pessoal) para os logs da função mostrarem quem ainda tenta. */
+  if (!EVENTOS_PERMITIDOS.has(event_name)) {
+    console.warn('meta-capi: evento recusado:', event_name.slice(0, 60));
+    return json({ error: 'evento_nao_permitido' }, 400);
+  }
 
   const ip = (req.headers.get('x-forwarded-for') || '').split(',')[0].trim();
   const ua = req.headers.get('user-agent') || '';

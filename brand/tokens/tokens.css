@@ -8,6 +8,12 @@
   --no-ambar: #EDA33B;     /* atenção · nó principal (IA & sistemas) */
   --no-verde: #30A46C;     /* sucesso · CTA · vertical saúde (nó health) */
 
+  /* ── Sub-marca nó.agentes (aprovado por Lucca em 15/10/2026; medido em brand/agentes/
+     "Logotipo nó.agentes em fundo marfim-2.png"). Proposta para o no-design-system:
+     work/agentes-auditor/docs/proposta-design-system-agentes-azul.md ── */
+  --no-agentes-azul: #2F56E5;
+  --no-agentes-azul-tint: #EAEEFC;
+
   /* ── Tints (fundos suaves) ── */
   --no-azul-tint: #E9EEFB;
   --no-vermelho-tint: #FBEAE5;
