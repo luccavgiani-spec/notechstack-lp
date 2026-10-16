@@ -145,8 +145,13 @@ PR, merge e deploy.
    id da V1 como `baseVersionId` (a cópia da V2 tem que descartar mensagem da V1).
 5. Oscar confere só a troca do id e dá o ok; Michael faz PR, merge e deploy.
 6. Lucca roda `.checks/espaco-saude-mental-v2/editor_version_configs-v2.sql`
-   inteiro (`bridge_enabled = true`). Opcional: "Associar checklist" do Base V1 à V2
-   no mesmo card, o que libera o checklist no histórico da cliente.
+   inteiro, uma vez (`bridge_enabled = true`). Desde a rodada 3 (achado F-05, Gabe
+   fez, Dwight revisou) ele só aceita a versão com macro `V2`, label `V2` e status
+   `publicada`, publicada depois da V1, e aborta sem gravar nada se a V2 já tiver
+   linha (insert simples, sem sobrescrever). Provado em PGlite (Postgres 18 em
+   memória) com as tabelas e a `editor_allowed_controls` das próprias migrations:
+   13 cenários, 0 falhas. Opcional: "Associar checklist" do Base V1 à V2 no mesmo
+   card, o que libera o checklist no histórico da cliente.
 7. Conferência (C4): a V2 aparece no dashboard e o Editor abre com os componentes.
 
 Entre 3 e 6 o Editor da Thaís fica vazio (`get_client_editor_config` só devolve a

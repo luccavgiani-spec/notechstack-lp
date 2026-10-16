@@ -30,9 +30,12 @@
 -- guarda aborta se for diferente (mesmo_build_da_v1 na conferência).
 --
 -- Guardas (seção 2), qualquer uma aborta tudo: placeholder não trocado ou uuid
--- inválido; id da V1; versão inexistente ou de outro projeto; versão que não é a
--- atual; V1 sem linha nesta tabela; build_reference diferente do da V1;
--- allowlist mal formada; banco sem editor_allowed_controls.
+-- inválido; id da V1; versão inexistente ou de outro projeto; versão que não é
+-- a V2 (macro V2, label V2 e status publicada, como publish_project_version
+-- grava; esquema citado na seção 2, migration 20260915223119); versão que não
+-- é a atual; V2 que já tem linha nesta tabela; V1 sem linha nesta tabela, sem
+-- macro V1 ou não anterior à V2; build_reference diferente do da V1; allowlist
+-- mal formada; banco sem editor_allowed_controls.
 --
 -- Formato: o data-components da cópia é um mapa {id: [controles]}, mas a coluna
 -- guarda um array [{id, label?, screen?, controls}]; gravar o mapa direto falha
@@ -43,13 +46,20 @@
 --
 -- Como rodar:
 --   1. Selecione só a consulta da seção 1 e rode a seleção. A V2 é a versão
---      nova (is_current = true, tem_config = false); confira nela
---      mesmo_build_da_v1 = true e build_https = true. Copie o version_id.
+--      nova (label = V2, macro = V2, status = publicada, is_current = true,
+--      tem_config = false); confira nela mesmo_build_da_v1 = true e
+--      build_https = true. Copie o version_id.
 --   2. Troque o placeholder da seção 0 (única ocorrência no arquivo).
---   3. Rode o arquivo inteiro. Se qualquer guarda falhar, nada é gravado.
---      O resultado exibido é a conferência da seção 5.
+--   3. Rode o arquivo inteiro, uma vez. Se qualquer guarda falhar, nada é
+--      gravado. O resultado exibido é a conferência da seção 5.
 --
--- Desfazer (só se a V2 não tinha linha antes, tem_config = false na seção 1):
+-- Nova execução não sobrescreve: se a V2 já tem linha nesta tabela
+-- (tem_config = true na seção 1), a seção 2 aborta e a linha fica como está.
+-- Para regravar (por exemplo, allowlist corrigida), rode o "Desfazer" abaixo e
+-- depois o arquivo inteiro.
+--
+-- Desfazer (a seção 2 só deixa gravar se a V2 não tinha linha, então a linha
+-- apagada é a que este arquivo gravou; o Editor da cliente volta a ficar vazio):
 --   delete from public.editor_version_configs where version_id = '<id da V2>';
 -- =============================================================================
 
@@ -116,7 +126,8 @@ declare
   v_alvo    jsonb := current_setting('esm_v2.allowlist', true)::jsonb;
   v_v2      uuid;
   v_versao  public.project_versions%rowtype;
-  v_build_v1 text;
+  v_v1      public.project_versions%rowtype;
+  v_cfg_em  timestamptz;
 begin
   -- Placeholder trocado e uuid válido.
   if v_bruto = '' or replace(v_bruto, '-', '') ~ '^0+$' then
@@ -129,7 +140,7 @@ begin
       raise exception 'ABORTADO: "%" não é um uuid.', v_bruto;
   end;
 
-  -- Não é a V1 (o on conflict sobrescreveria a linha dela).
+  -- Não é a V1 (engano mais provável ao copiar o id na seção 1).
   if v_v2 = c_v1 then
     raise exception 'ABORTADO: % é o id da V1. Use o id da V2.', v_v2;
   end if;
@@ -144,26 +155,68 @@ begin
       v_v2, v_versao.label, v_versao.project_id, c_projeto;
   end if;
 
+  -- É a V2, e não uma V1.x nem uma V2.N publicada por engano com o mesmo
+  -- build_reference. Esquema em supabase/migrations/20260915223119_f2_09_versions_backend.sql:
+  --   l.10       macro text not null check (macro in ('V1', 'V2', 'V3'));
+  --   l.9, l.18  label só exige texto não vazio, mas é unique (project_id, label):
+  --              label 'V2' é uma versão só no projeto;
+  --   l.126-157  publish_project_version (chamada por
+  --              supabase/functions/project-publish-version/index.ts l.54, que só
+  --              aceita macro V1/V2/V3 e label V1|V2|V3 com .N opcional, l.6-7)
+  --              grava V1.N com macro V1 e status 'intermediaria', V2.N com macro
+  --              V2 e status 'intermediaria', e só a V2 com macro V2, label V2 e
+  --              status 'publicada'.
+  -- Limite: o formato do label e os valores de status vêm só dessa função (a
+  -- tabela não os confere), e o trigger project_versions_protect_history
+  -- (l.40-60) não congela macro/label/status. Nenhuma função os altera depois do
+  -- insert: o único update em project_versions é is_current = false (l.162-164).
+  if v_versao.macro is distinct from 'V2'
+     or v_versao.label is distinct from 'V2'
+     or v_versao.status is distinct from 'publicada' then
+    raise exception 'ABORTADO: a versão % tem macro %, label % e status %; este arquivo é só para a V2 (macro V2, label V2, status publicada).',
+      v_v2, v_versao.macro, v_versao.label, v_versao.status;
+  end if;
+
   -- É a versão atual: get_client_editor_config só lê a configuração dela.
   if not v_versao.is_current then
     raise exception 'ABORTADO: a versão % (%) não é a atual do projeto; o Editor só lê a versão atual.',
       v_v2, v_versao.label;
   end if;
 
-  -- A V1 é deste projeto e tem linha (é dela que vêm label/screen dos itens).
-  select v.build_reference into v_build_v1
+  -- A V2 ainda não tem linha nesta tabela: a seção 3 é insert simples e este
+  -- arquivo nunca sobrescreve uma configuração existente.
+  select c.created_at into v_cfg_em
+  from public.editor_version_configs as c
+  where c.version_id = v_v2;
+  if found then
+    raise exception 'ABORTADO: a V2 (%) já tem linha em editor_version_configs (gravada em %); nada foi alterado. Veja a linha na seção 1 (tem_config = true). Para regravar, rode o "Desfazer" do cabeçalho e depois o arquivo inteiro.',
+      v_v2, v_cfg_em;
+  end if;
+
+  -- A V1 é deste projeto, tem linha (é dela que vêm label/screen dos itens), tem
+  -- macro V1 e foi publicada antes da V2. published_at é clock_timestamp() na
+  -- publicação (l.170) e imutável depois (project_versions_protect_history, l.47).
+  select v.* into v_v1
   from public.project_versions as v
   join public.editor_version_configs as c on c.version_id = v.id
   where v.id = c_v1 and v.project_id = c_projeto;
   if not found then
     raise exception 'ABORTADO: a V1 (%) não está neste projeto com linha em editor_version_configs.', c_v1;
   end if;
+  if v_v1.macro is distinct from 'V1' then
+    raise exception 'ABORTADO: a versão % (%), usada como V1, tem macro %; esperado V1.',
+      c_v1, v_v1.label, v_v1.macro;
+  end if;
+  if v_versao.published_at <= v_v1.published_at then
+    raise exception 'ABORTADO: a V2 (%) foi publicada em %, não depois da V1 (%).',
+      v_v2, v_versao.published_at, v_v1.published_at;
+  end if;
 
   -- Mesma cópia de preview da V1. O Editor abre no iframe o build_reference da
   -- versão atual, e ele não muda depois de publicar.
-  if v_versao.build_reference is distinct from v_build_v1 then
+  if v_versao.build_reference is distinct from v_v1.build_reference then
     raise exception 'ABORTADO: build_reference da V2 (%) difere do da V1 (%); o Editor abriria outra página.',
-      v_versao.build_reference, v_build_v1;
+      v_versao.build_reference, v_v1.build_reference;
   end if;
 
   -- Allowlist alvo no formato {id: [controles]}, só com controles de conteúdo.
@@ -195,8 +248,9 @@ $$;
 -- 3. GRAVAÇÃO -----------------------------------------------------------------
 -- Uma linha por versão (PK version_id). Lê a linha da V1 só para herdar
 -- label/screen e a ordem dos itens; ids e controles vêm da allowlist alvo.
--- Em nova execução, sobrescreve allowed_components e bridge_enabled e mantém o
--- created_at da primeira gravação.
+-- Insert simples, sem on conflict: nunca sobrescreve. A seção 2 já abortou se a
+-- V2 tinha linha; se outra sessão gravar a linha entre a guarda e este insert,
+-- a PK falha (23505) e a transação inteira volta.
 insert into public.editor_version_configs (version_id, allowed_components, bridge_enabled)
 select
   current_setting('esm_v2.version_id')::uuid,
@@ -217,10 +271,7 @@ select
   ),
   true
 from public.editor_version_configs as v1
-where v1.version_id = 'eb2ab04c-059e-4d70-8707-f9e7dc15384b'
-on conflict (version_id) do update
-  set allowed_components = excluded.allowed_components,
-      bridge_enabled     = excluded.bridge_enabled;
+where v1.version_id = 'eb2ab04c-059e-4d70-8707-f9e7dc15384b';
 
 -- 4. CONFERÊNCIA DENTRO DA TRANSAÇÃO ------------------------------------------
 -- Se a linha gravada não bater com o alvo, aborta e nada é gravado.
@@ -236,6 +287,13 @@ begin
   select * into v_cfg from public.editor_version_configs where version_id = v_v2;
   if not found or v_cfg.bridge_enabled is not true then
     raise exception 'ABORTADO: a linha da V2 não ficou gravada com bridge_enabled = true.';
+  end if;
+
+  -- A linha é desta execução: created_at (default now()) é o início desta
+  -- transação.
+  if v_cfg.created_at is distinct from now() then
+    raise exception 'ABORTADO: a linha da V2 tem created_at %, que não é desta execução (início %).',
+      v_cfg.created_at, now();
   end if;
 
   -- Mesmos ids e controles do data-components, sem item duplicado.
@@ -263,7 +321,8 @@ $$;
 commit;
 
 -- 5. CONFERÊNCIA DEPOIS (só leitura, dado já gravado; mesma consulta da seção 1)
--- Esperado na linha da V2: is_current = true, tem_config = true,
+-- Esperado na linha da V2: label = V2, macro = V2, status = publicada,
+-- is_current = true, tem_config = true,
 -- bridge_enabled = true, mapa_controles igual ao data-components,
 -- mesmo_build_da_v1 = true e build_https = true.
 -- mapa_igual_ao_da_v1 = false na V2 significa que a allowlist da V1 no banco não
