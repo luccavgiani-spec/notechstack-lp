@@ -75,13 +75,23 @@ Sem controle de `logo`: a LP não tem `<img>` de marca, e a única imagem da pá
 
 ## V2 — pedidos da Thaís (Base V1, enviado em 13/10/2026 16:09) · TASK-mvbfaammemy
 
-Estado em 16/10/2026: **aguardando o pacote**. O Base V1 está só no Storage de
-produção (bucket `editor-exports`, pasta
-`4fbc3859-a32f-4a71-b799-b005f32f65f8/<sha256>/`, com `editor.md`, `editor.cfg`,
-`editor.css` e `manifest.json`) e o gate nega leitura de banco remoto ao agente.
-Lucca salva os quatro arquivos em `.checks/espaco-saude-mental-v2/base-v1/` (não
-commitar: é dado de cliente). Fotos trocadas pela Thaís vêm como URL pública do
-bucket `editor-assets` dentro do `editor.cfg` e são baixadas pela URL.
+Estado em 16/10/2026 (rodada 2, 18:50): **aguardando o pacote**. O Base V1 está só
+em produção e o gate nega ao agente o conector Supabase (leitura de banco remoto
+incluída, mesmo com a aprovação de Lucca). Dois caminhos, ambos de Lucca, para
+`.checks/espaco-saude-mental-v2/base-v1/` (fora do git: é dado de cliente):
+
+- **Mais rápido:** admin → projeto Espaço Saúde Mental → seção "Exports do Editor" →
+  card "Base V1 · Enviado em 13/10/2026 16:09". O card lista cada componente
+  (tela / rótulo e id) com o "Antes" e o "Depois" em JSON
+  (`AdminDashboardPages.tsx`, `EditorExportsControl`). Copiar o card inteiro para
+  `base-v1/admin.txt` basta para aplicar texto, tamanho, cor e foto.
+- **Completo:** Storage, bucket `editor-exports`, pasta
+  `4fbc3859-a32f-4a71-b799-b005f32f65f8/<sha256>/`: `editor.md`, `editor.cfg`,
+  `editor.css` e `manifest.json`. O `editor.css` traz o seletor de cada id
+  `auto:…`, que o harness usa.
+
+Fotos trocadas pela Thaís vêm como URL pública do bucket `editor-assets` (no "Depois"
+ou no `editor.cfg`) e são baixadas pela URL.
 
 ### Onde a alteração entra (confirmado)
 
@@ -107,24 +117,34 @@ O `no-editor-preview.js` descarta mensagens cujo `baseVersionId` difere do
 (não há rascunho). Logo a cópia publicada precisa do id da V2, que só existe depois da
 publicação, e a V2 nasce sem configuração no Editor:
 
-1. Dwight aplica o Base V1 na cópia (ainda com o id da V1) e preenche o checklist.
-2. Oscar confere item por item: harness local de `postMessage` (no `localhost` o
-   runtime aceita o próprio origin) e o preview de `agent/<task>` à vista.
-3. Lucca publica a V2 no admin e informa o id. Publicar V2 exige o projeto em
-   `V2_EM_DESENVOLVIMENTO`; a partir de `V1_PUBLICADA` o caminho é
-   `EM_REVISAO_CLIENTE` → `ALTERACOES_RECEBIDAS` → `V2_EM_DESENVOLVIMENTO`
-   (`publish_project_version` e transições em 20260915223119). A referência do build tem de ser a
-   mesma da V1, `https://app.notechstack.com.br/prototipos/espaco-saudemental/`: o
-   Editor monta o iframe a partir dela (`config.buildReference`).
-4. Dwight troca o `data-version-id` da cópia para a V2 e põe o id no SQL; Oscar
-   confere só essa troca.
+Rodada 2 (16/10): ajustada ao fluxo de Lucca, "Dwight termina → Oscar revisa →
+Michael faz PR, merge e deploy", com uma passada só do Oscar:
+
+1. Dwight aplica o Base V1 na cópia (ainda com o id da V1), preenche o checklist e
+   confere no harness local (`.checks/espaco-saude-mental-v2/harness/`).
+2. Lucca, no admin, num bloco só, publica a V2 e informa o id:
+   `V1_PUBLICADA` → `EM_REVISAO_CLIENTE` (manual) → botão "Ingerir no Kanban" no card
+   do Base V1 (`ingest_editor_export` exige `EM_REVISAO_CLIENTE`, cria os itens do
+   Kanban e já leva a `ALTERACOES_RECEBIDAS`, migration 20261002141941) →
+   `V2_EM_DESENVOLVIMENTO` (manual) → publicar a V2 com a mesma referência de build da
+   V1, `https://app.notechstack.com.br/prototipos/espaco-saudemental/` (o Editor monta
+   o iframe por `config.buildReference`, e ela não muda depois de publicar).
+   Publicar não manda e-mail à cliente (`project-publish-version` só registra log).
+3. Dwight troca o `data-version-id` da cópia e o placeholder do SQL pelo id da V2.
+4. Oscar confere tudo de uma vez: itens do checklist e a troca do id.
 5. Michael: PR, merge e deploy.
 6. Lucca roda `.checks/espaco-saude-mental-v2/editor_version_configs-v2.sql`
-   (`bridge_enabled = true`).
+   inteiro (`bridge_enabled = true`). Opcional: "Associar checklist" do Base V1 à V2
+   no mesmo card, o que libera o checklist no histórico da cliente.
 7. Conferência (C4): a V2 aparece no dashboard e o Editor abre com os componentes.
 
-Entre 3 e 6 o Editor da Thaís fica vazio (`get_client_editor_config` só devolve a
-versão atual que tem linha em `editor_version_configs`); fazer 3 → 6 de uma vez.
+Entre 2 e 6 o Editor da Thaís fica vazio (`get_client_editor_config` só devolve a
+versão atual que tem linha em `editor_version_configs`) e o link do protótipo da V2
+ainda mostra a página antiga: fazer 2 → 6 no mesmo período, de preferência fora do
+horário da clínica. O SQL fica para depois do deploy de propósito: antes dele o
+Editor abriria com componentes, mas o preview não responderia (a cópia no ar, com o
+id da V1, descarta as mensagens da V2) e a Thaís poderia mandar um pacote sem ver o
+efeito. Vazio é mais seguro que mudo.
 
 ### Allowlist e C3
 
@@ -135,6 +155,32 @@ texto ou foto (ids `auto:…`; foto como `auto:src/<arquivo>`). O C3 da TASK lis
 decidir, alteração `auto:…` ou estrutural faz a TASK parar e voltar a ele para rever
 o porte (pedido aberto em 16/10 com a recomendação de aceitar o modo automático, que
 a V1 já liberava).
+
+### Harness de conferência (C1)
+
+`.checks/espaco-saude-mental-v2/harness/` (Andy fez, Dwight revisou):
+
+- `serve.mjs` serve `app/public` em `/` e o harness em `/__harness/`, só em
+  127.0.0.1 (no `localhost` o runtime aceita o próprio origin). Node puro.
+- `index.html` abre a cópia num iframe, lê projeto, versão e allowlist do próprio
+  script da cópia (segue a V1 hoje e a V2 depois da troca do id) e, para cada item,
+  confere (a) **estático**: a cópia já mostra o valor, sem mensagem; (b) **editor**:
+  o `postMessage` do Editor ainda acha e edita o componente e, com `changes: {}`,
+  volta ao original. Item `"negativo": true` prova que controle fora da allowlist
+  não passa. Texto que só difere no espaçamento (quebra de linha que vira `<br>`)
+  passa com aviso. Resultado no `document.title`: `HARNESS OK x/x` ou
+  `HARNESS FALHA x/x: n=…`.
+- Item: `{"n", "id", "selector"?, "field": "text|size|color|logo", "expected",
+  "negativo"?}`. Para id `auto:…`, o `selector` vem do `editor.css` do pacote.
+
+```
+node .checks/espaco-saude-mental-v2/harness/serve.mjs 5317
+msedge --headless=new --disable-gpu --user-data-dir=<pasta temporária> --dump-dom --virtual-time-budget=20000 "http://127.0.0.1:5317/__harness/index.html?checklist=checklist.exemplo.json"
+```
+
+Na V1 atual (16/10, 18:55): `checklist.exemplo.json` (13 itens dos cinco ids + 1
+negativo) → `HARNESS OK 14/14`; controle com um valor errado de propósito →
+`HARNESS FALHA 13/14: n=9`.
 
 ### Checklist (preenchido quando o pacote chegar)
 
