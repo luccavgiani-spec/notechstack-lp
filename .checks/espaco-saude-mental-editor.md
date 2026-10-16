@@ -110,7 +110,9 @@ publicação, e a V2 nasce sem configuração no Editor:
 1. Dwight aplica o Base V1 na cópia (ainda com o id da V1) e preenche o checklist.
 2. Oscar confere item por item: harness local de `postMessage` (no `localhost` o
    runtime aceita o próprio origin) e o preview de `agent/<task>` à vista.
-3. Lucca publica a V2 no admin e informa o id.
+3. Lucca publica a V2 no admin e informa o id. A referência do build tem de ser a
+   mesma da V1, `https://app.notechstack.com.br/prototipos/espaco-saudemental/`: o
+   Editor monta o iframe a partir dela (`config.buildReference`).
 4. Dwight troca o `data-version-id` da cópia para a V2 e põe o id no SQL; Oscar
    confere só essa troca.
 5. Michael: PR, merge e deploy.
@@ -118,15 +120,18 @@ publicação, e a V2 nasce sem configuração no Editor:
    (`bridge_enabled = true`).
 7. Conferência (C4): a V2 aparece no dashboard e o Editor abre com os componentes.
 
-Entre 3 e 6 o Editor da Thaís fica sem ponte; fazer 3 → 6 de uma vez.
+Entre 3 e 6 o Editor da Thaís fica vazio (`get_client_editor_config` só devolve a
+versão atual que tem linha em `editor_version_configs`); fazer 3 → 6 de uma vez.
 
 ### Allowlist e C3
 
-A V1 tem também o modo automático (`"*": text, size, color, logo` no
-`data-components` da cópia), então a Thaís pode ter mexido em qualquer texto ou foto
-(ids `auto:…`). O C3 da TASK lista só `marca_topo`, `hero_titulo`, `hero_texto`,
-`hero_cta` e `valores_titulo`: alteração `auto:…` ou estrutural faz a TASK parar e
-voltar a Lucca para rever o porte.
+A V1 tem também o modo automático desde 02/10 (`"*": text, size, color, logo` no
+`data-components` da cópia, PR #52 e #54), então a Thaís pode ter mexido em qualquer
+texto ou foto (ids `auto:…`; foto como `auto:src/<arquivo>`). O C3 da TASK lista só
+`marca_topo`, `hero_titulo`, `hero_texto`, `hero_cta` e `valores_titulo`. Até Lucca
+decidir, alteração `auto:…` ou estrutural faz a TASK parar e voltar a ele para rever
+o porte (pedido aberto em 16/10 com a recomendação de aceitar o modo automático, que
+a V1 já liberava).
 
 ### Checklist (preenchido quando o pacote chegar)
 
