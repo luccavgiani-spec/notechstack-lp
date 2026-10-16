@@ -72,3 +72,64 @@ Sem controle de `logo`: a LP não tem `<img>` de marca, e a única imagem da pá
   runtime, não um defeito desta build.
 - A conta CLIENT foi criada já confirmada, direto no banco, justamente para **não**
   disparar e-mail de convite para a cliente real.
+
+## V2 — pedidos da Thaís (Base V1, enviado em 13/10/2026 16:09) · TASK-mvbfaammemy
+
+Estado em 16/10/2026: **aguardando o pacote**. O Base V1 está só no Storage de
+produção (bucket `editor-exports`, pasta
+`4fbc3859-a32f-4a71-b799-b005f32f65f8/<sha256>/`, com `editor.md`, `editor.cfg`,
+`editor.css` e `manifest.json`) e o gate nega leitura de banco remoto ao agente.
+Lucca salva os quatro arquivos em `.checks/espaco-saude-mental-v2/base-v1/` (não
+commitar: é dado de cliente). Fotos trocadas pela Thaís vêm como URL pública do
+bucket `editor-assets` dentro do `editor.cfg` e são baixadas pela URL.
+
+### Onde a alteração entra (confirmado)
+
+**Direto na cópia** `app/public/prototipos/espaco-saudemental/`, não no repo
+`espacosaudemental`:
+
+- O site no ar está fora do escopo (reunião de 16/10, Q2 = A). Aplicar no repo da
+  cliente e regerar a cópia pelo `vite.prototipo.config.ts` mudaria a fonte do site
+  no ar.
+- Texto entra no bundle inline do `index.html` por troca exata de string (cada troca
+  conferida por contagem de ocorrências). Tamanho e cor entram num
+  `<style id="no-base-v2">` com os mesmos seletores do `editor.css` do pacote
+  (`[data-editor=…]`, ou o caminho no DOM no modo automático). O `no-editor-map.js`
+  continua carimbando os mesmos elementos, então o Editor da V2 segue achando os
+  componentes.
+- Quando a mudança for levada ao site no ar (outra TASK, depois do aceite da Thaís),
+  a cópia volta a ser regerada da fonte, e esta camada deixa de ser necessária.
+
+### Ordem (confirmada pelo runtime)
+
+O `no-editor-preview.js` descarta mensagens cujo `baseVersionId` difere do
+`data-version-id` da cópia, e `project-publish-version` cria a versão já como atual
+(não há rascunho). Logo a cópia publicada precisa do id da V2, que só existe depois da
+publicação, e a V2 nasce sem configuração no Editor:
+
+1. Dwight aplica o Base V1 na cópia (ainda com o id da V1) e preenche o checklist.
+2. Oscar confere item por item: harness local de `postMessage` (no `localhost` o
+   runtime aceita o próprio origin) e o preview de `agent/<task>` à vista.
+3. Lucca publica a V2 no admin e informa o id.
+4. Dwight troca o `data-version-id` da cópia para a V2 e põe o id no SQL; Oscar
+   confere só essa troca.
+5. Michael: PR, merge e deploy.
+6. Lucca roda `.checks/espaco-saude-mental-v2/editor_version_configs-v2.sql`
+   (`bridge_enabled = true`).
+7. Conferência (C4): a V2 aparece no dashboard e o Editor abre com os componentes.
+
+Entre 3 e 6 o Editor da Thaís fica sem ponte; fazer 3 → 6 de uma vez.
+
+### Allowlist e C3
+
+A V1 tem também o modo automático (`"*": text, size, color, logo` no
+`data-components` da cópia), então a Thaís pode ter mexido em qualquer texto ou foto
+(ids `auto:…`). O C3 da TASK lista só `marca_topo`, `hero_titulo`, `hero_texto`,
+`hero_cta` e `valores_titulo`: alteração `auto:…` ou estrutural faz a TASK parar e
+voltar a Lucca para rever o porte.
+
+### Checklist (preenchido quando o pacote chegar)
+
+| # | componente | campo | antes → depois | aplicado | Oscar |
+|---|---|---|---|---|---|
+| — | aguardando `base-v1/editor.md` | | | | |
