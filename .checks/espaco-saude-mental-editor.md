@@ -75,10 +75,14 @@ Sem controle de `logo`: a LP não tem `<img>` de marca, e a única imagem da pá
 
 ## V2 — pedidos da Thaís (Base V1, enviado em 13/10/2026 16:09) · TASK-mvbfaammemy
 
-Estado em 16/10/2026 (rodada 2, 18:50): **aguardando o pacote**. O Base V1 está só
+Estado em 16/10/2026 (rodada 3, 19:10): **aguardando o pacote**. O Base V1 está só
 em produção e o gate nega ao agente o conector Supabase (leitura de banco remoto
-incluída, mesmo com a aprovação de Lucca). Dois caminhos, ambos de Lucca, para
-`.checks/espaco-saude-mental-v2/base-v1/` (fora do git: é dado de cliente):
+incluída, mesmo com a aprovação de Lucca). O bucket `editor-exports` é privado
+(`public = false`, leitura só por usuário autenticado com acesso ao projeto,
+migrations 20260915238000 e 20260916015006), então não há URL pública para baixar
+sem a sessão de Lucca. Dois caminhos, ambos de Lucca, para
+`.checks/espaco-saude-mental-v2/base-v1/` (fora do git pelo `.gitignore`, l.11: é
+dado de cliente):
 
 - **Mais rápido:** admin → projeto Espaço Saúde Mental → seção "Exports do Editor" →
   card "Base V1 · Enviado em 13/10/2026 16:09". O card lista cada componente
@@ -117,12 +121,18 @@ O `no-editor-preview.js` descarta mensagens cujo `baseVersionId` difere do
 (não há rascunho). Logo a cópia publicada precisa do id da V2, que só existe depois da
 publicação, e a V2 nasce sem configuração no Editor:
 
-Rodada 2 (16/10): ajustada ao fluxo de Lucca, "Dwight termina → Oscar revisa →
-Michael faz PR, merge e deploy", com uma passada só do Oscar:
+Rodada 3 (16/10): o Oscar confere os itens **antes** da publicação e, depois, só a
+troca do id (achado F-04 da revisão da rodada 2: com uma passada só, depois de
+publicar, uma reprovação deixaria o Editor da Thaís vazio durante toda a correção).
+A instrução de Lucca continua valendo: Dwight termina → Oscar dá o ok → Michael faz
+PR, merge e deploy.
 
 1. Dwight aplica o Base V1 na cópia (ainda com o id da V1), preenche o checklist e
-   confere no harness local (`.checks/espaco-saude-mental-v2/harness/`).
-2. Lucca, no admin, num bloco só, publica a V2 e informa o id:
+   confere no harness local (`.checks/espaco-saude-mental-v2/harness/`,
+   `versionIdEsperado` = id da V1).
+2. Oscar confere item por item no harness, ainda com o id da V1. Sem PR e sem
+   publicação: a TASK volta ao Dwight só com a troca do id pendente.
+3. Lucca, no admin, num bloco só, publica a V2 e informa o id:
    `V1_PUBLICADA` → `EM_REVISAO_CLIENTE` (manual) → botão "Ingerir no Kanban" no card
    do Base V1 (`ingest_editor_export` exige `EM_REVISAO_CLIENTE`, cria os itens do
    Kanban e já leva a `ALTERACOES_RECEBIDAS`, migration 20261002141941) →
@@ -130,17 +140,19 @@ Michael faz PR, merge e deploy", com uma passada só do Oscar:
    V1, `https://app.notechstack.com.br/prototipos/espaco-saudemental/` (o Editor monta
    o iframe por `config.buildReference`, e ela não muda depois de publicar).
    Publicar não manda e-mail à cliente (`project-publish-version` só registra log).
-3. Dwight troca o `data-version-id` da cópia e o placeholder do SQL pelo id da V2.
-4. Oscar confere tudo de uma vez: itens do checklist e a troca do id.
-5. Michael: PR, merge e deploy.
+4. Dwight troca o `data-version-id` da cópia e o placeholder do SQL pelo id da V2 e
+   roda o harness com `versionIdEsperado` = id da V2 e o item negativo de versão com o
+   id da V1 como `baseVersionId` (a cópia da V2 tem que descartar mensagem da V1).
+5. Oscar confere só a troca do id e dá o ok; Michael faz PR, merge e deploy.
 6. Lucca roda `.checks/espaco-saude-mental-v2/editor_version_configs-v2.sql`
    inteiro (`bridge_enabled = true`). Opcional: "Associar checklist" do Base V1 à V2
    no mesmo card, o que libera o checklist no histórico da cliente.
 7. Conferência (C4): a V2 aparece no dashboard e o Editor abre com os componentes.
 
-Entre 2 e 6 o Editor da Thaís fica vazio (`get_client_editor_config` só devolve a
+Entre 3 e 6 o Editor da Thaís fica vazio (`get_client_editor_config` só devolve a
 versão atual que tem linha em `editor_version_configs`) e o link do protótipo da V2
-ainda mostra a página antiga: fazer 2 → 6 no mesmo período, de preferência fora do
+ainda mostra a página antiga. Nesse intervalo ficam só a troca do id, a conferência
+curta do Oscar e o deploy: fazer 3 → 6 no mesmo período, de preferência fora do
 horário da clínica. O SQL fica para depois do deploy de propósito: antes dele o
 Editor abriria com componentes, mas o preview não responderia (a cópia no ar, com o
 id da V1, descarta as mensagens da V2) e a Thaís poderia mandar um pacote sem ver o
@@ -151,10 +163,17 @@ efeito. Vazio é mais seguro que mudo.
 A V1 tem também o modo automático desde 02/10 (`"*": text, size, color, logo` no
 `data-components` da cópia, PR #52 e #54), então a Thaís pode ter mexido em qualquer
 texto ou foto (ids `auto:…`; foto como `auto:src/<arquivo>`). O C3 da TASK lista só
-`marca_topo`, `hero_titulo`, `hero_texto`, `hero_cta` e `valores_titulo`. Até Lucca
-decidir, alteração `auto:…` ou estrutural faz a TASK parar e voltar a ele para rever
-o porte (pedido aberto em 16/10 com a recomendação de aceitar o modo automático, que
-a V1 já liberava).
+`marca_topo`, `hero_titulo`, `hero_texto`, `hero_cta` e `valores_titulo`.
+
+**Decidido por Lucca em 16/10 (opção A):** ids `auto:…` entram nesta TASK, aplicados
+na cópia como os demais, e a configuração da V2 mantém o `"*"` da V1 (o SQL já grava
+o mesmo `data-components`). A TASK só para e volta a Lucca para rever o porte se o
+pacote trouxer:
+
+- mudança estrutural: seção ou bloco novo, removido ou reordenado, troca de layout,
+  componente que não existe na LP;
+- controle que a V1 não libera para aquele id (por exemplo `size` em `hero_cta` ou
+  `marca_topo`, `logo` em algo que não é imagem).
 
 ### Harness de conferência (C1)
 
@@ -170,17 +189,32 @@ a V1 já liberava).
   não passa. Texto que só difere no espaçamento (quebra de linha que vira `<br>`)
   passa com aviso. Resultado no `document.title`: `HARNESS OK x/x` ou
   `HARNESS FALHA x/x: n=…`.
+- Checklist: `{"versionIdEsperado": "<uuid>", "itens": [...]}` (rodada 3, achado F-02
+  do Oscar). Com `versionIdEsperado` diferente do `data-version-id` da cópia, nenhum
+  item roda e o título é `HARNESS FALHA 0/x: versionId <medido> ≠ <esperado>`. A forma
+  array antiga continua aceita, sem conferência de id.
 - Item: `{"n", "id", "selector"?, "field": "text|size|color|logo", "expected",
-  "negativo"?}`. Para id `auto:…`, o `selector` vem do `editor.css` do pacote.
+  "negativo"?, "baseVersionId"?}`. Para id `auto:…`, o `selector` vem do `editor.css`
+  do pacote. `baseVersionId` faz a sonda daquele item sair com outro id; com
+  `"negativo": true`, prova que o runtime descarta mensagem de outra versão
+  (`no-editor-preview.js`, `message.baseVersionId !== versionId`). No passo 4 da
+  ordem, esse item usa o id da V1 e o `versionIdEsperado` passa a ser o da V2.
 
 ```
 node .checks/espaco-saude-mental-v2/harness/serve.mjs 5317
-msedge --headless=new --disable-gpu --user-data-dir=<pasta temporária> --dump-dom --virtual-time-budget=20000 "http://127.0.0.1:5317/__harness/index.html?checklist=checklist.exemplo.json"
+msedge --headless=new --disable-gpu --no-first-run --no-default-browser-check --window-size=1366,900 --user-data-dir=<pasta temporária nova> --dump-dom --virtual-time-budget=20000 "http://127.0.0.1:5317/__harness/index.html?checklist=checklist.exemplo.json"
 ```
 
-Na V1 atual (16/10, 18:55): `checklist.exemplo.json` (13 itens dos cinco ids + 1
-negativo) → `HARNESS OK 14/14`; controle com um valor errado de propósito →
-`HARNESS FALHA 13/14: n=9`.
+`--no-first-run --no-default-browser-check` são obrigatórias nesta máquina: sem elas,
+com perfil novo, o Edge sai em ~10 ms (código 21) e não devolve DOM. A janela de
+1366×900 é a do item 4 (tamanho do título depende da largura).
+
+Na V1 atual (16/10, rodada 3): `checklist.exemplo.json` (13 itens dos cinco ids, 1
+negativo de allowlist e 1 negativo de versão) → `HARNESS OK 15/15`, rodado pelo Andy e
+de novo pelo Dwight. Controles do Andy: `versionIdEsperado` errado →
+`HARNESS FALHA 0/15: versionId eb2ab04c-… ≠ 22222222-…`; item 15 com o id certo →
+`HARNESS FALHA 14/15: n=15` (a sonda aplicou, então o negativo tem dente). Rodada 2:
+controle com um valor errado de propósito → `HARNESS FALHA 13/14: n=9`.
 
 ### Checklist (preenchido quando o pacote chegar)
 

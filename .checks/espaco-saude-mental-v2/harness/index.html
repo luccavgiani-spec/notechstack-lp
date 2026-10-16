@@ -62,7 +62,10 @@
     setTitle('HARNESS FALHA 0/0: checklist ilegível')
     return
   }
+  // Forma array: só os itens, sem conferência de id. Forma objeto: {"versionIdEsperado": "<uuid>", "itens": [...]}.
   const itens = Array.isArray(checklist) ? checklist : (checklist.itens || checklist.items || [])
+  const versionIdEsperado = Array.isArray(checklist) ? null : (checklist.versionIdEsperado ?? null)
+  meta.textContent += `\nversionIdEsperado: ${versionIdEsperado ?? '(sem conferência: checklist em forma array)'}`
 
   function read(el, field) {
     if (!el) return null
@@ -86,10 +89,11 @@
     }
     return fn()
   }
-  function post(changes) {
+  // baseVersionId padrão é o da cópia; um item pode sondar com outro id (item.baseVersionId) para provar que o runtime descarta.
+  function post(changes, baseVersionId = versionId) {
     frameWin.postMessage({
       source: 'no-editor', type: 'NO_EDITOR_PREVIEW', version: 1,
-      projectId, baseVersionId: versionId, changes, editorMode: false,
+      projectId, baseVersionId, changes, editorMode: false,
     }, location.origin)
   }
   function probeFor(item, atual) {
@@ -109,7 +113,8 @@
   // Linhas da tabela
   const rows = itens.map((item) => {
     const tr = document.createElement('tr')
-    tr.innerHTML = `<td>${item.n}</td><td>${item.id}${item.negativo ? ' (negativo)' : ''}</td><td>${item.field}</td><td class="pendente">...</td><td class="pendente">...</td><td></td>`
+    const marcas = `${item.negativo ? ' (negativo)' : ''}${item.baseVersionId ? ` [baseVersionId ${item.baseVersionId}]` : ''}`
+    tr.innerHTML = `<td>${item.n}</td><td>${item.id}${marcas}</td><td>${item.field}</td><td class="pendente">...</td><td class="pendente">...</td><td></td>`
     tbody.appendChild(tr)
     return tr
   })
@@ -117,6 +122,12 @@
     const td = tr.children[col]
     td.className = ok ? 'ok' : 'falha'
     td.textContent = (ok ? 'OK' : 'FALHA') + (detalhe ? ' ' + detalhe : '')
+  }
+
+  // F-02: com versionIdEsperado presente e diferente do data-version-id da cópia, não roda nenhum item.
+  if (versionIdEsperado != null && versionIdEsperado !== versionId) {
+    setTitle(`HARNESS FALHA 0/${itens.length}: versionId ${versionId} ≠ ${versionIdEsperado}`)
+    return
   }
 
   // Espera a LP montar e o mapa carimbar
@@ -155,7 +166,7 @@
     if (el) {
       const probe = probeFor(item, medidoAntes)
       const alvo = expectedAfterProbe(item.field, probe)
-      post({ [item.id]: { [item.field]: probe } })
+      post({ [item.id]: { [item.field]: probe } }, item.baseVersionId || versionId)
       if (item.negativo) {
         await sleep(400)
         const depois = read(find(item), item.field)
