@@ -110,7 +110,10 @@ publicação, e a V2 nasce sem configuração no Editor:
 1. Dwight aplica o Base V1 na cópia (ainda com o id da V1) e preenche o checklist.
 2. Oscar confere item por item: harness local de `postMessage` (no `localhost` o
    runtime aceita o próprio origin) e o preview de `agent/<task>` à vista.
-3. Lucca publica a V2 no admin e informa o id. A referência do build tem de ser a
+3. Lucca publica a V2 no admin e informa o id. Publicar V2 exige o projeto em
+   `V2_EM_DESENVOLVIMENTO`; a partir de `V1_PUBLICADA` o caminho é
+   `EM_REVISAO_CLIENTE` → `ALTERACOES_RECEBIDAS` → `V2_EM_DESENVOLVIMENTO`
+   (`publish_project_version` e transições em 20260915223119). A referência do build tem de ser a
    mesma da V1, `https://app.notechstack.com.br/prototipos/espaco-saudemental/`: o
    Editor monta o iframe a partir dela (`config.buildReference`).
 4. Dwight troca o `data-version-id` da cópia para a V2 e põe o id no SQL; Oscar

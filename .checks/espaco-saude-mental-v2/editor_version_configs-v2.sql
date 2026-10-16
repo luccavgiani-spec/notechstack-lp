@@ -1,83 +1,305 @@
--- Configuração do Editor da V2 · Espaço Saúde Mental (TASK-mvbfaammemy)
+-- =============================================================================
+-- Espaço Saúde Mental · configuração do Editor da V2 (editor_version_configs)
+-- TASK-mvbfaammemy · projeto 4fbc3859-a32f-4a71-b799-b005f32f65f8
+-- V1 publicada: eb2ab04c-059e-4d70-8707-f9e7dc15384b
 --
--- Passo 6 da ordem em .checks/espaco-saude-mental-editor.md: rodar no SQL Editor do
--- projeto "Nó Tech Stack" DEPOIS de publicar a V2 no admin (passo 3) e do merge/deploy
--- da cópia com o id da V2 (passo 5). Antes disso a V2 não existe.
+-- Quem roda: Lucca, à mão, no SQL Editor do Supabase de produção. A tabela tem
+-- RLS sem policy: só service_role/postgres gravam.
 --
--- Copia a allowlist da V1 como está (os 5 componentes nomeados e o modo automático
--- "*", ligado pela migration 20261002141941) e liga a ponte. allowed_components é um
--- array jsonb com {id, label, controls}; por isso é copiado da linha da V1, não
--- escrito à mão. get_client_editor_config só devolve a versão atual que tem linha
--- aqui: sem este passo o Editor da V2 abre vazio.
+-- Quando (ordem em .checks/espaco-saude-mental-editor.md):
+--   1. V2 publicada no admin. version_id é FK para project_versions: a linha só
+--      pode ser gravada depois que a V2 existe.
+--   2. Cópia app/public/prototipos/espaco-saudemental/index.html no ar com
+--      data-version-id = id da V2. O no-editor-preview.js e o EditorModule
+--      descartam mensagens cujo baseVersionId difere do data-version-id.
+--   3. Este arquivo. publish_project_version já cria a V2 como atual
+--      (is_current), e get_client_editor_config só devolve a versão atual que tem
+--      linha nesta tabela: entre publicar e rodar isto, o Editor da cliente fica
+--      vazio.
+--
+-- Tabela (criada em 20260915237000; 20261002141941 acrescentou o "*" e a função
+-- editor_allowed_controls; nenhuma migration altera colunas):
+--   version_id          uuid         PK, FK project_versions(id) on delete cascade
+--   allowed_components  jsonb        not null default '[]', check: precisa ser array
+--   bridge_enabled      boolean      not null default false
+--   created_at          timestamptz  not null default now()
+-- Não há trigger nesta tabela nem coluna de URL/build. A URL do preview é o
+-- build_reference da própria V2 em project_versions: definido ao publicar e
+-- imutável depois (trigger project_versions_protect_history). Para manter o
+-- preview da V1, a V2 precisa ser publicada com o mesmo build_reference; a
+-- guarda aborta se for diferente (mesmo_build_da_v1 na conferência).
+--
+-- Guardas (seção 2), qualquer uma aborta tudo: placeholder não trocado ou uuid
+-- inválido; id da V1; versão inexistente ou de outro projeto; versão que não é a
+-- atual; V1 sem linha nesta tabela; build_reference diferente do da V1;
+-- allowlist mal formada; banco sem editor_allowed_controls.
+--
+-- Formato: o data-components da cópia é um mapa {id: [controles]}, mas a coluna
+-- guarda um array [{id, label?, screen?, controls}]; gravar o mapa direto falha
+-- no check (23514). O script converte: cada id do mapa vira um item com os
+-- controles do mapa e herda label/screen (e a ordem) do item de mesmo id da V1.
+-- "*" é o modo automático (ids auto:...), lido por editor_allowed_controls.
+-- created_at não é copiado da V1: fica now().
+--
+-- Como rodar:
+--   1. Selecione só a consulta da seção 1 e rode a seleção. A V2 é a versão
+--      nova (is_current = true, tem_config = false); confira nela
+--      mesmo_build_da_v1 = true e build_https = true. Copie o version_id.
+--   2. Troque o placeholder da seção 0 (única ocorrência no arquivo).
+--   3. Rode o arquivo inteiro. Se qualquer guarda falhar, nada é gravado.
+--      O resultado exibido é a conferência da seção 5.
+--
+-- Desfazer (só se a V2 não tinha linha antes, tem_config = false na seção 1):
+--   delete from public.editor_version_configs where version_id = '<id da V2>';
+-- =============================================================================
 
--- 0) Conferência antes (só leitura): versões do projeto e a config de cada uma.
-select v.id, v.label, v.published_at, v.is_current, v.build_reference,
-       c.bridge_enabled, jsonb_array_length(c.allowed_components) as itens
-from public.project_versions v
-left join public.editor_version_configs c on c.version_id = v.id
-where v.project_id = '4fbc3859-a32f-4a71-b799-b005f32f65f8'
-order by v.published_at;
-
--- 1) Gravação. Troque o id da V2 na linha marcada antes de rodar.
 begin;
 
+-- 0. PARÂMETROS (set_config(..., true) vale só dentro desta transação) --------
+
+-- >>>>>>>>>>>>>>>> SUBSTITUA pelo id da V2 (project_versions.id) <<<<<<<<<<<<<<<<
+select set_config('esm_v2.version_id', '00000000-0000-0000-0000-000000000000', true);
+
+-- Allowlist alvo: cópia literal do data-components da cópia de preview
+-- (app/public/prototipos/espaco-saudemental/index.html). Não mexer.
+select set_config(
+  'esm_v2.allowlist',
+  '{"*":["text","size","color","logo"],"marca_topo":["text","color"],"hero_titulo":["text","size","color"],"hero_texto":["text","size","color"],"hero_cta":["text","color"],"valores_titulo":["text","size","color"]}',
+  true
+);
+
+-- 1. CONFERÊNCIA ANTES (só leitura) -------------------------------------------
+-- Versões do projeto e a configuração do Editor de cada uma. mapa_controles está
+-- no mesmo formato do data-components, para comparar a olho.
+with linhas as (
+  select
+    v.label,
+    v.macro,
+    v.status,
+    v.is_current,
+    v.id,
+    v.created_at,
+    v.build_reference,
+    c.version_id is not null as tem_config,
+    c.bridge_enabled,
+    c.allowed_components,
+    (select jsonb_object_agg(i ->> 'id', coalesce(i -> 'controls', '["text","size","color","logo"]'::jsonb))
+       from jsonb_array_elements(c.allowed_components) as i) as mapa_controles
+  from public.project_versions as v
+  left join public.editor_version_configs as c on c.version_id = v.id
+  where v.project_id = '4fbc3859-a32f-4a71-b799-b005f32f65f8'
+)
+select
+  l.label,
+  l.macro,
+  l.status,
+  l.is_current,
+  l.id                                   as version_id,
+  l.tem_config,
+  l.bridge_enabled,
+  l.mapa_controles,
+  l.mapa_controles = v1.mapa_controles   as mapa_igual_ao_da_v1,
+  l.build_reference,
+  l.build_reference = v1.build_reference as mesmo_build_da_v1,
+  l.build_reference ~ '^https://'        as build_https,
+  l.allowed_components
+from linhas as l
+left join linhas as v1 on v1.id = 'eb2ab04c-059e-4d70-8707-f9e7dc15384b'
+order by l.created_at;
+
+-- 2. GUARDA -------------------------------------------------------------------
 do $$
 declare
-  v_project constant uuid := '4fbc3859-a32f-4a71-b799-b005f32f65f8';
-  v_v1 constant uuid := 'eb2ab04c-059e-4d70-8707-f9e7dc15384b';
-  v_v2 constant uuid := '00000000-0000-0000-0000-000000000000'; -- TROQUE pelo id da V2
-  v_allowed jsonb;
+  c_projeto constant uuid := '4fbc3859-a32f-4a71-b799-b005f32f65f8';
+  c_v1      constant uuid := 'eb2ab04c-059e-4d70-8707-f9e7dc15384b';
+  v_bruto   text  := trim(coalesce(current_setting('esm_v2.version_id', true), ''));
+  v_alvo    jsonb := current_setting('esm_v2.allowlist', true)::jsonb;
+  v_v2      uuid;
+  v_versao  public.project_versions%rowtype;
+  v_build_v1 text;
 begin
-  if v_v2 = '00000000-0000-0000-0000-000000000000' or v_v2 = v_v1 then
-    raise exception 'Troque o id da V2 antes de rodar.';
+  -- Placeholder trocado e uuid válido.
+  if v_bruto = '' or replace(v_bruto, '-', '') ~ '^0+$' then
+    raise exception 'ABORTADO: troque o placeholder da seção 0 pelo id da V2 (project_versions.id).';
+  end if;
+  begin
+    v_v2 := v_bruto::uuid;
+  exception
+    when invalid_text_representation then
+      raise exception 'ABORTADO: "%" não é um uuid.', v_bruto;
+  end;
+
+  -- Não é a V1 (o on conflict sobrescreveria a linha dela).
+  if v_v2 = c_v1 then
+    raise exception 'ABORTADO: % é o id da V1. Use o id da V2.', v_v2;
   end if;
 
-  if not exists (
-    select 1 from public.project_versions
-    where id = v_v2 and project_id = v_project and is_current
-  ) then
-    raise exception 'O id informado não é a versão atual deste projeto.';
+  -- A versão existe e é deste projeto.
+  select * into v_versao from public.project_versions where id = v_v2;
+  if not found then
+    raise exception 'ABORTADO: a versão % não existe em project_versions (a V2 já foi publicada?).', v_v2;
+  end if;
+  if v_versao.project_id <> c_projeto then
+    raise exception 'ABORTADO: a versão % (%) é do projeto %, não do Espaço Saúde Mental (%).',
+      v_v2, v_versao.label, v_versao.project_id, c_projeto;
   end if;
 
-  -- O Editor monta o iframe a partir da referência do build; a V2 usa a mesma URL da V1.
-  if not exists (
+  -- É a versão atual: get_client_editor_config só lê a configuração dela.
+  if not v_versao.is_current then
+    raise exception 'ABORTADO: a versão % (%) não é a atual do projeto; o Editor só lê a versão atual.',
+      v_v2, v_versao.label;
+  end if;
+
+  -- A V1 é deste projeto e tem linha (é dela que vêm label/screen dos itens).
+  select v.build_reference into v_build_v1
+  from public.project_versions as v
+  join public.editor_version_configs as c on c.version_id = v.id
+  where v.id = c_v1 and v.project_id = c_projeto;
+  if not found then
+    raise exception 'ABORTADO: a V1 (%) não está neste projeto com linha em editor_version_configs.', c_v1;
+  end if;
+
+  -- Mesma cópia de preview da V1. O Editor abre no iframe o build_reference da
+  -- versão atual, e ele não muda depois de publicar.
+  if v_versao.build_reference is distinct from v_build_v1 then
+    raise exception 'ABORTADO: build_reference da V2 (%) difere do da V1 (%); o Editor abriria outra página.',
+      v_versao.build_reference, v_build_v1;
+  end if;
+
+  -- Allowlist alvo no formato {id: [controles]}, só com controles de conteúdo.
+  if v_alvo is null or jsonb_typeof(v_alvo) <> 'object' then
+    raise exception 'ABORTADO: a allowlist da seção 0 precisa ser um objeto {id: [controles]}.';
+  end if;
+  if exists (
     select 1
-    from public.project_versions v2
-    join public.project_versions v1 on v1.id = v_v1
-    where v2.id = v_v2 and v2.build_reference = v1.build_reference
+    from jsonb_each(v_alvo) as e
+    where case
+            when jsonb_typeof(e.value) <> 'array' then true
+            else exists (
+              select 1
+              from jsonb_array_elements_text(e.value) as ctl(valor)
+              where ctl.valor not in ('text', 'size', 'color', 'logo')
+            )
+          end
   ) then
-    raise exception 'A referência do build da V2 difere da V1; o Editor abriria outra página.';
+    raise exception 'ABORTADO: na allowlist da seção 0 cada id precisa de um array com text, size, color ou logo.';
   end if;
 
-  select allowed_components into v_allowed
-  from public.editor_version_configs
-  where version_id = v_v1;
+  -- O banco aceita "*" nos envios (migration 20261002141941_editor_auto_components).
+  if to_regprocedure('public.editor_allowed_controls(uuid,text)') is null then
+    raise exception 'ABORTADO: falta public.editor_allowed_controls (migration 20261002141941); sem ela o "*" não vale nos envios.';
+  end if;
+end
+$$;
 
-  if v_allowed is null then
-    raise exception 'A V1 não tem configuração do Editor para copiar.';
+-- 3. GRAVAÇÃO -----------------------------------------------------------------
+-- Uma linha por versão (PK version_id). Lê a linha da V1 só para herdar
+-- label/screen e a ordem dos itens; ids e controles vêm da allowlist alvo.
+-- Em nova execução, sobrescreve allowed_components e bridge_enabled e mantém o
+-- created_at da primeira gravação.
+insert into public.editor_version_configs (version_id, allowed_components, bridge_enabled)
+select
+  current_setting('esm_v2.version_id')::uuid,
+  (
+    select jsonb_agg(
+             coalesce(origem.item, '{}'::jsonb)
+               || jsonb_build_object('id', alvo.id, 'controls', alvo.controles)
+             order by origem.posicao nulls last, alvo.id
+           )
+    from jsonb_each(current_setting('esm_v2.allowlist')::jsonb) as alvo(id, controles)
+    left join lateral (
+      select e.item, e.posicao
+      from jsonb_array_elements(v1.allowed_components) with ordinality as e(item, posicao)
+      where e.item ->> 'id' = alvo.id
+      order by e.posicao
+      limit 1
+    ) as origem on true
+  ),
+  true
+from public.editor_version_configs as v1
+where v1.version_id = 'eb2ab04c-059e-4d70-8707-f9e7dc15384b'
+on conflict (version_id) do update
+  set allowed_components = excluded.allowed_components,
+      bridge_enabled     = excluded.bridge_enabled;
+
+-- 4. CONFERÊNCIA DENTRO DA TRANSAÇÃO ------------------------------------------
+-- Se a linha gravada não bater com o alvo, aborta e nada é gravado.
+do $$
+declare
+  v_v2   uuid  := current_setting('esm_v2.version_id')::uuid;
+  v_alvo jsonb := current_setting('esm_v2.allowlist')::jsonb;
+  v_cfg  public.editor_version_configs%rowtype;
+  v_mapa jsonb;
+  v_id   text;
+  v_ctl  jsonb;
+begin
+  select * into v_cfg from public.editor_version_configs where version_id = v_v2;
+  if not found or v_cfg.bridge_enabled is not true then
+    raise exception 'ABORTADO: a linha da V2 não ficou gravada com bridge_enabled = true.';
   end if;
 
-  if (
-    select count(distinct item ->> 'id')
-    from jsonb_array_elements(v_allowed) item
-    where item ->> 'id' in ('marca_topo', 'hero_titulo', 'hero_texto', 'hero_cta', 'valores_titulo', '*')
-  ) <> 6 then
-    raise exception 'A allowlist da V1 não tem os 5 componentes e o modo automático.';
+  -- Mesmos ids e controles do data-components, sem item duplicado.
+  select jsonb_object_agg(i ->> 'id', i -> 'controls')
+    into v_mapa
+    from jsonb_array_elements(v_cfg.allowed_components) as i;
+  if v_mapa is distinct from v_alvo
+     or jsonb_array_length(v_cfg.allowed_components) <> (select count(*) from jsonb_object_keys(v_alvo)) then
+    raise exception 'ABORTADO: allowlist gravada % difere do alvo %.', v_mapa, v_alvo;
   end if;
 
-  insert into public.editor_version_configs (version_id, allowed_components, bridge_enabled)
-  values (v_v2, v_allowed, true)
-  on conflict (version_id) do update
-    set allowed_components = excluded.allowed_components,
-        bridge_enabled = true;
-end $$;
+  -- Mesma função que o trigger editor_export_validate usa nos envios com base na
+  -- V2. Para "*", testa um id automático.
+  for v_id, v_ctl in select e.key, e.value from jsonb_each(v_alvo) as e loop
+    if public.editor_allowed_controls(
+         v_v2,
+         case when v_id = '*' then 'auto:#conferencia/p.1' else v_id end
+       ) is distinct from v_ctl then
+      raise exception 'ABORTADO: editor_allowed_controls(V2, %) não devolve %.', v_id, v_ctl;
+    end if;
+  end loop;
+end
+$$;
 
 commit;
 
--- 2) Conferência depois: a V2 aparece atual, com a ponte ligada e os mesmos itens da V1.
-select v.label, v.is_current, c.bridge_enabled,
-       (select jsonb_agg(item ->> 'id') from jsonb_array_elements(c.allowed_components) item) as componentes
-from public.editor_version_configs c
-join public.project_versions v on v.id = c.version_id
-where v.project_id = '4fbc3859-a32f-4a71-b799-b005f32f65f8'
-order by v.published_at;
+-- 5. CONFERÊNCIA DEPOIS (só leitura, dado já gravado; mesma consulta da seção 1)
+-- Esperado na linha da V2: is_current = true, tem_config = true,
+-- bridge_enabled = true, mapa_controles igual ao data-components,
+-- mesmo_build_da_v1 = true e build_https = true.
+-- mapa_igual_ao_da_v1 = false na V2 significa que a allowlist da V1 no banco não
+-- batia com o data-components; a V2 ficou igual ao data-components (seção 4).
+with linhas as (
+  select
+    v.label,
+    v.macro,
+    v.status,
+    v.is_current,
+    v.id,
+    v.created_at,
+    v.build_reference,
+    c.version_id is not null as tem_config,
+    c.bridge_enabled,
+    c.allowed_components,
+    (select jsonb_object_agg(i ->> 'id', coalesce(i -> 'controls', '["text","size","color","logo"]'::jsonb))
+       from jsonb_array_elements(c.allowed_components) as i) as mapa_controles
+  from public.project_versions as v
+  left join public.editor_version_configs as c on c.version_id = v.id
+  where v.project_id = '4fbc3859-a32f-4a71-b799-b005f32f65f8'
+)
+select
+  l.label,
+  l.macro,
+  l.status,
+  l.is_current,
+  l.id                                   as version_id,
+  l.tem_config,
+  l.bridge_enabled,
+  l.mapa_controles,
+  l.mapa_controles = v1.mapa_controles   as mapa_igual_ao_da_v1,
+  l.build_reference,
+  l.build_reference = v1.build_reference as mesmo_build_da_v1,
+  l.build_reference ~ '^https://'        as build_https,
+  l.allowed_components
+from linhas as l
+left join linhas as v1 on v1.id = 'eb2ab04c-059e-4d70-8707-f9e7dc15384b'
+order by l.created_at;
